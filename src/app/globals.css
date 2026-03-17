@@ -5,11 +5,11 @@
 
 @layer base {
   :root {
-    --background: 285 8% 10%;
+    --background: 285 8% 11%;
     --foreground: 0 0% 98%;
-    --card: 285 8% 12%;
+    --card: 285 8% 13%;
     --card-foreground: 0 0% 98%;
-    --popover: 285 8% 12%;
+    --popover: 285 8% 13%;
     --popover-foreground: 0 0% 98%;
     --primary: 263 68% 47%;
     --primary-foreground: 0 0% 100%;
@@ -24,7 +24,7 @@
     --border: 285 8% 25%;
     --input: 285 8% 25%;
     --ring: 263 68% 47%;
-    --radius: 0.25rem;
+    --radius: 0rem;
   }
 }
 
@@ -47,4 +47,17 @@
 .luxury-blur {
   backdrop-filter: blur(12px);
   background: rgba(28, 25, 29, 0.7);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(102, 38, 204, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
 }
