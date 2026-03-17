@@ -31,7 +31,10 @@ import {
   Activity,
   ZapOff,
   BookOpen,
-  Plus
+  Plus,
+  Share2,
+  MessageSquare,
+  Heart
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,12 +68,12 @@ import {
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 type AdminRole = 'admin' | 'marketing';
-type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'localization' | 'storytelling' | 'settings';
+type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'localization' | 'storytelling' | 'engagement' | 'settings';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
-  const { products, campaigns, addCampaign, addNotification, activeVip, setActiveVip, editorials, addEditorial } = useAppStore();
+  const { products, campaigns, addCampaign, addNotification, activeVip, setActiveVip, editorials, addEditorial, socialMetrics, socialInteractions, simulateGlobalEngagement } = useAppStore();
   const { toast } = useToast();
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -98,6 +101,7 @@ export default function AdminDashboard() {
     const items = [
       { id: 'dashboard', icon: <LayoutDashboard />, label: 'Overview', roles: ['admin', 'marketing'] },
       { id: 'analytics', icon: <BarChart3 />, label: 'Insights', roles: ['admin', 'marketing'] },
+      { id: 'engagement', icon: <Share2 />, label: 'Social Index', roles: ['admin', 'marketing'] },
       { id: 'inventory', icon: <Package />, label: 'Inventory', roles: ['admin'] },
       { id: 'vip-salon', icon: <Crown />, label: 'VIP Salon', roles: ['admin', 'marketing'] },
       { id: 'ai-studio', icon: <Sparkles />, label: 'AI Studio', roles: ['admin', 'marketing'] },
@@ -109,6 +113,14 @@ export default function AdminDashboard() {
     ];
     return items.filter(item => item.roles.includes(role));
   }, [role]);
+
+  const handleSimulateViral = (productId: string) => {
+    simulateGlobalEngagement(productId);
+    toast({
+      title: "Viral Event Triggered",
+      description: `Simulating high-volume engagement for ${products.find(p => p.id === productId)?.name}.`,
+    });
+  };
 
   const handleGenerateEditorial = async () => {
     if (!editorialDraft.topic) return;
@@ -151,58 +163,6 @@ export default function AdminDashboard() {
     addEditorial(newEd);
     toast({ title: "Narrative Published", description: "The AMARISÉ Journal has been updated." });
     setEditorialDraft({ topic: '', category: 'Artisanal', isVip: false, title: '', excerpt: '', content: '' });
-  };
-
-  const handleSuggestCopy = async () => {
-    const prod = products.find(p => p.id === newCampaign.product);
-    if (!prod) return;
-    
-    setIsGenerating(true);
-    try {
-      const res = await generateCampaignCopy({
-        campaignType: newCampaign.type,
-        productName: prod.name,
-        category: prod.category,
-        country: COUNTRIES[selectedCountry].name
-      });
-      setNewCampaign(prev => ({
-        ...prev,
-        subject: res.subjectLine,
-        body: res.bodyText
-      }));
-      toast({ title: "AI Copy Ready", description: "Localized luxury copy has been crafted." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Copy Engine Offline" });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleLaunchCampaign = () => {
-    const campaign: any = {
-      id: 'cmp-' + Date.now(),
-      title: newCampaign.title,
-      type: newCampaign.type,
-      status: 'scheduled',
-      reach: 0,
-      engagement: 0,
-      country: selectedCountry,
-      performance: 0,
-      subject: newCampaign.subject,
-      body: newCampaign.body,
-      scheduledAt: new Date(Date.now() + 86400000).toISOString()
-    };
-    addCampaign(campaign);
-    addNotification({
-      id: 'not-' + Date.now(),
-      type: newCampaign.type === 'email' ? 'Email' : 'Push',
-      subject: newCampaign.subject,
-      recipients: 'Global Client List',
-      scheduledAt: campaign.scheduledAt,
-      status: 'Queued'
-    });
-    toast({ title: "Campaign Scheduled", description: `${newCampaign.title} is queued for ${COUNTRIES[selectedCountry].name}.` });
-    setNewCampaign({ title: '', type: 'email', product: products[0].id, subject: '', body: '' });
   };
 
   return (
@@ -283,7 +243,7 @@ export default function AdminDashboard() {
           <div className="animate-fade-in space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard icon={<DollarSign className="text-primary" />} label="Market Revenue" value="$42.8M" trend="+18.4%" positive />
-              <StatCard icon={<Star className="text-secondary" />} label="VIP Retention" value="98.2%" trend="Stable" positive />
+              <StatCard icon={<Share2 className="text-secondary" />} label="Social Sentiment" value="High" trend="+5.2%" positive />
               <StatCard icon={<Database className="text-accent" />} label="Entity Load" value={products.length.toString()} trend="High" positive />
               <StatCard icon={<Globe className="text-primary" />} label="Global Reach" value="2.4M" trend="+12.2%" positive />
             </div>
@@ -342,6 +302,93 @@ export default function AdminDashboard() {
                 </Card>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'engagement' && (
+          <div className="animate-fade-in space-y-12">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               <Card className="bg-card border-border">
+                  <CardHeader><CardTitle className="text-white text-xl">Global Likes</CardTitle></CardHeader>
+                  <CardContent>
+                     <div className="text-5xl font-headline italic text-primary">
+                        {Object.values(socialMetrics).reduce((acc, m) => acc + m.likes, 0).toLocaleString()}
+                     </div>
+                  </CardContent>
+               </Card>
+               <Card className="bg-card border-border">
+                  <CardHeader><CardTitle className="text-white text-xl">Artisanal Shares</CardTitle></CardHeader>
+                  <CardContent>
+                     <div className="text-5xl font-headline italic text-secondary">
+                        {Object.values(socialMetrics).reduce((acc, m) => acc + m.shares, 0).toLocaleString()}
+                     </div>
+                  </CardContent>
+               </Card>
+               <Card className="bg-card border-border">
+                  <CardHeader><CardTitle className="text-white text-xl">Sentiment Score</CardTitle></CardHeader>
+                  <CardContent>
+                     <div className="text-5xl font-headline italic text-accent">9.4/10</div>
+                  </CardContent>
+               </Card>
+             </div>
+
+             <Card className="bg-card border-border shadow-2xl">
+                <CardHeader className="border-b border-border">
+                  <CardTitle className="text-white">Artisanal Resonance Simulation</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Manually trigger high-volume social events for specific pieces.</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.slice(0, 9).map(p => (
+                      <div key={p.id} className="p-6 bg-muted/20 border border-border flex flex-col justify-between">
+                        <div>
+                          <div className="text-sm font-bold text-white mb-1">{p.name}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-4">{p.category}</div>
+                          <div className="flex items-center space-x-4 text-xs text-muted-foreground mb-6">
+                             <div className="flex items-center space-x-1"><Heart className="w-3 h-3 text-primary" /> <span>{socialMetrics[p.id]?.likes}</span></div>
+                             <div className="flex items-center space-x-1"><Share2 className="w-3 h-3 text-secondary" /> <span>{socialMetrics[p.id]?.shares}</span></div>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-primary/40 text-primary hover:bg-primary hover:text-white rounded-none text-[9px] font-bold tracking-widest"
+                          onClick={() => handleSimulateViral(p.id)}
+                        >
+                          TRIGGER VIRAL EVENT
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+             </Card>
+
+             <Card className="bg-card border-border">
+                <CardHeader className="border-b border-border">
+                  <CardTitle className="text-white">Recent Interaction Stream</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    {socialInteractions.slice(0, 10).map(int => (
+                      <div key={int.id} className="flex items-center justify-between p-4 bg-muted/10 border-b border-border/30 last:border-0">
+                         <div className="flex items-center space-x-4">
+                            <div className={cn("p-2", int.type === 'like' ? 'text-primary' : 'text-secondary')}>
+                               {int.type === 'like' ? <Heart className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                            </div>
+                            <div>
+                               <div className="text-xs font-bold text-white uppercase tracking-widest">
+                                 {int.type === 'like' ? 'Appreciation Recorded' : 'Global Share Generated'}
+                               </div>
+                               <div className="text-[10px] text-muted-foreground italic">
+                                 Context: {COUNTRIES[int.country]?.name} | Product: {products.find(p => p.id === int.contentId)?.name}
+                               </div>
+                            </div>
+                         </div>
+                         <div className="text-[9px] text-muted-foreground uppercase">{new Date(int.timestamp).toLocaleTimeString()}</div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+             </Card>
           </div>
         )}
 
@@ -446,29 +493,10 @@ export default function AdminDashboard() {
             </Card>
           </div>
         )}
-
-        {/* Other tabs follow similar enterprise-grade structure... */}
       </main>
     </div>
   );
 }
-
-const mockChartData = [
-  { name: 'Jan', revenue: 12.5, growth: 10 },
-  { name: 'Feb', revenue: 14.8, growth: 15 },
-  { name: 'Mar', revenue: 18.2, growth: 22 },
-  { name: 'Apr', revenue: 16.5, growth: -8 },
-  { name: 'May', revenue: 21.4, growth: 25 },
-  { name: 'Jun', revenue: 25.8, growth: 18 },
-];
-
-const mockRegionalData = [
-  { name: 'United States', value: 45 },
-  { name: 'United Kingdom', value: 22 },
-  { name: 'UAE', value: 18 },
-  { name: 'India', value: 8 },
-  { name: 'Singapore', value: 7 },
-];
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
   return (

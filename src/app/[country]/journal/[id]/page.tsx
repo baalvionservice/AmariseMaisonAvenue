@@ -6,21 +6,50 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { ChevronLeft, Share2, Bookmark, Sparkles } from 'lucide-react';
+import { ChevronLeft, Share2, Bookmark, Sparkles, Heart, Facebook, Twitter, Linkedin, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function JournalArticlePage() {
   const { id, country } = useParams();
-  const { editorials, products } = useAppStore();
+  const { editorials, products, socialMetrics, toggleLike, trackShare, wishlist } = useAppStore();
+  const { toast } = useToast();
   const countryCode = (country as string) || 'us';
   
   const article = editorials.find(ed => ed.id === id);
   const featured = products.filter(p => article?.featuredProducts.includes(p.id));
+  const metrics = socialMetrics[id as string] || { likes: 0, shares: 0, engagementRate: 0 };
+  const isLiked = wishlist.some(w => w.id === id);
 
   if (!article) {
     return <div className="py-40 text-center">Article not found.</div>;
   }
+
+  const handleToggleLike = () => {
+    // We use contentId for toggleLike. In a real app we'd have a separate 'likedJournal' state.
+    // For this demo we'll just track it in the interaction log.
+    toggleLike(article.id, countryCode);
+    toast({
+      title: isLiked ? "Reaction Removed" : "Article Appreciated",
+      description: isLiked ? "Your mark has been cleared." : "The Maison appreciates your interest in our heritage.",
+    });
+  };
+
+  const handleShare = (platform: string) => {
+    trackShare(article.id, countryCode);
+    toast({
+      title: `Shared to ${platform}`,
+      description: "The AMARISÉ Journal is reaching a wider audience.",
+    });
+  };
 
   return (
     <div className="animate-fade-in">
@@ -55,18 +84,55 @@ export default function JournalArticlePage() {
       <section className="container mx-auto px-6 py-32">
         <div className="max-w-3xl mx-auto space-y-16">
           <div className="flex justify-between items-center py-6 border-y border-border">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center font-headline font-bold italic text-primary">
-                {article.author.charAt(0)}
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center font-headline font-bold italic text-primary">
+                  {article.author.charAt(0)}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-primary">Words By</span>
+                  <span className="text-xs font-bold uppercase">{article.author}</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-primary">Words By</span>
-                <span className="text-xs font-bold uppercase">{article.author}</span>
+              <div className="h-10 w-px bg-border hidden sm:block" />
+              <div className="hidden sm:flex items-center space-x-6">
+                 <div className="flex flex-col">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-primary">Appreciation</span>
+                    <span className="text-xs font-bold uppercase">{metrics.likes.toLocaleString()} Likes</span>
+                 </div>
+                 <div className="flex flex-col">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-primary">Resonance</span>
+                    <span className="text-xs font-bold uppercase">{metrics.shares.toLocaleString()} Shares</span>
+                 </div>
               </div>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-2">
+              <Button variant="ghost" size="icon" className={cn("hover:text-primary", isLiked && "text-primary")} onClick={handleToggleLike}>
+                <Heart className={cn("w-5 h-5", isLiked && "fill-current")} />
+              </Button>
               <Button variant="ghost" size="icon" className="hover:text-primary"><Bookmark className="w-5 h-5" /></Button>
-              <Button variant="ghost" size="icon" className="hover:text-primary"><Share2 className="w-5 h-5" /></Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="hover:text-primary">
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-card border-border luxury-blur w-48">
+                  <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Facebook')}>
+                    <Facebook className="w-4 h-4 mr-3" /> Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Twitter')}>
+                    <Twitter className="w-4 h-4 mr-3" /> Twitter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('LinkedIn')}>
+                    <Linkedin className="w-4 h-4 mr-3" /> LinkedIn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Copy Link')}>
+                    <Copy className="w-4 h-4 mr-3" /> Copy Link
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 

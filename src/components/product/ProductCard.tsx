@@ -5,7 +5,7 @@ import React, { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { Heart, ShoppingBag, Star, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, Star, Eye, Share2 } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { formatPrice } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -19,14 +19,16 @@ interface ProductCardProps {
 
 /**
  * ProductCard optimized for high-volume enterprise rendering and Core Web Vitals.
- * Uses strict aspect-ratio to prevent Cumulative Layout Shift (CLS).
+ * Enhanced with mock social interaction metrics.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
-  const { addToCart, toggleWishlist, wishlist } = useAppStore();
+  const { addToCart, toggleWishlist, wishlist, socialMetrics, toggleLike, trackShare } = useAppStore();
   const { toast } = useToast();
+  
   const isWishlisted = wishlist.some(i => i.id === product.id);
+  const metrics = socialMetrics[product.id] || { likes: 0, shares: 0, engagementRate: 0 };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,6 +44,24 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     toggleWishlist(product);
+    toggleLike(product.id, countryCode);
+    
+    if (!isWishlisted) {
+      toast({
+        title: "Artisan Piece Liked",
+        description: "Your appreciation has been recorded in the Maison archive.",
+      });
+    }
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    trackShare(product.id, countryCode);
+    toast({
+      title: "Link Generated",
+      description: "A private sharing link has been created for your network.",
+    });
   };
 
   return (
@@ -63,6 +83,12 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           </div>
         )}
 
+        {/* Social Metrics Bubble */}
+        <div className="absolute top-4 right-4 flex items-center space-x-2 luxury-blur px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 border border-white/10">
+           <Heart className={cn("w-3 h-3", isWishlisted ? "fill-primary text-primary" : "text-white")} />
+           <span className="text-[9px] font-bold text-white">{metrics.likes.toLocaleString()}</span>
+        </div>
+
         {/* Quick Actions Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur bg-black/40 z-20">
           <Button 
@@ -78,6 +104,13 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
               onClick={handleToggleWishlist}
             >
               <Heart className={cn("w-4 h-4 mr-2", isWishlisted && "fill-current")} /> {isWishlisted ? "SAVED" : "SAVE"}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-12 h-12 rounded-none border-white/20 text-white hover:bg-primary hover:text-white transition-all p-0 flex items-center justify-center"
+              onClick={handleShare}
+            >
+              <Share2 className="w-4 h-4" />
             </Button>
           </div>
         </div>

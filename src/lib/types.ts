@@ -105,3 +105,18 @@ export interface Editorial {
   isVip: boolean;
   featuredProducts: string[];
 }
+
+export interface SocialMetrics {
+  likes: number;
+  shares: number;
+  engagementRate: number;
+}
+
+export interface SocialInteraction {
+  id: string;
+  contentId: string;
+  type: 'like' | 'share' | 'comment';
+  country: string;
+  timestamp: string;
+  commentText?: string;
+}

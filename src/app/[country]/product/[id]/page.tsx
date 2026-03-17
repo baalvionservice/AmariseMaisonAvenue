@@ -15,7 +15,11 @@ import {
   Star,
   ChevronRight,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Copy
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -25,15 +29,22 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from '@/components/product/ProductCard';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
-  const { addToCart, toggleWishlist, wishlist } = useAppStore();
+  const { addToCart, toggleWishlist, wishlist, socialMetrics, toggleLike, trackShare } = useAppStore();
   
   const product = PRODUCTS.find(p => p.id === id);
+  const metrics = socialMetrics[id as string] || { likes: 0, shares: 0, engagementRate: 0 };
   const [aiDescription, setAiDescription] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -80,38 +91,27 @@ export default function ProductPage() {
     });
   };
 
+  const handleToggleLike = () => {
+    toggleWishlist(product);
+    toggleLike(product.id, countryCode);
+    if (!isWishlisted) {
+      toast({
+        title: "Selection Liked",
+        description: "Your taste for excellence is noted.",
+      });
+    }
+  };
+
+  const handleShare = (platform: string) => {
+    trackShare(product.id, countryCode);
+    toast({
+      title: `Shared to ${platform}`,
+      description: `The Maison's vision has been broadcasted to your ${platform} network.`,
+    });
+  };
+
   return (
     <div className="container mx-auto px-6 py-12">
-      {/* JSON-LD Product Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": product.name,
-            "image": [product.imageUrl],
-            "description": aiDescription || `Exclusive ${product.category} piece from Amarisé Luxe.`,
-            "brand": {
-              "@type": "Brand",
-              "name": "AMARISÉ Luxe"
-            },
-            "offers": {
-              "@type": "Offer",
-              "url": `https://amarise-luxe.com/${countryCode}/product/${product.id}`,
-              "priceCurrency": countryCode === 'uk' ? 'GBP' : countryCode === 'ae' ? 'AED' : 'USD',
-              "price": product.basePrice,
-              "availability": "https://schema.org/InStock"
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": product.rating,
-              "reviewCount": product.reviewsCount
-            }
-          })
-        }}
-      />
-
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground">
         <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Home</Link>
@@ -151,12 +151,31 @@ export default function ProductPage() {
             <div className="flex items-center justify-between">
               <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase">{product.category}</span>
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" className="hover:text-primary" onClick={() => toggleWishlist(product)}>
+                <Button variant="ghost" size="icon" className="hover:text-primary" onClick={handleToggleLike}>
                   <Heart className={cn("w-5 h-5 transition-all", isWishlisted && "fill-primary text-primary scale-110")} />
                 </Button>
-                <Button variant="ghost" size="icon" className="hover:text-primary">
-                  <Share2 className="w-5 h-5" />
-                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="hover:text-primary">
+                      <Share2 className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-card border-border luxury-blur w-48">
+                    <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Facebook')}>
+                      <Facebook className="w-4 h-4 mr-3" /> Facebook
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Twitter')}>
+                      <Twitter className="w-4 h-4 mr-3" /> Twitter
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('LinkedIn')}>
+                      <Linkedin className="w-4 h-4 mr-3" /> LinkedIn
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-primary" onClick={() => handleShare('Copy Link')}>
+                      <Copy className="w-4 h-4 mr-3" /> Copy Link
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-headline font-bold leading-tight">{product.name}</h1>
@@ -167,6 +186,11 @@ export default function ProductPage() {
                 ))}
               </div>
               <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">{product.reviewsCount} Verfied Reviews</span>
+              <div className="h-4 w-px bg-border" />
+              <div className="flex items-center space-x-2 text-[10px] font-bold text-primary uppercase tracking-widest">
+                 <Heart className="w-3 h-3 fill-current" />
+                 <span>{metrics.likes.toLocaleString()} Likes</span>
+              </div>
             </div>
             <div className="text-4xl font-light tracking-tighter pt-4">
               {formatPrice(product.basePrice, countryCode)}

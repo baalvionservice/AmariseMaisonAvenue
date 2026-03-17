@@ -2,7 +2,19 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification, VipClient, Editorial } from './types';
+import { 
+  CartItem, 
+  Product, 
+  Collection, 
+  Category, 
+  Campaign, 
+  Affiliate, 
+  Notification, 
+  VipClient, 
+  Editorial,
+  SocialMetrics,
+  SocialInteraction
+} from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
   COLLECTIONS as INITIAL_COLLECTIONS, 
@@ -27,6 +39,8 @@ interface AppContextType {
   editorials: Editorial[];
   activeVip: VipClient | null;
   isShowcaseMode: boolean;
+  socialMetrics: Record<string, SocialMetrics>;
+  socialInteractions: SocialInteraction[];
   setShowcaseMode: (val: boolean) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -39,6 +53,9 @@ interface AppContextType {
   addNotification: (notification: Notification) => void;
   addEditorial: (editorial: Editorial) => void;
   setActiveVip: (client: VipClient | null) => void;
+  toggleLike: (contentId: string, country: string) => void;
+  trackShare: (contentId: string, country: string) => void;
+  simulateGlobalEngagement: (contentId: string) => void;
   user: any | null; 
   isAuthenticated: boolean;
 }
@@ -59,6 +76,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [isShowcaseMode, setShowcaseMode] = useState<boolean>(true);
   
+  // Social State
+  const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
+  const [socialInteractions, setSocialInteractions] = useState<SocialInteraction[]>([]);
+
   const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
@@ -66,39 +87,39 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedWishlist = localStorage.getItem('amarise_wishlist');
     const savedVipId = localStorage.getItem('amarise_active_vip');
     const savedEditorials = localStorage.getItem('amarise_editorials');
-    if (savedCart) {
-      try { setCart(JSON.parse(savedCart)); } catch (e) {}
-    }
-    if (savedWishlist) {
-      try { setWishlist(JSON.parse(savedWishlist)); } catch (e) {}
-    }
+    const savedSocial = localStorage.getItem('amarise_social_metrics');
+    
+    if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
+    if (savedWishlist) try { setWishlist(JSON.parse(savedWishlist)); } catch (e) {}
     if (savedVipId) {
       const vip = INITIAL_VIP_CLIENTS.find(v => v.id === savedVipId);
       if (vip) setActiveVip(vip);
     }
-    if (savedEditorials) {
-      try { setEditorials(JSON.parse(savedEditorials)); } catch (e) {}
+    if (savedEditorials) try { setEditorials(JSON.parse(savedEditorials)); } catch (e) {}
+    if (savedSocial) try { setSocialMetrics(JSON.parse(savedSocial)); } catch (e) {}
+
+    // Initialize metrics for existing products if not present
+    if (!savedSocial) {
+      const initialMetrics: Record<string, SocialMetrics> = {};
+      INITIAL_PRODUCTS.forEach(p => {
+        initialMetrics[p.id] = {
+          likes: Math.floor(Math.random() * 1000) + 100,
+          shares: Math.floor(Math.random() * 200) + 50,
+          engagementRate: Math.random() * 5 + 2
+        };
+      });
+      setSocialMetrics(initialMetrics);
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('amarise_cart', JSON.stringify(cart));
-  }, [cart]);
+  useEffect(() => localStorage.setItem('amarise_cart', JSON.stringify(cart)), [cart]);
+  useEffect(() => localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist)), [wishlist]);
+  useEffect(() => localStorage.setItem('amarise_editorials', JSON.stringify(editorials)), [editorials]);
+  useEffect(() => localStorage.setItem('amarise_social_metrics', JSON.stringify(socialMetrics)), [socialMetrics]);
 
   useEffect(() => {
-    localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
-
-  useEffect(() => {
-    localStorage.setItem('amarise_editorials', JSON.stringify(editorials));
-  }, [editorials]);
-
-  useEffect(() => {
-    if (activeVip) {
-      localStorage.setItem('amarise_active_vip', activeVip.id);
-    } else {
-      localStorage.removeItem('amarise_active_vip');
-    }
+    if (activeVip) localStorage.setItem('amarise_active_vip', activeVip.id);
+    else localStorage.removeItem('amarise_active_vip');
   }, [activeVip]);
 
   const addToCart = (product: Product) => {
@@ -135,27 +156,79 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const clearCart = () => setCart([]);
+  const toggleLike = (contentId: string, country: string) => {
+    setSocialMetrics(prev => {
+      const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
+      const isLiked = wishlist.some(w => w.id === contentId); // Reuse wishlist as "liked" status for demo
+      return {
+        ...prev,
+        [contentId]: {
+          ...current,
+          likes: isLiked ? current.likes - 1 : current.likes + 1
+        }
+      };
+    });
+    
+    setSocialInteractions(prev => [
+      {
+        id: 'int-' + Date.now(),
+        contentId,
+        type: 'like',
+        country,
+        timestamp: new Date().toISOString()
+      },
+      ...prev
+    ]);
+  };
 
+  const trackShare = (contentId: string, country: string) => {
+    setSocialMetrics(prev => {
+      const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
+      return {
+        ...prev,
+        [contentId]: {
+          ...current,
+          shares: current.shares + 1
+        }
+      };
+    });
+    setSocialInteractions(prev => [
+      {
+        id: 'sh-' + Date.now(),
+        contentId,
+        type: 'share',
+        country,
+        timestamp: new Date().toISOString()
+      },
+      ...prev
+    ]);
+  };
+
+  const simulateGlobalEngagement = (contentId: string) => {
+    setSocialMetrics(prev => {
+      const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
+      return {
+        ...prev,
+        [contentId]: {
+          ...current,
+          likes: current.likes + Math.floor(Math.random() * 50),
+          shares: current.shares + Math.floor(Math.random() * 10),
+          engagementRate: current.engagementRate + 0.5
+        }
+      };
+    });
+  };
+
+  const clearCart = () => setCart([]);
   const updateProductDescription = (productId: string, description: string) => {
     setProducts(prev => prev.map(p => p.id === productId ? { ...p, subcategory: description } : p));
   };
-
   const updateCollectionNarrative = (collectionId: string, narrative: string) => {
     setCollections(prev => prev.map(c => c.id === collectionId ? { ...c, description: narrative } : c));
   };
-
-  const addCampaign = (campaign: Campaign) => {
-    setCampaigns(prev => [campaign, ...prev]);
-  };
-
-  const addNotification = (notification: Notification) => {
-    setNotifications(prev => [notification, ...prev]);
-  };
-
-  const addEditorial = (editorial: Editorial) => {
-    setEditorials(prev => [editorial, ...prev]);
-  };
+  const addCampaign = (campaign: Campaign) => setCampaigns(prev => [campaign, ...prev]);
+  const addNotification = (notification: Notification) => setNotifications(prev => [notification, ...prev]);
+  const addEditorial = (editorial: Editorial) => setEditorials(prev => [editorial, ...prev]);
 
   const value = useMemo(() => ({
     cart,
@@ -170,6 +243,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     editorials,
     activeVip,
     isShowcaseMode,
+    socialMetrics,
+    socialInteractions,
     setShowcaseMode,
     addToCart,
     removeFromCart,
@@ -182,9 +257,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addNotification,
     addEditorial,
     setActiveVip,
+    toggleLike,
+    trackShare,
+    simulateGlobalEngagement,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, editorials, activeVip, isShowcaseMode, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, editorials, activeVip, isShowcaseMode, socialMetrics, socialInteractions, user]);
 
   return (
     <AppContext.Provider value={value}>
