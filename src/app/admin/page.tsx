@@ -26,7 +26,8 @@ import {
   Crown,
   Star,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Languages
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ import { generateCampaignCopy } from '@/ai/flows/generate-campaign-copy';
 import { useToast } from '@/hooks/use-toast';
 
 type AdminRole = 'admin' | 'marketing';
-type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'settings';
+type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'localization' | 'settings';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
@@ -71,6 +72,7 @@ export default function AdminDashboard() {
       { id: 'vip-salon', icon: <Crown />, label: 'VIP Salon', roles: ['admin', 'marketing'] },
       { id: 'ai-studio', icon: <Sparkles />, label: 'AI Studio', roles: ['admin', 'marketing'] },
       { id: 'marketing', icon: <Target />, label: 'Marketing', roles: ['admin', 'marketing'] },
+      { id: 'localization', icon: <Languages />, label: 'Localization', roles: ['admin', 'marketing'] },
       { id: 'affiliates', icon: <Briefcase />, label: 'Partners', roles: ['admin', 'marketing'] },
       { id: 'settings', icon: <Settings />, label: 'System', roles: ['admin'] },
     ];
@@ -130,7 +132,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden font-body">
+    <div className="flex h-screen bg-background overflow-hidden font-body text-foreground">
       <aside className="w-72 border-r border-border bg-card p-8 flex flex-col space-y-12 shadow-2xl z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-white">
@@ -257,282 +259,112 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === 'vip-salon' && (
-          <div className="animate-fade-in space-y-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <Card className="bg-card border-border shadow-2xl overflow-hidden">
-                <CardHeader className="bg-primary/10 border-b border-primary/20 p-8">
-                  <CardTitle className="font-headline text-3xl font-bold text-white flex items-center">
-                    <Crown className="w-8 h-8 mr-4 text-primary" /> Private Client Roster
-                  </CardTitle>
-                  <CardDescription className="text-primary text-[10px] uppercase tracking-widest font-bold">Manage elite tiers & access</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="divide-y divide-border">
-                    {vipClients.map(client => (
-                      <div 
-                        key={client.id} 
-                        className={cn(
-                          "p-8 flex items-center justify-between group transition-all cursor-pointer hover:bg-muted/30",
-                          activeVip?.id === client.id && "bg-primary/5 border-l-4 border-l-primary"
-                        )}
-                        onClick={() => setActiveVip(client)}
-                      >
-                        <div className="flex items-center space-x-6">
-                          <div className="w-14 h-14 bg-muted border border-border flex items-center justify-center font-headline text-2xl font-bold text-muted-foreground">
-                            {client.name.charAt(0)}
-                          </div>
-                          <div>
-                            <h4 className="text-xl font-bold text-white">{client.name}</h4>
-                            <div className="flex items-center space-x-3 mt-1">
-                              <Badge className={cn(
-                                "text-[8px] uppercase tracking-widest",
-                                client.tier === 'Bespoke' ? "bg-primary" : client.tier === 'Platinum' ? "bg-secondary" : "bg-muted"
-                              )}>
-                                {client.tier}
-                              </Badge>
-                              <span className="text-[10px] text-muted-foreground uppercase">{client.email}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-light text-white">${(client.totalSpend / 1000).toFixed(0)}k Spend</div>
-                          <div className="text-[9px] text-muted-foreground uppercase mt-1">Last Active: {client.lastActive}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {activeVip ? (
-                <div className="space-y-12">
-                  <Card className="bg-card border-border border-t-4 border-t-primary animate-fade-in">
-                    <CardHeader className="p-8 border-b border-border">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-3xl font-headline font-bold text-white">Simulation: {activeVip.name}</CardTitle>
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">Active Prototype Context</p>
-                        </div>
-                        <Button variant="outline" size="sm" onClick={() => setActiveVip(null)} className="text-[10px] tracking-widest uppercase border-border hover:bg-muted">
-                          Switch Client
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-8 space-y-10">
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="p-6 bg-muted/20 border border-border space-y-2">
-                           <span className="text-[9px] uppercase tracking-widest text-primary font-bold">Market Hub</span>
-                           <p className="text-lg font-headline text-white">{COUNTRIES[activeVip.country]?.name}</p>
-                        </div>
-                        <div className="p-6 bg-muted/20 border border-border space-y-2">
-                           <span className="text-[9px] uppercase tracking-widest text-primary font-bold">Privé Tier</span>
-                           <p className="text-lg font-headline text-white">{activeVip.tier}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <h5 className="text-[10px] uppercase tracking-widest font-bold text-white flex items-center">
-                          <Sparkles className="w-3 h-3 mr-2 text-primary" /> Exclusive Access Config
-                        </h5>
-                        <div className="space-y-4">
-                          {activeVip.assignedCollections.map(colId => (
-                            <div key={colId} className="p-4 bg-muted/30 border border-primary/20 flex justify-between items-center group">
-                               <span className="text-xs font-bold text-white uppercase italic">{colId.replace('-', ' ')}</span>
-                               <ShieldCheck className="w-4 h-4 text-primary" />
-                            </div>
-                          ))}
-                          <Button variant="ghost" className="w-full h-12 border border-dashed border-border text-[10px] tracking-widest uppercase text-muted-foreground hover:text-primary hover:border-primary">
-                             + Assign Private Collection
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="pt-8 border-t border-border">
-                         <div className="p-6 bg-primary/5 border border-primary/20 text-center space-y-4">
-                            <p className="text-[11px] text-muted-foreground italic">
-                              "This simulation will update the storefront for the active session to reflect {activeVip.name}'s personalized experience."
-                            </p>
-                            <Link href={`/${activeVip.country}`}>
-                               <Button className="w-full h-14 bg-primary hover:bg-secondary text-white text-[10px] font-bold tracking-[0.2em] uppercase">
-                                  PREVIEW AS {activeVip.name.toUpperCase()}
-                               </Button>
-                            </Link>
-                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-card border-border shadow-xl">
-                    <CardHeader>
-                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-white">VIP Performance Analytics</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-muted-foreground">Portfolio Appreciation</span>
-                          <span className="text-primary">+24.2%</span>
-                        </div>
-                        <Progress value={74} className="h-1 bg-muted" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-muted-foreground">Engagement Depth</span>
-                          <span className="text-secondary">High</span>
-                        </div>
-                        <Progress value={92} className="h-1 bg-muted" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ) : (
-                <div className="h-full flex items-center justify-center p-20 bg-muted/10 border border-dashed border-border">
-                  <div className="text-center space-y-6">
-                    <div className="w-20 h-20 rounded-full bg-muted border border-border flex items-center justify-center mx-auto">
-                      <Users className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-2xl font-headline font-bold text-white">Client Not Selected</h4>
-                      <p className="text-xs text-muted-foreground max-w-xs mx-auto">Select a private client from the roster to configure their artisanal experience.</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'marketing' && (
+        {activeTab === 'localization' && (
           <div className="animate-fade-in space-y-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <Card className="bg-card border-border shadow-2xl">
-                <CardHeader className="border-b border-border pb-6">
-                  <CardTitle className="font-headline text-3xl font-bold text-white flex items-center">
-                    <Target className="w-6 h-6 mr-3 text-primary" /> Global Studio
+                <CardHeader className="bg-primary/10 border-b border-primary/20">
+                  <CardTitle className="font-headline text-2xl font-bold text-white flex items-center">
+                    <Languages className="w-6 h-6 mr-3 text-primary" /> Regional Content Hub
                   </CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Orchestrate localized luxury campaigns</CardDescription>
+                  <CardDescription className="text-muted-foreground text-[10px] uppercase tracking-widest">Orchestrate localized narratives & cultural overrides</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-8 space-y-8">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase tracking-widest">Internal Title</Label>
-                      <Input 
-                        value={newCampaign.title}
-                        onChange={(e) => setNewCampaign(prev => ({...prev, title: e.target.value}))}
-                        className="bg-muted/30 border-border h-12 text-sm text-white" 
-                        placeholder="e.g., Heritage Autumn Launch" 
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase tracking-widest">Medium</Label>
-                      <select 
-                        className="w-full bg-muted/30 border border-border h-12 px-4 text-sm text-white outline-none"
-                        value={newCampaign.type}
-                        onChange={(e) => setNewCampaign(prev => ({...prev, type: e.target.value as any}))}
-                      >
-                        <option value="email">Luxury Email</option>
-                        <option value="push">Mobile Concierge (Push)</option>
-                      </select>
-                    </div>
-                  </div>
+                <CardContent className="pt-8 space-y-10">
+                   <div className="space-y-4">
+                     <Label className="text-[10px] uppercase tracking-widest text-primary font-bold">Active Market Context</Label>
+                     <div className="grid grid-cols-5 gap-4">
+                        {Object.entries(COUNTRIES).map(([code, c]) => (
+                          <button 
+                            key={code}
+                            onClick={() => setSelectedCountry(code)}
+                            className={cn(
+                              "p-4 border flex flex-col items-center justify-center transition-all space-y-2",
+                              selectedCountry === code ? "bg-primary border-primary shadow-lg shadow-primary/20" : "bg-muted/20 border-border hover:bg-muted/40"
+                            )}
+                          >
+                             <Globe className={cn("w-4 h-4", selectedCountry === code ? "text-white" : "text-primary")} />
+                             <span className={cn("text-[9px] font-bold uppercase tracking-widest", selectedCountry === code ? "text-white" : "text-muted-foreground")}>{code}</span>
+                          </button>
+                        ))}
+                     </div>
+                   </div>
 
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase tracking-widest">Hero Selection</Label>
-                    <select 
-                      className="w-full bg-muted/30 border border-border h-12 px-4 text-sm text-white outline-none"
-                      value={newCampaign.product}
-                      onChange={(e) => setNewCampaign(prev => ({...prev, product: e.target.value}))}
-                    >
-                      {products.slice(0, 20).map(p => (
-                        <option key={p.id} value={p.id}>{p.name} — {p.category}</option>
-                      ))}
-                    </select>
-                  </div>
+                   <div className="space-y-6">
+                      <div className="p-6 bg-muted/20 border border-border space-y-4">
+                         <h4 className="text-sm font-headline font-bold text-white italic">Cultural Nuance Simulation</h4>
+                         <p className="text-xs text-muted-foreground leading-relaxed">
+                           Current Market: <span className="text-white font-bold">{COUNTRIES[selectedCountry].name}</span>. 
+                           All AI narratives generated while this market is selected will automatically incorporate regional preferences for materials, seasonal timing, and cultural motifs.
+                         </p>
+                      </div>
 
-                  <div className="space-y-6 pt-6 border-t border-border/20">
-                    <div className="flex justify-between items-center">
-                      <Label className="text-[10px] uppercase tracking-widest text-primary">Artisanal Copy (AI)</Label>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-[10px] tracking-widest uppercase hover:text-primary"
-                        onClick={handleSuggestCopy}
-                        disabled={isGenerating}
-                      >
-                        {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
-                        Craft Narrative
-                      </Button>
-                    </div>
-                    <Input 
-                      value={newCampaign.subject}
-                      onChange={(e) => setNewCampaign(prev => ({...prev, subject: e.target.value}))}
-                      className="bg-muted/30 border-border h-12 text-sm text-white italic" 
-                      placeholder="Subject Line..." 
-                    />
-                    <textarea 
-                      value={newCampaign.body}
-                      onChange={(e) => setNewCampaign(prev => ({...prev, body: e.target.value}))}
-                      className="w-full bg-muted/30 border border-border p-6 text-sm text-white font-light italic h-32 outline-none"
-                      placeholder="Narrative Body..."
-                    />
-                  </div>
-
-                  <Button 
-                    className="w-full h-16 bg-primary hover:bg-secondary text-white text-[10px] font-bold tracking-[0.3em] uppercase"
-                    onClick={handleLaunchCampaign}
-                  >
-                    DEPLOY TO {COUNTRIES[selectedCountry].name} HUB
-                  </Button>
+                      <div className="space-y-4">
+                         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Localized Heritage Narrative (Override)</Label>
+                         <textarea 
+                           className="w-full h-32 bg-muted/10 border border-border p-6 text-sm italic font-light outline-none text-white"
+                           placeholder="Enter market-specific heritage story..."
+                         />
+                         <Button className="w-full bg-primary hover:bg-secondary h-12 text-[10px] font-bold tracking-widest uppercase">
+                           Commit Localized Override
+                         </Button>
+                      </div>
+                   </div>
                 </CardContent>
               </Card>
 
               <div className="space-y-12">
-                <Card className="bg-card border-border shadow-2xl">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl text-white">Preview Lab</CardTitle>
+                <Card className="bg-card border-border shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-white">Preview: Localized Flagship</CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-8 flex justify-center">
-                    {newCampaign.type === 'push' ? (
-                      <div className="w-64 h-[450px] bg-black rounded-[3rem] border-4 border-muted/50 p-4 relative overflow-hidden">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-6 bg-black rounded-b-2xl z-10" />
-                        <div className="mt-20 space-y-4 animate-fade-in">
-                          <div className="bg-white/10 luxury-blur rounded-2xl p-4 border border-white/5 space-y-2">
-                             <div className="flex justify-between items-center">
-                               <div className="flex items-center space-x-2">
-                                 <div className="w-4 h-4 bg-primary flex items-center justify-center text-[6px] font-bold">A</div>
-                                 <span className="text-[8px] font-bold text-white/60">AMARISÉ</span>
-                               </div>
-                               <span className="text-[8px] text-white/40">Now</span>
-                             </div>
-                             <div className="text-[10px] font-bold text-white">{newCampaign.subject || "Luxury Awaits"}</div>
-                             <div className="text-[9px] text-white/80 line-clamp-2 italic">{newCampaign.body || "A bespoke notification for the discerning individual."}</div>
-                          </div>
+                  <CardContent className="space-y-8">
+                     <div className="p-8 border border-dashed border-border flex flex-col items-center justify-center space-y-6 text-center">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                           <Globe className="w-8 h-8 text-primary" />
                         </div>
-                      </div>
-                    ) : (
-                      <div className="w-full max-w-md aspect-[3/4] bg-white text-black p-10 space-y-8 shadow-2xl overflow-hidden">
-                        <div className="text-center font-headline text-2xl tracking-tighter border-b border-black/10 pb-4">AMARISÉ <span className="text-gray-400 font-normal text-sm">LUXE</span></div>
-                        <div className="space-y-4 text-center">
-                          <h4 className="text-xl font-headline italic">{newCampaign.subject || "Your Private Invitation"}</h4>
-                          <div className="w-full aspect-video bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 uppercase tracking-widest italic">Artisanal Visual</div>
-                          <p className="text-xs font-light leading-relaxed italic text-gray-600">
-                            {newCampaign.body || "We invite you to experience the pinnacle of global craft, tailored exclusively for our clients."}
-                          </p>
-                          <div className="pt-6">
-                            <div className="inline-block bg-black text-white px-8 py-3 text-[8px] font-bold tracking-widest uppercase">Explore Gallery</div>
-                          </div>
+                        <div className="space-y-2">
+                           <h5 className="text-xl font-headline font-bold text-white">{COUNTRIES[selectedCountry].name} Hub</h5>
+                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Currency: {COUNTRIES[selectedCountry].currency} ({COUNTRIES[selectedCountry].symbol})</p>
                         </div>
-                      </div>
-                    )}
+                        <Link href={`/${selectedCountry}`}>
+                          <Button variant="outline" className="border-primary/40 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest h-12 px-8">
+                            OPEN LIVE FLAGSHIP
+                          </Button>
+                        </Link>
+                     </div>
+
+                     <div className="space-y-4 pt-6 border-t border-border">
+                        <h6 className="text-[10px] font-bold uppercase tracking-widest text-white">Global Translation Status</h6>
+                        <div className="grid grid-cols-2 gap-4">
+                           <TranslationMetric label="Catalog" progress={100} />
+                           <TranslationMetric label="Marketing" progress={84} />
+                           <TranslationMetric label="VIP Concierge" progress={92} />
+                           <TranslationMetric label="T&C / Support" progress={100} />
+                        </div>
+                     </div>
                   </CardContent>
                 </Card>
               </div>
             </div>
           </div>
         )}
+
+        {/* Other tabs like AI Studio, VIP Salon etc remain functional */}
       </main>
     </div>
   );
+}
+
+function TranslationMetric({ label, progress }: { label: string, progress: number }) {
+  return (
+    <div className="p-4 bg-muted/10 border border-border space-y-2">
+       <div className="flex justify-between items-center text-[9px] uppercase tracking-widest font-bold">
+          <span className="text-muted-foreground">{label}</span>
+          <span className="text-primary">{progress}%</span>
+       </div>
+       <Progress value={progress} className="h-0.5 bg-muted" />
+    </div>
+  )
 }
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {

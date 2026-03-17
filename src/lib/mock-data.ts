@@ -86,6 +86,17 @@ export const REVIEWS: Review[] = [
   { id: 'r3', userName: 'Aamir Al-Farsi', rating: 5, comment: 'The pinnacle of luxury. The attention to detail is breath-taking.', date: '2024-02-18' },
 ];
 
+/**
+ * Enhanced mock localization utility for simulating regional translation and formatting.
+ */
+export const getLocalizedMockText = (text: string, countryCode: string) => {
+  if (countryCode === 'ae') return `[Localized UAE] ${text}`;
+  if (countryCode === 'sg') return `[Localized SG] ${text}`;
+  if (countryCode === 'in') return `[Localized IN] ${text}`;
+  if (countryCode === 'uk') return `[Localized UK] ${text}`;
+  return text;
+};
+
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;
   const rates: Record<string, number> = { us: 1, uk: 0.79, ae: 3.67, in: 83.2, sg: 1.34 };
