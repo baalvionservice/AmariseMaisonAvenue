@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -53,13 +52,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <div className="absolute inset-0 bg-black/5 opacity-100 group-hover:opacity-0 transition-opacity duration-700" />
         
         {product.isVip && (
-          <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg">
+          <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg z-10">
             VIP Limited
           </div>
         )}
 
         {/* Quick Actions Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur bg-black/40">
+        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur bg-black/40 z-20">
           <Button 
             className="w-full h-12 rounded-none bg-white text-black hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest uppercase"
             onClick={handleAddToCart}
@@ -86,9 +85,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="flex">
+            <div className="flex text-primary">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className={cn("w-3 h-3", i < Math.floor(product.rating) ? "fill-primary text-primary" : "text-muted-foreground")} />
+                <Star key={i} className={cn("w-3 h-3", i < Math.floor(product.rating) ? "fill-current" : "text-muted-foreground")} />
               ))}
             </div>
             <span className="text-[9px] text-muted-foreground uppercase tracking-widest">({product.reviewsCount})</span>
@@ -99,7 +98,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Provenance: FR</span>
+          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Provenance: Global</span>
           <div className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
             Discover <Eye className="w-3 h-3 ml-2" />
           </div>

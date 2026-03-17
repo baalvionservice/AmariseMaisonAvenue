@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -8,7 +7,7 @@ import { useParams } from 'next/navigation';
 import { PRODUCTS, COLLECTIONS, formatPrice, COUNTRIES } from '@/lib/mock-data';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, ShoppingBag, Globe } from 'lucide-react';
+import { ArrowRight, Sparkles, ShoppingBag, Globe, Star } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { cn } from '@/lib/utils';
 
@@ -17,15 +16,22 @@ export default function HomePage() {
   const countryCode = (country as string) || 'us';
   const featuredProducts = PRODUCTS.slice(0, 4);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [vipRecs, setVipRecs] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
 
   useEffect(() => {
     async function loadRecs() {
       try {
-        const res = await generateProductRecommendations({
-          scenario: `A discerning luxury shopper in ${COUNTRIES[countryCode]?.name} seeking iconic heritage pieces.`,
-        });
-        setRecommendations(res.recommendations);
+        const [general, vip] = await Promise.all([
+          generateProductRecommendations({
+            scenario: `A discerning luxury shopper in ${COUNTRIES[countryCode]?.name} seeking iconic heritage pieces.`,
+          }),
+          generateProductRecommendations({
+            scenario: `A VIP collector in ${COUNTRIES[countryCode]?.name} looking for the most exclusive limited release items.`,
+          })
+        ]);
+        setRecommendations(general.recommendations);
+        setVipRecs(vip.recommendations.slice(0, 3));
       } catch (e) {
         console.error(e);
       } finally {
@@ -132,25 +138,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trending Now */}
-      <section className="container mx-auto px-6 pt-48">
-        <div className="text-center space-y-8 mb-32">
-          <div className="flex items-center justify-center space-x-6">
-            <div className="h-px w-20 bg-border" />
-            <span className="text-primary text-[10px] font-bold tracking-[0.5em] uppercase">Highlights</span>
-            <div className="h-px w-20 bg-border" />
-          </div>
-          <h2 className="text-7xl font-headline font-bold italic">Seasonal Icons</h2>
-          <p className="text-muted-foreground text-lg font-light tracking-wide">The definitive pieces of the current movement.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* AI Recommendations */}
+      {/* AI Recommendations - Personalized for Country */}
       <section className="bg-card py-48 border-y border-border/40 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
         <div className="container mx-auto px-6 relative z-10">
@@ -159,9 +147,9 @@ export default function HomePage() {
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h2 className="text-5xl font-headline font-bold">Bespoke Curation</h2>
+              <h2 className="text-5xl font-headline font-bold">Global Curation</h2>
               <p className="text-lg text-muted-foreground font-light italic mt-2">
-                Tailored intelligence for your presence in {COUNTRIES[countryCode]?.name}.
+                Intelligent selections based on current market trends in {COUNTRIES[countryCode]?.name}.
               </p>
             </div>
           </div>
@@ -174,7 +162,6 @@ export default function HomePage() {
                   <div className="space-y-4">
                     <div className="h-4 bg-muted w-1/3" />
                     <div className="h-8 bg-muted w-3/4" />
-                    <div className="h-16 bg-muted w-full" />
                   </div>
                 </div>
               ))
@@ -195,9 +182,6 @@ export default function HomePage() {
                       <span className="text-[10px] font-bold tracking-[0.3em] text-primary uppercase">{rec.category}</span>
                       <h3 className="text-3xl font-headline italic">{rec.name}</h3>
                     </div>
-                    <p className="text-muted-foreground font-light leading-relaxed line-clamp-3 text-sm tracking-wide">
-                      {rec.description}
-                    </p>
                     <div className="pt-4 flex items-center justify-between border-t border-border/40">
                       <span className="text-2xl font-light tracking-tighter">
                         {rec.currency} {rec.price.toLocaleString()}
@@ -214,7 +198,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Ethos / Video Placeholder */}
+      {/* VIP Salon Area */}
+      <section className="container mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
+           <div className="lg:col-span-2 space-y-10">
+              <span className="text-primary text-[12px] font-bold tracking-[0.6em] uppercase">Private Atelier</span>
+              <h2 className="text-7xl font-headline font-bold leading-none">The VIP <br /> Selection</h2>
+              <p className="text-xl text-muted-foreground font-light leading-relaxed">
+                Unlock access to our most clandestine releases. These pieces never reach the public catalog, reserved exclusively for our most dedicated collectors.
+              </p>
+              <Button className="h-16 px-12 bg-primary hover:bg-secondary rounded-none text-xs tracking-[0.3em] font-bold">
+                ENTER THE SALON
+              </Button>
+           </div>
+           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
+              {loadingRecs ? (
+                 [...Array(3)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)
+              ) : (
+                vipRecs.map(rec => (
+                  <div key={rec.id} className="group relative bg-card border border-border/40 overflow-hidden">
+                    <div className="aspect-[3/4] relative">
+                       <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all" />
+                       <div className="absolute top-4 right-4 text-primary">
+                          <Star className="w-5 h-5 fill-current" />
+                       </div>
+                       <div className="absolute bottom-6 left-6 right-6 space-y-2">
+                          <span className="text-[9px] text-primary font-bold uppercase tracking-widest">Limited Release</span>
+                          <h4 className="text-xl font-headline text-white italic truncate">{rec.name}</h4>
+                       </div>
+                    </div>
+                  </div>
+                ))
+              )}
+           </div>
+        </div>
+      </section>
+
+      {/* Brand Ethos */}
       <section className="container mx-auto px-6 mb-48">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div className="relative h-[850px] w-full group overflow-hidden shadow-[0_0_100px_rgba(102,38,204,0.15)]">

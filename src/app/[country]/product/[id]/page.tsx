@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -13,12 +12,13 @@ import {
   Truck, 
   RefreshCcw,
   Star,
-  Check,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
+import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from '@/components/product/ProductCard';
@@ -35,29 +35,36 @@ export default function ProductPage() {
   const product = PRODUCTS.find(p => p.id === id);
   const [aiDescription, setAiDescription] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(true);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(true);
+  
   const isWishlisted = wishlist.some(i => i.id === product?.id);
-
-  const relatedProducts = useMemo(() => {
-    return PRODUCTS.filter(p => p.category === product?.category && p.id !== product?.id).slice(0, 4);
-  }, [product]);
 
   useEffect(() => {
     if (!product) return;
     
-    async function fetchAiDesc() {
+    async function fetchData() {
       try {
-        const res = await generateProductDescription({
-          productName: product.name,
-          category: product.category,
-        });
-        setAiDescription(res.description);
+        const [descRes, recRes] = await Promise.all([
+          generateProductDescription({
+            productName: product.name,
+            category: product.category,
+          }),
+          generateProductRecommendations({
+            scenario: `Upsell recommendations for a client viewing ${product.name} in the ${product.category} department.`,
+            currentProductId: product.id
+          })
+        ]);
+        setAiDescription(descRes.description);
+        setRecommendations(recRes.recommendations.slice(0, 4));
       } catch (e) {
         setAiDescription(null);
       } finally {
         setLoadingAi(false);
+        setLoadingRecs(false);
       }
     }
-    fetchAiDesc();
+    fetchData();
   }, [product]);
 
   if (!product) {
@@ -213,21 +220,29 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Related Products */}
+      {/* AI Recommendations */}
       <section className="mt-40 border-t border-border pt-20">
         <div className="flex items-end justify-between mb-16">
           <div className="space-y-4">
-            <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase">Recommendations</span>
+            <div className="flex items-center space-x-3 text-primary">
+               <Sparkles className="w-5 h-5" />
+               <span className="text-[10px] font-bold tracking-[0.4em] uppercase">AI Curation</span>
+            </div>
             <h2 className="text-5xl font-headline font-bold">You May Also Admire</h2>
           </div>
           <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="text-[10px] font-bold tracking-widest uppercase border-b border-primary pb-1 group flex items-center">
             View All <ArrowRight className="ml-2 w-3 h-3 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-          {relatedProducts.map(p => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+          {loadingRecs ? (
+            [...Array(4)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)
+          ) : (
+            recommendations.map(p => (
+              <ProductCard key={p.id} product={p} />
+            ))
+          )}
         </div>
       </section>
     </div>
