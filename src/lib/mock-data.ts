@@ -41,25 +41,18 @@ export const NOTIFICATIONS: Notification[] = [
   { id: 'n2', type: 'Push', subject: 'The Emerald Collection has arrived.', recipients: '8,400 Watch Collectors', scheduledAt: '2024-03-12 14:00', status: 'Queued' },
 ];
 
-/**
- * Generates a scalable mock dataset of products.
- * Pattern uses deterministic math to avoid hydration mismatches.
- */
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
   const categories = ['Apparel', 'Accessories', 'Timepieces', 'Fine Jewelry'];
   const collectionIds = ['spring-24', 'heritage', 'nocturnal'];
 
-  // Increased to 120 items to demonstrate scalability and pagination readiness
   for (let i = 1; i <= 120; i++) {
     const catIndex = i % categories.length;
     const cat = categories[catIndex];
     const collIndex = i % collectionIds.length;
-    
-    // Deterministic price based on index
     const basePrice = 1200 + ((i * 157) % 18000);
     const rating = 4.0 + ((i * 7) % 10) / 10;
-    const reviewsCount = 12 + ((i * 23) % 150);
+    const reviewsCount = 12 + ((i * i) % 150);
 
     products.push({
       id: `prod-${i}`,
@@ -68,8 +61,8 @@ const generateProducts = (): Product[] => {
       subcategory: 'Heritage Collection',
       collectionId: collectionIds[collIndex],
       basePrice,
-      imageUrl: `https://picsum.photos/seed/amarise-lux-v2-${i}/1200/1600`,
-      isVip: i % 10 === 0, // VIP items are rarer
+      imageUrl: `https://picsum.photos/seed/amarise-lux-v3-${i}/1200/1600`,
+      isVip: i % 10 === 0,
       rating,
       reviewsCount,
     });

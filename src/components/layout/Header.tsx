@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, X, Globe } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CATEGORIES, COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -15,14 +15,16 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 
+/**
+ * Header: The Entry to Maison Amarisé.
+ * Features a localized country selector and multi-tiered navigation.
+ */
 export const Header = () => {
   const { country } = useParams();
   const { cart, wishlist } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const countryCode = (country as string) || 'us';
-  const currentCountry = COUNTRIES[countryCode];
-
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
 
   return (
@@ -32,6 +34,7 @@ export const Header = () => {
         <button 
           className="lg:hidden text-foreground hover:text-primary transition-colors"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
         >
           {isMenuOpen ? <X /> : <Menu />}
         </button>
@@ -68,7 +71,7 @@ export const Header = () => {
               </div>
             </div>
           ))}
-          <Link href={`/${countryCode}/vip`} className="py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-primary hover:text-secondary transition-colors">
+          <Link href={`/${countryCode}/collection/heritage`} className="py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-primary hover:text-secondary transition-colors">
             VIP SALON
           </Link>
         </nav>
@@ -77,23 +80,23 @@ export const Header = () => {
         <div className="flex-1 lg:flex-none flex items-center justify-end space-x-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary transition-colors">
                 <Globe className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-none border-border bg-card">
+            <DropdownMenuContent align="end" className="border-border bg-card">
               {Object.values(COUNTRIES).map((c) => (
                 <DropdownMenuItem key={c.code} asChild>
-                  <Link href={`/${c.code}`} className="flex items-center justify-between w-full px-4 py-2 hover:bg-muted">
+                  <Link href={`/${c.code}`} className="flex items-center justify-between w-full px-4 py-2 hover:bg-muted transition-colors">
                     <span className="text-[10px] font-bold uppercase tracking-widest">{c.name}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase">({c.currency})</span>
+                    <span className="text-[9px] text-muted-foreground uppercase ml-4">({c.currency})</span>
                   </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="text-foreground hidden sm:flex hover:text-primary">
+          <Button variant="ghost" size="icon" className="text-foreground hidden sm:flex hover:text-primary transition-colors">
             <Search className="w-5 h-5" />
           </Button>
           
@@ -116,7 +119,7 @@ export const Header = () => {
           </Link>
 
           <Link href="/admin" className="hidden lg:block">
-            <Button variant="outline" className="rounded-none border-primary/40 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest h-10 px-6">
+            <Button variant="outline" className="border-primary/40 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest h-10 px-6">
               ADMIN
             </Button>
           </Link>
@@ -138,7 +141,7 @@ export const Header = () => {
               </Link>
             ))}
             <Link 
-              href={`/${countryCode}/vip`} 
+              href={`/${countryCode}/collection/heritage`} 
               className="block text-4xl font-headline font-bold text-primary"
               onClick={() => setIsMenuOpen(false)}
             >

@@ -12,7 +12,8 @@ import { generateProductRecommendations } from '@/ai/flows/generate-product-reco
 import { cn } from '@/lib/utils';
 
 /**
- * HomePage optimized for LCP with prioritized hero images and localized AI curation.
+ * HomePage: The Cinematic Flagship.
+ * Optimized for LCP and visual impact with localized AI curation.
  */
 export default function HomePage() {
   const { country } = useParams();
@@ -47,7 +48,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-32">
-      {/* Cinematic Hero - Prioritized for LCP */}
+      {/* Cinematic Hero */}
       <section className="relative h-[98vh] w-full flex items-center justify-center overflow-hidden">
         <Image 
           src="https://picsum.photos/seed/amarise-hero-main-hq/2560/1440" 
@@ -92,7 +93,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Collections - Scalable Grid */}
+      {/* Curated Chapters */}
       <section className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-6">
           <div className="space-y-4">
@@ -122,7 +123,6 @@ export default function HomePage() {
                 fill
                 className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                 sizes="(max-width: 768px) 100vw, 33vw"
-                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-700" />
               <div className="absolute bottom-12 left-12 right-12 space-y-6">
@@ -142,7 +142,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI Recommendations - Lazy Loaded and Localized */}
+      {/* AI Intelligence Section */}
       <section className="bg-card py-48 border-y border-border/40 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
         <div className="container mx-auto px-6 relative z-10">
@@ -151,9 +151,9 @@ export default function HomePage() {
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h2 className="text-5xl font-headline font-bold">Global Curation</h2>
+              <h2 className="text-5xl font-headline font-bold">Personalized for You</h2>
               <p className="text-lg text-muted-foreground font-light italic mt-2">
-                Intelligent selections based on the current market trends in {currentCountry.name}.
+                Intelligent selections based on the current market trends in {COUNTRIES[countryCode]?.name}.
               </p>
             </div>
           </div>
@@ -203,45 +203,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VIP Salon Area - Demo Scalability */}
-      <section className="container mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
-           <div className="lg:col-span-2 space-y-10">
-              <span className="text-primary text-[12px] font-bold tracking-[0.6em] uppercase">Private Atelier</span>
-              <h2 className="text-7xl font-headline font-bold leading-none">The VIP <br /> Selection</h2>
-              <p className="text-xl text-muted-foreground font-light leading-relaxed">
-                Unlock access to our most clandestine releases in {currentCountry.name}. These pieces never reach the public catalog, reserved exclusively for our most dedicated collectors.
-              </p>
-              {/* Security Placeholder: Auth check would trigger here */}
-              <Button className="h-16 px-12 bg-primary hover:bg-secondary rounded-none text-xs tracking-[0.3em] font-bold">
-                ENTER THE SALON
-              </Button>
-           </div>
-           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {loadingRecs ? (
-                 [...Array(3)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)
-              ) : (
-                vipRecs.map(rec => (
-                  <div key={rec.id} className="group relative bg-card border border-border/40 overflow-hidden hover-lift">
-                    <div className="aspect-[3/4] relative">
-                       <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" sizes="20vw" />
-                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all" />
-                       <div className="absolute top-4 right-4 text-primary">
-                          <Star className="w-5 h-5 fill-current" />
-                       </div>
-                       <div className="absolute bottom-6 left-6 right-6 space-y-2">
-                          <span className="text-[9px] text-primary font-bold uppercase tracking-widest">Limited Release</span>
-                          <h4 className="text-xl font-headline text-white italic truncate">{rec.name}</h4>
-                       </div>
-                    </div>
-                  </div>
-                ))
-              )}
-           </div>
-        </div>
-      </section>
-
-      {/* Brand Ethos - Performance Optimized Editorial */}
+      {/* Brand Ethos */}
       <section className="container mx-auto px-6 mb-48">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div className="relative h-[850px] w-full group overflow-hidden shadow-[0_0_100px_rgba(102,38,204,0.15)]">
