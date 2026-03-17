@@ -3,7 +3,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
+/**
+ * RootLayout optimized for Global SEO and Asset Delivery.
+ * Features hreflang support and canonical link logic for multi-country hubs.
+ */
 export const metadata: Metadata = {
+  metadataBase: new URL('https://amarise-luxe.com'), // Replace with actual production URL
   title: {
     default: 'AMARISÉ Luxe | The Pinnacle of Global Luxury',
     template: '%s | AMARISÉ Luxe'
@@ -14,21 +19,38 @@ export const metadata: Metadata = {
     title: 'AMARISÉ Luxe | The Pinnacle of Global Luxury',
     description: 'Curating the world\'s most exquisite treasures since 1924.',
     type: 'website',
-    images: ['https://picsum.photos/seed/amarise-og/1200/630'],
+    images: [{
+      url: 'https://picsum.photos/seed/amarise-og/1200/630',
+      width: 1200,
+      height: 630,
+      alt: 'AMARISÉ Luxe Global Flagship'
+    }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AMARISÉ Luxe',
-    description: 'The Pinnacle of Global Luxury',
+    title: 'AMARISÉ Luxe | The Pinnacle of Global Luxury',
+    description: 'The Pinnacle of Global Luxury Heritage',
     images: ['https://picsum.photos/seed/amarise-og/1200/630'],
   },
   alternates: {
+    canonical: '/',
     languages: {
       'en-US': '/us',
       'en-GB': '/uk',
       'en-AE': '/ae',
       'en-SG': '/sg',
       'en-IN': '/in',
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
 };
@@ -44,6 +66,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+        {/* Mock Security Header: Pre-connect to identity provider */}
+        <link rel="preconnect" href="https://apis.google.com" />
       </head>
       <body className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-white">
         {children}

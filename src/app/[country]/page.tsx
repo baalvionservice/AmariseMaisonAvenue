@@ -11,6 +11,9 @@ import { ArrowRight, Sparkles, Star } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { cn } from '@/lib/utils';
 
+/**
+ * HomePage optimized for LCP with prioritized hero images and localized AI curation.
+ */
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -31,10 +34,10 @@ export default function HomePage() {
             scenario: `A VIP collector in ${currentCountry.name} looking for the most exclusive limited release items.`,
           })
         ]);
-        setRecommendations(general.recommendations);
+        setRecommendations(general.recommendations.slice(0, 3));
         setVipRecs(vip.recommendations.slice(0, 3));
       } catch (e) {
-        console.error(e);
+        console.error("Personalization error:", e);
       } finally {
         setLoadingRecs(false);
       }
@@ -44,7 +47,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-32">
-      {/* Cinematic Hero */}
+      {/* Cinematic Hero - Prioritized for LCP */}
       <section className="relative h-[98vh] w-full flex items-center justify-center overflow-hidden">
         <Image 
           src="https://picsum.photos/seed/amarise-hero-main-hq/2560/1440" 
@@ -89,7 +92,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Collections */}
+      {/* Featured Collections - Scalable Grid */}
       <section className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-6">
           <div className="space-y-4">
@@ -139,7 +142,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI Recommendations - Personalized for Country */}
+      {/* AI Recommendations - Lazy Loaded and Localized */}
       <section className="bg-card py-48 border-y border-border/40 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
         <div className="container mx-auto px-6 relative z-10">
@@ -150,7 +153,7 @@ export default function HomePage() {
             <div>
               <h2 className="text-5xl font-headline font-bold">Global Curation</h2>
               <p className="text-lg text-muted-foreground font-light italic mt-2">
-                Intelligent selections based on current market trends in {currentCountry.name}.
+                Intelligent selections based on the current market trends in {currentCountry.name}.
               </p>
             </div>
           </div>
@@ -200,7 +203,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VIP Salon Area */}
+      {/* VIP Salon Area - Demo Scalability */}
       <section className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
            <div className="lg:col-span-2 space-y-10">
@@ -209,6 +212,7 @@ export default function HomePage() {
               <p className="text-xl text-muted-foreground font-light leading-relaxed">
                 Unlock access to our most clandestine releases in {currentCountry.name}. These pieces never reach the public catalog, reserved exclusively for our most dedicated collectors.
               </p>
+              {/* Security Placeholder: Auth check would trigger here */}
               <Button className="h-16 px-12 bg-primary hover:bg-secondary rounded-none text-xs tracking-[0.3em] font-bold">
                 ENTER THE SALON
               </Button>
@@ -237,7 +241,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Ethos */}
+      {/* Brand Ethos - Performance Optimized Editorial */}
       <section className="container mx-auto px-6 mb-48">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div className="relative h-[850px] w-full group overflow-hidden shadow-[0_0_100px_rgba(102,38,204,0.15)]">
@@ -247,6 +251,7 @@ export default function HomePage() {
               fill
               className="object-cover transition-transform duration-[2s] group-hover:scale-105"
               sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-1000" />
             <div className="absolute inset-0 border-[20px] border-background m-10 pointer-events-none" />

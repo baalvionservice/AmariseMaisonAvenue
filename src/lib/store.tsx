@@ -1,9 +1,13 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { CartItem, Product } from './types';
 
+/**
+ * AppState Interface
+ * Placeholders for Auth and Security context are defined for future scalability.
+ */
 interface AppContextType {
   cart: CartItem[];
   wishlist: Product[];
@@ -12,6 +16,9 @@ interface AppContextType {
   updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: Product) => void;
   clearCart: () => void;
+  // Mock Security/Auth placeholders
+  user: any | null; 
+  isAuthenticated: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -19,13 +26,28 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  
+  // Mock Security Placeholder: In production, this would be reactive to Firebase Auth
+  const [user, setUser] = useState<any | null>(null);
 
-  // Persistence (Optional for prototype)
+  // Persistence logic with efficient local storage handling
   useEffect(() => {
     const savedCart = localStorage.getItem('amarise_cart');
     const savedWishlist = localStorage.getItem('amarise_wishlist');
-    if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.warn("Storage recovery failed");
+      }
+    }
+    if (savedWishlist) {
+      try {
+        setWishlist(JSON.parse(savedWishlist));
+      } catch (e) {
+        console.warn("Storage recovery failed");
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -72,18 +94,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => setCart([]);
 
+  // useMemo to stabilize context value and prevent unnecessary re-renders in children
+  const value = useMemo(() => ({
+    cart,
+    wishlist,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    toggleWishlist,
+    clearCart,
+    user,
+    isAuthenticated: !!user,
+  }), [cart, wishlist, user]);
+
   return (
-    <AppContext.Provider
-      value={{
-        cart,
-        wishlist,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        toggleWishlist,
-        clearCart,
-      }}
-    >
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

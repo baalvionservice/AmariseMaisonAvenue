@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -16,6 +17,9 @@ interface ProductCardProps {
   product: Product;
 }
 
+/**
+ * ProductCard optimized for performance with next/image and scalability.
+ */
 export const ProductCard = ({ product }: ProductCardProps) => {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -29,7 +33,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     addToCart(product);
     toast({
       title: "Added to Bag",
-      description: `${product.name} is waiting for you.`,
+      description: `${product.name} has been added to your selection.`,
     });
   };
 
@@ -40,19 +44,20 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-2xl border border-border/40">
+    <div className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
         <Image 
           src={product.imageUrl} 
           alt={product.name}
           fill
           className="object-cover transition-transform duration-1000 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-black/5 opacity-100 group-hover:opacity-0 transition-opacity duration-700" />
         
         {product.isVip && (
-          <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg z-10">
+          <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg z-10 luxury-blur bg-opacity-80">
             VIP Limited
           </div>
         )}
@@ -98,7 +103,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Provenance: Global</span>
+          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Provenance: Atelier Paris</span>
           <div className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
             Discover <Eye className="w-3 h-3 ml-2" />
           </div>
