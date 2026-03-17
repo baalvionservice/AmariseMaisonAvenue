@@ -20,15 +20,9 @@ export interface Country {
 export interface Category {
   id: string;
   name: string;
+  description?: string;
+  imageUrl?: string;
   subcategories: string[];
-}
-
-export interface Collection {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  isPrivate?: boolean;
 }
 
 export interface Product {
@@ -42,6 +36,8 @@ export interface Product {
   isVip: boolean;
   rating: number;
   reviewsCount: number;
+  colors?: string[];
+  sizes?: string[];
 }
 
 export interface CartItem extends Product {
