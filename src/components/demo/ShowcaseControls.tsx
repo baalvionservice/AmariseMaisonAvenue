@@ -9,15 +9,12 @@ import {
   Globe, 
   Crown, 
   LayoutDashboard, 
-  Sparkles, 
-  ChevronRight, 
-  X, 
   Settings2,
   PlayCircle,
-  Eye,
   Zap,
   BookOpen,
-  PieChart
+  PieChart,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -27,8 +24,7 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ShowcaseControls: The high-fidelity demo orchestration layer.
- * Allows demonstrators to jump between global contexts, VIP tiers, and administrative hubs.
+ * ShowcaseControls: Redesigned for the Light/Elegant luxury theme.
  */
 export function ShowcaseControls() {
   const { country } = useParams();
@@ -55,10 +51,8 @@ export function ShowcaseControls() {
 
   if (!isShowcaseMode) return (
     <Button 
-      variant="outline" 
-      size="sm" 
       onClick={() => setShowcaseMode(true)}
-      className="fixed bottom-6 right-6 z-[100] bg-background border-primary text-primary hover:bg-primary hover:text-white rounded-full shadow-2xl"
+      className="fixed bottom-6 right-6 z-[100] bg-white border-gold text-gold hover:bg-gold hover:text-white rounded-full shadow-luxury h-12 px-6"
     >
       <PlayCircle className="w-4 h-4 mr-2" /> Enter Showcase
     </Button>
@@ -68,27 +62,27 @@ export function ShowcaseControls() {
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end space-y-4">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button className="w-16 h-16 bg-primary hover:bg-secondary text-white rounded-full shadow-[0_20px_50px_rgba(102,38,204,0.4)] flex items-center justify-center transition-all hover:scale-110 active:scale-95 group relative">
+          <button className="w-16 h-16 bg-gold text-gray-900 rounded-full shadow-luxury flex items-center justify-center transition-all hover:scale-110 active:scale-95 group relative hover:shadow-gold-glow">
             <Settings2 className={cn("w-7 h-7 transition-transform duration-500", isOpen && "rotate-180")} />
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-primary"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-plum opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-plum border-2 border-white"></span>
             </span>
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-80 p-0 bg-card border-border shadow-[0_30px_60px_rgba(0,0,0,0.6)] overflow-hidden">
-          <div className="p-6 bg-primary/10 border-b border-primary/20">
+        <PopoverContent align="end" className="w-80 p-0 bg-white border-border shadow-luxury overflow-hidden">
+          <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-sm font-headline font-bold text-white uppercase tracking-widest">Super-Demo Mode</h3>
-                <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-muted-foreground hover:text-white" /></button>
+                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Super-Demo Mode</h3>
+                <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
              </div>
-             <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Maison Amarisé | Integrated Showcase</p>
+             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Maison Amarisé | Light Edition</p>
           </div>
 
-          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto">
             {/* Market Context */}
             <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Globe className="w-3 h-3" />
                 <span>Global Market Hub</span>
               </div>
@@ -99,7 +93,7 @@ export function ShowcaseControls() {
                     onClick={() => handleCountrySwitch(code)}
                     className={cn(
                       "h-10 border text-[10px] font-bold uppercase tracking-widest transition-all",
-                      currentCountry === code ? "bg-primary border-primary text-white" : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                      currentCountry === code ? "bg-gold border-gold text-gray-900" : "bg-ivory border-border text-gray-400 hover:bg-gold hover:text-gray-900"
                     )}
                   >
                     {code}
@@ -110,7 +104,7 @@ export function ShowcaseControls() {
 
             {/* Persona Simulation */}
             <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Crown className="w-3 h-3" />
                 <span>Client Tiers</span>
               </div>
@@ -133,7 +127,7 @@ export function ShowcaseControls() {
 
             {/* Quick Experience Jumps */}
             <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Zap className="w-3 h-3" />
                 <span>Experience Flow</span>
               </div>
@@ -146,14 +140,14 @@ export function ShowcaseControls() {
             </div>
           </div>
 
-          <div className="bg-muted/30 p-4 border-t border-border flex justify-between items-center">
+          <div className="bg-ivory p-4 border-t border-border flex justify-between items-center">
              <button 
               onClick={() => setShowcaseMode(false)}
-              className="text-[9px] uppercase tracking-widest text-muted-foreground hover:text-destructive font-bold"
+              className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-destructive font-bold"
              >
                Exit Super-Demo
              </button>
-             <span className="text-[8px] text-muted-foreground/50 tracking-widest">v3.0.0-PRO</span>
+             <span className="text-[8px] text-gray-300 tracking-widest uppercase">v4.0.0-LUXE</span>
           </div>
         </PopoverContent>
       </Popover>
@@ -167,11 +161,11 @@ function VipButton({ label, active, onClick }: { label: string, active: boolean,
       onClick={onClick}
       className={cn(
         "w-full h-12 px-4 border text-[10px] font-bold uppercase tracking-widest text-left flex items-center justify-between transition-all",
-        active ? "bg-primary/20 border-primary text-primary" : "bg-muted/10 border-border text-muted-foreground hover:bg-muted/30 hover:text-white"
+        active ? "bg-gold/10 border-gold text-plum shadow-sm" : "bg-ivory border-border text-gray-400 hover:bg-gold/5 hover:text-gray-900"
       )}
     >
       <span>{label}</span>
-      {active && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+      {active && <div className="w-2 h-2 rounded-full bg-gold animate-pulse shadow-gold-glow" />}
     </button>
   );
 }
@@ -181,12 +175,12 @@ function ActionLink({ href, icon, label }: { href: string, icon: React.ReactNode
   return (
     <button 
       onClick={() => router.push(href)}
-      className="flex items-center space-x-3 p-3 bg-muted/20 border border-border hover:border-primary/50 group transition-all w-full"
+      className="flex items-center space-x-3 p-3 bg-white border border-border hover:border-gold hover:shadow-luxury group transition-all w-full text-left"
     >
-      <span className="text-primary group-hover:scale-110 transition-transform">
+      <span className="text-gold group-hover:scale-110 transition-transform">
         {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4" })}
       </span>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-white">{label}</span>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-900">{label}</span>
     </button>
   );
 }

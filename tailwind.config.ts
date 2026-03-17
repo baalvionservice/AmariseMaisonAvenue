@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -16,6 +15,10 @@ export default {
         code: ['monospace'],
       },
       colors: {
+        ivory: '#FAF9F6',
+        plum: '#7E3F98',
+        gold: '#D4AF37',
+        lavender: '#BFA2DB',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -13,9 +12,8 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 /**
- * HomePage: The Cinematic Flagship.
- * Optimized for LCP and visual impact with localized AI curation and multi-language support.
- * Uses priority loading for the hero to satisfy Core Web Vitals.
+ * HomePage: Redesigned for a light, elegant, editorial luxury feel.
+ * Centered content overlays, airy typography, and sophisticated gold/plum accents.
  */
 export default function HomePage() {
   const { country } = useParams();
@@ -47,78 +45,78 @@ export default function HomePage() {
   }, [countryCode, currentCountry.name, currentCountry.locale, activeVip]);
 
   return (
-    <div className="space-y-32">
-      {/* Cinematic Hero - Priority Loaded for LCP */}
-      <section className="relative h-[98vh] w-full flex items-center justify-center overflow-hidden">
+    <div className="space-y-32 bg-ivory min-h-screen">
+      {/* Cinematic Hero - Redesigned for Light Editorial Look */}
+      <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden">
         <Image 
-          src="https://picsum.photos/seed/amarise-hero-main-hq/2560/1440" 
+          src="https://picsum.photos/seed/amarise-hero-light/2560/1440" 
           alt="Amarisé Luxe Heritage Presentation"
           fill
-          className="object-cover opacity-70 animate-slow-zoom"
+          className="object-cover opacity-90 animate-slow-zoom"
           priority
           sizes="100vw"
         />
         <div className="absolute inset-0 cinematic-gradient" />
-        <div className="relative z-10 text-center space-y-12 max-w-5xl px-6">
+        <div className="relative z-10 text-center space-y-12 max-w-4xl px-6 py-12 luxury-blur rounded-sm shadow-luxury">
           <div className="animate-fade-in opacity-0 [animation-delay:200ms] space-y-6">
-            <div className="flex items-center justify-center space-x-4 mb-2">
-              <div className="w-12 h-px bg-primary" />
-              <span className="text-[11px] font-bold tracking-[0.6em] uppercase text-primary">
-                Atelier Amarisé | {currentCountry.name === 'United States' ? 'New York' : currentCountry.name === 'France' ? 'Paris' : 'Global Hub'}
+            <div className="flex items-center justify-center space-x-6">
+              <div className="w-16 h-px bg-gold" />
+              <span className="text-[12px] font-bold tracking-[0.5em] uppercase text-plum">
+                Atelier Amarisé | {currentCountry.name}
               </span>
-              <div className="w-12 h-px bg-primary" />
+              <div className="w-16 h-px bg-gold" />
             </div>
-            <h1 className="text-8xl md:text-[10rem] font-headline font-bold text-white leading-[0.85] tracking-tighter">
+            <h1 className="text-6xl md:text-8xl font-headline font-bold text-gray-900 leading-tight tracking-tight">
               {getLocalizedMockText('Timeless', countryCode)} <br /> 
-              <span className="italic font-normal serif text-primary/90">{getLocalizedMockText('Elegance', countryCode)}</span>
+              <span className="italic font-normal serif text-gold">{getLocalizedMockText('Elegance', countryCode)}</span>
             </h1>
           </div>
           <div className="animate-fade-in opacity-0 [animation-delay:400ms]">
-            <p className="text-lg md:text-xl text-muted-foreground font-light max-w-xl mx-auto leading-relaxed tracking-wide">
+            <p className="text-lg md:text-xl text-gray-600 font-light max-w-xl mx-auto leading-relaxed tracking-wide">
               {activeVip 
                 ? `Welcome back, ${activeVip.name}. We have prepared your private viewing for the ${currentCountry.name} market.`
                 : `Crafting artifacts of desire for ${currentCountry.name}'s most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.`
               }
             </p>
           </div>
-          <div className="animate-fade-in opacity-0 [animation-delay:600ms] flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
+          <div className="animate-fade-in opacity-0 [animation-delay:600ms] flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
             <Link href={`/${countryCode}/category/apparel`}>
-              <Button size="lg" className="bg-primary hover:bg-secondary text-white px-14 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl transition-all hover:-translate-y-1">
+              <Button className="bg-gold text-gray-900 hover:shadow-gold-glow hover:scale-105 px-14 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
                 {getLocalizedMockText('VIEW SELECTION', countryCode)}
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="border-white/40 text-white hover:bg-white hover:text-background px-14 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
+            <Button variant="outline" className="border-plum text-plum hover:bg-plum hover:text-white px-14 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
               {activeVip ? "REQUEST CONCIERGE" : getLocalizedMockText("OUR HERITAGE", countryCode)}
             </Button>
           </div>
         </div>
       </section>
 
-      {/* From The Journal - Storytelling Engine Integration */}
+      {/* From The Journal - Light Editorial Spacing */}
       {latestEditorial && (
         <section className="container mx-auto px-6 py-24">
-          <div className="flex flex-col lg:flex-row items-center gap-20">
-            <div className="lg:w-1/2 relative aspect-[4/5] overflow-hidden group">
+          <div className="flex flex-col lg:flex-row items-center gap-24">
+            <div className="lg:w-1/2 relative aspect-[4/5] overflow-hidden rounded-lg shadow-luxury group">
               <Image 
                 src={latestEditorial.imageUrl} 
                 alt={latestEditorial.title} 
                 fill 
-                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+                className="object-cover transition-transform duration-[3s] group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
+              <div className="absolute inset-0 bg-lavender/10 group-hover:bg-transparent transition-colors" />
             </div>
-            <div className="lg:w-1/2 space-y-8">
-              <div className="flex items-center space-x-4 text-primary">
+            <div className="lg:w-1/2 space-y-10">
+              <div className="flex items-center space-x-4 text-plum">
                 <BookOpen className="w-8 h-8" />
-                <span className="text-[10px] font-bold tracking-[0.4em] uppercase">From The Journal</span>
+                <span className="text-[12px] font-bold tracking-[0.5em] uppercase">From The Journal</span>
               </div>
-              <h2 className="text-6xl font-headline font-bold italic leading-tight">{latestEditorial.title}</h2>
-              <p className="text-xl text-muted-foreground font-light leading-relaxed italic">
+              <h2 className="text-5xl font-headline font-bold italic leading-tight text-gray-900 border-l-4 border-gold pl-8">{latestEditorial.title}</h2>
+              <p className="text-xl text-gray-600 font-light leading-relaxed italic max-w-xl">
                 {latestEditorial.excerpt}
               </p>
-              <div className="pt-8 border-t border-border">
+              <div className="pt-8">
                  <Link href={`/${countryCode}/journal/${latestEditorial.id}`}>
-                    <Button variant="outline" className="rounded-none border-foreground h-16 px-12 text-[10px] font-bold tracking-[0.4em]">
+                    <Button className="bg-gold text-gray-900 hover:shadow-gold-glow h-16 px-14 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
                       READ THE NARRATIVE
                     </Button>
                  </Link>
@@ -128,78 +126,91 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* VIP Private Atelier Section */}
+      {/* VIP Private Atelier - Light Lavender Aesthetic */}
       {activeVip && (
-        <section className="container mx-auto px-6 border-y border-primary/20 bg-primary/5 py-32 animate-fade-in">
-          <div className="flex flex-col lg:flex-row items-center gap-20">
-            <div className="lg:w-1/3 space-y-8">
-              <div className="flex items-center space-x-4 text-primary">
-                <Crown className="w-10 h-10" />
-                <span className="text-[12px] font-bold tracking-[0.4em] uppercase">Private Atelier</span>
-              </div>
-              <h2 className="text-5xl font-headline font-bold italic">Curated for <br />{activeVip.name}</h2>
-              <p className="text-muted-foreground font-light leading-relaxed italic">
-                {getLocalizedMockText('Each piece in this selection has been hand-vetted by our master artisans to complement your bespoke status.', countryCode)}
-              </p>
-              <div className="pt-6 border-t border-primary/20 space-y-4">
-                <div className="flex items-center space-x-3 text-[10px] uppercase tracking-widest text-primary font-bold">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Bespoke Access Enabled</span>
+        <section className="bg-lavender/5 py-32 border-y border-border">
+          <div className="container mx-auto px-6">
+            <div className="flex flex-col lg:flex-row items-center gap-20">
+              <div className="lg:w-1/3 space-y-8">
+                <div className="flex items-center space-x-4 text-gold">
+                  <Crown className="w-10 h-10" />
+                  <span className="text-[12px] font-bold tracking-[0.5em] uppercase text-plum">Private Atelier</span>
                 </div>
-                <Button className="w-full bg-primary hover:bg-secondary h-14 rounded-none text-[10px] tracking-widest font-bold">
-                  ACCESS PRIVATE VAULT
-                </Button>
+                <h2 className="text-5xl font-headline font-bold italic text-gray-900">Curated for <br />{activeVip.name}</h2>
+                <p className="text-gray-600 font-light leading-relaxed italic">
+                  Each piece in this selection has been hand-vetted by our master artisans to complement your bespoke status.
+                </p>
+                <div className="pt-6 border-t border-gold/30 space-y-4">
+                  <div className="flex items-center space-x-3 text-[11px] uppercase tracking-widest text-gold font-bold">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Bespoke Access Enabled</span>
+                  </div>
+                  <Button className="w-full bg-plum text-white border border-gold hover:bg-gold hover:text-gray-900 h-14 rounded-sm text-[11px] tracking-widest font-bold transition-all">
+                    ACCESS PRIVATE VAULT
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
-               {COLLECTIONS.filter(c => activeVip.assignedCollections.includes(c.id)).map(col => (
-                 <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-video overflow-hidden border border-primary/30">
-                   <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" sizes="(max-width: 1024px) 100vw, 50vw" />
-                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-                   <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
-                      <span className="text-primary text-[9px] font-bold tracking-[0.4em] uppercase">Private Preview</span>
-                      <h3 className="text-3xl font-headline font-bold italic text-white">{col.name}</h3>
-                      <div className="w-12 h-px bg-white/40" />
-                      <p className="text-[10px] text-white/80 uppercase tracking-widest">Enter Gallery</p>
-                   </div>
-                 </Link>
-               ))}
+              <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
+                 {COLLECTIONS.filter(c => activeVip.assignedCollections.includes(c.id)).map(col => (
+                   <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-video overflow-hidden rounded-lg shadow-luxury border border-border">
+                     <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-105" sizes="(max-width: 1024px) 100vw, 50vw" />
+                     <div className="absolute inset-0 bg-lavender/20 group-hover:bg-transparent transition-colors" />
+                     <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
+                        <span className="text-gold text-[10px] font-bold tracking-[0.5em] uppercase drop-shadow-md">Private Preview</span>
+                        <h3 className="text-3xl font-headline font-bold italic text-white drop-shadow-lg">{col.name}</h3>
+                        <div className="w-16 h-px bg-gold/60" />
+                        <p className="text-[11px] text-white uppercase tracking-widest font-bold drop-shadow-md">Enter Gallery</p>
+                     </div>
+                   </Link>
+                 ))}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* AI Recommendations */}
-      <section className="container mx-auto px-6">
-        <div className="flex items-center space-x-8 mb-24">
-           <div className="p-6 bg-primary/10 rounded-full">
-              <Sparkles className="w-8 h-8 text-primary" />
+      {/* AI Recommendations - Clean Grid */}
+      <section className="container mx-auto px-6 py-24">
+        <div className="flex flex-col items-center text-center space-y-6 mb-24">
+           <div className="p-6 bg-gold/10 rounded-full">
+              <Sparkles className="w-8 h-8 text-gold" />
            </div>
            <div>
-              <h2 className="text-4xl font-headline font-bold">Personalized for You</h2>
-              <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold mt-1">Refined Insights for {currentCountry.name}</p>
+              <h2 className="text-5xl font-headline font-bold text-gray-900 tracking-tight">Personalized for You</h2>
+              <p className="text-gray-400 text-sm uppercase tracking-[0.4em] font-bold mt-2">Refined Insights for {currentCountry.name}</p>
            </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
           {loadingRecs ? (
-            [...Array(3)].map((_, i) => <div key={i} className="aspect-[4/5] bg-muted animate-pulse" />)
+            [...Array(3)].map((_, i) => <div key={i} className="aspect-[4/5] bg-white rounded-lg border border-border animate-pulse" />)
           ) : (
             recommendations.map(rec => (
-              <div key={rec.id} className="group space-y-6">
-                <div className="relative aspect-[4/5] overflow-hidden bg-muted border border-border">
-                   <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 33vw" />
-                   <div className="absolute bottom-6 left-6 right-6 p-4 luxury-blur bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-[10px] text-white font-bold uppercase tracking-widest text-center">In Stock: {currentCountry.code.toUpperCase()}</p>
-                   </div>
+              <div key={rec.id} className="group space-y-8 animate-fade-in">
+                <div className="relative aspect-[4/5] overflow-hidden bg-white rounded-lg border border-border shadow-luxury hover:shadow-md transition-shadow">
+                   <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-700 group-hover:scale-103" sizes="(max-width: 768px) 100vw, 33vw" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-lavender/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="space-y-2">
-                   <span className="text-primary text-[10px] font-bold tracking-widest uppercase">{rec.category}</span>
-                   <h3 className="text-2xl font-headline italic">{rec.name}</h3>
-                   <p className="text-lg font-light tracking-tighter">{currentCountry.symbol} {rec.price.toLocaleString()}</p>
+                <div className="space-y-3 text-center">
+                   <span className="text-plum text-[10px] font-bold tracking-[0.4em] uppercase">{rec.category}</span>
+                   <h3 className="text-2xl font-headline italic text-gray-900 group-hover:text-gold transition-colors">{rec.name}</h3>
+                   <p className="text-xl font-light tracking-tighter text-gray-500">{currentCountry.symbol} {rec.price.toLocaleString()}</p>
                 </div>
               </div>
             ))
           )}
+        </div>
+      </section>
+
+      {/* Footer CTA */}
+      <section className="bg-ivory py-40 text-center space-y-12">
+        <div className="max-w-2xl mx-auto space-y-8">
+           <h3 className="text-4xl font-headline font-bold italic text-gray-900">Experience Excellence</h3>
+           <p className="text-gray-600 font-light leading-relaxed">
+             Join the world of AMARISÉ Luxe. Receive private invitations to global launches and bespoke artisanal events.
+           </p>
+           <Button className="bg-gold text-gray-900 hover:shadow-gold-glow px-16 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold">
+             SUBSCRIBE TO THE MAISON
+           </Button>
         </div>
       </section>
     </div>

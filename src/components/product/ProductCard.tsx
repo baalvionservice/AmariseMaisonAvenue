@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { memo } from 'react';
@@ -18,8 +17,8 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard optimized for high-volume enterprise rendering and Core Web Vitals.
- * Enhanced with mock social interaction metrics.
+ * ProductCard: Optimized for high-volume enterprise rendering.
+ * Redesigned with a minimalist light aesthetic, soft shadows, and gold accents.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -65,34 +64,34 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   };
 
   return (
-    <article className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40 animate-fade-in h-full">
-      <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
+    <article className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-500 hover:shadow-luxury border border-border animate-fade-in h-full">
+      <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-ivory">
         <Image 
           src={product.imageUrl} 
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+          className="object-cover transition-transform duration-1000 group-hover:scale-103"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-black/5 opacity-100 group-hover:opacity-0 transition-opacity duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-lavender/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
         
         {product.isVip && (
-          <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg z-10 luxury-blur bg-opacity-80">
+          <div className="absolute top-4 left-4 bg-plum px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-sm z-10 bg-opacity-90 rounded-sm">
             VIP Limited
           </div>
         )}
 
         {/* Social Metrics Bubble */}
-        <div className="absolute top-4 right-4 flex items-center space-x-2 luxury-blur px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 border border-white/10">
-           <Heart className={cn("w-3 h-3", isWishlisted ? "fill-primary text-primary" : "text-white")} />
-           <span className="text-[9px] font-bold text-white">{metrics.likes.toLocaleString()}</span>
+        <div className="absolute top-4 right-4 flex items-center space-x-2 luxury-blur px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 border border-border rounded-full shadow-sm">
+           <Heart className={cn("w-3 h-3", isWishlisted ? "fill-plum text-plum" : "text-gray-400")} />
+           <span className="text-[9px] font-bold text-gray-700">{metrics.likes.toLocaleString()}</span>
         </div>
 
         {/* Quick Actions Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur bg-black/40 z-20">
+        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur z-20">
           <Button 
-            className="w-full h-12 rounded-none bg-white text-black hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest uppercase"
+            className="w-full h-12 rounded-sm bg-gold text-gray-900 hover:shadow-gold-glow hover:scale-102 transition-all text-[10px] font-bold tracking-widest uppercase border-none"
             onClick={handleAddToCart}
           >
             <ShoppingBag className="w-4 h-4 mr-2" /> ADD TO BAG
@@ -100,14 +99,14 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
-              className={cn("flex-1 h-12 rounded-none border-white/20 text-white hover:bg-white hover:text-black transition-all text-[10px] font-bold tracking-widest uppercase", isWishlisted && "bg-white text-black")}
+              className={cn("flex-1 h-12 rounded-sm border-border text-gray-700 hover:bg-ivory transition-all text-[10px] font-bold tracking-widest uppercase", isWishlisted && "bg-plum text-white hover:bg-plum/90")}
               onClick={handleToggleWishlist}
             >
               <Heart className={cn("w-4 h-4 mr-2", isWishlisted && "fill-current")} /> {isWishlisted ? "SAVED" : "SAVE"}
             </Button>
             <Button 
               variant="outline" 
-              className="w-12 h-12 rounded-none border-white/20 text-white hover:bg-primary hover:text-white transition-all p-0 flex items-center justify-center"
+              className="w-12 h-12 rounded-sm border-border text-gray-700 hover:text-gold transition-all p-0 flex items-center justify-center"
               onClick={handleShare}
             >
               <Share2 className="w-4 h-4" />
@@ -116,31 +115,31 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
       </Link>
       
-      <div className="p-8 flex-1 flex flex-col space-y-4">
+      <div className="p-8 flex-1 flex flex-col space-y-4 bg-white">
         <div className="space-y-1">
-          <div className="text-[9px] text-primary uppercase tracking-[0.3em] font-bold">{product.category}</div>
+          <div className="text-[9px] text-plum uppercase tracking-[0.3em] font-bold">{product.category}</div>
           <Link href={`/${countryCode}/product/${product.id}`}>
-            <h3 className="font-headline text-xl text-foreground group-hover:text-primary transition-colors duration-500 leading-tight line-clamp-1">{product.name}</h3>
+            <h3 className="font-headline text-xl text-gray-900 group-hover:text-gold transition-colors duration-500 leading-tight line-clamp-1">{product.name}</h3>
           </Link>
         </div>
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="flex text-primary">
+            <div className="flex text-gold">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className={cn("w-3 h-3", i < Math.floor(product.rating) ? "fill-current" : "text-muted-foreground")} />
+                <Star key={i} className={cn("w-3 h-3", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />
               ))}
             </div>
-            <span className="text-[9px] text-muted-foreground uppercase tracking-widest">({product.reviewsCount})</span>
+            <span className="text-[9px] text-gray-400 uppercase tracking-widest">({product.reviewsCount})</span>
           </div>
-          <span className="text-xl font-body font-light tracking-tighter text-foreground">
+          <span className="text-xl font-body font-light tracking-tighter text-gray-900">
             {formatPrice(product.basePrice, countryCode)}
           </span>
         </div>
 
-        <div className="pt-4 border-t border-border/40 flex items-center justify-between mt-auto">
-          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Atelier Paris</span>
-          <Link href={`/${countryCode}/product/${product.id}`} className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="pt-4 border-t border-border flex items-center justify-between mt-auto">
+          <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-bold">Atelier Paris</span>
+          <Link href={`/${countryCode}/product/${product.id}`} className="flex items-center text-[9px] text-gold font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
             Explore <Eye className="w-3 h-3 ml-2" />
           </Link>
         </div>
