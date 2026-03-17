@@ -42,7 +42,8 @@ import {
   Building2,
   History,
   Lock,
-  Smartphone
+  Smartphone,
+  LayoutTemplate
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -107,13 +108,10 @@ export default function SuperAdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('intelligence');
   const { 
     products, 
-    collections, 
     admins,
     vendors,
     activeCampaigns,
     auditLogs,
-    vipClients,
-    globalSettings,
     deleteProduct
   } = useAppStore();
   const { toast } = useToast();
@@ -139,9 +137,13 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture')} />
           <AdminNavItem icon={<Target />} label="Strategy" active={activeTab === 'strategy'} onClick={() => setActiveTab('strategy')} />
           <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
-          <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Operational Layers</div>
-          <AdminNavItem icon={<Package />} label="Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
-          <AdminNavItem icon={<ImageIcon />} label="Visuals" active={activeTab === 'assets'} onClick={() => setActiveTab('assets')} />
+          
+          <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Jumps</div>
+          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group px-6" asChild>
+            <Link href="/admin/operations">
+              <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
+            </Link>
+          </Button>
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -217,7 +219,7 @@ export default function SuperAdminPanel() {
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={REVENUE_DATA}>
                         <defs>
-                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                          <linearGradient id="colorValue" x1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.1}/>
                             <stop offset="95%" stopColor="#7E3F98" stopOpacity={0}/>
                           </linearGradient>
