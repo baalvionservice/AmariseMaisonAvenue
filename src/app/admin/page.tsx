@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -256,7 +255,7 @@ export default function SuperAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle突破
+                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by loyalty tier</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 flex flex-col items-center">
