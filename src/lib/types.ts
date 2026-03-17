@@ -145,3 +145,9 @@ export interface MaisonStory {
   }[];
   sustainability: string;
 }
+
+export interface CustomerServiceInfo {
+  shipping: string;
+  returns: string;
+  faqs: { question: string; answer: string }[];
+}

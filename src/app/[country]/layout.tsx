@@ -50,16 +50,16 @@ export default function CountryLayout({
             <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-plum">Client Services</h4>
             <ul className="space-y-4 text-sm font-light text-gray-500">
               <li><Link href={`/${countryCode}/wishlist`} className="hover:text-gold transition-colors">VIP Salon</Link></li>
-              <li><Link href={`/${countryCode}/checkout`} className="hover:text-gold transition-colors">Track Your Order</Link></li>
-              <li><Link href={`/${countryCode}/cart`} className="hover:text-gold transition-colors">Global Shipping</Link></li>
-              <li><Link href={`/${countryCode}/cart`} className="hover:text-gold transition-colors">Return Policy</Link></li>
+              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Track Your Order</Link></li>
+              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Global Shipping</Link></li>
+              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Return Policy</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-plum">Maison Amarisé</h4>
             <ul className="space-y-4 text-sm font-light text-gray-500">
               <li><Link href={`/${countryCode}/about`} className="hover:text-gold transition-colors">Our Story</Link></li>
-              <li><Link href={`/${countryCode}/about`} className="hover:text-gold transition-colors">Ateliers</Link></li>
+              <li><Link href={`/${countryCode}/contact`} className="hover:text-gold transition-colors">Ateliers</Link></li>
               <li><Link href={`/${countryCode}/journal`} className="hover:text-gold transition-colors">Sustainability</Link></li>
               <li><Link href="/admin" className="hover:text-gold transition-colors">Careers</Link></li>
             </ul>

@@ -1,5 +1,5 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory } from './types';
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { 
@@ -139,6 +139,50 @@ export const MAISON_STORY: MaisonStory = {
   sustainability: "Our Heritage of Responsibility ensures that 100% of our raw materials are ethically sourced, supporting the communities that provide us with nature's rarest gifts."
 };
 
+export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
+  us: {
+    shipping: "Complimentary white-glove delivery across the United States. Estimated arrival: 3-5 business days. Overnight delivery available for selection at the final salon view.",
+    returns: "30-day complimentary returns for all unworn artisanal pieces. Items must be in original architectural packaging with the authenticity seal intact. Bespoke commissions are final sale.",
+    faqs: [
+      { question: "How do I track my global shipment?", answer: "Once your piece leaves our New York atelier, you will receive a digital tracking portal via email and SMS." },
+      { question: "Is the packaging sustainable?", answer: "Our signature boxes are crafted from FSC-certified heritage paper and vegetable-based inks, designed for archival reuse." },
+      { question: "Are the shipments insured?", answer: "Every Amarisé artifact is fully insured for its replacement value until it is physically delivered to your care." }
+    ]
+  },
+  uk: {
+    shipping: "Bespoke courier service throughout the United Kingdom. Standard delivery: 2-3 business days. Same-day delivery available within Greater London.",
+    returns: "Complimentary returns within 30 days. Pieces must be returned in their original condition to our Old Bond Street atelier or via our private collection service.",
+    faqs: [
+      { question: "Can I visit the London atelier for a return?", answer: "Yes, our Old Bond Street salon accepts returns by private appointment between 10 AM and 6 PM." },
+      { question: "Do you offer international shipping from the UK?", answer: "We provide global white-glove delivery from our London hub to over 150 countries." }
+    ]
+  },
+  ae: {
+    shipping: "Exclusive delivery via the Amarisé Private Fleet across the Emirates. Same-day delivery for Dubai and Abu Dhabi for orders placed before 2 PM.",
+    returns: "21-day private collection service. Our concierge will visit your residence to inspect and collect the return items.",
+    faqs: [
+      { question: "Is same-day delivery available in Dubai?", answer: "Yes, for our local connoisseurs, we provide expedited fleet delivery within 6 hours of purchase." },
+      { question: "Can I pay in multiple currencies?", answer: "While we default to AED, our digital terminal accepts major global currencies and select private banking transfers." }
+    ]
+  },
+  in: {
+    shipping: "Secure artisanal transport across India. Estimated delivery to major metros: 4-6 business days. Fully insured transit for all high-jewelry pieces.",
+    returns: "15-day complimentary return policy. Collections can be arranged through our Mumbai HQ for verified return inspection.",
+    faqs: [
+      { question: "How are high-jewelry pieces shipped in India?", answer: "Jewelry artifacts are transported in specialized armored vehicles with dual-custodian security protocols." },
+      { question: "Is gift wrapping available?", answer: "All Indian orders include our signature Silk-wrapped festive packaging, perfect for high-society events." }
+    ]
+  },
+  sg: {
+    shipping: "Next-day concierge delivery across Singapore. Marina Bay Sands flagship pickup available within 2 hours of digital confirmation.",
+    returns: "30-day effortless returns. Visit our Marina Bay Sands salon for instant boutique credit or bank transfer processing.",
+    faqs: [
+      { question: "Can I pick up my order in person?", answer: "Absolutely. Select 'Atelier Collection' during checkout to meet our curators at the Marina Bay Sands flagship." },
+      { question: "Are duties included for Singapore deliveries?", answer: "All local GST and import duties are pre-settled by the Maison for your convenience." }
+    ]
+  }
+};
+
 export const CAMPAIGNS: Campaign[] = [
   { id: 'c1', title: 'Ramadan 2024 - Exclusive Edit', type: 'email', status: 'active', reach: 450000, engagement: 12.4, country: 'ae', performance: 88 },
   { id: 'c2', title: 'Spring Equinox Preview', type: 'social', status: 'scheduled', reach: 1200000, engagement: 0, country: 'us', performance: 0 },
@@ -150,7 +194,7 @@ export const AFFILIATES: Affiliate[] = [
   { id: 'a1', name: 'Vogue Global', tier: 'diamond', salesGenerated: 4500000, commissionPaid: 450000, status: 'active' },
   { id: 'a2', name: 'The London Gent', tier: 'gold', salesGenerated: 1200000, commissionPaid: 120000, status: 'active' },
   { id: 'a3', name: 'Dubai Luxe Life', tier: 'diamond', salesGenerated: 8900000, commissionPaid: 890000, status: 'active' },
-  { id: 'a4', name: 'Modern Maharaja', tier: 'silver', salesGenerated: 450000, commissionPaid: 45000, status: 'pending' },
+  { id: 'a4', name: 'Modern Maharaja', tier: 'silver', salesGenerated: 45000, commissionPaid: 4500, status: 'pending' },
 ];
 
 export const NOTIFICATIONS: Notification[] = [
