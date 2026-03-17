@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating immersive luxury category narratives.
@@ -25,10 +26,20 @@ export type GenerateCategoryNarrativeOutput = z.infer<
   typeof GenerateCategoryNarrativeOutputSchema
 >;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateCategoryNarrative(
   input: GenerateCategoryNarrativeInput
 ): Promise<GenerateCategoryNarrativeOutput> {
-  return generateCategoryNarrativeFlow(input);
+  try {
+    return await generateCategoryNarrativeFlow(input);
+  } catch (error) {
+    console.warn("AI Category Narrative Quota Exceeded. Returning archival entry.");
+    return {
+      narrative: `The ${input.categoryName} department at Maison Amarisé represents a dialogue between heritage and innovation. Each piece within this curation is a testament to our century-long pursuit of excellence, hand-selected to meet the standards of the world's most discerning connoisseurs.`
+    };
+  }
 }
 
 const categoryNarrativePrompt = ai.definePrompt({

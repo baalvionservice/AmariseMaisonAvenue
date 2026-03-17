@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating compelling and varied mock product descriptions.
@@ -25,10 +26,20 @@ export type GenerateProductDescriptionOutput = z.infer<
   typeof GenerateProductDescriptionOutputSchema
 >;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateProductDescription(
   input: GenerateProductDescriptionInput
 ): Promise<GenerateProductDescriptionOutput> {
-  return generateProductDescriptionFlow(input);
+  try {
+    return await generateProductDescriptionFlow(input);
+  } catch (error) {
+    console.warn("AI Description Quota Exceeded. Returning archive description.");
+    return {
+      description: `A testament to the pursuit of perfection, this ${input.productName} represents the pinnacle of Maison Amarisé's ${input.category} atelier. Designed in our Paris flagship and brought to life through centuries-old craft, it is an artifact for the modern connoisseur.`
+    };
+  }
 }
 
 const generateProductDescriptionPrompt = ai.definePrompt({

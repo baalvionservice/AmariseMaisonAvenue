@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating mock product recommendations.
@@ -43,10 +44,49 @@ export type GenerateProductRecommendationsOutput = z.infer<
   typeof GenerateProductRecommendationsOutputSchema
 >;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateProductRecommendations(
   input: GenerateProductRecommendationsInput
 ): Promise<GenerateProductRecommendationsOutput> {
-  return generateProductRecommendationsFlow(input);
+  try {
+    return await generateProductRecommendationsFlow(input);
+  } catch (error) {
+    console.warn("AI Recommendation Quota Exceeded. Returning curated fallback selection.");
+    // Curated Fallback Selection for Maison Connoisseurs
+    return {
+      recommendations: [
+        {
+          id: 'fallback-1',
+          name: 'Amarisé Heritage Silk Scarf',
+          description: 'A masterpiece of hand-painted silk from our 1924 archive.',
+          price: 1200,
+          currency: 'USD',
+          imageUrl: 'https://picsum.photos/seed/amarise-fallback-1/800/800',
+          category: 'Accessories'
+        },
+        {
+          id: 'fallback-2',
+          name: 'Maison Grand Complication',
+          description: 'A Swiss-engineered marvel with hand-polished heritage movements.',
+          price: 18500,
+          currency: 'USD',
+          imageUrl: 'https://picsum.photos/seed/amarise-fallback-2/800/800',
+          category: 'Watches'
+        },
+        {
+          id: 'fallback-3',
+          name: 'Nocturnal Allure Evening Gown',
+          description: 'Sculpted from midnight velvet and reclaimed gold thread.',
+          price: 9400,
+          currency: 'USD',
+          imageUrl: 'https://picsum.photos/seed/amarise-fallback-3/800/800',
+          category: 'Apparel'
+        }
+      ]
+    };
+  }
 }
 
 const productRecommendationPrompt = ai.definePrompt({
