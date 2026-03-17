@@ -129,12 +129,12 @@ export default function SuperAdminPanel() {
         </div>
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
-          <AdminNavItem icon={<BarChart3 />} label="Intelligence" active={activeTab === 'intelligence'} onClick={() => setActiveTab('intelligence'} />
-          <AdminNavItem icon={<Users />} label="Governance" active={activeTab === 'governance'} onClick={() => setActiveTab('governance'} />
-          <AdminNavItem icon={<Building2 />} label="Ecosystem" active={activeTab === 'ecosystem'} onClick={() => setActiveTab('ecosystem'} />
-          <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture'} />
-          <AdminNavItem icon={<Target />} label="Strategy" active={activeTab === 'strategy'} onClick={() => setActiveTab('strategy'} />
-          <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives'} />
+          <AdminNavItem icon={<BarChart3 />} label="Intelligence" active={activeTab === 'intelligence'} onClick={() => setActiveTab('intelligence')} />
+          <AdminNavItem icon={<Users />} label="Governance" active={activeTab === 'governance'} onClick={() => setActiveTab('governance')} />
+          <AdminNavItem icon={<Building2 />} label="Ecosystem" active={activeTab === 'ecosystem'} onClick={() => setActiveTab('ecosystem')} />
+          <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture')} />
+          <AdminNavItem icon={<Target />} label="Strategy" active={activeTab === 'strategy'} onClick={() => setActiveTab('strategy')} />
+          <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
           
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Jumps</div>
           <div className="space-y-1 px-4">
