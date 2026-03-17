@@ -29,17 +29,23 @@ const generateProducts = (): Product[] => {
 
   for (let i = 1; i <= 24; i++) {
     const cat = categories[i % categories.length];
+    
+    // Deterministic values to avoid hydration mismatch between server and client
+    const basePrice = ((i * 123) % 4501) + 500;
+    const rating = 4 + ((i * 7) % 11) / 10;
+    const reviewsCount = ((i * 17) % 46) + 5;
+
     products.push({
       id: `prod-${i}`,
       name: `Amarisé ${cat} Item ${i}`,
       category: cat,
       subcategory: 'Exclusive',
       collectionId: collectionIds[i % collectionIds.length],
-      basePrice: Math.floor(Math.random() * 5000) + 500,
+      basePrice,
       imageUrl: `https://picsum.photos/seed/amarise-p-${i}/800/800`,
       isVip: i % 5 === 0,
-      rating: 4 + Math.random(),
-      reviewsCount: Math.floor(Math.random() * 50) + 5,
+      rating,
+      reviewsCount,
     });
   }
   return products;
