@@ -9,6 +9,7 @@ interface AppContextType {
   wishlist: Product[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: Product) => void;
   clearCart: () => void;
 }
@@ -18,6 +19,22 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+
+  // Persistence (Optional for prototype)
+  useEffect(() => {
+    const savedCart = localStorage.getItem('amarise_cart');
+    const savedWishlist = localStorage.getItem('amarise_wishlist');
+    if (savedCart) setCart(JSON.parse(savedCart));
+    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('amarise_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -33,6 +50,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== productId));
+  };
+
+  const updateQuantity = (productId: string, delta: number) => {
+    setCart((prev) => prev.map(item => {
+      if (item.id === productId) {
+        const newQty = Math.max(1, item.quantity + delta);
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
   };
 
   const toggleWishlist = (product: Product) => {
@@ -52,6 +79,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         wishlist,
         addToCart,
         removeFromCart,
+        updateQuantity,
         toggleWishlist,
         clearCart,
       }}

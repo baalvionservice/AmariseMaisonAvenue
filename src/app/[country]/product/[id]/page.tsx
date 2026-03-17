@@ -1,7 +1,9 @@
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { PRODUCTS, REVIEWS, formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,12 +13,17 @@ import {
   Truck, 
   RefreshCcw,
   Star,
-  Check
+  Check,
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { ProductCard } from '@/components/product/ProductCard';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function ProductPage() {
   const { id, country } = useParams();
@@ -29,6 +36,10 @@ export default function ProductPage() {
   const [aiDescription, setAiDescription] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(true);
   const isWishlisted = wishlist.some(i => i.id === product?.id);
+
+  const relatedProducts = useMemo(() => {
+    return PRODUCTS.filter(p => p.category === product?.category && p.id !== product?.id).slice(0, 4);
+  }, [product]);
 
   useEffect(() => {
     if (!product) return;
@@ -63,18 +74,34 @@ export default function ProductPage() {
 
   return (
     <div className="container mx-auto px-6 py-12">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground">
+        <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Home</Link>
+        <ChevronRight className="w-3 h-3" />
+        <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="hover:text-primary transition-colors">{product.category}</Link>
+        <ChevronRight className="w-3 h-3" />
+        <span className="text-foreground">{product.name}</span>
+      </nav>
+
       <div className="flex flex-col lg:flex-row gap-20">
         {/* Gallery */}
         <div className="w-full lg:w-3/5 space-y-4">
-          <div className="relative aspect-[4/5] overflow-hidden bg-card bg-muted">
-            {/* Image removed */}
+          <div className="group relative aspect-[4/5] overflow-hidden bg-card bg-muted border border-border/40">
+            <Image 
+              src={product.imageUrl} 
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-1000 group-hover:scale-110"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/5 pointer-events-none" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative aspect-square bg-card bg-muted overflow-hidden">
-               {/* Image removed */}
+            <div className="relative aspect-square bg-card bg-muted overflow-hidden border border-border/40">
+               <Image src={`https://picsum.photos/seed/${product.id}-alt1/800/800`} alt="Detail 1" fill className="object-cover" />
             </div>
-            <div className="relative aspect-square bg-card bg-muted overflow-hidden">
-               {/* Image removed */}
+            <div className="relative aspect-square bg-card bg-muted overflow-hidden border border-border/40">
+               <Image src={`https://picsum.photos/seed/${product.id}-alt2/800/800`} alt="Detail 2" fill className="object-cover" />
             </div>
           </div>
         </div>
@@ -83,76 +110,67 @@ export default function ProductPage() {
         <div className="w-full lg:w-2/5 space-y-10">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">{product.category}</span>
+              <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase">{product.category}</span>
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" onClick={() => toggleWishlist(product)}>
-                  <Heart className={cn("w-5 h-5", isWishlisted && "fill-primary text-primary")} />
+                <Button variant="ghost" size="icon" className="hover:text-primary" onClick={() => toggleWishlist(product)}>
+                  <Heart className={cn("w-5 h-5 transition-all", isWishlisted && "fill-primary text-primary scale-110")} />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:text-primary">
                   <Share2 className="w-5 h-5" />
                 </Button>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-headline font-bold">{product.name}</h1>
-            <div className="flex items-center space-x-4">
+            <h1 className="text-5xl md:text-6xl font-headline font-bold leading-tight">{product.name}</h1>
+            <div className="flex items-center space-x-6">
               <div className="flex text-primary">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-muted-foreground")} />
                 ))}
               </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-widest">{product.reviewsCount} Reviews</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">{product.reviewsCount} Verfied Reviews</span>
             </div>
-            <div className="text-3xl font-light tracking-tighter pt-4">
+            <div className="text-4xl font-light tracking-tighter pt-4">
               {formatPrice(product.basePrice, countryCode)}
             </div>
           </div>
 
           <div className="space-y-6">
-            <p className="text-muted-foreground font-light leading-relaxed">
-              Exquisitely engineered and meticulously finished, this piece from the {product.collectionId} collection exemplifies the Amarisé standard.
-            </p>
+            <div className="prose prose-invert prose-sm font-light text-muted-foreground leading-relaxed italic">
+              "A testament to the pursuit of perfection, designed in our Paris atelier and brought to life through centuries-old craft."
+            </div>
             
-            <div className="grid grid-cols-1 gap-4 py-8 border-y border-border">
-              <div className="flex items-center space-x-4">
-                < ShieldCheck className="w-5 h-5 text-primary" />
-                <span className="text-sm">Lifetime Authenticity Guarantee</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Truck className="w-5 h-5 text-primary" />
-                <span className="text-sm">Complimentary Global Priority Shipping</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <RefreshCcw className="w-5 h-5 text-primary" />
-                <span className="text-sm">30-Day Concierge Returns</span>
-              </div>
+            <div className="grid grid-cols-1 gap-6 py-10 border-y border-border">
+              <Benefit icon={<ShieldCheck className="w-5 h-5" />} label="Authenticity Certificate Included" />
+              <Benefit icon={<Truck className="w-5 h-5" />} label="Complimentary Global White-Glove Shipping" />
+              <Benefit icon={<RefreshCcw className="w-5 h-5" />} label="30-Day Bespoke Returns Policy" />
             </div>
           </div>
 
           <div className="space-y-4 pt-6">
             <Button 
               size="lg" 
-              className="w-full bg-primary hover:bg-secondary text-white h-16 rounded-none text-xs tracking-[0.2em] font-bold"
+              className="w-full bg-primary hover:bg-secondary text-white h-16 rounded-none text-[10px] tracking-[0.3em] font-bold shadow-xl shadow-primary/20 transition-all hover:-translate-y-1"
               onClick={handleAddToCart}
             >
-              ADD TO BAG
+              ADD TO SHOPPING BAG
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="w-full border-foreground h-16 rounded-none text-xs tracking-[0.2em] font-bold"
-              onClick={() => router.push(`/${countryCode}/cart`)}
+              className="w-full border-foreground/50 hover:border-foreground h-16 rounded-none text-[10px] tracking-[0.3em] font-bold transition-all"
+              onClick={() => router.push(`/${countryCode}/checkout`)}
             >
-              PROCEED TO CHECKOUT
+              EXPRESS CHECKOUT
             </Button>
           </div>
 
-          <Tabs defaultValue="description" className="w-full pt-10">
-            <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-12 p-0 space-x-10">
-              <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">The Story</TabsTrigger>
-              <TabsTrigger value="details" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">Details</TabsTrigger>
-              <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">Reviews</TabsTrigger>
+          <Tabs defaultValue="description" className="w-full pt-12">
+            <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12">
+              <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">The Narrative</TabsTrigger>
+              <TabsTrigger value="details" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">Provenance</TabsTrigger>
+              <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full px-0 text-[10px] tracking-widest uppercase font-bold">Critiques</TabsTrigger>
             </TabsList>
-            <TabsContent value="description" className="pt-8 min-h-[200px]">
+            <TabsContent value="description" className="pt-10 min-h-[250px] animate-fade-in">
               {loadingAi ? (
                 <div className="space-y-4 animate-pulse">
                   <div className="h-4 bg-muted w-full" />
@@ -160,33 +178,33 @@ export default function ProductPage() {
                   <div className="h-4 bg-muted w-4/6" />
                 </div>
               ) : (
-                <div className="prose prose-invert prose-sm font-light text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {aiDescription || "The master story for this piece is being curated by our atelier."}
+                <div className="text-muted-foreground font-light leading-relaxed whitespace-pre-wrap first-letter:text-5xl first-letter:font-headline first-letter:mr-3 first-letter:float-left first-letter:text-primary">
+                  {aiDescription || "Our master storytellers are crafting the legacy for this exquisite piece."}
                 </div>
               )}
             </TabsContent>
-            <TabsContent value="details" className="pt-8">
-              <ul className="space-y-4 text-sm text-muted-foreground font-light">
-                <li className="flex items-center space-x-3"><Check className="w-4 h-4 text-primary" /> <span>Premium materials sourced ethically</span></li>
-                <li className="flex items-center space-x-3"><Check className="w-4 h-4 text-primary" /> <span>Hand-finished by master artisans</span></li>
-                <li className="flex items-center space-x-3"><Check className="w-4 h-4 text-primary" /> <span>Individually numbered for exclusivity</span></li>
-                <li className="flex items-center space-x-3"><Check className="w-4 h-4 text-primary" /> <span>Ships in signature luxury packaging</span></li>
+            <TabsContent value="details" className="pt-10 animate-fade-in">
+              <ul className="space-y-6">
+                <DetailItem label="Origin" value="Paris, France" />
+                <DetailItem label="Material" value="Sustainably Sourced Italian Silk & Fine Gold Hardware" />
+                <DetailItem label="Craft" value="Hand-finished by 3rd Generation Master Artisans" />
+                <DetailItem label="Exclusivity" value="Part of the Limited Edition Heritage Series" />
               </ul>
             </TabsContent>
-            <TabsContent value="reviews" className="pt-8">
-               <div className="space-y-8">
+            <TabsContent value="reviews" className="pt-10 animate-fade-in">
+               <div className="space-y-12">
                  {REVIEWS.map(rev => (
-                   <div key={rev.id} className="space-y-2">
+                   <div key={rev.id} className="space-y-4 pb-8 border-b border-border/50 last:border-0">
                      <div className="flex items-center justify-between">
-                       <span className="font-bold text-sm uppercase tracking-widest">{rev.userName}</span>
-                       <span className="text-[10px] text-muted-foreground">{rev.date}</span>
+                       <span className="font-bold text-xs uppercase tracking-[0.2em]">{rev.userName}</span>
+                       <span className="text-[10px] text-muted-foreground font-bold">{rev.date}</span>
                      </div>
                      <div className="flex text-primary">
                        {[...Array(5)].map((_, i) => (
                          <Star key={i} className={cn("w-3 h-3", i < rev.rating ? "fill-current" : "text-muted-foreground")} />
                        ))}
                      </div>
-                     <p className="text-sm text-muted-foreground italic">"{rev.comment}"</p>
+                     <p className="text-sm text-muted-foreground font-light italic leading-relaxed">"{rev.comment}"</p>
                    </div>
                  ))}
                </div>
@@ -194,10 +212,44 @@ export default function ProductPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Related Products */}
+      <section className="mt-40 border-t border-border pt-20">
+        <div className="flex items-end justify-between mb-16">
+          <div className="space-y-4">
+            <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase">Recommendations</span>
+            <h2 className="text-5xl font-headline font-bold">You May Also Admire</h2>
+          </div>
+          <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="text-[10px] font-bold tracking-widest uppercase border-b border-primary pb-1 group flex items-center">
+            View All <ArrowRight className="ml-2 w-3 h-3 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          {relatedProducts.map(p => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
+function Benefit({ icon, label }: { icon: React.ReactNode, label: string }) {
+  return (
+    <div className="flex items-center space-x-6 group">
+      <div className="p-3 bg-primary/5 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-500">
+        {icon}
+      </div>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">{label}</span>
+    </div>
+  );
+}
+
+function DetailItem({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="grid grid-cols-3 gap-8 items-start">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{label}</span>
+      <span className="col-span-2 text-sm text-muted-foreground font-light">{value}</span>
+    </div>
+  );
 }
