@@ -30,6 +30,33 @@
         "imageUrl": { "type": "string" }
       }
     },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "A global marketing initiative targeting specific regions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["email", "push", "social"] },
+        "status": { "type": "string", "enum": ["draft", "scheduled", "active", "completed"] },
+        "reach": { "type": "number" },
+        "engagement": { "type": "number" },
+        "country": { "type": "string" }
+      }
+    },
+    "Affiliate": {
+      "title": "Affiliate",
+      "description": "A luxury brand partner or influencer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "tier": { "type": "string", "enum": ["silver", "gold", "diamond"] },
+        "salesGenerated": { "type": "number" },
+        "commissionPaid": { "type": "number" },
+        "status": { "type": "string" }
+      }
+    },
     "Order": {
       "title": "Order",
       "description": "A record of a high-end customer purchase.",
@@ -47,44 +74,17 @@
         "countryCode": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       }
-    },
-    "Review": {
-      "title": "Review",
-      "description": "Client critique of a product.",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "productId": { "type": "string" },
-        "userName": { "type": "string" },
-        "rating": { "type": "number" },
-        "comment": { "type": "string" },
-        "date": { "type": "string", "format": "date" }
-      }
     }
   },
   "auth": {
     "providers": ["google.com", "password"]
   },
   "firestore": {
-    "/products/{productId}": {
-      "schema": "Product",
-      "description": "Global catalog of luxury items."
-    },
-    "/collections/{collectionId}": {
-      "schema": "Collection",
-      "description": "Seasonal and Heritage collections."
-    },
-    "/orders/{orderId}": {
-      "schema": "Order",
-      "description": "Global order tracking for VIP clientele."
-    },
-    "/reviews/{reviewId}": {
-      "schema": "Review",
-      "description": "Verified client testimonials."
-    },
-    "/wishlists/{userId}": {
-      "schema": { "type": "object" },
-      "description": "Private selection records."
-    }
+    "/products/{productId}": { "schema": "Product", "description": "Global catalog of luxury items." },
+    "/collections/{collectionId}": { "schema": "Collection", "description": "Seasonal and Heritage collections." },
+    "/campaigns/{campaignId}": { "schema": "Campaign", "description": "Global marketing campaigns." },
+    "/affiliates/{affiliateId}": { "schema": "Affiliate", "description": "Brand partner management." },
+    "/orders/{orderId}": { "schema": "Order", "description": "Global order tracking." },
+    "/reviews/{reviewId}": { "schema": { "$ref": "#/entities/Review" }, "description": "Client testimonials." }
   }
 }

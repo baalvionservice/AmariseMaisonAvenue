@@ -46,3 +46,32 @@ export interface Review {
   comment: string;
   date: string;
 }
+
+export interface Campaign {
+  id: string;
+  title: string;
+  type: 'email' | 'push' | 'social';
+  status: 'draft' | 'scheduled' | 'active' | 'completed';
+  reach: number;
+  engagement: number;
+  country: string;
+  performance: number;
+}
+
+export interface Affiliate {
+  id: string;
+  name: string;
+  tier: 'silver' | 'gold' | 'diamond';
+  salesGenerated: number;
+  commissionPaid: number;
+  status: 'active' | 'pending' | 'on_hold';
+}
+
+export interface Notification {
+  id: string;
+  type: 'Email' | 'Push';
+  subject: string;
+  recipients: string;
+  scheduledAt: string;
+  status: 'Queued' | 'Sent' | 'Failed';
+}
