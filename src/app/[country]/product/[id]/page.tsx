@@ -4,23 +4,23 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { PRODUCTS, REVIEWS, formatPrice, COUNTRIES } from '@/lib/mock-data';
+import { PRODUCTS, formatPrice, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
   Share2, 
   ShieldCheck, 
   Truck, 
-  RefreshCcw,
   Star,
   ChevronRight,
-  ArrowRight,
   Sparkles,
   Facebook,
   Twitter,
   Linkedin,
   Copy,
-  Info
+  Info,
+  Calendar,
+  Gift
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -37,10 +37,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/**
- * ProductPage: Enterprise-Grade Luxury Artifact Presentation.
- * Supports 12,500+ products with localized SEO, dynamic stock, and AI-driven narratives.
- */
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -60,8 +56,6 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   
   const isWishlisted = wishlist.some(i => i.id === product?.id);
-
-  // MOCK: Generate dynamic SKU and Stock levels for the demo
   const sku = useMemo(() => `AM-${id?.split('-')[1]}-${countryCode.toUpperCase()}`, [id, countryCode]);
   const stockCount = useMemo(() => Math.floor(Math.random() * 8) + 1, [id]);
 
@@ -102,90 +96,44 @@ export default function ProductPage() {
     addToCart(product);
     toast({
       title: "Added to Bag",
-      description: `${product.name} (SKU: ${sku}) has been added to your selection.`,
+      description: `${product.name} has been added to your selection.`,
     });
   };
 
   const handleToggleLike = () => {
     toggleWishlist(product);
     toggleLike(product.id, countryCode);
-    if (!isWishlisted) {
-      toast({
-        title: "Artisanal Resonance",
-        description: "Your taste for excellence is recorded in our archives.",
-      });
-    }
   };
 
   const handleShare = (platform: string) => {
     trackShare(product.id, countryCode);
     toast({
       title: `Shared to ${platform}`,
-      description: `The Maison's vision has been broadcasted to your network.`,
+      description: `The Maison's vision has been broadcasted.`,
     });
   };
 
   return (
     <div className="bg-ivory min-h-screen">
-      {/* SEO: JSON-LD Product Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": product.name,
-            "image": [
-              product.imageUrl,
-              `https://picsum.photos/seed/${id}-detail/1200/1600`,
-              `https://picsum.photos/seed/${id}-lifestyle/1200/1600`
-            ],
-            "description": product.subcategory,
-            "sku": sku,
-            "mpn": sku,
-            "brand": {
-              "@type": "Brand",
-              "name": "AMARISÉ Luxe"
-            },
-            "offers": {
-              "@type": "Offer",
-              "url": `https://amarise-luxe.com/${countryCode}/product/${id}`,
-              "priceCurrency": currentCountry.currency,
-              "price": product.basePrice,
-              "itemCondition": "https://schema.org/NewCondition",
-              "availability": "https://schema.org/InStock",
-              "seller": {
-                "@type": "Organization",
-                "name": "AMARISÉ Luxe"
-              }
-            }
-          })
-        }}
-      />
-
       <div className="container mx-auto px-6 py-12">
-        {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground font-bold">
           <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Maison</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="hover:text-primary transition-colors">{product.category}</Link>
+          <Link href={`/${countryCode}/category/${product.categoryId}`} className="hover:text-primary transition-colors uppercase">{product.categoryId}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-foreground font-black" aria-current="page">{product.name}</span>
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-24">
-          {/* Professional Gallery Section */}
           <div className="w-full lg:w-3/5 space-y-8">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
               <Image 
                 src={product.imageUrl} 
-                alt={`${product.name} - Front View`}
+                alt={product.name}
                 fill
                 className="object-cover transition-transform duration-[2.5s] group-hover:scale-105"
                 priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
               />
-              <div className="absolute inset-0 bg-black/5 pointer-events-none" />
               {product.isVip && (
                 <div className="absolute top-8 left-8 bg-plum px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80">
                   Private Edition
@@ -194,29 +142,14 @@ export default function ProductPage() {
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div className="relative aspect-[4/5] bg-white overflow-hidden border border-border shadow-sm group">
-                 <Image 
-                  src={`https://picsum.photos/seed/${id}-detail/1200/1600`} 
-                  alt="Artisanal Detail" 
-                  fill 
-                  className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                  sizes="30vw"
-                 />
-                 <div className="absolute inset-0 bg-plum/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 <Image src={`https://picsum.photos/seed/${id}-detail/1200/1600`} alt="Artisanal Detail" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               </div>
               <div className="relative aspect-[4/5] bg-white overflow-hidden border border-border shadow-sm group">
-                 <Image 
-                  src={`https://picsum.photos/seed/${id}-lifestyle/1200/1600`} 
-                  alt="Maison Lifestyle" 
-                  fill 
-                  className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                  sizes="30vw"
-                 />
-                 <div className="absolute inset-0 bg-plum/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 <Image src={`https://picsum.photos/seed/${id}-lifestyle/1200/1600`} alt="Maison Lifestyle" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               </div>
             </div>
           </div>
 
-          {/* Configuration & Purchase Section */}
           <div className="w-full lg:w-2/5 space-y-12">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -238,99 +171,38 @@ export default function ProductPage() {
                   ))}
                 </div>
                 <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold">{product.reviewsCount} Critiques</span>
-                <div className="h-4 w-px bg-border" />
-                <span className="text-[10px] text-plum uppercase tracking-widest font-bold">SKU: {sku}</span>
               </div>
               <div className="text-6xl font-light tracking-tighter pt-4 text-gray-900">
                 {formatPrice(product.basePrice, countryCode)}
               </div>
             </div>
 
-            {/* Selection Controls */}
-            <div className="space-y-12 py-12 border-y border-border">
-              {product.colors && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Artisanal Color: {selectedColor}</span>
-                  </div>
-                  <div className="flex gap-4">
-                    {product.colors.map(c => (
-                      <button 
-                        key={c}
-                        onClick={() => setSelectedColor(c)}
-                        className={cn(
-                          "w-12 h-12 border-2 transition-all p-1",
-                          selectedColor === c ? "border-gold scale-110" : "border-transparent"
-                        )}
-                      >
-                         <div className={cn(
-                           "w-full h-full",
-                           c === 'Ivory' ? 'bg-[#FAF9F6] border border-border' : 
-                           c === 'Gold' ? 'bg-[#D4AF37]' : 
-                           c === 'Plum' ? 'bg-[#7E3F98]' : 
-                           c === 'Midnight' ? 'bg-[#191970]' : 
-                           c === 'Emerald' ? 'bg-[#50C878]' : 
-                           c === 'Sapphire' ? 'bg-[#0F52BA]' : 
-                           'bg-[#353935]'
-                         )} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {product.sizes && (
-                <div className="space-y-4">
-                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dimensions: {selectedSize}</span>
-                    <button className="text-[9px] uppercase tracking-widest text-gold underline font-bold">Size Guide</button>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {product.sizes.map(s => (
-                      <button 
-                        key={s}
-                        onClick={() => setSelectedSize(s)}
-                        className={cn(
-                          "px-6 py-3 border text-[10px] font-bold tracking-widest transition-all",
-                          selectedSize === s ? "bg-plum text-white border-plum" : "bg-white border-border hover:border-plum"
-                        )}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Stock Status */}
-              <div className="flex items-center space-x-3 text-gold">
-                 <Info className="w-4 h-4" />
-                 <span className="text-[10px] font-bold uppercase tracking-widest">
-                   Only {stockCount} items remaining in our {currentCountry.office?.city} archive.
-                 </span>
-              </div>
-            </div>
-
-            {/* Actions */}
             <div className="space-y-4">
               <Button 
                 size="lg" 
-                className="w-full bg-plum text-white hover:bg-gold hover:text-gray-900 h-20 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl shadow-plum/10 transition-all hover:-translate-y-1"
+                className="w-full bg-plum text-white hover:bg-gold hover:text-gray-900 h-20 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl transition-all"
                 onClick={handleAddToCart}
               >
                 ADD TO SHOPPING BAG
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="w-full border-gray-900 hover:bg-gray-900 hover:text-white h-20 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all"
-                onClick={() => router.push(`/${countryCode}/checkout`)}
-              >
-                EXPRESS ATELIER CHECKOUT
-              </Button>
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
+                  onClick={() => router.push(`/${countryCode}/appointments`)}
+                >
+                  <Calendar className="w-4 h-4 mr-2" /> BOOK APPOINTMENT
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
+                  onClick={() => router.push(`/${countryCode}/gift-registry`)}
+                >
+                  <Gift className="w-4 h-4 mr-2" /> GIFT REGISTRY
+                </Button>
+              </div>
             </div>
 
-            {/* Tabs & Narrative */}
             <Tabs defaultValue="narrative" className="w-full pt-12">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12">
                 <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
@@ -345,18 +217,18 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="text-gray-600 font-light leading-relaxed whitespace-pre-wrap first-letter:text-6xl first-letter:font-headline first-letter:mr-3 first-letter:float-left first-letter:text-plum italic">
-                    {aiDescription || product.subcategory}
+                    {aiDescription || "A testament to the Maison's century-long pursuit of excellence."}
                   </div>
                 )}
               </TabsContent>
-              <TabsContent value="provenance" className="pt-10 animate-fade-in">
+              <TabsContent value="provenance" className="pt-10">
                 <ul className="space-y-6">
                   <DetailRow label="Origin" value={`Maison Amarisé Ateliers, ${currentCountry.office?.city}`} />
                   <DetailRow label="Atelier Craft" value="Hand-finished heritage series" />
                   <DetailRow label="Authenticity" value="NFC-enabled certification included" />
                 </ul>
               </TabsContent>
-              <TabsContent value="logistics" className="pt-10 animate-fade-in space-y-8">
+              <TabsContent value="logistics" className="pt-10 space-y-8">
                 <Benefit icon={<Truck className="w-4 h-4" />} title="White-Glove Delivery" desc={`Complimentary in ${currentCountry.name}`} />
                 <Benefit icon={<ShieldCheck className="w-4 h-4" />} title="Insured Transit" desc="Full value insurance included" />
               </TabsContent>
@@ -364,7 +236,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Curation: You May Also Admire */}
         <section className="mt-40 border-t border-border pt-20">
           <div className="flex items-end justify-between mb-20">
             <div className="space-y-4">
@@ -374,9 +245,6 @@ export default function ProductPage() {
               </div>
               <h2 className="text-5xl font-headline font-bold italic text-gray-900">Complementary Artifacts</h2>
             </div>
-            <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="text-[10px] font-bold tracking-[0.4em] uppercase border-b border-gold pb-2 hover:text-gold transition-colors">
-              EXPLORE FULL GALLERY
-            </Link>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -403,16 +271,16 @@ function ShareDropdown({ onShare }: { onShare: (platform: string) => void }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-white border-border luxury-blur w-56 p-2 shadow-luxury">
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-gold" onClick={() => onShare('Facebook')}>
+        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Facebook')}>
           <Facebook className="w-4 h-4 mr-3" /> Facebook
         </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-gold" onClick={() => onShare('Twitter')}>
+        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Twitter')}>
           <Twitter className="w-4 h-4 mr-3" /> Twitter
         </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-gold" onClick={() => onShare('LinkedIn')}>
+        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('LinkedIn')}>
           <Linkedin className="w-4 h-4 mr-3" /> LinkedIn
         </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-gold" onClick={() => onShare('Copy Link')}>
+        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Copy Link')}>
           <Copy className="w-4 h-4 mr-3" /> Copy Link
         </DropdownMenuItem>
       </DropdownMenuContent>

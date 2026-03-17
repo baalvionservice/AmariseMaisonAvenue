@@ -24,7 +24,9 @@ import {
   MaisonIntegration,
   ApiLog,
   IndexingStatus,
-  IndexingLog
+  IndexingLog,
+  Appointment,
+  Invoice
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -45,7 +47,9 @@ import {
   INTEGRATIONS,
   API_LOGS,
   INDEXING_STATUS,
-  INDEXING_LOGS
+  INDEXING_LOGS,
+  APPOINTMENTS,
+  INVOICES
 } from './mock-data';
 
 interface AppContextType {
@@ -69,6 +73,8 @@ interface AppContextType {
   vipClients: VipClient[];
   customerSegments: CustomerSegment[];
   globalSettings: GlobalSettings;
+  appointments: Appointment[];
+  invoices: Invoice[];
   
   // Support Hub State
   supportTickets: SupportTicket[];
@@ -104,6 +110,8 @@ interface AppContextType {
   upsertCampaign: (campaign: Campaign) => void;
   updateGlobalSettings: (settings: GlobalSettings) => void;
   upsertSegment: (segment: CustomerSegment) => void;
+  upsertAppointment: (apt: Appointment) => void;
+  updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   
   // Support Actions
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
@@ -148,6 +156,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
   const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
   const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
+  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
   
   // Support Hub State
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
@@ -164,7 +174,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
     seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
-    payments: { cards: true, wallets: true, crypto: false }
+    payments: { cards: true, wallets: true, crypto: false },
+    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
+    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' }
   });
   
   const [isShowcaseMode, setShowcaseMode] = useState(false);
@@ -307,6 +319,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const upsertAppointment = (apt: Appointment) => {
+    setAppointments(prev => [...prev, apt]);
+  };
+
+  const updateAppointmentStatus = (id: string, status: Appointment['status']) => {
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+  };
+
   // Support Actions
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
     setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
@@ -398,6 +418,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     apiLogs,
     indexingStatus,
     indexingLogs,
+    appointments,
+    invoices,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -414,6 +436,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertVendor,
     upsertCampaign,
     upsertSegment,
+    upsertAppointment,
+    updateAppointmentStatus,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
@@ -426,7 +450,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

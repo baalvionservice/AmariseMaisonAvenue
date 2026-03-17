@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -46,26 +47,20 @@ import {
   BriefcaseBusiness,
   PieChart,
   LifeBuoy,
-  Cpu
+  Cpu,
+  ShieldCheck,
+  ActivitySquare
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   COUNTRIES, 
-  DEPARTMENTS, 
-  CATEGORIES, 
-  COLORS, 
-  SIZES 
 } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Table, 
   TableBody, 
@@ -84,18 +79,20 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Pie,
-  Cell
+  Cell,
+  BarChart,
+  Bar
 } from 'recharts';
 
-type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives';
+type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives' | 'compliance';
 
 const REVENUE_DATA = [
-  { name: 'Jan', value: 450000 },
-  { name: 'Feb', value: 520000 },
-  { name: 'Mar', value: 480000 },
-  { name: 'Apr', value: 610000 },
-  { name: 'May', value: 590000 },
-  { name: 'Jun', value: 720000 },
+  { name: 'Jan', value: 450000, forecast: 460000 },
+  { name: 'Feb', value: 520000, forecast: 530000 },
+  { name: 'Mar', value: 480000, forecast: 500000 },
+  { name: 'Apr', value: 610000, forecast: 620000 },
+  { name: 'May', value: 590000, forecast: 640000 },
+  { name: 'Jun', value: 720000, forecast: 750000 },
 ];
 
 const DEMO_DATA = [
@@ -111,7 +108,8 @@ export default function SuperAdminPanel() {
     admins,
     vendors,
     activeCampaigns,
-    auditLogs
+    auditLogs,
+    globalSettings
   } = useAppStore();
   const { toast } = useToast();
 
@@ -130,14 +128,20 @@ export default function SuperAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <AdminNavItem icon={<BarChart3 />} label="Intelligence" active={activeTab === 'intelligence'} onClick={() => setActiveTab('intelligence')} />
+          <AdminNavItem icon={<ShieldCheck />} label="Compliance" active={activeTab === 'compliance'} onClick={() => setActiveTab('compliance')} />
           <AdminNavItem icon={<Users />} label="Governance" active={activeTab === 'governance'} onClick={() => setActiveTab('governance')} />
           <AdminNavItem icon={<Building2 />} label="Ecosystem" active={activeTab === 'ecosystem'} onClick={() => setActiveTab('ecosystem')} />
           <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture')} />
           <AdminNavItem icon={<Target />} label="Strategy" active={activeTab === 'strategy'} onClick={() => setActiveTab('strategy')} />
           <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
           
-          <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Jumps</div>
+          <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
           <div className="space-y-1 px-4">
+            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
+              <Link href="/admin/finance">
+                <CreditCard className="w-4 h-4 mr-3" /> Finance Hub
+              </Link>
+            </Button>
             <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
               <Link href="/admin/operations">
                 <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
@@ -158,11 +162,6 @@ export default function SuperAdminPanel() {
                 <Cpu className="w-4 h-4 mr-3" /> Sync / API Hub
               </Link>
             </Button>
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-              <Link href="/admin/vendor">
-                <BriefcaseBusiness className="w-4 h-4 mr-3" /> Vendor Portal
-              </Link>
-            </Button>
           </div>
         </nav>
 
@@ -171,7 +170,7 @@ export default function SuperAdminPanel() {
              <ShieldAlert className="w-4 h-4 text-plum" />
              <div className="flex flex-col">
                 <span className="text-[9px] font-bold uppercase tracking-widest">Security: Optimal</span>
-                <span className="text-[8px] text-gray-400">2FA Verified</span>
+                <span className="text-[8px] text-gray-400">2FA Enforced</span>
              </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
@@ -223,14 +222,14 @@ export default function SuperAdminPanel() {
                 <StatCard icon={<DollarSign />} label="Global Revenue" value="$4.2M" trend="+12.5%" positive />
                 <StatCard icon={<Briefcase />} label="Avg. Order Value" value="$8,450" trend="+4.2%" positive />
                 <StatCard icon={<Crown />} label="VIP Retention" value="94%" trend="Live" positive />
-                <StatCard icon={<Target />} label="Ad Conversion" value="3.8%" trend="-0.5%" positive={false} />
+                <StatCard icon={<Target />} label="Predicted Growth" value="18.2%" trend="AI Forecast" positive />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Revenue Architecture</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Growth trajectory across global ateliers (6 months)</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Revenue Architecture & AI Forecasting</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Growth trajectory vs predicted artisanal volume</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 h-80">
                     <ResponsiveContainer width="100%" height="100%">
@@ -247,7 +246,8 @@ export default function SuperAdminPanel() {
                         <ChartTooltip 
                           contentStyle={{backgroundColor: '#fff', border: '1px solid #eee', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase'}}
                         />
-                        <Area type="monotone" dataKey="value" stroke="#7E3F98" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
+                        <Area type="monotone" dataKey="value" name="Actual" stroke="#7E3F98" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
+                        <Area type="monotone" dataKey="forecast" name="AI Forecast" stroke="#D4AF37" strokeDasharray="5 5" fill="transparent" strokeWidth={2} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -255,8 +255,8 @@ export default function SuperAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by loyalty tier</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Client Lifetime Value</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by tier resonance</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 flex flex-col items-center">
                     <div className="h-48 w-full">
@@ -296,6 +296,30 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
+          {activeTab === 'compliance' && (
+            <div className="space-y-12">
+              <h2 className="text-2xl font-headline font-bold italic">Security & Regulatory Compliance</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <ComplianceCard icon={<ShieldCheck />} label="GDPR / CCPA Status" value={globalSettings.compliance.gdprEnabled ? "Active" : "Disabled"} status="Optimal" />
+                <ComplianceCard icon={<Lock />} label="PCI-DSS v4.0" value={globalSettings.compliance.pciStatus} status="Verified" />
+                <ComplianceCard icon={<ActivitySquare />} label="Fraud Shield" value="99.9% Protection" status="Active" />
+              </div>
+              
+              <Card className="bg-white border-border shadow-luxury">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl">Platform Security Policies</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Enterprise-level safety protocols</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <SecuritySettingRow label="Mandatory Two-Factor Authentication (2FA)" active={true} />
+                  <SecuritySettingRow label="IP Whitelisting for Admin Operations" active={true} />
+                  <SecuritySettingRow label="Automated PII Masking in Logs" active={true} />
+                  <SecuritySettingRow label="Real-time Intrusion Detection (IDS)" active={true} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {activeTab === 'governance' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -329,10 +353,9 @@ export default function SuperAdminPanel() {
                           <span>Role</span>
                           <span className="text-plum">{admin.role}</span>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {admin.permissions.map(p => (
-                            <Badge key={p} variant="outline" className="text-[7px] border-border text-gray-400 uppercase tracking-tighter">PERM_{p.toUpperCase()}</Badge>
-                          ))}
+                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                          <span>2FA Status</span>
+                          <span className={admin.twoFactorEnabled ? "text-green-600" : "text-red-600"}>{admin.twoFactorEnabled ? "Verified" : "Missing"}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -357,7 +380,7 @@ export default function SuperAdminPanel() {
                     <TableRow>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold">Partner Name</TableHead>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold">Category</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Trust Index</TableHead>
+                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Fulfillment</TableHead>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Entities</TableHead>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold text-right">Revenue Share</TableHead>
                     </TableRow>
@@ -369,7 +392,7 @@ export default function SuperAdminPanel() {
                         <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{vendor.category}</Badge></TableCell>
                         <TableCell>
                           <div className="flex flex-col items-center space-y-1">
-                            <span className="text-[10px] font-bold text-gold">{vendor.performance}%</span>
+                            <span className="text-[10px] font-bold text-gold">{vendor.kpis.fulfillmentSpeed}</span>
                             <Progress value={vendor.performance} className="h-1 w-16 bg-gray-100" />
                           </div>
                         </TableCell>
@@ -466,5 +489,32 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function ComplianceCard({ icon, label, value, status }: { icon: any, label: string, value: string, status: string }) {
+  return (
+    <Card className="bg-white border-border shadow-sm p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="p-3 bg-ivory rounded-sm text-plum">{icon}</div>
+        <Badge className="bg-green-50 text-green-600 text-[8px] uppercase">{status}</Badge>
+      </div>
+      <div>
+        <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest">{label}</p>
+        <p className="text-xl font-headline font-bold mt-1">{value}</p>
+      </div>
+    </Card>
+  );
+}
+
+function SecuritySettingRow({ label, active }: { label: string, active: boolean }) {
+  return (
+    <div className="flex items-center justify-between p-4 border border-border rounded-sm hover:bg-ivory/50 transition-colors">
+      <div className="flex items-center space-x-4">
+        <div className={cn("w-2.5 h-2.5 rounded-full", active ? "bg-green-500" : "bg-gray-200")} />
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-700">{label}</span>
+      </div>
+      <Badge variant="outline" className="text-[8px] uppercase">{active ? "Enforced" : "Optional"}</Badge>
+    </div>
   );
 }

@@ -140,17 +140,18 @@ export interface CustomerServiceInfo {
   faqs: { question: string; answer: string }[];
 }
 
-// --- ADMIN & MARKETING EXTENSIONS ---
+// --- ENTERPRISE & ADMIN EXTENSIONS ---
 
 export interface AdminAccount {
   id: string;
   name: string;
   email: string;
-  role: 'CEO' | 'Manager' | 'Ops' | 'Marketing' | 'Support';
+  role: 'CEO' | 'Manager' | 'Ops' | 'Marketing' | 'Support' | 'Finance' | 'IT';
   permissions: string[];
   status: 'active' | 'suspended';
   lastActive: string;
   avatar?: string;
+  twoFactorEnabled: boolean;
 }
 
 export interface Vendor {
@@ -163,6 +164,11 @@ export interface Vendor {
   status: 'active' | 'pending' | 'rejected';
   payoutSchedule: 'weekly' | 'monthly';
   joinedDate: string;
+  kpis: {
+    returnRate: number;
+    fulfillmentSpeed: string;
+    rating: number;
+  };
 }
 
 export interface Campaign {
@@ -177,6 +183,8 @@ export interface Campaign {
   roi?: number;
   reach?: number;
   conversions?: number;
+  predictedRoi?: number;
+  abTestActive: boolean;
 }
 
 export interface CustomerSegment {
@@ -186,6 +194,29 @@ export interface CustomerSegment {
   userCount: number;
   avgOrderValue: number;
   tags: string[];
+  predictedChurn: number;
+}
+
+export interface Appointment {
+  id: string;
+  customerId: string;
+  customerName: string;
+  type: 'Private Viewing' | 'Virtual Try-on' | 'Atelier Tour';
+  date: string;
+  time: string;
+  city: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+}
+
+export interface Invoice {
+  id: string;
+  orderId: string;
+  customerName: string;
+  amount: number;
+  currency: string;
+  status: 'issued' | 'paid' | 'overdue';
+  date: string;
+  taxAmount: number;
 }
 
 export interface AuditLog {
@@ -215,6 +246,16 @@ export interface GlobalSettings {
     wallets: boolean;
     crypto: boolean;
   };
+  compliance: {
+    gdprEnabled: boolean;
+    ccpaEnabled: boolean;
+    pciStatus: 'Optimal' | 'Review Required';
+  };
+  performance: {
+    cdnEnabled: boolean;
+    cachingEnabled: boolean;
+    autoScalingStatus: string;
+  }
 }
 
 export interface VipClient {
