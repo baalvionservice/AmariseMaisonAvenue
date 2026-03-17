@@ -31,6 +31,7 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const countryCode = (country as string) || 'us';
+  const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
 
   const countryCities = CITIES.filter(c => c.countryCode === countryCode);
@@ -69,7 +70,7 @@ export const Header = () => {
                 </button>
                 <div className="absolute top-full left-0 hidden group-hover:block w-64 bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-2 duration-300 pt-2">
                   <div className="p-2 space-y-1">
-                    <DropdownMenuLabel className="text-[9px] uppercase tracking-widest text-muted-foreground px-4 py-2">Maison Cities: {COUNTRIES[countryCode].name}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="text-[9px] uppercase tracking-widest text-muted-foreground px-4 py-2">Maison Cities: {currentCountry.name}</DropdownMenuLabel>
                     {countryCities.map(city => (
                       <Link 
                         key={city.id}

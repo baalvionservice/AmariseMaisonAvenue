@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -57,6 +58,8 @@ export default function AdminDashboard() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('us');
 
+  const currentCountry = COUNTRIES[selectedCountry] || COUNTRIES.us;
+
   const [editorialDraft, setEditorialDraft] = useState({
     topic: '',
     category: 'Artisanal' as any,
@@ -98,7 +101,7 @@ export default function AdminDashboard() {
       const res = await generateEditorialContent({
         topic: editorialDraft.topic,
         category: editorialDraft.category,
-        country: COUNTRIES[selectedCountry].name,
+        country: currentCountry.name,
         isVip: editorialDraft.isVip
       });
       setEditorialDraft(prev => ({
@@ -182,7 +185,7 @@ export default function AdminDashboard() {
               {activeTab.replace('-', ' ')}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Atelier Command Hub | {COUNTRIES[selectedCountry].name}
+              Atelier Command Hub | {currentCountry.name}
             </p>
           </div>
           <div className="flex items-center space-x-6">
@@ -236,7 +239,7 @@ export default function AdminDashboard() {
                             <div>
                               <div className="font-headline text-xl font-bold text-gray-900 group-hover:text-plum transition-colors">{c.title}</div>
                               <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mt-1">
-                                {c.status} | {COUNTRIES[c.country]?.name}
+                                {c.status} | {COUNTRIES[c.country]?.name || 'Global'}
                               </div>
                             </div>
                           </div>
@@ -271,8 +274,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
-
-        {/* ... (Additional Tabs omitted for brevity, but they would follow the same light theme pattern) */}
       </main>
     </div>
   );
