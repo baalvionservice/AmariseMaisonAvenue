@@ -25,6 +25,7 @@ import {
 } from './mock-data';
 
 interface AppContextType {
+  // Data State
   cart: CartItem[];
   wishlist: Product[];
   products: Product[];
@@ -35,15 +36,33 @@ interface AppContextType {
   buyingGuides: BuyingGuide[];
   editorials: Editorial[];
   socialMetrics: Record<string, SocialMetrics>;
-  socialInteractions: SocialInteraction[];
+  
+  // Showcase State
+  isShowcaseMode: boolean;
+  activeVip: any | null;
+  
+  // Actions
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: Product) => void;
   clearCart: () => void;
-  addEditorial: (editorial: Editorial) => void;
+  
+  // Admin Actions
+  upsertProduct: (product: Product) => void;
+  deleteProduct: (id: string) => void;
+  upsertCollection: (collection: Collection) => void;
+  upsertEditorial: (editorial: Editorial) => void;
+  upsertCity: (city: City) => void;
+  upsertBuyingGuide: (guide: BuyingGuide) => void;
+  
+  // Social Actions
   toggleLike: (contentId: string, country: string) => void;
   trackShare: (contentId: string, country: string) => void;
+  
+  // System Controls
+  setShowcaseMode: (val: boolean) => void;
+  setActiveVip: (vip: any | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,11 +78,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES);
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
-  const [socialInteractions, setSocialInteractions] = useState<SocialInteraction[]>([]);
+  
+  const [isShowcaseMode, setShowcaseMode] = useState(false);
+  const [activeVip, setActiveVip] = useState<any | null>(null);
 
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
-    INITIAL_PRODUCTS.forEach(p => {
+    products.forEach(p => {
       initialMetrics[p.id] = {
         likes: Math.floor(Math.random() * 1000) + 100,
         shares: Math.floor(Math.random() * 200) + 50,
@@ -71,8 +92,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       };
     });
     setSocialMetrics(initialMetrics);
-  }, []);
+  }, [products]);
 
+  // --- E-commerce Actions ---
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -107,6 +129,74 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const clearCart = () => setCart([]);
+
+  // --- Admin Mutations ---
+  const upsertProduct = (p: Product) => {
+    setProducts(prev => {
+      const idx = prev.findIndex(item => item.id === p.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = p;
+        return next;
+      }
+      return [p, ...prev];
+    });
+  };
+
+  const deleteProduct = (id: string) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const upsertCollection = (c: Collection) => {
+    setCollections(prev => {
+      const idx = prev.findIndex(item => item.id === c.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = c;
+        return next;
+      }
+      return [c, ...prev];
+    });
+  };
+
+  const upsertEditorial = (ed: Editorial) => {
+    setEditorials(prev => {
+      const idx = prev.findIndex(item => item.id === ed.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = ed;
+        return next;
+      }
+      return [ed, ...prev];
+    });
+  };
+
+  const upsertCity = (city: City) => {
+    setCities(prev => {
+      const idx = prev.findIndex(item => item.id === city.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = city;
+        return next;
+      }
+      return [city, ...prev];
+    });
+  };
+
+  const upsertBuyingGuide = (guide: BuyingGuide) => {
+    setBuyingGuides(prev => {
+      const idx = prev.findIndex(item => item.id === guide.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = guide;
+        return next;
+      }
+      return [guide, ...prev];
+    });
+  };
+
+  // --- Social Actions ---
   const toggleLike = (contentId: string, country: string) => {
     setSocialMetrics(prev => {
       const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
@@ -121,9 +211,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const clearCart = () => setCart([]);
-  const addEditorial = (editorial: Editorial) => setEditorials(prev => [editorial, ...prev]);
-
   const value = useMemo(() => ({
     cart,
     wishlist,
@@ -135,16 +222,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     buyingGuides,
     editorials,
     socialMetrics,
-    socialInteractions,
+    isShowcaseMode,
+    activeVip,
     addToCart,
     removeFromCart,
     updateQuantity,
     toggleWishlist,
     clearCart,
-    addEditorial,
+    upsertProduct,
+    deleteProduct,
+    upsertCollection,
+    upsertEditorial,
+    upsertCity,
+    upsertBuyingGuide,
     toggleLike,
     trackShare,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, socialInteractions]);
+    setShowcaseMode,
+    setActiveVip,
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, isShowcaseMode, activeVip]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
