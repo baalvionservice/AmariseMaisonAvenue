@@ -30,7 +30,11 @@ import {
   RefreshCcw,
   History,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  LayoutDashboard,
+  PieChart,
+  LineChart,
+  Layers
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,24 +42,73 @@ import {
   CAMPAIGNS, 
   AFFILIATES, 
   COUNTRIES,
-  formatPrice 
+  formatPrice,
+  PRODUCTS
 } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
-import { generateCollectionNarrative } from '@/ai/flows/generate-collection-narrative';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  ChartContainer, 
+  ChartTooltip, 
+  ChartTooltipContent, 
+  ChartLegend, 
+  ChartLegendContent 
+} from "@/components/ui/chart";
+import { 
+  Bar, 
+  BarChart, 
+  CartesianGrid, 
+  XAxis, 
+  YAxis, 
+  ResponsiveContainer, 
+  Tooltip, 
+  Area, 
+  AreaChart,
+  Pie,
+  Cell,
+  PieChart as RePieChart,
+  Line,
+  LineChart as ReLineChart
+} from "recharts";
 
 type AdminRole = 'admin' | 'marketing';
-type ActiveTab = 'dashboard' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'notifications' | 'settings';
+type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'notifications' | 'settings';
+
+// Mock Analytics Data
+const REVENUE_TREND = [
+  { month: 'Jan', revenue: 2400, conversions: 400 },
+  { month: 'Feb', revenue: 1398, conversions: 300 },
+  { month: 'Mar', revenue: 9800, conversions: 2000 },
+  { month: 'Apr', revenue: 3908, conversions: 2780 },
+  { month: 'May', revenue: 4800, conversions: 1890 },
+  { month: 'Jun', revenue: 3800, conversions: 2390 },
+  { month: 'Jul', revenue: 4300, conversions: 3490 },
+];
+
+const REGIONAL_PERFORMANCE = [
+  { name: 'US', sales: 4000, reach: 2400 },
+  { name: 'UK', sales: 3000, reach: 1398 },
+  { name: 'UAE', sales: 2000, reach: 9800 },
+  { name: 'IN', sales: 2780, reach: 3908 },
+  { name: 'SG', sales: 1890, reach: 4800 },
+];
+
+const CATEGORY_DATA = [
+  { name: 'Apparel', value: 400, color: 'hsl(var(--primary))' },
+  { name: 'Jewelry', value: 300, color: 'hsl(var(--secondary))' },
+  { name: 'Timepieces', value: 300, color: 'hsl(var(--accent))' },
+  { name: 'Accessories', value: 200, color: 'hsl(var(--muted-foreground))' },
+];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
   const [isStressTest, setIsStressTest] = useState(false);
-  const { products, collections, updateProductDescription, updateCollectionNarrative } = useAppStore();
+  const { products, updateProductDescription } = useAppStore();
   const { toast } = useToast();
 
   const [aiLogs, setAiLogs] = useState<{ id: string, action: string, target: string, time: string }[]>([]);
@@ -69,11 +122,12 @@ export default function AdminDashboard() {
 
   const filteredNavItems = useMemo(() => {
     const items = [
-      { id: 'dashboard', icon: <BarChart3 />, label: 'Dashboard', roles: ['admin', 'marketing'] },
+      { id: 'dashboard', icon: <LayoutDashboard />, label: 'Overview', roles: ['admin', 'marketing'] },
+      { id: 'analytics', icon: <BarChart3 />, label: 'Insights', roles: ['admin', 'marketing'] },
       { id: 'inventory', icon: <Package />, label: 'Inventory', roles: ['admin'] },
       { id: 'ai-studio', icon: <Sparkles />, label: 'AI Studio', roles: ['admin', 'marketing'] },
       { id: 'marketing', icon: <Target />, label: 'Campaigns', roles: ['admin', 'marketing'] },
-      { id: 'affiliates', icon: <Briefcase />, label: 'Affiliates', roles: ['admin', 'marketing'] },
+      { id: 'affiliates', icon: <Briefcase />, label: 'Partners', roles: ['admin', 'marketing'] },
       { id: 'notifications', icon: <Mail />, label: 'Messaging', roles: ['admin', 'marketing'] },
       { id: 'settings', icon: <Settings />, label: 'System', roles: ['admin'] },
     ];
@@ -123,7 +177,6 @@ export default function AdminDashboard() {
       description: "Automating narratives for the entire heritage series...",
     });
 
-    // Simulate batch processing for the demo
     setTimeout(() => {
       setIsGenerating(false);
       toast({
@@ -182,7 +235,7 @@ export default function AdminDashboard() {
                 <span className="text-[8px] uppercase tracking-widest font-bold text-primary">Enterprise Node</span>
                 <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
               </div>
-              <p className="text-[9px] text-muted-foreground font-light italic">Simulating high-volume traffic across 5 global hubs.</p>
+              <p className="text-[9px] text-muted-foreground font-light italic">Global Hubs: Active & Synced.</p>
             </div>
           )}
           <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive group" asChild>
@@ -199,14 +252,15 @@ export default function AdminDashboard() {
           <div className="flex items-center space-x-6">
             <div>
               <h1 className="text-4xl font-headline font-bold italic text-white">
-                {activeTab === 'dashboard' ? 'Enterprise Overview' : 
+                {activeTab === 'dashboard' ? 'Maison Overview' : 
+                 activeTab === 'analytics' ? 'Global Insights' :
                  activeTab === 'ai-studio' ? 'AI Content Studio' :
                  activeTab === 'marketing' ? 'Global Growth' : 
                  activeTab === 'affiliates' ? 'Heritage Partners' : 
                  activeTab === 'notifications' ? 'Client Messaging' : 'Atelier Management'}
               </h1>
               <p className="text-muted-foreground text-sm tracking-widest uppercase font-bold mt-1">
-                {role === 'admin' ? 'Executive Director' : 'Marketing Curator'} | 5 Global Hubs Active
+                {role === 'admin' ? 'Executive Director' : 'Marketing Curator'} | 5 Global Regions
               </p>
             </div>
           </div>
@@ -214,7 +268,7 @@ export default function AdminDashboard() {
             <div className="relative group">
                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                <select 
-                 className="bg-muted/30 border border-border h-12 pl-10 pr-8 text-[10px] tracking-widest uppercase font-bold outline-none focus:border-primary transition-all appearance-none cursor-pointer"
+                 className="bg-muted/30 border border-border h-12 pl-10 pr-8 text-[10px] tracking-widest uppercase font-bold outline-none focus:border-primary transition-all appearance-none cursor-pointer text-white"
                  value={selectedCountry}
                  onChange={(e) => setSelectedCountry(e.target.value)}
                >
@@ -234,7 +288,7 @@ export default function AdminDashboard() {
         </header>
 
         {activeTab === 'dashboard' && (
-          <>
+          <div className="animate-fade-in space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard icon={<DollarSign className="text-primary" />} label="Market Revenue" value="$42.8M" trend="+18.4%" positive />
               <StatCard icon={<Activity className="text-secondary" />} label="API Latency" value="24ms" trend="Stable" positive />
@@ -303,7 +357,102 @@ export default function AdminDashboard() {
                  </Card>
               </div>
             </div>
-          </>
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="animate-fade-in space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Revenue Trends */}
+              <Card className="bg-card border-border shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl text-white">Global Revenue Trends</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Monthly financial performance across all hubs</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={REVENUE_TREND}>
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorRevenue)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Regional Performance */}
+              <Card className="bg-card border-border shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl text-white">Regional Sales Index</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Comparative market analysis</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={REGIONAL_PERFORMANCE}>
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip content={<ChartTooltipContent />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                      <Bar dataKey="sales" fill="hsl(var(--secondary))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Category Distribution */}
+              <Card className="bg-card border-border shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl text-white">Department Allocation</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Revenue distribution by luxury category</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[400px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RePieChart>
+                      <Pie
+                        data={CATEGORY_DATA}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {CATEGORY_DATA.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* AI Conversion Metrics */}
+              <Card className="bg-card border-border shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl text-white">AI Content Impact</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Conversion correlation for artisanal narratives</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ReLineChart data={REVENUE_TREND}>
+                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Line type="stepAfter" dataKey="conversions" stroke="hsl(var(--accent))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--accent))' }} />
+                    </ReLineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         )}
 
         {activeTab === 'ai-studio' && (
