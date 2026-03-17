@@ -1,20 +1,21 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { PRODUCTS, COLLECTIONS, formatPrice, COUNTRIES } from '@/lib/mock-data';
-import { ProductCard } from '@/components/product/ProductCard';
+import { PRODUCTS, COLLECTIONS, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, ShoppingBag, Globe, Star } from 'lucide-react';
+import { ArrowRight, Sparkles, Star } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { cn } from '@/lib/utils';
 
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
-  const featuredProducts = PRODUCTS.slice(0, 4);
+  const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
+  
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [vipRecs, setVipRecs] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
@@ -24,10 +25,10 @@ export default function HomePage() {
       try {
         const [general, vip] = await Promise.all([
           generateProductRecommendations({
-            scenario: `A discerning luxury shopper in ${COUNTRIES[countryCode]?.name} seeking iconic heritage pieces.`,
+            scenario: `A discerning luxury shopper in ${currentCountry.name} seeking iconic heritage pieces.`,
           }),
           generateProductRecommendations({
-            scenario: `A VIP collector in ${COUNTRIES[countryCode]?.name} looking for the most exclusive limited release items.`,
+            scenario: `A VIP collector in ${currentCountry.name} looking for the most exclusive limited release items.`,
           })
         ]);
         setRecommendations(general.recommendations);
@@ -39,7 +40,7 @@ export default function HomePage() {
       }
     }
     loadRecs();
-  }, [countryCode]);
+  }, [countryCode, currentCountry.name]);
 
   return (
     <div className="space-y-32">
@@ -47,11 +48,11 @@ export default function HomePage() {
       <section className="relative h-[98vh] w-full flex items-center justify-center overflow-hidden">
         <Image 
           src="https://picsum.photos/seed/amarise-hero-main-hq/2560/1440" 
-          alt="Amarisé Luxe Hero"
+          alt="Amarisé Luxe Heritage Presentation"
           fill
           className="object-cover opacity-70 animate-slow-zoom"
           priority
-          data-ai-hint="luxury aesthetic"
+          sizes="100vw"
         />
         <div className="absolute inset-0 cinematic-gradient" />
         <div className="relative z-10 text-center space-y-12 max-w-5xl px-6">
@@ -67,7 +68,7 @@ export default function HomePage() {
           </div>
           <div className="animate-fade-in opacity-0 [animation-delay:400ms]">
             <p className="text-lg md:text-xl text-muted-foreground font-light max-w-xl mx-auto leading-relaxed tracking-wide">
-              Crafting artifacts of desire for the world's most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.
+              Crafting artifacts of desire for {currentCountry.name}'s most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.
             </p>
           </div>
           <div className="animate-fade-in opacity-0 [animation-delay:600ms] flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
@@ -82,8 +83,7 @@ export default function HomePage() {
           </div>
         </div>
         
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-4 animate-bounce">
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-4">
           <span className="text-[9px] uppercase tracking-[0.5em] text-muted-foreground rotate-90">Scroll</span>
           <div className="w-px h-12 bg-gradient-to-b from-primary to-transparent" />
         </div>
@@ -109,7 +109,7 @@ export default function HomePage() {
               key={col.id} 
               href={`/${countryCode}/collection/${col.id}`}
               className={cn(
-                "group relative h-[650px] overflow-hidden bg-card transition-all duration-1000 hover:shadow-2xl border border-border/20",
+                "group relative h-[650px] overflow-hidden bg-card transition-all duration-1000 hover:shadow-2xl border border-border/20 hover-lift",
                 idx === 1 && "md:translate-y-20"
               )}
             >
@@ -118,7 +118,8 @@ export default function HomePage() {
                 alt={col.name}
                 fill
                 className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
-                data-ai-hint="fashion editorial"
+                sizes="(max-width: 768px) 100vw, 33vw"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-700" />
               <div className="absolute bottom-12 left-12 right-12 space-y-6">
@@ -149,7 +150,7 @@ export default function HomePage() {
             <div>
               <h2 className="text-5xl font-headline font-bold">Global Curation</h2>
               <p className="text-lg text-muted-foreground font-light italic mt-2">
-                Intelligent selections based on current market trends in {COUNTRIES[countryCode]?.name}.
+                Intelligent selections based on current market trends in {currentCountry.name}.
               </p>
             </div>
           </div>
@@ -167,13 +168,14 @@ export default function HomePage() {
               ))
             ) : (
               recommendations.map((rec) => (
-                <div key={rec.id} className="group relative space-y-8">
+                <div key={rec.id} className="group relative space-y-8 hover-lift">
                   <div className="aspect-[4/5] overflow-hidden relative bg-muted shadow-2xl border border-border/20">
                     <Image 
                       src={rec.imageUrl} 
                       alt={rec.name}
                       fill
                       className="object-cover transition-transform duration-[1.2s] group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-700" />
                   </div>
@@ -205,7 +207,7 @@ export default function HomePage() {
               <span className="text-primary text-[12px] font-bold tracking-[0.6em] uppercase">Private Atelier</span>
               <h2 className="text-7xl font-headline font-bold leading-none">The VIP <br /> Selection</h2>
               <p className="text-xl text-muted-foreground font-light leading-relaxed">
-                Unlock access to our most clandestine releases. These pieces never reach the public catalog, reserved exclusively for our most dedicated collectors.
+                Unlock access to our most clandestine releases in {currentCountry.name}. These pieces never reach the public catalog, reserved exclusively for our most dedicated collectors.
               </p>
               <Button className="h-16 px-12 bg-primary hover:bg-secondary rounded-none text-xs tracking-[0.3em] font-bold">
                 ENTER THE SALON
@@ -216,9 +218,9 @@ export default function HomePage() {
                  [...Array(3)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />)
               ) : (
                 vipRecs.map(rec => (
-                  <div key={rec.id} className="group relative bg-card border border-border/40 overflow-hidden">
+                  <div key={rec.id} className="group relative bg-card border border-border/40 overflow-hidden hover-lift">
                     <div className="aspect-[3/4] relative">
-                       <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                       <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" sizes="20vw" />
                        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all" />
                        <div className="absolute top-4 right-4 text-primary">
                           <Star className="w-5 h-5 fill-current" />
@@ -241,10 +243,10 @@ export default function HomePage() {
           <div className="relative h-[850px] w-full group overflow-hidden shadow-[0_0_100px_rgba(102,38,204,0.15)]">
             <Image 
               src="https://picsum.photos/seed/editorial-main-hq/1440/1920"
-              alt="Editorial"
+              alt="Artisanal Excellence at Amarisé"
               fill
               className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-              data-ai-hint="fashion atelier"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-1000" />
             <div className="absolute inset-0 border-[20px] border-background m-10 pointer-events-none" />
