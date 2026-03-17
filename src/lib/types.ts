@@ -281,3 +281,23 @@ export interface ApiLog {
   latency: string;
   integrationId: string;
 }
+
+// --- INDEXING & SYNC HUB ---
+
+export interface IndexingStatus {
+  catalogItems: number;
+  indexedItems: number;
+  lastFullScan: string;
+  searchEngineStatus: 'Optimal' | 'Syncing' | 'Offline';
+  sitemapStatus: 'Up to date' | 'Regenerating';
+  autoSyncEnabled: boolean;
+}
+
+export interface IndexingLog {
+  id: string;
+  timestamp: string;
+  action: string;
+  itemsAffected: number;
+  duration: string;
+  status: 'Success' | 'Partial' | 'Failed';
+}

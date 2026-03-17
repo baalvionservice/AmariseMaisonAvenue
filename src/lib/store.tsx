@@ -22,7 +22,9 @@ import {
   SupportTicket,
   SupportStats,
   MaisonIntegration,
-  ApiLog
+  ApiLog,
+  IndexingStatus,
+  IndexingLog
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -41,7 +43,9 @@ import {
   SUPPORT_TICKETS,
   SUPPORT_STATS,
   INTEGRATIONS,
-  API_LOGS
+  API_LOGS,
+  INDEXING_STATUS,
+  INDEXING_LOGS
 } from './mock-data';
 
 interface AppContextType {
@@ -74,6 +78,10 @@ interface AppContextType {
   integrations: MaisonIntegration[];
   apiLogs: ApiLog[];
   
+  // Indexing State
+  indexingStatus: IndexingStatus;
+  indexingLogs: IndexingLog[];
+
   // Showcase State
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
@@ -105,6 +113,10 @@ interface AppContextType {
   // Integration Actions
   toggleIntegration: (id: string) => void;
   
+  // Indexing Actions
+  triggerReindex: (type: 'catalog' | 'sitemap' | 'search') => void;
+  toggleAutoSync: () => void;
+
   // Social Actions
   toggleLike: (contentId: string, country: string) => void;
   trackShare: (contentId: string, country: string) => void;
@@ -144,6 +156,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Integration Hub State
   const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
+
+  // Indexing State
+  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
+  const [indexingLogs, setIndexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
 
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
@@ -324,6 +340,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  // Indexing Actions
+  const triggerReindex = (type: 'catalog' | 'sitemap' | 'search') => {
+    const newLog: IndexingLog = {
+      id: `idx-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      action: `Manual ${type.charAt(0).toUpperCase() + type.slice(1)} Refresh`,
+      itemsAffected: indexingStatus.catalogItems,
+      duration: '45s',
+      status: 'Success'
+    };
+    setIndexingLogs(prev => [newLog, ...prev]);
+    setIndexingStatus(prev => ({ ...prev, lastFullScan: new Date().toISOString() }));
+  };
+
+  const toggleAutoSync = () => {
+    setIndexingStatus(prev => ({ ...prev, autoSyncEnabled: !prev.autoSyncEnabled }));
+  };
+
   const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
 
   const toggleLike = (contentId: string, country: string) => {
@@ -362,6 +396,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     supportStats,
     integrations,
     apiLogs,
+    indexingStatus,
+    indexingLogs,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -383,12 +419,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     assignTicket,
     addTicketMessage,
     toggleIntegration,
+    triggerReindex,
+    toggleAutoSync,
     toggleLike,
     trackShare,
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

@@ -32,12 +32,20 @@ import {
   Clock,
   ArrowUpRight,
   TrendingUp,
-  Cpu
+  Cpu,
+  Server,
+  Search as SearchIcon,
+  Globe2,
+  DatabaseZap,
+  ArrowRightLeft,
+  FastForward,
+  RotateCw
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -57,11 +65,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type IntegrationTab = 'dashboard' | 'payments' | 'logistics' | 'crm' | 'erp' | 'analytics' | 'security';
+type IntegrationTab = 'dashboard' | 'payments' | 'logistics' | 'crm' | 'erp' | 'indexing' | 'security';
 
 export default function IntegrationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<IntegrationTab>('dashboard');
-  const { integrations, apiLogs, toggleIntegration } = useAppStore();
+  const { integrations, apiLogs, toggleIntegration, indexingStatus, indexingLogs, triggerReindex, toggleAutoSync } = useAppStore();
   const { toast } = useToast();
 
   const handleAction = (msg: string) => {
@@ -81,11 +89,11 @@ export default function IntegrationsAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <SyncNavItem icon={<LayoutDashboard />} label="Health Registry" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <SyncNavItem icon={<FastForward />} label="Auto Indexing" active={activeTab === 'indexing'} onClick={() => setActiveTab('indexing')} />
           <SyncNavItem icon={<CreditCard />} label="Payment Bridges" active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} />
           <SyncNavItem icon={<Truck />} label="Logistics APIs" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
           <SyncNavItem icon={<UserCheck />} label="CRM Connectors" active={activeTab === 'crm'} onClick={() => setActiveTab('crm')} />
           <SyncNavItem icon={<Database />} label="ERP Middleware" active={activeTab === 'erp'} onClick={() => setActiveTab('erp')} />
-          <SyncNavItem icon={<PieChart />} label="BI Endpoints" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SyncNavItem icon={<Lock />} label="Keys & Security" active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
         </nav>
 
@@ -108,7 +116,7 @@ export default function IntegrationsAdminPanel() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              {activeTab}
+              {activeTab === 'indexing' ? 'Auto-Indexing & Sync' : activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
               Systems Integration • API Lifecycle Management
@@ -208,6 +216,144 @@ export default function IntegrationsAdminPanel() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {/* AUTO INDEXING (FAST INTEGRATION) */}
+          {activeTab === 'indexing' && (
+            <div className="space-y-12">
+              <div className="flex justify-between items-end">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-headline font-bold italic">Auto-Indexing & Search Engine</h2>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Real-time database synchronization and SEO indexing</p>
+                </div>
+                <div className="flex items-center space-x-6 bg-white p-4 border border-border shadow-sm">
+                   <div className="flex flex-col">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Automated Sync</span>
+                      <span className="text-[10px] font-bold uppercase text-plum">{indexingStatus.autoSyncEnabled ? 'ENABLED' : 'DISABLED'}</span>
+                   </div>
+                   <Switch checked={indexingStatus.autoSyncEnabled} onCheckedChange={toggleAutoSync} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="bg-white border-border shadow-luxury">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-center">
+                      <DatabaseZap className="w-5 h-5 text-plum" />
+                      <Badge className="bg-green-50 text-green-600 text-[8px] uppercase">Active</Badge>
+                    </div>
+                    <CardTitle className="font-headline text-xl pt-4">Catalog Registry</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">{indexingStatus.catalogItems.toLocaleString()} Total Items</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                       <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+                          <span className="text-gray-400">Index Coverage</span>
+                          <span className="text-plum">100%</span>
+                       </div>
+                       <Progress value={100} className="h-1 bg-ivory" />
+                    </div>
+                    <Button variant="outline" className="w-full h-10 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => triggerReindex('catalog')}>
+                      <RotateCw className="w-3 h-3 mr-2" /> Full Catalog Re-Index
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white border-border shadow-luxury">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-center">
+                      <SearchIcon className="w-5 h-5 text-gold" />
+                      <Badge className="bg-green-50 text-green-600 text-[8px] uppercase">{indexingStatus.searchEngineStatus}</Badge>
+                    </div>
+                    <CardTitle className="font-headline text-xl pt-4">Search Engine</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Algolia / ES Connectivity</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                       <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+                          <span className="text-gray-400">Search Latency</span>
+                          <span className="text-gold">18ms</span>
+                       </div>
+                       <Progress value={95} className="h-1 bg-ivory" />
+                    </div>
+                    <Button variant="outline" className="w-full h-10 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => triggerReindex('search')}>
+                      <Settings className="w-3 h-3 mr-2" /> Purge Cache & Sync
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white border-border shadow-luxury">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-center">
+                      <Globe2 className="w-5 h-5 text-plum" />
+                      <Badge className="bg-plum/5 text-plum text-[8px] uppercase">{indexingStatus.sitemapStatus}</Badge>
+                    </div>
+                    <CardTitle className="font-headline text-xl pt-4">SEO Sitemap</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Dynamic Route Generation</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                       <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+                          <span className="text-gray-400">URL Discovery</span>
+                          <span className="text-plum">Fast</span>
+                       </div>
+                       <Progress value={100} className="h-1 bg-ivory" />
+                    </div>
+                    <Button variant="outline" className="w-full h-10 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => triggerReindex('sitemap')}>
+                      <Plus className="w-3 h-3 mr-2" /> Regenerate Sitemap
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="bg-white border-border shadow-luxury">
+                <CardHeader className="border-b border-border">
+                  <CardTitle className="font-headline text-2xl">Recent Indexing Operations</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Audit trail of automated and manual syncs</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader className="bg-ivory/50">
+                      <TableRow>
+                        <TableHead className="text-[9px] uppercase font-bold pl-8">Operation</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold">Timestamp</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold text-center">Items Affected</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold text-center">Duration</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {indexingLogs.map(log => (
+                        <TableRow key={log.id} className="hover:bg-ivory/30">
+                          <TableCell className="pl-8">
+                            <div className="flex items-center space-x-3">
+                               <ArrowRightLeft className="w-3 h-3 text-plum" />
+                               <span className="text-xs font-bold">{log.action}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-[10px] text-gray-400 uppercase tracking-widest">
+                            {new Date(log.timestamp).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-center text-xs font-mono">
+                            {log.itemsAffected.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-center text-xs text-gray-500 italic">
+                            {log.duration}
+                          </TableCell>
+                          <TableCell className="text-right pr-8">
+                            <Badge className={cn("text-[8px] uppercase tracking-widest", 
+                              log.status === 'Success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                            )}>
+                              {log.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             </div>
           )}
 
@@ -368,11 +514,11 @@ export default function IntegrationsAdminPanel() {
           )}
 
           {/* PLACEHOLDERS FOR REMAINING TABS */}
-          {['crm', 'erp', 'analytics'].includes(activeTab) && (
+          {['crm', 'erp'].includes(activeTab) && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
-                  <SyncIcon className="w-12 h-12 text-gold/30 mx-auto animate-spin-slow" />
+                  <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto animate-spin-slow" />
                 </div>
               </div>
               <p className="text-2xl text-muted-foreground font-light italic font-headline">
@@ -479,8 +625,4 @@ function AuthRow({ label, status, date, urgent }: { label: string, status: strin
       <Badge className={cn("text-[7px] uppercase", urgent ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600")}>{status}</Badge>
     </div>
   );
-}
-
-function SyncIcon({ className }: { className?: string }) {
-  return <RefreshCcw className={className} />;
 }

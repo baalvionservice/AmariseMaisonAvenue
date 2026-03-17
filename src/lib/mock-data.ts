@@ -3,7 +3,7 @@ import {
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
   Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats,
-  MaisonIntegration, ApiLog
+  MaisonIntegration, ApiLog, IndexingStatus, IndexingLog
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -204,6 +204,21 @@ export const API_LOGS: ApiLog[] = [
   { id: 'log-101', timestamp: '2024-03-15T12:05:00Z', endpoint: '/v1/charges', method: 'POST', status: 200, latency: '42ms', integrationId: 'int-1' },
   { id: 'log-102', timestamp: '2024-03-15T12:04:30Z', endpoint: '/shipments/track', method: 'GET', status: 200, latency: '115ms', integrationId: 'int-2' },
   { id: 'log-103', timestamp: '2024-03-15T12:04:00Z', endpoint: '/v2/inventory', method: 'PUT', status: 503, latency: '850ms', integrationId: 'int-3' },
+];
+
+export const INDEXING_STATUS: IndexingStatus = {
+  catalogItems: 2026875,
+  indexedItems: 2026875,
+  lastFullScan: '2024-03-15T04:00:00Z',
+  searchEngineStatus: 'Optimal',
+  sitemapStatus: 'Up to date',
+  autoSyncEnabled: true
+};
+
+export const INDEXING_LOGS: IndexingLog[] = [
+  { id: 'idx-1', timestamp: '2024-03-15T12:00:00Z', action: 'Bulk Category Update', itemsAffected: 125, duration: '4.2s', status: 'Success' },
+  { id: 'idx-2', timestamp: '2024-03-15T11:30:00Z', action: 'New Product Auto-Index', itemsAffected: 1, duration: '0.8s', status: 'Success' },
+  { id: 'idx-3', timestamp: '2024-03-15T10:00:00Z', action: 'Hourly Sitemap Refresh', itemsAffected: 450000, duration: '125s', status: 'Success' },
 ];
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
