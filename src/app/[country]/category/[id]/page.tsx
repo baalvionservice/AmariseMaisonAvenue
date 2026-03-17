@@ -2,15 +2,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { PRODUCTS, CATEGORIES, COUNTRIES, formatPrice } from '@/lib/mock-data';
+import { PRODUCTS, CATEGORIES, formatPrice } from '@/lib/mock-data';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { 
   ChevronRight, 
   Filter, 
   LayoutGrid,
-  List,
-  Sparkles
+  List
 } from 'lucide-react';
 import Link from 'next/link';
 import { generateCategoryNarrative } from '@/ai/flows/generate-category-narrative';
@@ -27,13 +26,23 @@ export default function CategoryPage() {
   const [narrative, setNarrative] = useState<string | null>(null);
   const [loadingNarrative, setLoadingNarrative] = useState(true);
 
+  // ENTERPRISE OPTIMIZATION: Memoize filtered products for high-volume catalogs
   const filteredProducts = useMemo(() => {
-    let list = PRODUCTS.filter(p => p.category.toLowerCase() === category?.name.toLowerCase());
+    if (!category) return [];
+    
+    let list = PRODUCTS.filter(p => p.category.toLowerCase() === category.name.toLowerCase());
+    
     if (sub) {
-      list = list.filter(p => p.subcategory.toLowerCase().includes(sub.toLowerCase()) || p.name.toLowerCase().includes(sub.toLowerCase()));
+      const lowerSub = sub.toLowerCase();
+      list = list.filter(p => 
+        p.subcategory.toLowerCase().includes(lowerSub) || 
+        p.name.toLowerCase().includes(lowerSub)
+      );
     }
+    
     if (sortBy === 'price-low') list = [...list].sort((a, b) => a.basePrice - b.basePrice);
     if (sortBy === 'price-high') list = [...list].sort((a, b) => b.basePrice - a.basePrice);
+    
     return list;
   }, [category, sortBy, sub]);
 
@@ -58,7 +67,7 @@ export default function CategoryPage() {
   if (!category) return <div className="py-40 text-center">Department not found</div>;
 
   return (
-    <div className="container mx-auto px-6 py-12">
+    <div className="container mx-auto px-6 py-12 animate-fade-in">
       {/* Breadcrumbs */}
       <nav className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground">
         <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Home</Link>
@@ -127,7 +136,7 @@ export default function CategoryPage() {
                   </div>
                   <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-tighter">
                     <span>{formatPrice(500, countryCode)}</span>
-                    <span>{formatPrice(10000, countryCode)}</span>
+                    <span>{formatPrice(25000, countryCode)}</span>
                   </div>
                 </div>
               </FilterGroup>
@@ -139,7 +148,7 @@ export default function CategoryPage() {
         <main className="flex-1">
           <div className="flex justify-between items-center mb-10 pb-6 border-b border-border">
             <div className="text-[10px] tracking-widest uppercase text-muted-foreground font-bold">
-              {filteredProducts.length} Artisanal Pieces
+              {filteredProducts.length} Pieces Found
             </div>
             <div className="flex items-center space-x-6">
               <select 
@@ -169,16 +178,18 @@ export default function CategoryPage() {
           </div>
 
           <div className={`grid gap-8 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-            {filteredProducts.map(product => (
+            {filteredProducts.slice(0, 24).map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          <div className="mt-20 flex justify-center">
-            <Button variant="outline" className="border-border hover:bg-muted text-[10px] tracking-[0.3em] font-bold h-14 px-12 rounded-none">
-              REVEAL MORE MASTERPIECES
-            </Button>
-          </div>
+          {filteredProducts.length > 24 && (
+            <div className="mt-20 flex justify-center">
+              <Button variant="outline" className="border-border hover:bg-muted text-[10px] tracking-[0.3em] font-bold h-14 px-12 rounded-none">
+                REVEAL MORE MASTERPIECES
+              </Button>
+            </div>
+          )}
         </main>
       </div>
     </div>

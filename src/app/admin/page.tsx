@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BarChart3, 
@@ -22,14 +21,18 @@ import {
   Target,
   Briefcase,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Activity,
+  Globe,
+  Database
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   CAMPAIGNS, 
   AFFILIATES, 
-  NOTIFICATIONS 
+  PRODUCTS,
+  formatPrice 
 } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +44,13 @@ type ActiveTab = 'dashboard' | 'inventory' | 'marketing' | 'affiliates' | 'notif
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
+  const [isStressTest, setIsStressTest] = useState(false);
+
+  // Simulate stress test activation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsStressTest(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredNavItems = useMemo(() => {
     const items = [
@@ -90,7 +100,16 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <div className="pt-8 border-t border-border">
+        <div className="pt-8 space-y-4 border-t border-border">
+          {isStressTest && (
+            <div className="p-4 bg-primary/5 border border-primary/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[8px] uppercase tracking-widest font-bold text-primary">Enterprise Node</span>
+                <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              </div>
+              <p className="text-[9px] text-muted-foreground font-light italic">Simulating high-volume traffic across 5 global hubs.</p>
+            </div>
+          )}
           <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive group" asChild>
             <Link href="/us">
               <LogOut className="w-4 h-4 mr-3 transition-transform group-hover:-translate-x-1" /> Exit to Maison
@@ -102,16 +121,23 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-12 space-y-12">
         <header className="flex justify-between items-center bg-card/50 luxury-blur p-6 -m-6 mb-6 border-b border-border sticky top-0 z-10">
-          <div>
-            <h1 className="text-4xl font-headline font-bold italic">
-              {activeTab === 'dashboard' ? 'Atelier Overview' : 
-               activeTab === 'marketing' ? 'Global Growth' : 
-               activeTab === 'affiliates' ? 'Heritage Partners' : 
-               activeTab === 'notifications' ? 'Client Messaging' : 'Atelier Management'}
-            </h1>
-            <p className="text-muted-foreground text-sm tracking-widest uppercase font-bold mt-1">
-              Role: {role === 'admin' ? 'Executive Director' : 'Marketing Curator'} | Region: Global
-            </p>
+          <div className="flex items-center space-x-6">
+            <div>
+              <h1 className="text-4xl font-headline font-bold italic">
+                {activeTab === 'dashboard' ? 'Enterprise Overview' : 
+                 activeTab === 'marketing' ? 'Global Growth' : 
+                 activeTab === 'affiliates' ? 'Heritage Partners' : 
+                 activeTab === 'notifications' ? 'Client Messaging' : 'Atelier Management'}
+              </h1>
+              <p className="text-muted-foreground text-sm tracking-widest uppercase font-bold mt-1">
+                {role === 'admin' ? 'Executive Director' : 'Marketing Curator'} | 5 Global Hubs Active
+              </p>
+            </div>
+            {isStressTest && (
+              <Badge variant="outline" className="border-primary/50 text-primary bg-primary/5 px-4 h-8 text-[9px] tracking-widest">
+                STRESS TEST: STABLE
+              </Badge>
+            )}
           </div>
           <div className="flex items-center space-x-6">
             <div className="relative group">
@@ -131,10 +157,10 @@ export default function AdminDashboard() {
         {activeTab === 'dashboard' && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <StatCard icon={<DollarSign className="text-primary" />} label="Market Revenue" value="$2.4M" trend="+12.4%" positive />
-              <StatCard icon={<Zap className="text-secondary" />} label="Campaign Reach" value="1.2M" trend="+45.2%" positive />
-              <StatCard icon={<Users className="text-accent" />} label="VIP Conversions" value="84" trend="+8.5%" positive />
-              <StatCard icon={<TrendingUp className="text-primary" />} label="Market Sentiment" value="Exquisite" trend="Stable" positive />
+              <StatCard icon={<DollarSign className="text-primary" />} label="Market Revenue" value="$42.8M" trend="+18.4%" positive />
+              <StatCard icon={<Activity className="text-secondary" />} label="API Latency" value="24ms" trend="Stable" positive />
+              <StatCard icon={<Database className="text-accent" />} label="Entity Load" value={PRODUCTS.length.toString()} trend="High" positive />
+              <StatCard icon={<Globe className="text-primary" />} label="Global Reach" value="2.4M" trend="+12.2%" positive />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -142,8 +168,8 @@ export default function AdminDashboard() {
                 <Card className="bg-card border-border shadow-2xl">
                   <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-6">
                     <div>
-                      <CardTitle className="font-headline text-3xl font-bold">Active Campaigns</CardTitle>
-                      <CardDescription className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold mt-2">Global growth performance across hubs</CardDescription>
+                      <CardTitle className="font-headline text-3xl font-bold">Global Campaigns</CardTitle>
+                      <CardDescription className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold mt-2">Enterprise-wide marketing performance</CardDescription>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-8">
@@ -179,7 +205,7 @@ export default function AdminDashboard() {
               <div className="space-y-12">
                  <Card className="bg-card border-border shadow-2xl">
                     <CardHeader className="border-b border-border pb-6">
-                      <CardTitle className="font-headline text-2xl font-bold">Affiliate Tiers</CardTitle>
+                      <CardTitle className="font-headline text-2xl font-bold">Heritage Partners</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-8 pt-8">
                       {AFFILIATES.map(a => (
@@ -196,13 +222,31 @@ export default function AdminDashboard() {
                       ))}
                     </CardContent>
                  </Card>
+                 
+                 <Card className="bg-primary/5 border-primary/20">
+                   <CardHeader className="pb-4">
+                     <CardTitle className="text-xs uppercase tracking-[0.2em] font-bold text-primary">System Integrity</CardTitle>
+                   </CardHeader>
+                   <CardContent className="space-y-4">
+                      <IntegrityMetric label="Asset CDN" value="99.9%" />
+                      <IntegrityMetric label="Genkit Flow" value="Stable" />
+                      <IntegrityMetric label="Firestore Sink" value="Active" />
+                   </CardContent>
+                 </Card>
               </div>
             </div>
           </>
         )}
-
-        {/* ... Other tabs follow similar polished pattern ... */}
       </main>
+    </div>
+  );
+}
+
+function IntegrityMetric({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-bold text-primary">{value}</span>
     </div>
   );
 }

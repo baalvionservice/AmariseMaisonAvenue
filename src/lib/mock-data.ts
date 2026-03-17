@@ -1,4 +1,3 @@
-
 import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -23,22 +22,22 @@ export const COLLECTIONS: Collection[] = [
 ];
 
 export const CAMPAIGNS: Campaign[] = [
-  { id: 'c1', title: 'Ramadan 2024 - Exclusive Edit', type: 'email', status: 'active', reach: 45000, engagement: 12.4, country: 'ae', performance: 88 },
-  { id: 'c2', title: 'Spring Equinox Preview', type: 'social', status: 'scheduled', reach: 120000, engagement: 0, country: 'us', performance: 0 },
-  { id: 'c3', title: 'Heritage Watch Collectors Push', type: 'push', status: 'completed', reach: 8500, engagement: 22.1, country: 'uk', performance: 94 },
+  { id: 'c1', title: 'Ramadan 2024 - Exclusive Edit', type: 'email', status: 'active', reach: 450000, engagement: 12.4, country: 'ae', performance: 88 },
+  { id: 'c2', title: 'Spring Equinox Preview', type: 'social', status: 'scheduled', reach: 1200000, engagement: 0, country: 'us', performance: 0 },
+  { id: 'c3', title: 'Heritage Watch Collectors Push', type: 'push', status: 'completed', reach: 85000, engagement: 22.1, country: 'uk', performance: 94 },
   { id: 'c4', title: 'Singapore Anniversary Gala', type: 'email', status: 'draft', reach: 0, engagement: 0, country: 'sg', performance: 0 },
 ];
 
 export const AFFILIATES: Affiliate[] = [
-  { id: 'a1', name: 'Vogue Global', tier: 'diamond', salesGenerated: 450000, commissionPaid: 45000, status: 'active' },
-  { id: 'a2', name: 'The London Gent', tier: 'gold', salesGenerated: 120000, commissionPaid: 12000, status: 'active' },
-  { id: 'a3', name: 'Dubai Luxe Life', tier: 'diamond', salesGenerated: 890000, commissionPaid: 89000, status: 'active' },
-  { id: 'a4', name: 'Modern Maharaja', tier: 'silver', salesGenerated: 45000, commissionPaid: 4500, status: 'pending' },
+  { id: 'a1', name: 'Vogue Global', tier: 'diamond', salesGenerated: 4500000, commissionPaid: 450000, status: 'active' },
+  { id: 'a2', name: 'The London Gent', tier: 'gold', salesGenerated: 1200000, commissionPaid: 120000, status: 'active' },
+  { id: 'a3', name: 'Dubai Luxe Life', tier: 'diamond', salesGenerated: 8900000, commissionPaid: 890000, status: 'active' },
+  { id: 'a4', name: 'Modern Maharaja', tier: 'silver', salesGenerated: 450000, commissionPaid: 45000, status: 'pending' },
 ];
 
 export const NOTIFICATIONS: Notification[] = [
-  { id: 'n1', type: 'Email', subject: 'Your Private Invitation: Nocturnal Allure', recipients: '15,000 VIPs', scheduledAt: '2024-03-10 09:00', status: 'Queued' },
-  { id: 'n2', type: 'Push', subject: 'The Emerald Collection has arrived.', recipients: '8,400 Watch Collectors', scheduledAt: '2024-03-12 14:00', status: 'Queued' },
+  { id: 'n1', type: 'Email', subject: 'Your Private Invitation: Nocturnal Allure', recipients: '150,000 VIPs', scheduledAt: '2024-03-10 09:00', status: 'Queued' },
+  { id: 'n2', type: 'Push', subject: 'The Emerald Collection has arrived.', recipients: '84,000 Watch Collectors', scheduledAt: '2024-03-12 14:00', status: 'Queued' },
 ];
 
 const generateProducts = (): Product[] => {
@@ -46,24 +45,27 @@ const generateProducts = (): Product[] => {
   const categories = ['Apparel', 'Accessories', 'Timepieces', 'Fine Jewelry'];
   const collectionIds = ['spring-24', 'heritage', 'nocturnal'];
 
-  for (let i = 1; i <= 120; i++) {
+  // ENTERPRISE SCALE: 500 Products for Stress Testing
+  for (let i = 1; i <= 500; i++) {
     const catIndex = i % categories.length;
     const cat = categories[catIndex];
     const collIndex = i % collectionIds.length;
-    const basePrice = 1200 + ((i * 157) % 18000);
-    const rating = 4.0 + ((i * 7) % 10) / 10;
-    const reviewsCount = 12 + ((i * i) % 150);
+    
+    // Deterministic prices and ratings to avoid hydration errors
+    const basePrice = 1200 + ((i * 19) % 25000);
+    const rating = 4.0 + ((i * 3) % 11) / 10;
+    const reviewsCount = 10 + ((i * 7) % 300);
 
     products.push({
       id: `prod-${i}`,
       name: `Amarisé ${cat} Piece No. ${i.toString().padStart(3, '0')}`,
       category: cat,
-      subcategory: 'Heritage Collection',
+      subcategory: i % 2 === 0 ? 'Heritage Collection' : 'Limited Release',
       collectionId: collectionIds[collIndex],
       basePrice,
-      imageUrl: `https://picsum.photos/seed/amarise-lux-v3-${i}/1200/1600`,
-      isVip: i % 10 === 0,
-      rating,
+      imageUrl: `https://picsum.photos/seed/amarise-enterprise-${i}/1200/1600`,
+      isVip: i % 15 === 0,
+      rating: rating > 5 ? 5 : rating,
       reviewsCount,
     });
   }

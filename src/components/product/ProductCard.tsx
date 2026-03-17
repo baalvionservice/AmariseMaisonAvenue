@@ -1,7 +1,6 @@
-
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -18,9 +17,10 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard optimized for performance with next/image and scalability.
+ * ProductCard optimized for high-volume enterprise rendering.
+ * Wrapped in memo to prevent unnecessary re-renders during stress tests.
  */
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const { addToCart, toggleWishlist, wishlist } = useAppStore();
@@ -44,7 +44,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40">
+    <div className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40 animate-fade-in">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
         <Image 
           src={product.imageUrl} 
@@ -76,7 +76,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               className={cn("flex-1 h-12 rounded-none border-white/20 text-white hover:bg-white hover:text-black transition-all text-[10px] font-bold tracking-widest uppercase", isWishlisted && "bg-white text-black")}
               onClick={handleToggleWishlist}
             >
-              <Heart className={cn("w-4 h-4 mr-2", isWishlisted && "fill-current")} /> {isWishlisted ? "WISHLISTED" : "WISHLIST"}
+              <Heart className={cn("w-4 h-4 mr-2", isWishlisted && "fill-current")} /> {isWishlisted ? "SAVED" : "SAVE"}
             </Button>
           </div>
         </div>
@@ -103,12 +103,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Provenance: Atelier Paris</span>
+          <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Atelier Paris</span>
           <div className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-            Discover <Eye className="w-3 h-3 ml-2" />
+            Explore <Eye className="w-3 h-3 ml-2" />
           </div>
         </div>
       </Link>
     </div>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
