@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, Languages } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CATEGORIES, COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -16,10 +17,12 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 /**
  * Header: The Entry to Maison Amarisé.
  * Redesigned for a light, elegant, editorial feel.
+ * Updated to support 10 luxury departments with a mega-menu inspired scroll.
  */
 export const Header = () => {
   const { country } = useParams();
@@ -53,40 +56,39 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex flex-1 justify-center space-x-12">
-          {CATEGORIES.map((cat) => (
-            <div key={cat.id} className="group relative py-8">
-              <Link 
-                href={`/${countryCode}/category/${cat.id}`}
-                className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-600 hover:text-gold transition-all pb-1 border-b border-transparent hover:border-gold"
-              >
-                {cat.name}
-              </Link>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 hidden group-hover:block w-56 bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="p-2 space-y-1">
-                  {cat.subcategories.map(sub => (
-                    <Link 
-                      key={sub}
-                      href={`/${countryCode}/category/${cat.id}?sub=${sub}`}
-                      className="block px-4 py-3 text-[10px] uppercase tracking-widest text-gray-500 hover:text-plum hover:bg-ivory transition-colors font-bold"
-                    >
-                      {sub}
-                    </Link>
-                  ))}
+        {/* Desktop Navigation - Scrollable for 10 Departments */}
+        <nav className="hidden lg:flex flex-1 justify-center px-10">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex space-x-8 h-20 items-center">
+              {CATEGORIES.map((cat) => (
+                <div key={cat.id} className="group relative">
+                  <Link 
+                    href={`/${countryCode}/category/${cat.id}`}
+                    className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 hover:text-gold transition-all pb-1 border-b-2 border-transparent hover:border-gold flex items-center"
+                  >
+                    {cat.name}
+                  </Link>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 hidden group-hover:block w-56 bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-2 duration-300 pt-2">
+                    <div className="p-2 space-y-1">
+                      {cat.subcategories.map(sub => (
+                        <Link 
+                          key={sub}
+                          href={`/${countryCode}/category/${cat.id}?sub=${sub}`}
+                          className="block px-4 py-3 text-[9px] uppercase tracking-widest text-gray-500 hover:text-plum hover:bg-ivory transition-colors font-bold whitespace-normal"
+                        >
+                          {sub}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
+              <Link href={`/${countryCode}/journal`} className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 hover:text-gold transition-all pb-1 border-b-2 border-transparent hover:border-gold">
+                JOURNAL
+              </Link>
             </div>
-          ))}
-          <Link href={`/${countryCode}/journal`} className="py-8 text-[11px] font-bold uppercase tracking-[0.3em] text-gray-600 hover:text-gold transition-all pb-1 border-b border-transparent hover:border-gold">
-            JOURNAL
-          </Link>
-          <Link href={activeVip ? `/${countryCode}/collection/heritage` : `/${countryCode}/category/apparel`} className={cn(
-            "py-8 text-[11px] font-bold uppercase tracking-[0.3em] transition-colors",
-            activeVip ? "text-plum hover:text-gold" : "text-gray-600 hover:text-gold"
-          )}>
-            {activeVip ? "PRIVATE SALON" : "DISCOVER"}
-          </Link>
+            <ScrollBar orientation="horizontal" className="hidden" />
+          </ScrollArea>
         </nav>
 
         {/* Action Icons */}
@@ -122,10 +124,6 @@ export const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="text-gray-600 hidden sm:flex hover:text-gold transition-colors">
-            <Search className="w-5 h-5" />
-          </Button>
-          
           <Link href={`/${countryCode}/wishlist`} className="relative text-gray-600 hover:text-gold transition-all group">
             <Heart className={cn("w-5 h-5 transition-all", wishlist.length > 0 && "fill-plum text-plum scale-110")} />
             {wishlist.length > 0 && (
@@ -151,6 +149,44 @@ export const Header = () => {
           </Link>
         </div>
       </div>
+
+      {/* Mobile Drawer (Simplified) */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 top-20 bg-white z-[60] overflow-y-auto animate-in slide-in-from-left duration-500">
+           <div className="p-10 space-y-8">
+              {CATEGORIES.map(cat => (
+                <div key={cat.id} className="space-y-4">
+                  <Link 
+                    href={`/${countryCode}/category/${cat.id}`}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-2xl font-headline font-bold text-gray-900 border-b border-border block pb-2"
+                  >
+                    {cat.name}
+                  </Link>
+                  <div className="flex flex-wrap gap-4">
+                    {cat.subcategories.map(sub => (
+                      <Link 
+                        key={sub}
+                        href={`/${countryCode}/category/${cat.id}?sub=${sub}`}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-[10px] uppercase tracking-widest text-muted-foreground"
+                      >
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <Link 
+                href={`/${countryCode}/journal`}
+                onClick={() => setIsMenuOpen(false)}
+                className="text-2xl font-headline font-bold text-gray-900 border-b border-border block pb-2"
+              >
+                Journal
+              </Link>
+           </div>
+        </div>
+      )}
     </header>
   );
 };

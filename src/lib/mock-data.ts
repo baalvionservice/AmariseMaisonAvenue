@@ -80,10 +80,16 @@ export const COUNTRIES: Record<string, Country> = {
 };
 
 export const CATEGORIES: Category[] = [
-  { id: 'apparel', name: 'Apparel', subcategories: ['Haute Couture', 'Ready-to-Wear', 'Outerwear'] },
-  { id: 'accessories', name: 'Accessories', subcategories: ['Handbags', 'Belts', 'Sunglasses'] },
-  { id: 'timepieces', name: 'Timepieces', subcategories: ['Automatic', 'Chronographs', 'Heritage'] },
-  { id: 'jewelry', name: 'Fine Jewelry', subcategories: ['Necklaces', 'Earrings', 'Bracelets'] },
+  { id: 'women', name: 'Women', subcategories: ['Haute Couture', 'Evening Wear', 'Signature Bags', 'Silk Scarves'] },
+  { id: 'men', name: 'Men', subcategories: ['Bespoke Tailoring', 'Luxury Outerwear', 'Heritage Shoes', 'Fine Knits'] },
+  { id: 'kids', name: 'Kids', subcategories: ['Junior Couture', 'Nursery Heritage', 'Artisanal Toys'] },
+  { id: 'accessories', name: 'Accessories', subcategories: ['Exotic Leather', 'Heritage Belts', 'Luxury Eyewear'] },
+  { id: 'jewelry', name: 'Jewelry', subcategories: ['High Jewelry', 'Fine Gold', 'Bespoke Rings'] },
+  { id: 'watches', name: 'Watches', subcategories: ['Grand Complications', 'Heritage Collection', 'Limited Editions'] },
+  { id: 'beauty', name: 'Beauty', subcategories: ['Maison Fragrance', 'Elite Skincare', 'Atelier Cosmetics'] },
+  { id: 'lifestyle', name: 'Lifestyle', subcategories: ['Digital Heritage', 'Fine Stationery', 'Exclusive Gifts'] },
+  { id: 'home', name: 'Home', subcategories: ['Artisanal Decor', 'Heritage Linens', 'Sculptural Furniture'] },
+  { id: 'travel', name: 'Travel', subcategories: ['Luxury Luggage', 'Atelier Trunks', 'Bespoke Travel Kits'] },
 ];
 
 export const COLLECTIONS: Collection[] = [
@@ -210,8 +216,8 @@ export const VIP_CLIENTS: VipClient[] = [
 
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
-  const categories = ['Apparel', 'Accessories', 'Timepieces', 'Fine Jewelry'];
-  const collectionIds = ['spring-24', 'heritage', 'nocturnal', 'privé-watches'];
+  const categories = CATEGORIES.map(c => c.name);
+  const collectionIds = COLLECTIONS.map(c => c.id);
 
   for (let i = 1; i <= 500; i++) {
     const catIndex = i % categories.length;
