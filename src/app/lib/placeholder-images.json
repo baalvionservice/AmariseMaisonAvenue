@@ -3,33 +3,45 @@
   "placeholderImages": [
     {
       "id": "hero-main",
-      "description": "Amarisé Heritage Banner",
-      "imageUrl": "https://picsum.photos/seed/amarise-hero-main-hq/2560/1440",
-      "imageHint": "luxury fashion"
+      "description": "Maison Amarisé Global Flagship Avenue",
+      "imageUrl": "https://picsum.photos/seed/amarise-avenue-hq/2560/1440",
+      "imageHint": "luxury storefront"
     },
     {
-      "id": "editorial-1",
-      "description": "Atelier Craftsmanship",
-      "imageUrl": "https://picsum.photos/seed/editorial-main-hq/1440/1920",
+      "id": "editorial-artisanal",
+      "description": "Master Artisan at Work",
+      "imageUrl": "https://picsum.photos/seed/amarise-artisanal/1440/1920",
       "imageHint": "fashion atelier"
     },
     {
-      "id": "spring-collection",
-      "description": "Spring Summer 24 Editorial",
-      "imageUrl": "https://picsum.photos/seed/spring24-luxe/1920/1080",
-      "imageHint": "fashion runway"
+      "id": "editorial-city-london",
+      "description": "London Heritage Edit",
+      "imageUrl": "https://picsum.photos/seed/amarise-london-edit/1600/900",
+      "imageHint": "london luxury"
     },
     {
-      "id": "heritage-collection",
-      "description": "Heritage Collection Editorial",
+      "id": "editorial-city-dubai",
+      "description": "Dubai Gold Edit",
+      "imageUrl": "https://picsum.photos/seed/amarise-dubai-edit/1600/900",
+      "imageHint": "dubai gold"
+    },
+    {
+      "id": "collection-spring-summer",
+      "description": "Spring Summer 2024 Collection",
+      "imageUrl": "https://picsum.photos/seed/ss24-luxe/1920/1080",
+      "imageHint": "spring runway"
+    },
+    {
+      "id": "collection-heritage",
+      "description": "The Heritage Series",
       "imageUrl": "https://picsum.photos/seed/heritage-luxe/1920/1080",
-      "imageHint": "vintage luxury"
+      "imageHint": "vintage jewelry"
     },
     {
-      "id": "nocturnal-collection",
-      "description": "Nocturnal Allure Editorial",
-      "imageUrl": "https://picsum.photos/seed/nocturnal-luxe/1920/1080",
-      "imageHint": "night fashion"
+      "id": "collection-prive",
+      "description": "VIP Private Collection",
+      "imageUrl": "https://picsum.photos/seed/prive-exclusive/1920/1080",
+      "imageHint": "exclusive watches"
     }
   ]
 }
