@@ -1,5 +1,5 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo } from './types';
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo, City } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { 
@@ -78,6 +78,68 @@ export const COUNTRIES: Record<string, Country> = {
     }
   },
 };
+
+export const CITIES: City[] = [
+  // US Cities
+  {
+    id: 'new-york',
+    name: 'New York',
+    countryCode: 'us',
+    description: 'The global pulse of contemporary luxury.',
+    heroImage: 'https://picsum.photos/seed/nyc-luxe/2560/1440',
+    featuredCollections: ['heritage', 'spring-24'],
+    featuredProducts: ['prod-1', 'prod-2', 'prod-3'],
+    office: COUNTRIES.us.office!,
+    trends: [
+      { title: 'Fifth Avenue Minimalism', description: 'Monochrome tailoring meets architectural jewelry.' },
+      { title: 'The Gallery Edit', description: 'Bespoke leather accessories for the modern art connoisseur.' }
+    ]
+  },
+  {
+    id: 'los-angeles',
+    name: 'Los Angeles',
+    countryCode: 'us',
+    description: 'Cinematic elegance and sun-drenched sophistication.',
+    heroImage: 'https://picsum.photos/seed/la-luxe/2560/1440',
+    featuredCollections: ['spring-24', 'nocturnal'],
+    featuredProducts: ['prod-4', 'prod-5'],
+    office: { ...COUNTRIES.us.office!, city: 'Beverly Hills', address: 'Rodeo Drive, Beverly Hills, CA 90210' },
+    trends: [
+      { title: 'Pacific Riviera', description: 'Lightweight silk heritage scarves and oversized eyewear.' }
+    ]
+  },
+  { id: 'miami', name: 'Miami', countryCode: 'us', description: 'Art Deco vibrance meets high-end resort living.', heroImage: 'https://picsum.photos/seed/miami-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-6'], office: { ...COUNTRIES.us.office!, city: 'Design District', address: 'NE 40th St, Miami, FL 33137' }, trends: [] },
+  { id: 'chicago', name: 'Chicago', countryCode: 'us', description: 'The architectural heart of American luxury.', heroImage: 'https://picsum.photos/seed/chi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-7'], office: { ...COUNTRIES.us.office!, city: 'Magnificent Mile', address: 'N Michigan Ave, Chicago, IL 60611' }, trends: [] },
+  { id: 'san-francisco', name: 'San Francisco', countryCode: 'us', description: 'Innovating the future of the heritage aesthetic.', heroImage: 'https://picsum.photos/seed/sf-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-8'], office: { ...COUNTRIES.us.office!, city: 'Union Square', address: 'Post St, San Francisco, CA 94108' }, trends: [] },
+
+  // UK Cities
+  { id: 'london', name: 'London', countryCode: 'uk', description: 'The intersection of royal heritage and avant-garde craft.', heroImage: 'https://picsum.photos/seed/london-luxe/2560/1440', featuredCollections: ['heritage', 'nocturnal'], featuredProducts: ['prod-10', 'prod-11'], office: COUNTRIES.uk.office!, trends: [{ title: 'Mayfair Tradition', description: 'Bespoke Savile Row-inspired outerwear.' }] },
+  { id: 'manchester', name: 'Manchester', countryCode: 'uk', description: 'Industrial legacy reimagined for the modern connoisseur.', heroImage: 'https://picsum.photos/seed/mcr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-12'], office: { ...COUNTRIES.uk.office!, city: 'Spinningfields', address: 'The Avenue, Manchester M3 3FL' }, trends: [] },
+  { id: 'edinburgh', name: 'Edinburgh', countryCode: 'uk', description: 'Historic grandeur and artisanal resilience.', heroImage: 'https://picsum.photos/seed/edi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-13'], office: { ...COUNTRIES.uk.office!, city: 'Multrees Walk', address: 'St Andrew Sq, Edinburgh EH1 3DQ' }, trends: [] },
+  { id: 'birmingham', name: 'Birmingham', countryCode: 'uk', description: 'The artisanal heart of the British Midlands.', heroImage: 'https://picsum.photos/seed/bhx-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-14'], office: { ...COUNTRIES.uk.office!, city: 'Mailbox', address: 'Royal Mail St, Birmingham B1 1RD' }, trends: [] },
+  { id: 'glasgow', name: 'Glasgow', countryCode: 'uk', description: 'The architectural spirit of the North.', heroImage: 'https://picsum.photos/seed/gla-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-15'], office: { ...COUNTRIES.uk.office!, city: 'Buchanan St', address: 'Glasgow G1 3HL' }, trends: [] },
+
+  // UAE Cities
+  { id: 'dubai', name: 'Dubai', countryCode: 'ae', description: 'Where gravity-defying ambition meets ancient gold.', heroImage: 'https://picsum.photos/seed/dxb-luxe/2560/1440', featuredCollections: ['privé-watches', 'heritage'], featuredProducts: ['prod-20', 'prod-21'], office: COUNTRIES.ae.office!, trends: [{ title: 'Desert Rose Gold', description: 'High-jewelry inspired by the Arabian dawn.' }] },
+  { id: 'abu-dhabi', name: 'Abu Dhabi', countryCode: 'ae', description: 'Cultural preservation and palatial elegance.', heroImage: 'https://picsum.photos/seed/auh-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-22'], office: { ...COUNTRIES.ae.office!, city: 'Galleria', address: 'Al Maryah Island, Abu Dhabi' }, trends: [] },
+  { id: 'sharjah', name: 'Sharjah', countryCode: 'ae', description: 'The intellectual soul of the Emirates.', heroImage: 'https://picsum.photos/seed/shj-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-23'], office: { ...COUNTRIES.ae.office!, city: 'University City', address: 'Sharjah, UAE' }, trends: [] },
+  { id: 'al-ain', name: 'Al Ain', countryCode: 'ae', description: 'The oasis of heritage and tranquility.', heroImage: 'https://picsum.photos/seed/aln-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-24'], office: { ...COUNTRIES.ae.office!, city: 'Al Ain Mall', address: 'Al Ain, UAE' }, trends: [] },
+  { id: 'ras-al-khaimah', name: 'Ras Al Khaimah', countryCode: 'ae', description: 'The untamed luxury of the northern mountains.', heroImage: 'https://picsum.photos/seed/rak-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-25'], office: { ...COUNTRIES.ae.office!, city: 'Al Marjan', address: 'RAK, UAE' }, trends: [] },
+
+  // India Cities
+  { id: 'mumbai', name: 'Mumbai', countryCode: 'in', description: 'The high-velocity heart of Indian Haute Couture.', heroImage: 'https://picsum.photos/seed/bom-luxe/2560/1440', featuredCollections: ['heritage', 'spring-24'], featuredProducts: ['prod-30', 'prod-31'], office: COUNTRIES.in.office!, trends: [{ title: 'Colaba Heritage', description: 'Silk-woven artifacts and temple-inspired gold.' }] },
+  { id: 'delhi', name: 'Delhi', countryCode: 'in', description: 'Imperial grandeur and contemporary political style.', heroImage: 'https://picsum.photos/seed/del-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-32'], office: { ...COUNTRIES.in.office!, city: 'Emporio', address: 'Vasant Kunj, New Delhi' }, trends: [] },
+  { id: 'bangalore', name: 'Bangalore', countryCode: 'in', description: 'Innovation meets the classic Indian aesthetic.', heroImage: 'https://picsum.photos/seed/blr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-33'], office: { ...COUNTRIES.in.office!, city: 'UB City', address: 'Vittal Mallya Rd, Bangalore' }, trends: [] },
+  { id: 'hyderabad', name: 'Hyderabad', countryCode: 'in', description: 'The city of Nizams and timeless pearl heritage.', heroImage: 'https://picsum.photos/seed/hyd-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-34'], office: { ...COUNTRIES.in.office!, city: 'Banjara Hills', address: 'Road No. 1, Hyderabad' }, trends: [] },
+  { id: 'chennai', name: 'Chennai', countryCode: 'in', description: 'The artistic soul of Southern Indian craft.', heroImage: 'https://picsum.photos/seed/maa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-35'], office: { ...COUNTRIES.in.office!, city: 'Nungambakkam', address: 'Khader Nawaz Khan Rd, Chennai' }, trends: [] },
+
+  // Singapore Cities (Areas)
+  { id: 'orchard-road', name: 'Orchard Road', countryCode: 'sg', description: 'The world-renowned avenue of high-end discovery.', heroImage: 'https://picsum.photos/seed/orchard-luxe/2560/1440', featuredCollections: ['spring-24', 'heritage'], featuredProducts: ['prod-40', 'prod-41'], office: COUNTRIES.sg.office!, trends: [{ title: 'Tropical Sophisticate', description: 'Linen-silk blends and marine-grade complications.' }] },
+  { id: 'marina-bay', name: 'Marina Bay', countryCode: 'sg', description: 'Futuristic architectural excellence.', heroImage: 'https://picsum.photos/seed/mbs-luxe/2560/1440', featuredCollections: ['privé-watches'], featuredProducts: ['prod-42'], office: { ...COUNTRIES.sg.office!, city: 'MBS South', address: 'Marina Bay Sands Level 1' }, trends: [] },
+  { id: 'sentosa', name: 'Sentosa', countryCode: 'sg', description: 'Elite island living and private resort luxury.', heroImage: 'https://picsum.photos/seed/sentosa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-43'], office: { ...COUNTRIES.sg.office!, city: 'Sentosa Cove', address: 'Quayside Isle, Singapore' }, trends: [] },
+  { id: 'bugis', name: 'Bugis', countryCode: 'sg', description: 'Heritage blocks and artisanal vibrance.', heroImage: 'https://picsum.photos/seed/bugis-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-44'], office: { ...COUNTRIES.sg.office!, city: 'Victoria St', address: 'Singapore 188067' }, trends: [] },
+  { id: 'raffles-place', name: 'Raffles Place', countryCode: 'sg', description: 'The financial heart with a heritage pulse.', heroImage: 'https://picsum.photos/seed/raffles-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-45'], office: { ...COUNTRIES.sg.office!, city: 'Battery Rd', address: 'Singapore 049909' }, trends: [] },
+];
 
 const generateDetailedSubcategories = (prefix: string, count: number) => {
   return Array.from({ length: count }, (_, i) => `${prefix} Series ${i + 1}`);

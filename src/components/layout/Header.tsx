@@ -4,9 +4,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, ChevronDown } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, ChevronDown, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CATEGORIES, COUNTRIES } from '@/lib/mock-data';
+import { CATEGORIES, COUNTRIES, CITIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
 import { 
   DropdownMenu, 
@@ -22,7 +22,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 /**
  * Header: The Entry to Maison Amarisé.
  * Redesigned for a light, elegant, editorial feel.
- * Updated to support 10 luxury departments with a mega-menu inspired scroll.
+ * Updated to support 10 luxury departments and City Destinations.
  */
 export const Header = () => {
   const { country } = useParams();
@@ -32,6 +32,8 @@ export const Header = () => {
   
   const countryCode = (country as string) || 'us';
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
+
+  const countryCities = CITIES.filter(c => c.countryCode === countryCode);
 
   const handleCountryChange = (code: string) => {
     router.push(`/${code}`);
@@ -56,10 +58,31 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* Desktop Navigation - Scrollable for 10 Departments */}
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex flex-1 justify-center px-10">
           <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex space-x-8 h-20 items-center">
+              {/* Destinations Dropdown */}
+              <div className="group relative">
+                <button className="text-[10px] font-bold uppercase tracking-[0.3em] text-plum hover:text-gold transition-all pb-1 border-b-2 border-transparent hover:border-gold flex items-center">
+                  <MapPin className="w-3 h-3 mr-2" /> DESTINATIONS
+                </button>
+                <div className="absolute top-full left-0 hidden group-hover:block w-64 bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-2 duration-300 pt-2">
+                  <div className="p-2 space-y-1">
+                    <DropdownMenuLabel className="text-[9px] uppercase tracking-widest text-muted-foreground px-4 py-2">Maison Cities: {COUNTRIES[countryCode].name}</DropdownMenuLabel>
+                    {countryCities.map(city => (
+                      <Link 
+                        key={city.id}
+                        href={`/${countryCode}/city/${city.id}`}
+                        className="block px-4 py-3 text-[10px] uppercase tracking-widest text-gray-900 hover:text-plum hover:bg-ivory transition-colors font-bold"
+                      >
+                        {city.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               {CATEGORIES.map((cat) => (
                 <div key={cat.id} className="group relative">
                   <Link 
@@ -70,7 +93,7 @@ export const Header = () => {
                   </Link>
                   <div className="absolute top-full left-1/2 -translate-x-1/2 hidden group-hover:block w-56 bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-2 duration-300 pt-2">
                     <div className="p-2 space-y-1">
-                      {cat.subcategories.map(sub => (
+                      {cat.subcategories.slice(0, 10).map(sub => (
                         <Link 
                           key={sub}
                           href={`/${countryCode}/category/${cat.id}?sub=${sub}`}
@@ -154,6 +177,16 @@ export const Header = () => {
       {isMenuOpen && (
         <div className="fixed inset-0 top-20 bg-white z-[60] overflow-y-auto animate-in slide-in-from-left duration-500">
            <div className="p-10 space-y-8">
+              <div className="space-y-4">
+                 <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-plum">Destinations</h3>
+                 <div className="flex flex-wrap gap-4">
+                    {countryCities.map(city => (
+                      <Link key={city.id} href={`/${countryCode}/city/${city.id}`} onClick={() => setIsMenuOpen(false)} className="text-[10px] uppercase tracking-widest text-gray-900 font-bold">
+                        {city.name}
+                      </Link>
+                    ))}
+                 </div>
+              </div>
               {CATEGORIES.map(cat => (
                 <div key={cat.id} className="space-y-4">
                   <Link 
@@ -164,7 +197,7 @@ export const Header = () => {
                     {cat.name}
                   </Link>
                   <div className="flex flex-wrap gap-4">
-                    {cat.subcategories.map(sub => (
+                    {cat.subcategories.slice(0, 8).map(sub => (
                       <Link 
                         key={sub}
                         href={`/${countryCode}/category/${cat.id}?sub=${sub}`}

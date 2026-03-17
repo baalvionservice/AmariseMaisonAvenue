@@ -1,20 +1,37 @@
 
 export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
 
+export interface Office {
+  city: string;
+  address: string;
+  phone: string;
+  email: string;
+  mapUrl: string;
+  image: string;
+}
+
+export interface City {
+  id: string;
+  name: string;
+  countryCode: CountryCode;
+  description: string;
+  heroImage: string;
+  featuredCollections: string[];
+  featuredProducts: string[];
+  office: Office;
+  trends: {
+    title: string;
+    description: string;
+  }[];
+}
+
 export interface Country {
   code: CountryCode;
   name: string;
   currency: string;
   symbol: string;
   locale: string;
-  office?: {
-    city: string;
-    address: string;
-    phone: string;
-    email: string;
-    mapUrl: string;
-    image: string;
-  };
+  office?: Office;
 }
 
 export interface Category {
