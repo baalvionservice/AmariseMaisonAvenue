@@ -17,7 +17,8 @@ import {
   Campaign,
   AuditLog,
   VipClient,
-  GlobalSettings
+  GlobalSettings,
+  CustomerSegment
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -31,7 +32,8 @@ import {
   VENDORS,
   CAMPAIGNS,
   AUDIT_LOGS,
-  VIP_CLIENTS
+  VIP_CLIENTS,
+  CUSTOMER_SEGMENTS
 } from './mock-data';
 
 interface AppContextType {
@@ -53,6 +55,7 @@ interface AppContextType {
   activeCampaigns: Campaign[];
   auditLogs: AuditLog[];
   vipClients: VipClient[];
+  customerSegments: CustomerSegment[];
   globalSettings: GlobalSettings;
   
   // Showcase State
@@ -76,6 +79,7 @@ interface AppContextType {
   upsertVendor: (vendor: Vendor) => void;
   upsertCampaign: (campaign: Campaign) => void;
   updateGlobalSettings: (settings: GlobalSettings) => void;
+  upsertSegment: (segment: CustomerSegment) => void;
   
   // Social Actions
   toggleLike: (contentId: string, country: string) => void;
@@ -107,6 +111,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
   const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
+  const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
     seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
@@ -241,6 +246,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const upsertSegment = (seg: CustomerSegment) => {
+    setCustomerSegments(prev => {
+      const idx = prev.findIndex(s => s.id === seg.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = seg;
+        return next;
+      }
+      return [seg, ...prev];
+    });
+  };
+
   const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
 
   const toggleLike = (contentId: string, country: string) => {
@@ -273,6 +290,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     activeCampaigns,
     auditLogs,
     vipClients,
+    customerSegments,
     globalSettings,
     isShowcaseMode,
     activeVip,
@@ -289,13 +307,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertAdmin,
     upsertVendor,
     upsertCampaign,
+    upsertSegment,
     updateGlobalSettings,
     toggleLike,
     trackShare,
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, globalSettings, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

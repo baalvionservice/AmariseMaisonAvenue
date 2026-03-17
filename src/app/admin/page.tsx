@@ -44,7 +44,8 @@ import {
   Lock,
   Smartphone,
   LayoutTemplate,
-  BriefcaseBusiness
+  BriefcaseBusiness,
+  PieChart
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,12 +81,12 @@ import {
   CartesianGrid,
   Tooltip as ChartTooltip,
   ResponsiveContainer,
-  PieChart,
+  PieChart as RechartsPieChart,
   Pie,
   Cell
 } from 'recharts';
 
-type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives' | 'catalog' | 'assets';
+type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives';
 
 const REVENUE_DATA = [
   { name: 'Jan', value: 450000 },
@@ -102,9 +103,6 @@ const DEMO_DATA = [
   { name: 'Silver', value: 25, color: '#BFA2DB' },
 ];
 
-/**
- * Super Admin Panel (Master Control): The Strategic Center for AMARISÉ MAISON AVENUE.
- */
 export default function SuperAdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('intelligence');
   const { 
@@ -112,8 +110,7 @@ export default function SuperAdminPanel() {
     admins,
     vendors,
     activeCampaigns,
-    auditLogs,
-    deleteProduct
+    auditLogs
   } = useAppStore();
   const { toast } = useToast();
 
@@ -122,7 +119,6 @@ export default function SuperAdminPanel() {
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
-      {/* Strategic Sidebar Navigation */}
       <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
@@ -144,6 +140,11 @@ export default function SuperAdminPanel() {
             <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
               <Link href="/admin/operations">
                 <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
+              </Link>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+              <Link href="/admin/marketing">
+                <PieChart className="w-4 h-4 mr-3" /> Marketing Hub
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
@@ -170,7 +171,6 @@ export default function SuperAdminPanel() {
         </div>
       </aside>
 
-      {/* Control Workspace */}
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
@@ -206,8 +206,6 @@ export default function SuperAdminPanel() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          
-          {/* INTELLIGENCE (ANALYTICS) */}
           {activeTab === 'intelligence' && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -252,7 +250,7 @@ export default function SuperAdminPanel() {
                   <CardContent className="pt-8 flex flex-col items-center">
                     <div className="h-48 w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
+                        <RechartsPieChart>
                           <Pie
                             data={DEMO_DATA}
                             cx="50%"
@@ -267,7 +265,7 @@ export default function SuperAdminPanel() {
                             ))}
                           </Pie>
                           <ChartTooltip />
-                        </PieChart>
+                        </RechartsPieChart>
                       </ResponsiveContainer>
                     </div>
                     <div className="w-full space-y-4 mt-6">
@@ -287,7 +285,6 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
-          {/* GOVERNANCE (ADMINS) */}
           {activeTab === 'governance' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -327,13 +324,6 @@ export default function SuperAdminPanel() {
                           ))}
                         </div>
                       </div>
-                      <div className="flex justify-between items-center pt-4">
-                        <span className="text-[8px] text-gray-300 italic">Last Active: {new Date(admin.lastActive).toLocaleDateString()}</span>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Edit3 className="w-3 h-3" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-destructive"><Lock className="w-3 h-3" /></Button>
-                        </div>
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -341,17 +331,12 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
-          {/* ECOSYSTEM (VENDORS) */}
           {activeTab === 'ecosystem' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-headline font-bold italic">Artisanal Partners</h2>
                   <p className="text-[10px] uppercase tracking-widest text-gray-400">Manage vendor applications and sales performance</p>
-                </div>
-                <div className="flex space-x-4">
-                  <Button variant="outline" className="border-border text-gray-400 hover:text-plum h-12 px-8 rounded-none text-[10px] font-bold uppercase">View Applications (3)</Button>
-                  <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold uppercase">Invite Master Artisan</Button>
                 </div>
               </div>
 
@@ -364,7 +349,6 @@ export default function SuperAdminPanel() {
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Trust Index</TableHead>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Entities</TableHead>
                       <TableHead className="text-[9px] uppercase tracking-widest font-bold text-right">Revenue Share</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -380,10 +364,6 @@ export default function SuperAdminPanel() {
                         </TableCell>
                         <TableCell className="text-xs text-center font-bold text-plum">{vendor.productCount}</TableCell>
                         <TableCell className="text-xs text-right font-light">${vendor.salesTotal.toLocaleString()}</TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Eye className="w-4 h-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><DollarSign className="w-4 h-4" /></Button>
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -392,131 +372,6 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
-          {/* ARCHITECTURE (SETTINGS) */}
-          {activeTab === 'architecture' && (
-            <div className="space-y-12">
-              <h2 className="text-2xl font-headline font-bold italic">Maison Architecture</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border flex flex-row items-center space-x-4">
-                    <div className="p-3 bg-plum/5 text-plum rounded-sm"><Smartphone className="w-5 h-5" /></div>
-                    <div>
-                      <CardTitle className="text-sm uppercase tracking-widest">Interface & Identity</CardTitle>
-                      <CardDescription className="text-[8px]">Global theming and font registry</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-6">
-                    <div className="space-y-4">
-                      <Label className="text-[9px] uppercase tracking-widest text-gray-400">Primary Branding Color</Label>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-sm bg-plum border-2 border-border shadow-sm" />
-                        <Input className="h-10 text-[10px] font-bold rounded-none" defaultValue="#7E3F98" />
-                      </div>
-                    </div>
-                    <div className="space-y-4 pt-4 border-t border-border">
-                      <Label className="text-[9px] uppercase tracking-widest text-gray-400">Maison Typography</Label>
-                      <select className="w-full bg-white border border-border h-10 px-4 text-[10px] font-bold uppercase outline-none rounded-none">
-                        <option>Alegreya (Serif)</option>
-                        <option>Inter (Sans)</option>
-                        <option>Playfair Display</option>
-                      </select>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border flex flex-row items-center space-x-4">
-                    <div className="p-3 bg-gold/5 text-gold rounded-sm"><CreditCard className="w-5 h-5" /></div>
-                    <div>
-                      <CardTitle className="text-sm uppercase tracking-widest">Financial Gateway</CardTitle>
-                      <CardDescription className="text-[8px]">Payment bridge configuration</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-6">
-                    <SettingsToggle label="Global Card Terminal" active={true} />
-                    <SettingsToggle label="Digital Wallets (Apple/Google)" active={true} />
-                    <SettingsToggle label="Cryptocurrency Bridge" active={false} />
-                    <SettingsToggle label="Tax Engine Autopilot" active={true} />
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border flex flex-row items-center space-x-4">
-                    <div className="p-3 bg-plum/5 text-plum rounded-sm"><Search className="w-5 h-5" /></div>
-                    <div>
-                      <CardTitle className="text-sm uppercase tracking-widest">Global SEO Index</CardTitle>
-                      <CardDescription className="text-[8px]">Metadata and schema strategy</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-6">
-                    <div className="space-y-2">
-                      <Label className="text-[9px] uppercase tracking-widest text-gray-400">Title Template</Label>
-                      <Input className="h-10 text-[10px] rounded-none" defaultValue="%s | Amarisé Luxe" />
-                    </div>
-                    <div className="space-y-2 pt-4 border-t border-border">
-                      <Label className="text-[9px] uppercase tracking-widest text-gray-400">Default OG Image</Label>
-                      <div className="aspect-video bg-ivory border border-dashed border-border flex items-center justify-center text-gray-300 text-[8px] uppercase tracking-widest">
-                        Upload Asset
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
-
-          {/* STRATEGY (CAMPAIGNS) */}
-          {activeTab === 'strategy' && (
-            <div className="space-y-12">
-              <div className="flex justify-between items-end">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Market Strategy</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Strategic campaign oversight and approvals</p>
-                </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold uppercase tracking-widest">
-                  Draft Platform Event
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {activeCampaigns.map(camp => (
-                  <Card key={camp.id} className="bg-white border-border shadow-luxury overflow-hidden flex">
-                    <div className={cn("w-2 h-full", camp.status === 'active' ? 'bg-green-500' : 'bg-gold')} />
-                    <div className="flex-1 p-8 space-y-6">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <h4 className="text-xl font-headline font-bold italic">{camp.title}</h4>
-                          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">{camp.type}</p>
-                        </div>
-                        <Badge className={cn("text-[8px] uppercase tracking-widest", camp.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gold/10 text-gold')}>
-                          {camp.status}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-8 border-y border-border py-6">
-                        <div className="space-y-1">
-                          <span className="text-[8px] text-gray-400 uppercase tracking-widest font-bold">Market Scope</span>
-                          <p className="text-xs font-bold uppercase">{camp.market}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[8px] text-gray-400 uppercase tracking-widest font-bold">Benefit</span>
-                          <p className="text-xs font-bold uppercase text-plum">{camp.discountValue > 0 ? `-${camp.discountValue}% Global` : 'Early Access'}</p>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center pt-2">
-                        <span className="text-[9px] text-gray-400 italic">Timeline: {camp.startDate} — {camp.endDate}</span>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm" className="text-[9px] uppercase tracking-widest font-bold text-plum hover:bg-plum/5">Edit Scope</Button>
-                          {camp.status === 'scheduled' && <Button size="sm" className="bg-plum text-white h-8 text-[9px] uppercase tracking-widest font-bold">Launch Now</Button>}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ARCHIVES (AUDIT LOGS) */}
           {activeTab === 'archives' && (
             <div className="space-y-12">
               <div className="flex justify-between items-center border-b border-border pb-8">
@@ -524,9 +379,6 @@ export default function SuperAdminPanel() {
                   <h2 className="text-2xl font-headline font-bold italic text-gray-900">Maison Archives</h2>
                   <p className="text-[10px] uppercase tracking-widest text-gray-400">Platform-wide audit and activity footprint</p>
                 </div>
-                <Button variant="outline" className="border-border text-gray-400 h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest">
-                  Export Compliance Report
-                </Button>
               </div>
 
               <div className="space-y-4">
@@ -547,32 +399,17 @@ export default function SuperAdminPanel() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-12">
-                      <div className="text-right">
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">IP ORIGIN</p>
-                        <p className="text-[10px] text-gray-900 font-mono">{log.ipAddress}</p>
-                      </div>
-                      <Badge className={cn(
-                        "text-[8px] uppercase tracking-widest",
-                        log.severity === 'high' ? 'bg-red-50 text-red-600' : log.severity === 'medium' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'
-                      )}>
-                        {log.severity} RISK
-                      </Badge>
-                    </div>
+                    <Badge className={cn(
+                      "text-[8px] uppercase tracking-widest",
+                      log.severity === 'high' ? 'bg-red-50 text-red-600' : log.severity === 'medium' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'
+                    )}>
+                      {log.severity} RISK
+                    </Badge>
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          {/* OPERATIONAL PLACEHOLDERS (CATALOG & ASSETS) */}
-          {(activeTab === 'catalog' || activeTab === 'assets') && (
-            <div className="py-40 text-center space-y-6">
-              <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto animate-spin-slow" />
-              <p className="text-2xl text-muted-foreground font-light italic font-headline">The {activeTab} workspace is being updated with the latest Global Registry data.</p>
-            </div>
-          )}
-
         </div>
       </main>
     </div>
@@ -618,22 +455,5 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function SettingsToggle({ label, active }: { label: string, active: boolean }) {
-  return (
-    <div className="flex items-center justify-between p-4 bg-ivory/50 border border-border rounded-none">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-700">{label}</span>
-      <div className={cn(
-        "w-10 h-5 rounded-full relative transition-colors duration-300",
-        active ? 'bg-plum' : 'bg-gray-200'
-      )}>
-        <div className={cn(
-          "w-3 h-3 bg-white rounded-full absolute top-1 transition-all duration-300",
-          active ? 'left-6' : 'left-1'
-        )} />
-      </div>
-    </div>
   );
 }

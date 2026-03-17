@@ -140,7 +140,7 @@ export interface CustomerServiceInfo {
   faqs: { question: string; answer: string }[];
 }
 
-// --- SUPER ADMIN EXTENSIONS ---
+// --- ADMIN & MARKETING EXTENSIONS ---
 
 export interface AdminAccount {
   id: string;
@@ -168,12 +168,24 @@ export interface Vendor {
 export interface Campaign {
   id: string;
   title: string;
-  type: 'Flash Sale' | 'VIP Loyalty' | 'Seasonal' | 'Launch';
+  type: 'Flash Sale' | 'VIP Loyalty' | 'Seasonal' | 'Launch' | 'Email' | 'Social';
   status: 'scheduled' | 'active' | 'completed' | 'draft';
   discountValue: number;
   startDate: string;
   endDate: string;
   market: CountryCode | 'global';
+  roi?: number;
+  reach?: number;
+  conversions?: number;
+}
+
+export interface CustomerSegment {
+  id: string;
+  name: string;
+  description: string;
+  userCount: number;
+  avgOrderValue: number;
+  tags: string[];
 }
 
 export interface AuditLog {
@@ -212,4 +224,5 @@ export interface VipClient {
   tier: 'Silver' | 'Gold' | 'Diamond';
   loyaltyPoints: number;
   totalSpend: number;
+  lastPurchase?: string;
 }

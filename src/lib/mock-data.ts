@@ -2,7 +2,7 @@
 import { 
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
-  Vendor, Campaign, AuditLog 
+  Vendor, Campaign, AuditLog, CustomerSegment 
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -96,8 +96,9 @@ export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
 };
 
 export const VIP_CLIENTS: VipClient[] = [
-  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000 },
-  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000 }
+  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10' },
+  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28' },
+  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14' }
 ];
 
 export const ADMIN_ACCOUNTS: AdminAccount[] = [
@@ -112,8 +113,15 @@ export const VENDORS: Vendor[] = [
 ];
 
 export const CAMPAIGNS: Campaign[] = [
-  { id: 'camp-1', title: 'Midnight Soirée Flash Sale', type: 'Flash Sale', status: 'scheduled', discountValue: 15, startDate: '2024-04-01', endDate: '2024-04-03', market: 'global' },
-  { id: 'camp-2', title: 'Heritage Collection Launch', type: 'Launch', status: 'active', discountValue: 0, startDate: '2024-03-10', endDate: '2024-03-25', market: 'us' }
+  { id: 'camp-1', title: 'Midnight Soirée Flash Sale', type: 'Flash Sale', status: 'scheduled', discountValue: 15, startDate: '2024-04-01', endDate: '2024-04-03', market: 'global', reach: 45000, conversions: 1200, roi: 4.5 },
+  { id: 'camp-2', title: 'Heritage Collection Launch', type: 'Launch', status: 'active', discountValue: 0, startDate: '2024-03-10', endDate: '2024-03-25', market: 'us', reach: 120000, conversions: 800, roi: 8.2 },
+  { id: 'camp-3', title: 'Spring Equinox Newsletter', type: 'Email', status: 'completed', discountValue: 10, startDate: '2024-03-01', endDate: '2024-03-05', market: 'global', reach: 250000, conversions: 4500, roi: 12.4 }
+];
+
+export const CUSTOMER_SEGMENTS: CustomerSegment[] = [
+  { id: 'seg-1', name: 'Ultra-High Net Worth', description: 'Clients with >$100k lifetime spend.', userCount: 450, avgOrderValue: 12500, tags: ['Diamond', 'Bespoke'] },
+  { id: 'seg-2', name: 'Seasonal Enthusiasts', description: 'Purchased in last 3 months.', userCount: 2800, avgOrderValue: 3200, tags: ['Active', 'Fashion'] },
+  { id: 'seg-3', name: 'Dormant Connoisseurs', description: 'No purchase in 12 months.', userCount: 1200, avgOrderValue: 4500, tags: ['Inactive', 'Luxury'] }
 ];
 
 export const AUDIT_LOGS: AuditLog[] = [

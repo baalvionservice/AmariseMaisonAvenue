@@ -28,7 +28,9 @@ import {
   ArrowDownRight,
   Eye,
   Star,
-  MapPin
+  MapPin,
+  PieChart,
+  LayoutTemplate
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -66,7 +68,6 @@ export default function OperationsAdminPanel() {
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
-      {/* Operations Sidebar */}
       <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
@@ -87,9 +88,15 @@ export default function OperationsAdminPanel() {
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+          <div className="px-4 py-2 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
+          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
             <Link href="/admin">
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+            <Link href="/admin/marketing">
+              <PieChart className="w-4 h-4 mr-3" /> Marketing Hub
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
@@ -100,7 +107,6 @@ export default function OperationsAdminPanel() {
         </div>
       </aside>
 
-      {/* Main Workspace */}
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
@@ -121,8 +127,6 @@ export default function OperationsAdminPanel() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          
-          {/* ORCHESTRATION (DASHBOARD) */}
           {activeTab === 'dashboard' && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -184,7 +188,6 @@ export default function OperationsAdminPanel() {
             </div>
           )}
 
-          {/* CATALOG ATELIER (PRODUCT MGMT) */}
           {activeTab === 'catalog' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -243,7 +246,6 @@ export default function OperationsAdminPanel() {
             </div>
           )}
 
-          {/* STORYTELLING CMS */}
           {activeTab === 'cms' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -284,21 +286,6 @@ export default function OperationsAdminPanel() {
               </div>
             </div>
           )}
-
-          {/* PLACEHOLDERS FOR REMAINING TABS */}
-          {['curations', 'orders', 'customers', 'reports', 'logistics'].includes(activeTab) && (
-            <div className="py-40 text-center space-y-6">
-              <div className="flex justify-center">
-                <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
-                  <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto" />
-                </div>
-              </div>
-              <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} terminal is currently synchronizing with the Global Ateliers.
-              </p>
-            </div>
-          )}
-
         </div>
       </main>
     </div>
