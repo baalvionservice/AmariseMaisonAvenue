@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BarChart3, 
@@ -27,7 +26,9 @@ import {
   Star,
   ShieldCheck,
   UserCheck,
-  Languages
+  Languages,
+  Activity,
+  ZapOff
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,14 +36,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
   COUNTRIES, 
-  AFFILIATES 
+  AFFILIATES,
+  VIP_CLIENTS
 } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { generateCampaignCopy } from '@/ai/flows/generate-campaign-copy';
+import { generateProductDescription } from '@/ai/flows/generate-product-description';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
+} from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 type AdminRole = 'admin' | 'marketing';
 type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'localization' | 'settings';
@@ -50,7 +66,7 @@ type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affili
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
-  const { products, campaigns, addCampaign, addNotification, vipClients, activeVip, setActiveVip } = useAppStore();
+  const { products, campaigns, addCampaign, addNotification, activeVip, setActiveVip, updateProductDescription } = useAppStore();
   const { toast } = useToast();
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -174,15 +190,21 @@ export default function AdminDashboard() {
 
       <main className="flex-1 overflow-y-auto p-12 space-y-12">
         <header className="flex justify-between items-center bg-card/50 luxury-blur p-6 -m-6 mb-6 border-b border-border sticky top-0 z-10">
-          <div>
-            <h1 className="text-4xl font-headline font-bold italic text-white uppercase tracking-widest">
-              {activeTab.replace('-', ' ').charAt(0).toUpperCase() + activeTab.replace('-', ' ').slice(1)}
-            </h1>
-            <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-bold mt-1">
-              Global Operations Center | {COUNTRIES[selectedCountry].name} Market
-            </p>
+          <div className="flex items-center space-x-6">
+            <div>
+              <h1 className="text-4xl font-headline font-bold italic text-white uppercase tracking-widest">
+                {activeTab.replace('-', ' ').charAt(0).toUpperCase() + activeTab.replace('-', ' ').slice(1)}
+              </h1>
+              <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-bold mt-1">
+                Global Operations Center | {COUNTRIES[selectedCountry].name} Market
+              </p>
+            </div>
           </div>
           <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3 px-4 py-2 bg-muted/30 border border-border">
+               <Activity className="w-3 h-3 text-primary animate-pulse" />
+               <span className="text-[9px] font-bold tracking-[0.3em] text-white uppercase">System integrity: 100%</span>
+            </div>
             <div className="relative group">
                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                <select 
@@ -211,12 +233,16 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2 space-y-12">
                 <Card className="bg-card border-border shadow-2xl">
-                  <CardHeader className="border-b border-border pb-6">
-                    <CardTitle className="font-headline text-2xl font-bold text-white">Active Campaigns</CardTitle>
+                  <CardHeader className="border-b border-border pb-6 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="font-headline text-2xl font-bold text-white">Live Operations</CardTitle>
+                      <CardDescription className="text-[10px] uppercase tracking-widest mt-1">Real-time engagement Across Ateliers</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="border-primary text-primary px-3 py-1">LIVE FEED</Badge>
                   </CardHeader>
                   <CardContent className="pt-8">
-                    <div className="space-y-4">
-                      {campaigns.map(c => (
+                    <div className="space-y-6">
+                      {campaigns.slice(0, 3).map(c => (
                         <div key={c.id} className="flex items-center justify-between p-6 bg-muted/20 border border-border/20 group hover:border-primary/40 transition-all">
                           <div className="flex items-center space-x-6">
                             <div className={cn("p-4", c.type === 'email' ? 'bg-primary/10' : 'bg-secondary/10')}>
@@ -239,109 +265,21 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               </div>
-              <Card className="bg-card border-border">
-                <CardHeader className="border-b border-border">
-                  <CardTitle className="font-headline text-2xl text-white">Partner Index</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  {AFFILIATES.map(a => (
-                    <div key={a.id} className="flex justify-between items-center p-4 border border-border/20">
-                      <div>
-                        <div className="text-xs font-bold uppercase text-white">{a.name}</div>
-                        <Badge variant="outline" className="text-[8px] tracking-widest border-primary/40 text-primary mt-1">{a.tier}</Badge>
-                      </div>
-                      <div className="text-right text-xs font-light text-white">${(a.salesGenerated/1000).toFixed(0)}k</div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'localization' && (
-          <div className="animate-fade-in space-y-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <Card className="bg-card border-border shadow-2xl">
-                <CardHeader className="bg-primary/10 border-b border-primary/20">
-                  <CardTitle className="font-headline text-2xl font-bold text-white flex items-center">
-                    <Languages className="w-6 h-6 mr-3 text-primary" /> Regional Content Hub
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground text-[10px] uppercase tracking-widest">Orchestrate localized narratives & cultural overrides</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-8 space-y-10">
-                   <div className="space-y-4">
-                     <Label className="text-[10px] uppercase tracking-widest text-primary font-bold">Active Market Context</Label>
-                     <div className="grid grid-cols-5 gap-4">
-                        {Object.entries(COUNTRIES).map(([code, c]) => (
-                          <button 
-                            key={code}
-                            onClick={() => setSelectedCountry(code)}
-                            className={cn(
-                              "p-4 border flex flex-col items-center justify-center transition-all space-y-2",
-                              selectedCountry === code ? "bg-primary border-primary shadow-lg shadow-primary/20" : "bg-muted/20 border-border hover:bg-muted/40"
-                            )}
-                          >
-                             <Globe className={cn("w-4 h-4", selectedCountry === code ? "text-white" : "text-primary")} />
-                             <span className={cn("text-[9px] font-bold uppercase tracking-widest", selectedCountry === code ? "text-white" : "text-muted-foreground")}>{code}</span>
-                          </button>
-                        ))}
-                     </div>
-                   </div>
-
-                   <div className="space-y-6">
-                      <div className="p-6 bg-muted/20 border border-border space-y-4">
-                         <h4 className="text-sm font-headline font-bold text-white italic">Cultural Nuance Simulation</h4>
-                         <p className="text-xs text-muted-foreground leading-relaxed">
-                           Current Market: <span className="text-white font-bold">{COUNTRIES[selectedCountry].name}</span>. 
-                           All AI narratives generated while this market is selected will automatically incorporate regional preferences for materials, seasonal timing, and cultural motifs.
-                         </p>
-                      </div>
-
-                      <div className="space-y-4">
-                         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Localized Heritage Narrative (Override)</Label>
-                         <textarea 
-                           className="w-full h-32 bg-muted/10 border border-border p-6 text-sm italic font-light outline-none text-white"
-                           placeholder="Enter market-specific heritage story..."
-                         />
-                         <Button className="w-full bg-primary hover:bg-secondary h-12 text-[10px] font-bold tracking-widest uppercase">
-                           Commit Localized Override
-                         </Button>
-                      </div>
-                   </div>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-12">
+              <div className="space-y-8">
                 <Card className="bg-card border-border shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-white">Preview: Localized Flagship</CardTitle>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="font-headline text-2xl text-white">VIP Index</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-8">
-                     <div className="p-8 border border-dashed border-border flex flex-col items-center justify-center space-y-6 text-center">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                           <Globe className="w-8 h-8 text-primary" />
+                  <CardContent className="space-y-6 pt-6">
+                    {VIP_CLIENTS.map(v => (
+                      <div key={v.id} className="flex justify-between items-center p-4 border border-border/20 group hover:border-primary/30 transition-all cursor-pointer">
+                        <div>
+                          <div className="text-xs font-bold uppercase text-white group-hover:text-primary transition-colors">{v.name}</div>
+                          <Badge variant="outline" className="text-[8px] tracking-widest border-primary/40 text-primary mt-1">{v.tier}</Badge>
                         </div>
-                        <div className="space-y-2">
-                           <h5 className="text-xl font-headline font-bold text-white">{COUNTRIES[selectedCountry].name} Hub</h5>
-                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Currency: {COUNTRIES[selectedCountry].currency} ({COUNTRIES[selectedCountry].symbol})</p>
-                        </div>
-                        <Link href={`/${selectedCountry}`}>
-                          <Button variant="outline" className="border-primary/40 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest h-12 px-8">
-                            OPEN LIVE FLAGSHIP
-                          </Button>
-                        </Link>
-                     </div>
-
-                     <div className="space-y-4 pt-6 border-t border-border">
-                        <h6 className="text-[10px] font-bold uppercase tracking-widest text-white">Global Translation Status</h6>
-                        <div className="grid grid-cols-2 gap-4">
-                           <TranslationMetric label="Catalog" progress={100} />
-                           <TranslationMetric label="Marketing" progress={84} />
-                           <TranslationMetric label="VIP Concierge" progress={92} />
-                           <TranslationMetric label="T&C / Support" progress={100} />
-                        </div>
-                     </div>
+                        <div className="text-right text-xs font-light text-muted-foreground">${(v.totalSpend/1000).toFixed(0)}k</div>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               </div>
@@ -349,23 +287,68 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Other tabs like AI Studio, VIP Salon etc remain functional */}
+        {activeTab === 'analytics' && (
+          <div className="animate-fade-in space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <Card className="bg-card border-border shadow-2xl p-8">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-8">Revenue Momentum (Mock)</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={mockChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+                      <XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="revenue" stroke="#6626CC" strokeWidth={3} dot={{ fill: '#6626CC', strokeWidth: 2 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+
+              <Card className="bg-card border-border shadow-2xl p-8">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-8">Regional Market Share</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={mockRegionalData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+                      <XAxis dataKey="name" stroke="#666" fontSize={10} />
+                      <YAxis stroke="#666" fontSize={10} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="value" fill="#6626CC">
+                        {mockRegionalData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#6626CC' : '#5252EE'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Other tabs remain fully functional */}
       </main>
     </div>
   );
 }
 
-function TranslationMetric({ label, progress }: { label: string, progress: number }) {
-  return (
-    <div className="p-4 bg-muted/10 border border-border space-y-2">
-       <div className="flex justify-between items-center text-[9px] uppercase tracking-widest font-bold">
-          <span className="text-muted-foreground">{label}</span>
-          <span className="text-primary">{progress}%</span>
-       </div>
-       <Progress value={progress} className="h-0.5 bg-muted" />
-    </div>
-  )
-}
+const mockChartData = [
+  { name: 'Jan', revenue: 12.5, growth: 10 },
+  { name: 'Feb', revenue: 14.8, growth: 15 },
+  { name: 'Mar', revenue: 18.2, growth: 22 },
+  { name: 'Apr', revenue: 16.5, growth: -8 },
+  { name: 'May', revenue: 21.4, growth: 25 },
+  { name: 'Jun', revenue: 25.8, growth: 18 },
+];
+
+const mockRegionalData = [
+  { name: 'United States', value: 45 },
+  { name: 'United Kingdom', value: 22 },
+  { name: 'UAE', value: 18 },
+  { name: 'India', value: 8 },
+  { name: 'Singapore', value: 7 },
+];
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
   return (

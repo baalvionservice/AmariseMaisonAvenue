@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -24,6 +23,8 @@ interface AppContextType {
   notifications: Notification[];
   vipClients: VipClient[];
   activeVip: VipClient | null;
+  isShowcaseMode: boolean;
+  setShowcaseMode: (val: boolean) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
@@ -51,6 +52,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   const [vipClients, setVipClients] = useState<VipClient[]>(INITIAL_VIP_CLIENTS);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
+  const [isShowcaseMode, setShowcaseMode] = useState<boolean>(true);
   
   const [user, setUser] = useState<any | null>(null);
 
@@ -149,6 +151,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     notifications,
     vipClients,
     activeVip,
+    isShowcaseMode,
+    setShowcaseMode,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -161,7 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setActiveVip,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, activeVip, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, activeVip, isShowcaseMode, user]);
 
   return (
     <AppContext.Provider value={value}>

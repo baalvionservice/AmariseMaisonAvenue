@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -6,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { AppProvider } from '@/lib/store';
 import { useParams } from 'next/navigation';
 import { COUNTRIES } from '@/lib/mock-data';
+import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 
 export default function CountryLayout({
   children,
@@ -15,16 +15,13 @@ export default function CountryLayout({
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   
-  if (!COUNTRIES[countryCode]) {
-    // In a production app, we would handle 404 or redirect here
-  }
-
   return (
     <AppProvider>
       <Header />
-      <main className="min-h-screen pt-20 animate-fade-in">
+      <main className="min-h-screen pt-20 animate-fade-in relative">
         {children}
       </main>
+      <ShowcaseControls />
       <footer className="bg-card py-32 border-t border-border mt-32 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-20 relative z-10">
