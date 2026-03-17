@@ -4,16 +4,27 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { PRODUCTS, COLLECTIONS, COUNTRIES, getLocalizedMockText } from '@/lib/mock-data';
+import { PRODUCTS, COLLECTIONS, COUNTRIES, CATEGORIES, getLocalizedMockText } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Crown, ShieldCheck, BookOpen } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Sparkles, 
+  Crown, 
+  ShieldCheck, 
+  BookOpen, 
+  Gem, 
+  Watch, 
+  Shirt, 
+  ChevronRight 
+} from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { ProductCard } from '@/components/product/ProductCard';
 
 /**
- * HomePage: Redesigned for a light, elegant, editorial luxury feel.
- * Centered content overlays, airy typography, and sophisticated gold/plum accents.
+ * HomePage: AMARISÉ MAISON AVENUE
+ * A light, airy, editorial luxury experience.
  */
 export default function HomePage() {
   const { country } = useParams();
@@ -25,16 +36,17 @@ export default function HomePage() {
   const [loadingRecs, setLoadingRecs] = useState(true);
 
   const latestEditorial = editorials.find(ed => ed.country === countryCode) || editorials[0];
+  const featuredCollections = COLLECTIONS.slice(0, 3);
 
   useEffect(() => {
     async function loadRecs() {
       try {
         const scenario = activeVip 
-          ? `Personalized curations for ${activeVip.name}, a ${activeVip.tier} tier client in ${currentCountry.name}. Market: ${countryCode}. Language: ${currentCountry.locale}.`
-          : `A discerning luxury shopper in ${currentCountry.name} seeking iconic heritage pieces. Regional context: ${countryCode}.`;
+          ? `VIP curation for ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on heritage and high-value artifacts.`
+          : `Luxury discovery for a new client in ${currentCountry.name}. Seasonal and iconic pieces.`;
 
         const res = await generateProductRecommendations({ scenario });
-        setRecommendations(res.recommendations.slice(0, 3));
+        setRecommendations(res.recommendations.slice(0, 4));
       } catch (e) {
         console.error("Personalization error:", e);
       } finally {
@@ -42,177 +54,222 @@ export default function HomePage() {
       }
     }
     loadRecs();
-  }, [countryCode, currentCountry.name, currentCountry.locale, activeVip]);
+  }, [countryCode, currentCountry.name, activeVip]);
 
   return (
-    <div className="space-y-32 bg-ivory min-h-screen">
-      {/* Cinematic Hero - Redesigned for Light Editorial Look */}
-      <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden">
+    <div className="space-y-32 bg-ivory min-h-screen pb-20">
+      {/* Cinematic Hero - Maison Avenue Presentation */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <Image 
-          src="https://picsum.photos/seed/amarise-hero-light/2560/1440" 
-          alt="Amarisé Luxe Heritage Presentation"
+          src="https://picsum.photos/seed/amarise-avenue-hero/2560/1440" 
+          alt="Amarisé Maison Avenue Global Flagship"
           fill
           className="object-cover opacity-90 animate-slow-zoom"
           priority
-          sizes="100vw"
         />
         <div className="absolute inset-0 cinematic-gradient" />
-        <div className="relative z-10 text-center space-y-12 max-w-4xl px-6 py-12 luxury-blur rounded-sm shadow-luxury">
-          <div className="animate-fade-in opacity-0 [animation-delay:200ms] space-y-6">
-            <div className="flex items-center justify-center space-x-6">
-              <div className="w-16 h-px bg-gold" />
-              <span className="text-[12px] font-bold tracking-[0.5em] uppercase text-plum">
-                Atelier Amarisé | {currentCountry.name}
+        <div className="relative z-10 text-center space-y-10 max-w-5xl px-6 py-16 luxury-blur border border-white/20 shadow-luxury">
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-12 h-px bg-gold/50" />
+              <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-plum">
+                Maison Avenue | {currentCountry.name}
               </span>
-              <div className="w-16 h-px bg-gold" />
+              <div className="w-12 h-px bg-gold/50" />
             </div>
-            <h1 className="text-6xl md:text-8xl font-headline font-bold text-gray-900 leading-tight tracking-tight">
-              {getLocalizedMockText('Timeless', countryCode)} <br /> 
-              <span className="italic font-normal serif text-gold">{getLocalizedMockText('Elegance', countryCode)}</span>
+            <h1 className="text-7xl md:text-9xl font-headline font-bold text-gray-900 leading-none">
+              {getLocalizedMockText('The Art of', countryCode)} <br /> 
+              <span className="italic font-normal serif text-gold">{getLocalizedMockText('Excellence', countryCode)}</span>
             </h1>
           </div>
-          <div className="animate-fade-in opacity-0 [animation-delay:400ms]">
-            <p className="text-lg md:text-xl text-gray-600 font-light max-w-xl mx-auto leading-relaxed tracking-wide">
-              {activeVip 
-                ? `Welcome back, ${activeVip.name}. We have prepared your private viewing for the ${currentCountry.name} market.`
-                : `Crafting artifacts of desire for ${currentCountry.name}'s most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.`
-              }
-            </p>
-          </div>
-          <div className="animate-fade-in opacity-0 [animation-delay:600ms] flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
+          <p className="text-lg md:text-xl text-gray-600 font-light max-w-2xl mx-auto leading-relaxed italic animate-fade-in [animation-delay:200ms]">
+            "Curating the world's most exquisite treasures since 1924. A testament to human brilliance, craft, and the pursuit of timeless beauty."
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 animate-fade-in [animation-delay:400ms]">
             <Link href={`/${countryCode}/category/apparel`}>
-              <Button className="bg-gold text-gray-900 hover:shadow-gold-glow hover:scale-105 px-14 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
-                {getLocalizedMockText('VIEW SELECTION', countryCode)}
+              <Button className="bg-plum text-white hover:bg-gold hover:text-gray-900 px-16 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all shadow-xl shadow-plum/10">
+                {getLocalizedMockText('EXPLORE THE ATELIER', countryCode)}
               </Button>
             </Link>
-            <Button variant="outline" className="border-plum text-plum hover:bg-plum hover:text-white px-14 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
-              {activeVip ? "REQUEST CONCIERGE" : getLocalizedMockText("OUR HERITAGE", countryCode)}
+            <Button variant="outline" className="border-gold text-gold hover:bg-gold/5 px-16 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
+              {getLocalizedMockText('OUR HERITAGE', countryCode)}
             </Button>
           </div>
         </div>
       </section>
 
-      {/* From The Journal - Light Editorial Spacing */}
-      {latestEditorial && (
-        <section className="container mx-auto px-6 py-24">
-          <div className="flex flex-col lg:flex-row items-center gap-24">
-            <div className="lg:w-1/2 relative aspect-[4/5] overflow-hidden rounded-lg shadow-luxury group">
-              <Image 
-                src={latestEditorial.imageUrl} 
-                alt={latestEditorial.title} 
-                fill 
-                className="object-cover transition-transform duration-[3s] group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-lavender/10 group-hover:bg-transparent transition-colors" />
-            </div>
-            <div className="lg:w-1/2 space-y-10">
-              <div className="flex items-center space-x-4 text-plum">
-                <BookOpen className="w-8 h-8" />
-                <span className="text-[12px] font-bold tracking-[0.5em] uppercase">From The Journal</span>
-              </div>
-              <h2 className="text-5xl font-headline font-bold italic leading-tight text-gray-900 border-l-4 border-gold pl-8">{latestEditorial.title}</h2>
-              <p className="text-xl text-gray-600 font-light leading-relaxed italic max-w-xl">
-                {latestEditorial.excerpt}
-              </p>
-              <div className="pt-8">
-                 <Link href={`/${countryCode}/journal/${latestEditorial.id}`}>
-                    <Button className="bg-gold text-gray-900 hover:shadow-gold-glow h-16 px-14 rounded-sm text-[11px] tracking-[0.4em] font-bold transition-all">
-                      READ THE NARRATIVE
-                    </Button>
-                 </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Featured Departments - Iconographic Grid */}
+      <section className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <DepartmentCard 
+            icon={<Shirt className="w-8 h-8" />} 
+            title="Haute Couture" 
+            desc="Bespoke tailoring and seasonal runways."
+            href={`/${countryCode}/category/apparel`}
+          />
+          <DepartmentCard 
+            icon={<Gem className="w-8 h-8" />} 
+            title="Fine Jewelry" 
+            desc="Rare stones and hand-sculpted gold."
+            href={`/${countryCode}/category/jewelry`}
+          />
+          <DepartmentCard 
+            icon={<Watch className="w-8 h-8" />} 
+            title="Heritage Timepieces" 
+            desc="Swiss precision and horological secrets."
+            href={`/${countryCode}/category/timepieces`}
+          />
+        </div>
+      </section>
 
-      {/* VIP Private Atelier - Light Lavender Aesthetic */}
-      {activeVip && (
+      {/* Featured Collections - The Curated Edit */}
+      <section className="container mx-auto px-6 py-12">
+        <div className="flex flex-col items-center text-center space-y-6 mb-20">
+           <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Seasonal Curations</span>
+           <h2 className="text-5xl md:text-6xl font-headline font-bold italic text-gray-900">The Collection Edit</h2>
+           <div className="w-20 h-px bg-gold" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {featuredCollections.map((col, idx) => (
+            <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-white shadow-luxury">
+              <Image 
+                src={col.imageUrl} 
+                alt={col.name} 
+                fill 
+                className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+              <div className="absolute inset-0 flex flex-col items-center justify-end p-12 text-center space-y-4">
+                <span className="text-gold text-[10px] font-bold tracking-[0.5em] uppercase">Maison Exclusive</span>
+                <h3 className="text-3xl font-headline font-bold text-white italic">{col.name}</h3>
+                <div className="flex items-center text-white text-[9px] font-bold tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
+                  Reveal Piece <ArrowRight className="ml-2 w-3 h-3" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Editorial Highlight - From The Journal */}
+      {latestEditorial && (
         <section className="bg-lavender/5 py-32 border-y border-border">
           <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row items-center gap-20">
-              <div className="lg:w-1/3 space-y-8">
-                <div className="flex items-center space-x-4 text-gold">
-                  <Crown className="w-10 h-10" />
-                  <span className="text-[12px] font-bold tracking-[0.5em] uppercase text-plum">Private Atelier</span>
-                </div>
-                <h2 className="text-5xl font-headline font-bold italic text-gray-900">Curated for <br />{activeVip.name}</h2>
-                <p className="text-gray-600 font-light leading-relaxed italic">
-                  Each piece in this selection has been hand-vetted by our master artisans to complement your bespoke status.
-                </p>
-                <div className="pt-6 border-t border-gold/30 space-y-4">
-                  <div className="flex items-center space-x-3 text-[11px] uppercase tracking-widest text-gold font-bold">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Bespoke Access Enabled</span>
-                  </div>
-                  <Button className="w-full bg-plum text-white border border-gold hover:bg-gold hover:text-gray-900 h-14 rounded-sm text-[11px] tracking-widest font-bold transition-all">
-                    ACCESS PRIVATE VAULT
-                  </Button>
+            <div className="flex flex-col lg:flex-row items-center gap-24">
+              <div className="lg:w-1/2 relative aspect-[4/5] shadow-2xl">
+                <Image 
+                  src={latestEditorial.imageUrl} 
+                  alt={latestEditorial.title} 
+                  fill 
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute -bottom-10 -right-10 w-64 h-80 bg-white p-8 shadow-luxury hidden xl:flex flex-col justify-between border border-border">
+                   <span className="text-[9px] font-bold tracking-widest uppercase text-plum">Featured Extract</span>
+                   <p className="text-sm font-light italic leading-relaxed text-gray-600 line-clamp-4">
+                     {latestEditorial.excerpt}
+                   </p>
+                   <Link href={`/${countryCode}/journal/${latestEditorial.id}`} className="text-[10px] font-bold uppercase tracking-widest text-gold flex items-center">
+                     Read Full Story <ChevronRight className="w-3 h-3 ml-1" />
+                   </Link>
                 </div>
               </div>
-              <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
-                 {COLLECTIONS.filter(c => activeVip.assignedCollections.includes(c.id)).map(col => (
-                   <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-video overflow-hidden rounded-lg shadow-luxury border border-border">
-                     <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-105" sizes="(max-width: 1024px) 100vw, 50vw" />
-                     <div className="absolute inset-0 bg-lavender/20 group-hover:bg-transparent transition-colors" />
-                     <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
-                        <span className="text-gold text-[10px] font-bold tracking-[0.5em] uppercase drop-shadow-md">Private Preview</span>
-                        <h3 className="text-3xl font-headline font-bold italic text-white drop-shadow-lg">{col.name}</h3>
-                        <div className="w-16 h-px bg-gold/60" />
-                        <p className="text-[11px] text-white uppercase tracking-widest font-bold drop-shadow-md">Enter Gallery</p>
-                     </div>
+              <div className="lg:w-1/2 space-y-10">
+                <div className="flex items-center space-x-4 text-plum">
+                  <BookOpen className="w-6 h-6" />
+                  <span className="text-[10px] font-bold tracking-[0.4em] uppercase">The Maison Journal</span>
+                </div>
+                <h2 className="text-5xl md:text-7xl font-headline font-bold italic leading-tight text-gray-900">{latestEditorial.title}</h2>
+                <div className="space-y-6 text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l-2 border-gold/30 pl-8">
+                  <p>{latestEditorial.excerpt}</p>
+                </div>
+                <div className="pt-8">
+                   <Link href={`/${countryCode}/journal/${latestEditorial.id}`}>
+                      <Button className="bg-plum text-white hover:bg-gold hover:text-gray-900 h-16 px-14 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
+                        ENTER THE NARRATIVE
+                      </Button>
                    </Link>
-                 ))}
+                </div>
               </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* AI Recommendations - Clean Grid */}
+      {/* VIP Preview Salon - Private Access Simulation */}
       <section className="container mx-auto px-6 py-24">
-        <div className="flex flex-col items-center text-center space-y-6 mb-24">
-           <div className="p-6 bg-gold/10 rounded-full">
-              <Sparkles className="w-8 h-8 text-gold" />
-           </div>
-           <div>
-              <h2 className="text-5xl font-headline font-bold text-gray-900 tracking-tight">Personalized for You</h2>
-              <p className="text-gray-400 text-sm uppercase tracking-[0.4em] font-bold mt-2">Refined Insights for {currentCountry.name}</p>
-           </div>
+        <div className="flex flex-col lg:flex-row items-end justify-between mb-20 gap-8">
+          <div className="space-y-4">
+             <div className="flex items-center space-x-3 text-gold">
+                <Crown className="w-6 h-6" />
+                <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">The Private Salon</span>
+             </div>
+             <h2 className="text-5xl font-headline font-bold text-gray-900">Curated Intelligence</h2>
+             <p className="text-gray-400 text-xs uppercase tracking-[0.4em] font-bold">Personalized Artifacts for {currentCountry.name}</p>
+          </div>
+          <Link href={`/${countryCode}/wishlist`}>
+            <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-gold">
+              View Your Private Selection <ArrowRight className="ml-2 w-3 h-3" />
+            </Button>
+          </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {loadingRecs ? (
-            [...Array(3)].map((_, i) => <div key={i} className="aspect-[4/5] bg-white rounded-lg border border-border animate-pulse" />)
+            [...Array(4)].map((_, i) => <div key={i} className="aspect-[3/4] bg-white border border-border animate-pulse" />)
           ) : (
             recommendations.map(rec => (
-              <div key={rec.id} className="group space-y-8 animate-fade-in">
-                <div className="relative aspect-[4/5] overflow-hidden bg-white rounded-lg border border-border shadow-luxury hover:shadow-md transition-shadow">
-                   <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-700 group-hover:scale-103" sizes="(max-width: 768px) 100vw, 33vw" />
-                   <div className="absolute inset-0 bg-gradient-to-t from-lavender/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div className="space-y-3 text-center">
-                   <span className="text-plum text-[10px] font-bold tracking-[0.4em] uppercase">{rec.category}</span>
-                   <h3 className="text-2xl font-headline italic text-gray-900 group-hover:text-gold transition-colors">{rec.name}</h3>
-                   <p className="text-xl font-light tracking-tighter text-gray-500">{currentCountry.symbol} {rec.price.toLocaleString()}</p>
-                </div>
-              </div>
+              <ProductCard key={rec.id} product={rec} />
             ))
           )}
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section className="bg-ivory py-40 text-center space-y-12">
-        <div className="max-w-2xl mx-auto space-y-8">
-           <h3 className="text-4xl font-headline font-bold italic text-gray-900">Experience Excellence</h3>
-           <p className="text-gray-600 font-light leading-relaxed">
-             Join the world of AMARISÉ Luxe. Receive private invitations to global launches and bespoke artisanal events.
+      {/* Newsletter Signup - The Archive */}
+      <section className="bg-white py-40 text-center border-t border-border">
+        <div className="max-w-3xl mx-auto space-y-12 px-6">
+           <div className="inline-flex items-center justify-center p-4 bg-plum/5 rounded-full mb-4">
+              <Sparkles className="w-8 h-8 text-gold" />
+           </div>
+           <div className="space-y-4">
+              <h3 className="text-4xl md:text-5xl font-headline font-bold italic text-gray-900">Join The Archive</h3>
+              <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
+                Receive private invitations to seasonal launches, artisanal showcases, and digital premieres from the Maison Amarisé.
+              </p>
+           </div>
+           <div className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-gold transition-colors">
+              <input 
+                type="email" 
+                placeholder="YOUR EMAIL ADDRESS" 
+                className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-300"
+              />
+              <button className="text-[10px] font-bold tracking-[0.3em] uppercase text-plum hover:text-gold transition-colors py-4">
+                SUBSCRIBE
+              </button>
+           </div>
+           <p className="text-[8px] text-gray-400 uppercase tracking-widest">
+             By subscribing, you agree to our Privacy Policy and Terms of Heritage.
            </p>
-           <Button className="bg-gold text-gray-900 hover:shadow-gold-glow px-16 h-16 rounded-sm text-[11px] tracking-[0.4em] font-bold">
-             SUBSCRIBE TO THE MAISON
-           </Button>
         </div>
       </section>
     </div>
+  );
+}
+
+function DepartmentCard({ icon, title, desc, href }: { icon: React.ReactNode, title: string, desc: string, href: string }) {
+  return (
+    <Link href={href} className="group p-10 bg-white border border-border shadow-sm hover:shadow-luxury transition-all duration-500 text-center space-y-6">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-ivory rounded-full text-plum group-hover:bg-gold group-hover:text-white transition-colors duration-500">
+        {icon}
+      </div>
+      <div className="space-y-2">
+        <h4 className="text-xl font-headline font-bold text-gray-900 group-hover:text-gold transition-colors">{title}</h4>
+        <p className="text-xs text-gray-400 font-light leading-relaxed px-4">{desc}</p>
+      </div>
+      <div className="pt-4 flex items-center justify-center text-[9px] font-bold tracking-widest uppercase text-plum opacity-0 group-hover:opacity-100 transition-opacity">
+        Enter Gallery <ChevronRight className="w-3 h-3 ml-1" />
+      </div>
+    </Link>
   );
 }
