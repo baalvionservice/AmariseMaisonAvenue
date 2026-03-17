@@ -257,3 +257,27 @@ export interface SupportStats {
   csatScore: number;
   activeChats: number;
 }
+
+// --- INTEGRATION EXTENSIONS ---
+
+export interface MaisonIntegration {
+  id: string;
+  name: string;
+  type: 'Payment' | 'Logistics' | 'CRM' | 'ERP' | 'Analytics';
+  provider: string;
+  status: 'Connected' | 'Disconnected' | 'Error' | 'Degraded';
+  lastSync: string;
+  latency?: string;
+  uptime: number; // 0-100
+  logo?: string;
+}
+
+export interface ApiLog {
+  id: string;
+  timestamp: string;
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  status: number;
+  latency: string;
+  integrationId: string;
+}

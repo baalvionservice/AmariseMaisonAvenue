@@ -20,7 +20,9 @@ import {
   GlobalSettings,
   CustomerSegment,
   SupportTicket,
-  SupportStats
+  SupportStats,
+  MaisonIntegration,
+  ApiLog
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -37,7 +39,9 @@ import {
   VIP_CLIENTS,
   CUSTOMER_SEGMENTS,
   SUPPORT_TICKETS,
-  SUPPORT_STATS
+  SUPPORT_STATS,
+  INTEGRATIONS,
+  API_LOGS
 } from './mock-data';
 
 interface AppContextType {
@@ -65,6 +69,10 @@ interface AppContextType {
   // Support Hub State
   supportTickets: SupportTicket[];
   supportStats: SupportStats;
+
+  // Integration Hub State
+  integrations: MaisonIntegration[];
+  apiLogs: ApiLog[];
   
   // Showcase State
   isShowcaseMode: boolean;
@@ -93,6 +101,9 @@ interface AppContextType {
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
   assignTicket: (ticketId: string, adminId: string) => void;
   addTicketMessage: (ticketId: string, text: string, sender: 'agent' | 'customer') => void;
+
+  // Integration Actions
+  toggleIntegration: (id: string) => void;
   
   // Social Actions
   toggleLike: (contentId: string, country: string) => void;
@@ -129,6 +140,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Support Hub State
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
   const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
+
+  // Integration Hub State
+  const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
+  const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
 
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
@@ -300,6 +315,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const toggleIntegration = (id: string) => {
+    setIntegrations(prev => prev.map(i => {
+      if (i.id === id) {
+        return { ...i, status: i.status === 'Connected' ? 'Disconnected' : 'Connected' };
+      }
+      return i;
+    }));
+  };
+
   const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
 
   const toggleLike = (contentId: string, country: string) => {
@@ -336,6 +360,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     globalSettings,
     supportTickets,
     supportStats,
+    integrations,
+    apiLogs,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -356,12 +382,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateTicketStatus,
     assignTicket,
     addTicketMessage,
+    toggleIntegration,
     toggleLike,
     trackShare,
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

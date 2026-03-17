@@ -46,7 +46,8 @@ import {
   LayoutTemplate,
   BriefcaseBusiness,
   PieChart,
-  LifeBuoy
+  LifeBuoy,
+  Cpu
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -154,6 +155,11 @@ export default function SuperAdminPanel() {
               </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+              <Link href="/admin/integrations">
+                <Cpu className="w-4 h-4 mr-3" /> Sync / API Hub
+              </Link>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
               <Link href="/admin/vendor">
                 <BriefcaseBusiness className="w-4 h-4 mr-3" /> Vendor Portal
               </Link>
@@ -250,7 +256,7 @@ export default function SuperAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle突破
                     <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by loyalty tier</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 flex flex-col items-center">

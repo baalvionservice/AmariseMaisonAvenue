@@ -2,7 +2,8 @@
 import { 
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
-  Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats 
+  Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats,
+  MaisonIntegration, ApiLog
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -189,6 +190,21 @@ export const SUPPORT_STATS: SupportStats = {
   csatScore: 4.9,
   activeChats: 3
 };
+
+export const INTEGRATIONS: MaisonIntegration[] = [
+  { id: 'int-1', name: 'Stripe Master', type: 'Payment', provider: 'Stripe', status: 'Connected', lastSync: '2024-03-15T12:00:00Z', latency: '45ms', uptime: 99.99 },
+  { id: 'int-2', name: 'FedEx Global', type: 'Logistics', provider: 'FedEx', status: 'Connected', lastSync: '2024-03-15T11:55:00Z', latency: '120ms', uptime: 98.5 },
+  { id: 'int-3', name: 'DHL Express', type: 'Logistics', provider: 'DHL', status: 'Degraded', lastSync: '2024-03-15T11:45:00Z', latency: '850ms', uptime: 94.2 },
+  { id: 'int-4', name: 'Salesforce CRM', type: 'CRM', provider: 'Salesforce', status: 'Connected', lastSync: '2024-03-15T10:00:00Z', latency: '310ms', uptime: 99.9 },
+  { id: 'int-5', name: 'SAP S/4HANA', type: 'ERP', provider: 'SAP', status: 'Connected', lastSync: '2024-03-15T09:00:00Z', latency: '150ms', uptime: 99.95 },
+  { id: 'int-6', name: 'Google Analytics 4', type: 'Analytics', provider: 'Google', status: 'Connected', lastSync: '2024-03-15T12:05:00Z', latency: '25ms', uptime: 100 },
+];
+
+export const API_LOGS: ApiLog[] = [
+  { id: 'log-101', timestamp: '2024-03-15T12:05:00Z', endpoint: '/v1/charges', method: 'POST', status: 200, latency: '42ms', integrationId: 'int-1' },
+  { id: 'log-102', timestamp: '2024-03-15T12:04:30Z', endpoint: '/shipments/track', method: 'GET', status: 200, latency: '115ms', integrationId: 'int-2' },
+  { id: 'log-103', timestamp: '2024-03-15T12:04:00Z', endpoint: '/v2/inventory', method: 'PUT', status: 503, latency: '850ms', integrationId: 'int-3' },
+];
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;

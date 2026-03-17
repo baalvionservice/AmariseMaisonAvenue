@@ -31,7 +31,8 @@ import {
   FileText,
   LayoutDashboard,
   PieChart,
-  Users
+  Users,
+  Cpu
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,11 @@ export default function SupportAdminPanel() {
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/admin">
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+            <Link href="/admin/integrations">
+              <Cpu className="w-4 h-4 mr-3" /> Sync Hub
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
