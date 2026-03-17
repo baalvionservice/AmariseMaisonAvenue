@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { PRODUCTS, COLLECTIONS, formatPrice } from '@/lib/mock-data';
+import { PRODUCTS, COLLECTIONS, formatPrice, COUNTRIES } from '@/lib/mock-data';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
