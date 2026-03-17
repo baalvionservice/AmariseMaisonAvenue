@@ -1,5 +1,9 @@
 
-import { Country, Product, Category, Department, Collection, City, BuyingGuide, Editorial, MaisonStory, CustomerServiceInfo, VipClient } from './types';
+import { 
+  Country, Product, Category, Department, Collection, City, BuyingGuide, 
+  Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
+  Vendor, Campaign, AuditLog 
+} from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US', office: { city: 'New York', address: '730 Fifth Avenue, New York, NY 10019', phone: '+1 (212) 555-0192', email: 'concierge.us@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=730+Fifth+Avenue+New+York', image: 'https://picsum.photos/seed/amarise-ny/1200/800' } },
@@ -40,8 +44,6 @@ export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'One Size', 'Bespoke'];
 
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
-  // For the demo, we generate 1000 representative products
-  // In production, this would be fetched from a massive database
   for (let i = 1; i <= 1000; i++) {
     const cat = CATEGORIES[i % CATEGORIES.length];
     const sub = cat.subcategories[i % cat.subcategories.length];
@@ -60,6 +62,7 @@ const generateProducts = (): Product[] => {
       colors: [COLORS[i % COLORS.length], COLORS[(i + 1) % COLORS.length]],
       sizes: [SIZES[i % SIZES.length], SIZES[(i + 1) % SIZES.length]],
       stock: 1 + (i % 10),
+      vendorId: `vend-${(i % 5) + 1}`,
     });
   }
   return products;
@@ -92,6 +95,32 @@ export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
   us: { shipping: 'White-glove delivery.', returns: '30-day policy.', faqs: [{ question: 'Book a viewing?', answer: 'Contact concierge.' }] }
 };
 
+export const VIP_CLIENTS: VipClient[] = [
+  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000 },
+  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000 }
+];
+
+export const ADMIN_ACCOUNTS: AdminAccount[] = [
+  { id: 'adm-1', name: 'Maison Owner', email: 'ceo@amarise-luxe.com', role: 'CEO', permissions: ['all'], status: 'active', lastActive: '2024-03-15T10:00:00Z', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=owner' },
+  { id: 'adm-2', name: 'Market Manager', email: 'ops@amarise-luxe.com', role: 'Manager', permissions: ['ops', 'marketing'], status: 'active', lastActive: '2024-03-15T09:30:00Z' }
+];
+
+export const VENDORS: Vendor[] = [
+  { id: 'vend-1', name: 'Lumière Silks', category: 'Accessories', performance: 98, productCount: 45, salesTotal: 125000, status: 'active', payoutSchedule: 'weekly', joinedDate: '2023-01-10' },
+  { id: 'vend-2', name: 'Geneva Horology', category: 'Watches', performance: 95, productCount: 12, salesTotal: 850000, status: 'active', payoutSchedule: 'monthly', joinedDate: '2023-05-15' },
+  { id: 'vend-3', name: 'Artisanal Gold', category: 'Jewelry', performance: 92, productCount: 28, salesTotal: 340000, status: 'active', payoutSchedule: 'weekly', joinedDate: '2023-08-20' }
+];
+
+export const CAMPAIGNS: Campaign[] = [
+  { id: 'camp-1', title: 'Midnight Soirée Flash Sale', type: 'Flash Sale', status: 'scheduled', discountValue: 15, startDate: '2024-04-01', endDate: '2024-04-03', market: 'global' },
+  { id: 'camp-2', title: 'Heritage Collection Launch', type: 'Launch', status: 'active', discountValue: 0, startDate: '2024-03-10', endDate: '2024-03-25', market: 'us' }
+];
+
+export const AUDIT_LOGS: AuditLog[] = [
+  { id: 'log-1', adminId: 'adm-1', adminName: 'Maison Owner', action: 'Approved Vendor Geneva Horology', module: 'Vendor Management', timestamp: '2024-03-15T08:00:00Z', ipAddress: '192.168.1.1', severity: 'low' },
+  { id: 'log-2', adminId: 'adm-2', adminName: 'Market Manager', action: 'Updated Global Tax Rules (UAE)', module: 'Website Settings', timestamp: '2024-03-15T07:45:00Z', ipAddress: '192.168.1.5', severity: 'medium' }
+];
+
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;
   const rates: Record<string, number> = { us: 1, uk: 0.79, ae: 3.67, in: 83.2, sg: 1.34 };
@@ -100,8 +129,3 @@ export const formatPrice = (price: number, countryCode: string = 'us') => {
 };
 
 export const getLocalizedMockText = (text: string, countryCode: string) => text;
-
-export const VIP_CLIENTS: VipClient[] = [];
-export const AFFILIATES: any[] = [];
-export const CAMPAIGNS: any[] = [];
-export const NOTIFICATIONS: any[] = [];

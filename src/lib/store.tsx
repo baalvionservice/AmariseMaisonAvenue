@@ -12,7 +12,12 @@ import {
   BuyingGuide, 
   Editorial,
   SocialMetrics,
-  SocialInteraction
+  AdminAccount,
+  Vendor,
+  Campaign,
+  AuditLog,
+  VipClient,
+  GlobalSettings
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -21,7 +26,12 @@ import {
   DEPARTMENTS as INITIAL_DEPARTMENTS,
   CITIES as INITIAL_CITIES,
   BUYING_GUIDES as INITIAL_GUIDES,
-  EDITOR_INITIAL
+  EDITOR_INITIAL,
+  ADMIN_ACCOUNTS,
+  VENDORS,
+  CAMPAIGNS,
+  AUDIT_LOGS,
+  VIP_CLIENTS
 } from './mock-data';
 
 interface AppContextType {
@@ -37,9 +47,17 @@ interface AppContextType {
   editorials: Editorial[];
   socialMetrics: Record<string, SocialMetrics>;
   
+  // High-Level Admin State
+  admins: AdminAccount[];
+  vendors: Vendor[];
+  activeCampaigns: Campaign[];
+  auditLogs: AuditLog[];
+  vipClients: VipClient[];
+  globalSettings: GlobalSettings;
+  
   // Showcase State
   isShowcaseMode: boolean;
-  activeVip: any | null;
+  activeVip: VipClient | null;
   
   // Actions
   addToCart: (product: Product) => void;
@@ -53,8 +71,10 @@ interface AppContextType {
   deleteProduct: (id: string) => void;
   upsertCollection: (collection: Collection) => void;
   upsertEditorial: (editorial: Editorial) => void;
-  upsertCity: (city: City) => void;
-  upsertBuyingGuide: (guide: BuyingGuide) => void;
+  upsertAdmin: (admin: AdminAccount) => void;
+  upsertVendor: (vendor: Vendor) => void;
+  upsertCampaign: (campaign: Campaign) => void;
+  updateGlobalSettings: (settings: GlobalSettings) => void;
   
   // Social Actions
   toggleLike: (contentId: string, country: string) => void;
@@ -62,7 +82,7 @@ interface AppContextType {
   
   // System Controls
   setShowcaseMode: (val: boolean) => void;
-  setActiveVip: (vip: any | null) => void;
+  setActiveVip: (vip: VipClient | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -79,8 +99,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   
+  // Admin Extensions
+  const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
+  const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
+  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
+    theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
+    seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
+    payments: { cards: true, wallets: true, crypto: false }
+  });
+  
   const [isShowcaseMode, setShowcaseMode] = useState(false);
-  const [activeVip, setActiveVip] = useState<any | null>(null);
+  const [activeVip, setActiveVip] = useState<VipClient | null>(null);
 
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
@@ -94,7 +126,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSocialMetrics(initialMetrics);
   }, [products]);
 
-  // --- E-commerce Actions ---
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -131,7 +162,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => setCart([]);
 
-  // --- Admin Mutations ---
   const upsertProduct = (p: Product) => {
     setProducts(prev => {
       const idx = prev.findIndex(item => item.id === p.id);
@@ -172,31 +202,44 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const upsertCity = (city: City) => {
-    setCities(prev => {
-      const idx = prev.findIndex(item => item.id === city.id);
+  const upsertAdmin = (admin: AdminAccount) => {
+    setAdmins(prev => {
+      const idx = prev.findIndex(a => a.id === admin.id);
       if (idx > -1) {
         const next = [...prev];
-        next[idx] = city;
+        next[idx] = admin;
         return next;
       }
-      return [city, ...prev];
+      return [admin, ...prev];
     });
   };
 
-  const upsertBuyingGuide = (guide: BuyingGuide) => {
-    setBuyingGuides(prev => {
-      const idx = prev.findIndex(item => item.id === guide.id);
+  const upsertVendor = (vendor: Vendor) => {
+    setVendors(prev => {
+      const idx = prev.findIndex(v => v.id === vendor.id);
       if (idx > -1) {
         const next = [...prev];
-        next[idx] = guide;
+        next[idx] = vendor;
         return next;
       }
-      return [guide, ...prev];
+      return [vendor, ...prev];
     });
   };
 
-  // --- Social Actions ---
+  const upsertCampaign = (campaign: Campaign) => {
+    setActiveCampaigns(prev => {
+      const idx = prev.findIndex(c => c.id === campaign.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = campaign;
+        return next;
+      }
+      return [campaign, ...prev];
+    });
+  };
+
+  const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
+
   const toggleLike = (contentId: string, country: string) => {
     setSocialMetrics(prev => {
       const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
@@ -222,6 +265,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     buyingGuides,
     editorials,
     socialMetrics,
+    admins,
+    vendors,
+    activeCampaigns,
+    auditLogs,
+    vipClients,
+    globalSettings,
     isShowcaseMode,
     activeVip,
     addToCart,
@@ -233,13 +282,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     deleteProduct,
     upsertCollection,
     upsertEditorial,
-    upsertCity,
-    upsertBuyingGuide,
+    upsertAdmin,
+    upsertVendor,
+    upsertCampaign,
+    updateGlobalSettings,
     toggleLike,
     trackShare,
     setShowcaseMode,
     setActiveVip,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, isShowcaseMode, activeVip]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, globalSettings, isShowcaseMode, activeVip]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

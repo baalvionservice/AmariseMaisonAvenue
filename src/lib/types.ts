@@ -34,12 +34,6 @@ export interface Country {
   office?: Office;
 }
 
-export interface Subcategory {
-  id: string;
-  name: string;
-  description?: string;
-}
-
 export interface Category {
   id: string;
   name: string;
@@ -72,6 +66,7 @@ export interface Product {
   colors?: string[];
   sizes?: string[];
   stock: number;
+  vendorId?: string;
 }
 
 export interface CartItem extends Product {
@@ -122,14 +117,6 @@ export interface SocialMetrics {
   engagementRate: number;
 }
 
-export interface SocialInteraction {
-  id: string;
-  contentId: string;
-  type: 'like' | 'share' | 'comment';
-  country: string;
-  timestamp: string;
-}
-
 export interface MaisonStory {
   title: string;
   subtitle: string;
@@ -151,4 +138,78 @@ export interface CustomerServiceInfo {
   shipping: string;
   returns: string;
   faqs: { question: string; answer: string }[];
+}
+
+// --- SUPER ADMIN EXTENSIONS ---
+
+export interface AdminAccount {
+  id: string;
+  name: string;
+  email: string;
+  role: 'CEO' | 'Manager' | 'Ops' | 'Marketing' | 'Support';
+  permissions: string[];
+  status: 'active' | 'suspended';
+  lastActive: string;
+  avatar?: string;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  category: string;
+  performance: number; // 0-100
+  productCount: number;
+  salesTotal: number;
+  status: 'active' | 'pending' | 'rejected';
+  payoutSchedule: 'weekly' | 'monthly';
+  joinedDate: string;
+}
+
+export interface Campaign {
+  id: string;
+  title: string;
+  type: 'Flash Sale' | 'VIP Loyalty' | 'Seasonal' | 'Launch';
+  status: 'scheduled' | 'active' | 'completed' | 'draft';
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  market: CountryCode | 'global';
+}
+
+export interface AuditLog {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action: string;
+  module: string;
+  timestamp: string;
+  ipAddress: string;
+  severity: 'low' | 'medium' | 'high';
+}
+
+export interface GlobalSettings {
+  theme: {
+    primary: string;
+    accent: string;
+    fontFamily: string;
+  };
+  seo: {
+    defaultTitle: string;
+    defaultDesc: string;
+    sitemapUrl: string;
+  };
+  payments: {
+    cards: boolean;
+    wallets: boolean;
+    crypto: boolean;
+  };
+}
+
+export interface VipClient {
+  id: string;
+  name: string;
+  email: string;
+  tier: 'Silver' | 'Gold' | 'Diamond';
+  loyaltyPoints: number;
+  totalSpend: number;
 }
