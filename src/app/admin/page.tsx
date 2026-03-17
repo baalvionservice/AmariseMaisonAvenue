@@ -43,7 +43,8 @@ import {
   History,
   Lock,
   Smartphone,
-  LayoutTemplate
+  LayoutTemplate,
+  BriefcaseBusiness
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -139,11 +140,18 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
           
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Jumps</div>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group px-6" asChild>
-            <Link href="/admin/operations">
-              <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
-            </Link>
-          </Button>
+          <div className="space-y-1 px-4">
+            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
+              <Link href="/admin/operations">
+                <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
+              </Link>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+              <Link href="/admin/vendor">
+                <BriefcaseBusiness className="w-4 h-4 mr-3" /> Vendor Portal
+              </Link>
+            </Button>
+          </div>
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">

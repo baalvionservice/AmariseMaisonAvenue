@@ -58,6 +58,7 @@ interface AppContextType {
   // Showcase State
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
+  activeVendor: Vendor | null;
   
   // Actions
   addToCart: (product: Product) => void;
@@ -83,6 +84,7 @@ interface AppContextType {
   // System Controls
   setShowcaseMode: (val: boolean) => void;
   setActiveVip: (vip: VipClient | null) => void;
+  setActiveVendor: (vendor: Vendor | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -113,6 +115,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
+  const [activeVendor, setActiveVendor] = useState<Vendor | null>(VENDORS[0]);
 
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
@@ -273,6 +276,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     globalSettings,
     isShowcaseMode,
     activeVip,
+    activeVendor,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -290,7 +294,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     trackShare,
     setShowcaseMode,
     setActiveVip,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, globalSettings, isShowcaseMode, activeVip]);
+    setActiveVendor,
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, globalSettings, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
