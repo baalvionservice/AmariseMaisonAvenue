@@ -1,14 +1,11 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { PRODUCTS, REVIEWS, formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
-  ShoppingBag, 
   Share2, 
   ShieldCheck, 
   Truck, 
@@ -69,21 +66,15 @@ export default function ProductPage() {
       <div className="flex flex-col lg:flex-row gap-20">
         {/* Gallery */}
         <div className="w-full lg:w-3/5 space-y-4">
-          <div className="relative aspect-[4/5] overflow-hidden bg-card">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
+          <div className="relative aspect-[4/5] overflow-hidden bg-card bg-muted">
+            {/* Image removed */}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative aspect-square bg-card overflow-hidden">
-               <Image src={`https://picsum.photos/seed/${product.id}detail1/800/800`} alt="Detail" fill className="object-cover" />
+            <div className="relative aspect-square bg-card bg-muted overflow-hidden">
+               {/* Image removed */}
             </div>
-            <div className="relative aspect-square bg-card overflow-hidden">
-               <Image src={`https://picsum.photos/seed/${product.id}detail2/800/800`} alt="Detail" fill className="object-cover" />
+            <div className="relative aspect-square bg-card bg-muted overflow-hidden">
+               {/* Image removed */}
             </div>
           </div>
         </div>
@@ -123,7 +114,7 @@ export default function ProductPage() {
             
             <div className="grid grid-cols-1 gap-4 py-8 border-y border-border">
               <div className="flex items-center space-x-4">
-                <ShieldCheck className="w-5 h-5 text-primary" />
+                < ShieldCheck className="w-5 h-5 text-primary" />
                 <span className="text-sm">Lifetime Authenticity Guarantee</span>
               </div>
               <div className="flex items-center space-x-4">

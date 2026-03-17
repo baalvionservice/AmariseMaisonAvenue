@@ -1,8 +1,6 @@
-
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
@@ -24,13 +22,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div className="group relative flex flex-col bg-card overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
-      <div className="relative aspect-[3/4] overflow-hidden">
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+      <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+        {/* Image removed */}
         {product.isVip && (
           <div className="absolute top-4 left-4 bg-primary px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase rounded-sm">
             VIP Exclusive

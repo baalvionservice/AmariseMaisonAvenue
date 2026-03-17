@@ -1,14 +1,12 @@
-
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Trash2, ShoppingBag } from 'lucide-react';
 
 export default function CartPage() {
   const { cart, removeFromCart } = useAppStore();
@@ -42,8 +40,8 @@ export default function CartPage() {
         <div className="lg:w-2/3 space-y-8">
           {cart.map((item) => (
             <div key={item.id} className="flex gap-8 pb-8 border-b border-border group">
-              <div className="relative w-32 h-40 bg-card overflow-hidden">
-                <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+              <div className="relative w-32 h-40 bg-card bg-muted overflow-hidden">
+                {/* Image removed */}
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">

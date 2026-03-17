@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { PRODUCTS, COLLECTIONS, formatPrice, COUNTRIES } from '@/lib/mock-data';
@@ -37,15 +36,7 @@ export default function HomePage() {
   return (
     <div className="space-y-32">
       {/* Cinematic Hero */}
-      <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden">
-        <Image
-          src="https://picsum.photos/seed/amarise-hero/1920/1080"
-          alt="Cinematic Hero"
-          fill
-          priority
-          className="object-cover scale-105 animate-pulse-slow transition-transform duration-[10000ms] hover:scale-100"
-          data-ai-hint="luxury fashion"
-        />
+      <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden bg-muted/20">
         <div className="absolute inset-0 cinematic-gradient" />
         <div className="relative z-10 text-center space-y-8 max-w-4xl px-6">
           <div className="animate-fade-in opacity-0 [animation-delay:200ms]">
@@ -90,12 +81,7 @@ export default function HomePage() {
                 idx === 1 && "md:translate-y-12"
               )}
             >
-              <Image
-                src={col.imageUrl}
-                alt={col.name}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+              <div className="absolute inset-0 bg-muted/40 transition-colors" />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
               <div className="absolute bottom-10 left-10 right-10">
                 <h3 className="text-3xl font-headline text-white mb-2">{col.name}</h3>
@@ -147,13 +133,8 @@ export default function HomePage() {
             ) : (
               recommendations.map((rec) => (
                 <div key={rec.id} className="group relative">
-                  <div className="aspect-square overflow-hidden relative mb-6">
-                    <Image
-                      src={rec.imageUrl}
-                      alt={rec.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                  <div className="aspect-square overflow-hidden relative mb-6 bg-muted">
+                    {/* Image removed */}
                   </div>
                   <div className="space-y-2">
                     <span className="text-[10px] font-bold tracking-widest text-primary uppercase">{rec.category}</span>
@@ -176,13 +157,8 @@ export default function HomePage() {
       {/* Social / Editorial */}
       <section className="container mx-auto px-6 mb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-          <div className="relative h-[700px]">
-            <Image
-              src="https://picsum.photos/seed/editorial/800/1000"
-              alt="Editorial"
-              fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-            />
+          <div className="relative h-[700px] bg-muted">
+            {/* Image removed */}
           </div>
           <div className="space-y-10">
             <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-primary">Editorial</span>

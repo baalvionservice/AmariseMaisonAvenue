@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -91,7 +90,7 @@ export default function AdminDashboard() {
                     <div key={p.id} className="flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-muted relative rounded-sm overflow-hidden">
-                           <img src={p.imageUrl} alt={p.name} className="object-cover w-full h-full" />
+                           {/* img removed */}
                         </div>
                         <div>
                           <div className="font-bold text-sm">{p.name}</div>
