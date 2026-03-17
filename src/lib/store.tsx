@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -164,7 +163,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         [contentId]: {
           ...current,
-          likes: isLiked ? current.likes - 1 : current.likes + 1
+          likes: isLiked ? Math.max(0, current.likes - 1) : current.likes + 1
         }
       };
     });

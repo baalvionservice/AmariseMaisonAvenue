@@ -14,7 +14,10 @@ import {
   X, 
   Settings2,
   PlayCircle,
-  Eye
+  Eye,
+  Zap,
+  BookOpen,
+  PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -76,18 +79,18 @@ export function ShowcaseControls() {
         <PopoverContent align="end" className="w-80 p-0 bg-card border-border shadow-[0_30px_60px_rgba(0,0,0,0.6)] overflow-hidden">
           <div className="p-6 bg-primary/10 border-b border-primary/20">
              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-sm font-headline font-bold text-white uppercase tracking-widest">Showcase Studio</h3>
+                <h3 className="text-sm font-headline font-bold text-white uppercase tracking-widest">Super-Demo Mode</h3>
                 <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-muted-foreground hover:text-white" /></button>
              </div>
-             <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Maison Amarisé | Enterprise Demo</p>
+             <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Maison Amarisé | Integrated Showcase</p>
           </div>
 
-          <div className="p-6 space-y-8">
+          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
             {/* Market Context */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
                 <Globe className="w-3 h-3" />
-                <span>Switch Market Hub</span>
+                <span>Global Market Hub</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {Object.keys(COUNTRIES).map(code => (
@@ -105,11 +108,11 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* VIP Simulation */}
+            {/* Persona Simulation */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
                 <Crown className="w-3 h-3" />
-                <span>Simulate Elite Tiers</span>
+                <span>Client Tiers</span>
               </div>
               <div className="space-y-2">
                 <VipButton 
@@ -128,15 +131,17 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Experience Jumps */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-primary">
-                <LayoutDashboard className="w-3 h-3" />
-                <span>Executive Access</span>
+                <Zap className="w-3 h-3" />
+                <span>Experience Flow</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <ActionLink href="/admin" icon={<LayoutDashboard />} label="Dashboard" />
-                <ActionLink href="/admin" icon={<Sparkles />} label="AI Studio" />
+                <ActionLink href="/admin" icon={<LayoutDashboard />} label="Super-Dashboard" />
+                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Maison Journal" />
+                <ActionLink href={`/${currentCountry}/category/apparel`} icon={<PieChart />} label="Global Catalog" />
+                <ActionLink href={`/${currentCountry}/wishlist`} icon={<Crown />} label="Private Selection" />
               </div>
             </div>
           </div>
@@ -146,9 +151,9 @@ export function ShowcaseControls() {
               onClick={() => setShowcaseMode(false)}
               className="text-[9px] uppercase tracking-widest text-muted-foreground hover:text-destructive font-bold"
              >
-               Exit Demo Mode
+               Exit Super-Demo
              </button>
-             <span className="text-[8px] text-muted-foreground/50 tracking-widest">v2.0.4-Luxe</span>
+             <span className="text-[8px] text-muted-foreground/50 tracking-widest">v3.0.0-PRO</span>
           </div>
         </PopoverContent>
       </Popover>
