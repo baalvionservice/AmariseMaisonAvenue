@@ -20,6 +20,7 @@ export interface Collection {
   name: string;
   description: string;
   imageUrl: string;
+  isPrivate?: boolean;
 }
 
 export interface Product {
@@ -78,4 +79,15 @@ export interface Notification {
   recipients: string;
   scheduledAt: string;
   status: 'Queued' | 'Sent' | 'Failed';
+}
+
+export interface VipClient {
+  id: string;
+  name: string;
+  email: string;
+  tier: 'Gold' | 'Platinum' | 'Bespoke';
+  country: string;
+  totalSpend: number;
+  lastActive: string;
+  assignedCollections: string[];
 }

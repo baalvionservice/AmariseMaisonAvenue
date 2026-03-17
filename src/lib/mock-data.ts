@@ -1,4 +1,5 @@
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification } from './types';
+
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US' },
@@ -19,6 +20,7 @@ export const COLLECTIONS: Collection[] = [
   { id: 'spring-24', name: 'Spring/Summer 2024', description: 'Lightweight elegance for the modern aristocrat. Inspired by the soft hues of a Mediterranean dawn.', imageUrl: 'https://picsum.photos/seed/spring24-luxe/1920/1080' },
   { id: 'heritage', name: 'The Heritage Line', description: 'Timeless pieces that define generations. A tribute to the founding year of 1924.', imageUrl: 'https://picsum.photos/seed/heritage-luxe/1920/1080' },
   { id: 'nocturnal', name: 'Nocturnal Allure', description: 'Sophisticated evening wear and accessories for those who own the night.', imageUrl: 'https://picsum.photos/seed/nocturnal-luxe/1920/1080' },
+  { id: 'privé-watches', name: 'Watchmakers Secret', description: 'Unreleased prototypes from the Swiss high-plateau. Strictly for Bespoke tier collectors.', imageUrl: 'https://picsum.photos/seed/prive-watches/1920/1080', isPrivate: true },
 ];
 
 export const CAMPAIGNS: Campaign[] = [
@@ -40,18 +42,22 @@ export const NOTIFICATIONS: Notification[] = [
   { id: 'n2', type: 'Push', subject: 'The Emerald Collection has arrived.', recipients: '84,000 Watch Collectors', scheduledAt: '2024-03-12 14:00', status: 'Queued' },
 ];
 
+export const VIP_CLIENTS: VipClient[] = [
+  { id: 'vip-1', name: 'Julian Vandervilt', email: 'j.vandervilt@lux.net', tier: 'Bespoke', country: 'us', totalSpend: 1250000, lastActive: '2024-03-01', assignedCollections: ['privé-watches', 'heritage'] },
+  { id: 'vip-2', name: 'Sophia Laurent', email: 'sophia@laurent-group.fr', tier: 'Platinum', country: 'ae', totalSpend: 840000, lastActive: '2024-02-28', assignedCollections: ['nocturnal'] },
+  { id: 'vip-3', name: 'Marcus Sterling', email: 'm.sterling@sterling.co.uk', tier: 'Gold', country: 'uk', totalSpend: 250000, lastActive: '2024-03-05', assignedCollections: ['spring-24'] },
+];
+
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
   const categories = ['Apparel', 'Accessories', 'Timepieces', 'Fine Jewelry'];
-  const collectionIds = ['spring-24', 'heritage', 'nocturnal'];
+  const collectionIds = ['spring-24', 'heritage', 'nocturnal', 'privé-watches'];
 
-  // ENTERPRISE SCALE: 500 Products for Stress Testing
   for (let i = 1; i <= 500; i++) {
     const catIndex = i % categories.length;
     const cat = categories[catIndex];
     const collIndex = i % collectionIds.length;
     
-    // Deterministic prices and ratings to avoid hydration errors
     const basePrice = 1200 + ((i * 19) % 25000);
     const rating = 4.0 + ((i * 3) % 11) / 10;
     const reviewsCount = 10 + ((i * 7) % 300);
@@ -64,7 +70,7 @@ const generateProducts = (): Product[] => {
       collectionId: collectionIds[collIndex],
       basePrice,
       imageUrl: `https://picsum.photos/seed/amarise-enterprise-${i}/1200/1600`,
-      isVip: i % 15 === 0,
+      isVip: i % 15 === 0 || collectionIds[collIndex] === 'privé-watches',
       rating: rating > 5 ? 5 : rating,
       reviewsCount,
     });

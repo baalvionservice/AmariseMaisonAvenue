@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Globe } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CATEGORIES, COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -14,14 +14,15 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 /**
  * Header: The Entry to Maison Amarisé.
- * Features a localized country selector and multi-tiered navigation.
+ * Features localized country selector and VIP client status indicators.
  */
 export const Header = () => {
   const { country } = useParams();
-  const { cart, wishlist } = useAppStore();
+  const { cart, wishlist, activeVip } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const countryCode = (country as string) || 'us';
@@ -71,13 +72,23 @@ export const Header = () => {
               </div>
             </div>
           ))}
-          <Link href={`/${countryCode}/collection/heritage`} className="py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-primary hover:text-secondary transition-colors">
-            VIP SALON
+          <Link href={`/${countryCode}/collection/heritage`} className={cn(
+            "py-8 text-[10px] font-bold uppercase tracking-[0.3em] transition-colors",
+            activeVip ? "text-primary hover:text-secondary" : "text-muted-foreground hover:text-primary"
+          )}>
+            {activeVip ? "PRIVATE SALON" : "MAISON WORLD"}
           </Link>
         </nav>
 
         {/* Action Icons */}
         <div className="flex-1 lg:flex-none flex items-center justify-end space-x-6">
+          {activeVip && (
+            <div className="hidden xl:flex items-center space-x-3 px-4 py-2 bg-primary/10 border border-primary/20 animate-fade-in">
+               <Crown className="w-3 h-3 text-primary" />
+               <span className="text-[9px] font-bold tracking-widest text-primary uppercase">{activeVip.tier} MEMBER</span>
+            </div>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground hover:text-primary transition-colors">
@@ -120,7 +131,7 @@ export const Header = () => {
 
           <Link href="/admin" className="hidden lg:block">
             <Button variant="outline" className="border-primary/40 text-primary hover:bg-primary hover:text-white transition-all text-[10px] font-bold tracking-widest h-10 px-6">
-              ADMIN
+              {activeVip ? "CONCIERGE" : "ADMIN"}
             </Button>
           </Link>
         </div>

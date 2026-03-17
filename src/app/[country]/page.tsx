@@ -7,18 +7,21 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { PRODUCTS, COLLECTIONS, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Sparkles, Crown, ShieldCheck } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
+import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 /**
  * HomePage: The Cinematic Flagship.
  * Optimized for LCP and visual impact with localized AI curation.
+ * Features VIP-exclusive Private Atelier sections for assigned clients.
  */
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
+  const { activeVip } = useAppStore();
   
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [vipRecs, setVipRecs] = useState<any[]>([]);
@@ -27,10 +30,12 @@ export default function HomePage() {
   useEffect(() => {
     async function loadRecs() {
       try {
+        const scenario = activeVip 
+          ? `Personalized curations for ${activeVip.name}, a ${activeVip.tier} tier client in ${currentCountry.name}.`
+          : `A discerning luxury shopper in ${currentCountry.name} seeking iconic heritage pieces.`;
+
         const [general, vip] = await Promise.all([
-          generateProductRecommendations({
-            scenario: `A discerning luxury shopper in ${currentCountry.name} seeking iconic heritage pieces.`,
-          }),
+          generateProductRecommendations({ scenario }),
           generateProductRecommendations({
             scenario: `A VIP collector in ${currentCountry.name} looking for the most exclusive limited release items.`,
           })
@@ -44,7 +49,7 @@ export default function HomePage() {
       }
     }
     loadRecs();
-  }, [countryCode, currentCountry.name]);
+  }, [countryCode, currentCountry.name, activeVip]);
 
   return (
     <div className="space-y-32">
@@ -72,7 +77,10 @@ export default function HomePage() {
           </div>
           <div className="animate-fade-in opacity-0 [animation-delay:400ms]">
             <p className="text-lg md:text-xl text-muted-foreground font-light max-w-xl mx-auto leading-relaxed tracking-wide">
-              Crafting artifacts of desire for {currentCountry.name}'s most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.
+              {activeVip 
+                ? `Welcome back, ${activeVip.name}. We have prepared your private viewing for the ${currentCountry.name} market.`
+                : `Crafting artifacts of desire for ${currentCountry.name}'s most discerning individuals. Hand-sculpted heritage, redefined for the contemporary era.`
+              }
             </p>
           </div>
           <div className="animate-fade-in opacity-0 [animation-delay:600ms] flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
@@ -82,16 +90,52 @@ export default function HomePage() {
               </Button>
             </Link>
             <Button variant="outline" size="lg" className="border-white/40 text-white hover:bg-white hover:text-background px-14 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
-              OUR HERITAGE
+              {activeVip ? "REQUEST CONCIERGE" : "OUR HERITAGE"}
             </Button>
           </div>
         </div>
-        
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-4">
-          <span className="text-[9px] uppercase tracking-[0.5em] text-muted-foreground rotate-90">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-primary to-transparent" />
-        </div>
       </section>
+
+      {/* VIP Private Atelier Section */}
+      {activeVip && (
+        <section className="container mx-auto px-6 border-y border-primary/20 bg-primary/5 py-32 animate-fade-in">
+          <div className="flex flex-col lg:flex-row items-center gap-20">
+            <div className="lg:w-1/3 space-y-8">
+              <div className="flex items-center space-x-4 text-primary">
+                <Crown className="w-10 h-10" />
+                <span className="text-[12px] font-bold tracking-[0.4em] uppercase">Private Atelier</span>
+              </div>
+              <h2 className="text-5xl font-headline font-bold italic">Curated for <br />{activeVip.name}</h2>
+              <p className="text-muted-foreground font-light leading-relaxed italic">
+                Each piece in this selection has been hand-vetted by our master artisans to complement your {activeVip.tier} tier status and historical preferences.
+              </p>
+              <div className="pt-6 border-t border-primary/20 space-y-4">
+                <div className="flex items-center space-x-3 text-[10px] uppercase tracking-widest text-primary font-bold">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Bespoke Access Enabled</span>
+                </div>
+                <Button className="w-full bg-primary hover:bg-secondary h-14 rounded-none text-[10px] tracking-widest font-bold">
+                  ACCESS PRIVATE VAULT
+                </Button>
+              </div>
+            </div>
+            <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
+               {COLLECTIONS.filter(c => activeVip.assignedCollections.includes(c.id)).map(col => (
+                 <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-video overflow-hidden border border-primary/30">
+                   <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+                   <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
+                      <span className="text-primary text-[9px] font-bold tracking-[0.4em] uppercase">Private Preview</span>
+                      <h3 className="text-3xl font-headline font-bold italic text-white">{col.name}</h3>
+                      <div className="w-12 h-px bg-white/40" />
+                      <p className="text-[10px] text-white/80 uppercase tracking-widest">Enter Gallery</p>
+                   </div>
+                 </Link>
+               ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Curated Chapters */}
       <section className="container mx-auto px-6">
@@ -108,7 +152,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {COLLECTIONS.map((col, idx) => (
+          {COLLECTIONS.filter(c => !c.isPrivate || (activeVip && activeVip.assignedCollections.includes(c.id))).map((col, idx) => (
             <Link 
               key={col.id} 
               href={`/${countryCode}/collection/${col.id}`}
@@ -127,7 +171,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/60 transition-all duration-700" />
               <div className="absolute bottom-12 left-12 right-12 space-y-6">
                 <div className="space-y-2">
-                  <span className="text-primary text-[9px] font-bold tracking-[0.4em] uppercase">Maison Exclusive</span>
+                  <span className="text-primary text-[9px] font-bold tracking-[0.4em] uppercase">{col.isPrivate ? "VIP Private Access" : "Maison Exclusive"}</span>
                   <h3 className="text-4xl font-headline text-white italic">{col.name}</h3>
                 </div>
                 <p className="text-xs text-gray-300 font-light opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 line-clamp-2">
@@ -151,7 +195,7 @@ export default function HomePage() {
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h2 className="text-5xl font-headline font-bold">Personalized for You</h2>
+              <h2 className="text-5xl font-headline font-bold">{activeVip ? `Personalized for ${activeVip.name.split(' ')[0]}` : "Personalized for You"}</h2>
               <p className="text-lg text-muted-foreground font-light italic mt-2">
                 Intelligent selections based on the current market trends in {COUNTRIES[countryCode]?.name}.
               </p>
@@ -181,6 +225,11 @@ export default function HomePage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-700" />
+                    {rec.isVip && (
+                      <div className="absolute top-6 left-6 bg-primary px-3 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase shadow-lg z-10 luxury-blur bg-opacity-80">
+                        VIP Edition
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-6">
                     <div className="space-y-2">

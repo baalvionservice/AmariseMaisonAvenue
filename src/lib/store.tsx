@@ -2,14 +2,15 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification } from './types';
+import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification, VipClient } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
   COLLECTIONS as INITIAL_COLLECTIONS, 
   CATEGORIES as INITIAL_CATEGORIES,
   CAMPAIGNS as INITIAL_CAMPAIGNS,
   AFFILIATES as INITIAL_AFFILIATES,
-  NOTIFICATIONS as INITIAL_NOTIFICATIONS
+  NOTIFICATIONS as INITIAL_NOTIFICATIONS,
+  VIP_CLIENTS as INITIAL_VIP_CLIENTS
 } from './mock-data';
 
 interface AppContextType {
@@ -21,6 +22,8 @@ interface AppContextType {
   campaigns: Campaign[];
   affiliates: Affiliate[];
   notifications: Notification[];
+  vipClients: VipClient[];
+  activeVip: VipClient | null;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
@@ -30,6 +33,7 @@ interface AppContextType {
   updateCollectionNarrative: (collectionId: string, narrative: string) => void;
   addCampaign: (campaign: Campaign) => void;
   addNotification: (notification: Notification) => void;
+  setActiveVip: (client: VipClient | null) => void;
   user: any | null; 
   isAuthenticated: boolean;
 }
@@ -45,17 +49,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
   const [affiliates, setAffiliates] = useState<Affiliate[]>(INITIAL_AFFILIATES);
   const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
+  const [vipClients, setVipClients] = useState<VipClient[]>(INITIAL_VIP_CLIENTS);
+  const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   
   const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const savedCart = localStorage.getItem('amarise_cart');
     const savedWishlist = localStorage.getItem('amarise_wishlist');
+    const savedVipId = localStorage.getItem('amarise_active_vip');
     if (savedCart) {
       try { setCart(JSON.parse(savedCart)); } catch (e) {}
     }
     if (savedWishlist) {
       try { setWishlist(JSON.parse(savedWishlist)); } catch (e) {}
+    }
+    if (savedVipId) {
+      const vip = INITIAL_VIP_CLIENTS.find(v => v.id === savedVipId);
+      if (vip) setActiveVip(vip);
     }
   }, []);
 
@@ -66,6 +77,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  useEffect(() => {
+    if (activeVip) {
+      localStorage.setItem('amarise_active_vip', activeVip.id);
+    } else {
+      localStorage.removeItem('amarise_active_vip');
+    }
+  }, [activeVip]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -128,6 +147,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     campaigns,
     affiliates,
     notifications,
+    vipClients,
+    activeVip,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -137,9 +158,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateCollectionNarrative,
     addCampaign,
     addNotification,
+    setActiveVip,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, activeVip, user]);
 
   return (
     <AppContext.Provider value={value}>

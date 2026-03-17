@@ -1,117 +1,60 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   BarChart3, 
   Users, 
   Settings, 
-  TrendingUp, 
   DollarSign, 
   Package,
-  Search,
-  Bell,
   LogOut,
   ChevronRight,
-  Eye,
   ArrowUpRight,
   ArrowDownRight,
   Mail,
   Zap,
   Target,
   Briefcase,
-  ShieldCheck,
-  UserCheck,
-  Activity,
   Globe,
   Database,
   Sparkles,
   RefreshCcw,
-  History,
-  CheckCircle2,
-  AlertCircle,
   LayoutDashboard,
-  PieChart,
-  LineChart,
-  Layers,
-  Calendar,
   Clock,
-  Phone
+  Crown,
+  Star,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  CAMPAIGNS, 
-  AFFILIATES, 
-  COUNTRIES,
-  formatPrice,
-  PRODUCTS
+  COUNTRIES, 
+  AFFILIATES 
 } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
-import { generateProductDescription } from '@/ai/flows/generate-product-description';
 import { generateCampaignCopy } from '@/ai/flows/generate-campaign-copy';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Bar, 
-  BarChart, 
-  XAxis, 
-  YAxis, 
-  ResponsiveContainer, 
-  Tooltip, 
-  Area, 
-  AreaChart,
-  Cell,
-  PieChart as RePieChart,
-  Pie,
-  Line as ReLine,
-  LineChart as ReLineChart
-} from "recharts";
 
 type AdminRole = 'admin' | 'marketing';
-type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'notifications' | 'settings';
-
-const REVENUE_TREND = [
-  { month: 'Jan', revenue: 2400, conversions: 400 },
-  { month: 'Feb', revenue: 1398, conversions: 300 },
-  { month: 'Mar', revenue: 9800, conversions: 2000 },
-  { month: 'Apr', revenue: 3908, conversions: 2780 },
-  { month: 'May', revenue: 4800, conversions: 1890 },
-  { month: 'Jun', revenue: 3800, conversions: 2390 },
-  { month: 'Jul', revenue: 4300, conversions: 3490 },
-];
-
-const REGIONAL_PERFORMANCE = [
-  { name: 'US', sales: 4000, reach: 2400 },
-  { name: 'UK', sales: 3000, reach: 1398 },
-  { name: 'UAE', sales: 2000, reach: 9800 },
-  { name: 'IN', sales: 2780, reach: 3908 },
-  { name: 'SG', sales: 1890, reach: 4800 },
-];
-
-const CATEGORY_DATA = [
-  { name: 'Apparel', value: 400, color: 'hsl(var(--primary))' },
-  { name: 'Jewelry', value: 300, color: 'hsl(var(--secondary))' },
-  { name: 'Timepieces', value: 300, color: 'hsl(var(--accent))' },
-  { name: 'Accessories', value: 200, color: 'hsl(var(--muted-foreground))' },
-];
+type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'vip-salon' | 'settings';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
-  const { products, updateProductDescription, campaigns, addCampaign, addNotification } = useAppStore();
+  const { products, campaigns, addCampaign, addNotification, vipClients, activeVip, setActiveVip } = useAppStore();
   const { toast } = useToast();
 
-  const [aiLogs, setAiLogs] = useState<{ id: string, action: string, target: string, time: string }[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('us');
 
-  // Marketing Form State
   const [newCampaign, setNewCampaign] = useState({
     title: '',
     type: 'email' as 'email' | 'push',
@@ -125,6 +68,7 @@ export default function AdminDashboard() {
       { id: 'dashboard', icon: <LayoutDashboard />, label: 'Overview', roles: ['admin', 'marketing'] },
       { id: 'analytics', icon: <BarChart3 />, label: 'Insights', roles: ['admin', 'marketing'] },
       { id: 'inventory', icon: <Package />, label: 'Inventory', roles: ['admin'] },
+      { id: 'vip-salon', icon: <Crown />, label: 'VIP Salon', roles: ['admin', 'marketing'] },
       { id: 'ai-studio', icon: <Sparkles />, label: 'AI Studio', roles: ['admin', 'marketing'] },
       { id: 'marketing', icon: <Target />, label: 'Marketing', roles: ['admin', 'marketing'] },
       { id: 'affiliates', icon: <Briefcase />, label: 'Partners', roles: ['admin', 'marketing'] },
@@ -187,7 +131,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden font-body">
-      {/* Sidebar */}
       <aside className="w-72 border-r border-border bg-card p-8 flex flex-col space-y-12 shadow-2xl z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-white">
@@ -227,12 +170,11 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-12 space-y-12">
         <header className="flex justify-between items-center bg-card/50 luxury-blur p-6 -m-6 mb-6 border-b border-border sticky top-0 z-10">
           <div>
             <h1 className="text-4xl font-headline font-bold italic text-white uppercase tracking-widest">
-              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+              {activeTab.replace('-', ' ').charAt(0).toUpperCase() + activeTab.replace('-', ' ').slice(1)}
             </h1>
             <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-bold mt-1">
               Global Operations Center | {COUNTRIES[selectedCountry].name} Market
@@ -259,7 +201,7 @@ export default function AdminDashboard() {
           <div className="animate-fade-in space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard icon={<DollarSign className="text-primary" />} label="Market Revenue" value="$42.8M" trend="+18.4%" positive />
-              <StatCard icon={<Activity className="text-secondary" />} label="API Latency" value="24ms" trend="Stable" positive />
+              <StatCard icon={<Star className="text-secondary" />} label="VIP Retention" value="98.2%" trend="Stable" positive />
               <StatCard icon={<Database className="text-accent" />} label="Entity Load" value={products.length.toString()} trend="High" positive />
               <StatCard icon={<Globe className="text-primary" />} label="Global Reach" value="2.4M" trend="+12.2%" positive />
             </div>
@@ -311,6 +253,151 @@ export default function AdminDashboard() {
                   ))}
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'vip-salon' && (
+          <div className="animate-fade-in space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <Card className="bg-card border-border shadow-2xl overflow-hidden">
+                <CardHeader className="bg-primary/10 border-b border-primary/20 p-8">
+                  <CardTitle className="font-headline text-3xl font-bold text-white flex items-center">
+                    <Crown className="w-8 h-8 mr-4 text-primary" /> Private Client Roster
+                  </CardTitle>
+                  <CardDescription className="text-primary text-[10px] uppercase tracking-widest font-bold">Manage elite tiers & access</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-border">
+                    {vipClients.map(client => (
+                      <div 
+                        key={client.id} 
+                        className={cn(
+                          "p-8 flex items-center justify-between group transition-all cursor-pointer hover:bg-muted/30",
+                          activeVip?.id === client.id && "bg-primary/5 border-l-4 border-l-primary"
+                        )}
+                        onClick={() => setActiveVip(client)}
+                      >
+                        <div className="flex items-center space-x-6">
+                          <div className="w-14 h-14 bg-muted border border-border flex items-center justify-center font-headline text-2xl font-bold text-muted-foreground">
+                            {client.name.charAt(0)}
+                          </div>
+                          <div>
+                            <h4 className="text-xl font-bold text-white">{client.name}</h4>
+                            <div className="flex items-center space-x-3 mt-1">
+                              <Badge className={cn(
+                                "text-[8px] uppercase tracking-widest",
+                                client.tier === 'Bespoke' ? "bg-primary" : client.tier === 'Platinum' ? "bg-secondary" : "bg-muted"
+                              )}>
+                                {client.tier}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground uppercase">{client.email}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs font-light text-white">${(client.totalSpend / 1000).toFixed(0)}k Spend</div>
+                          <div className="text-[9px] text-muted-foreground uppercase mt-1">Last Active: {client.lastActive}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {activeVip ? (
+                <div className="space-y-12">
+                  <Card className="bg-card border-border border-t-4 border-t-primary animate-fade-in">
+                    <CardHeader className="p-8 border-b border-border">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-3xl font-headline font-bold text-white">Simulation: {activeVip.name}</CardTitle>
+                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">Active Prototype Context</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => setActiveVip(null)} className="text-[10px] tracking-widest uppercase border-border hover:bg-muted">
+                          Switch Client
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-10">
+                      <div className="grid grid-cols-2 gap-8">
+                        <div className="p-6 bg-muted/20 border border-border space-y-2">
+                           <span className="text-[9px] uppercase tracking-widest text-primary font-bold">Market Hub</span>
+                           <p className="text-lg font-headline text-white">{COUNTRIES[activeVip.country]?.name}</p>
+                        </div>
+                        <div className="p-6 bg-muted/20 border border-border space-y-2">
+                           <span className="text-[9px] uppercase tracking-widest text-primary font-bold">Privé Tier</span>
+                           <p className="text-lg font-headline text-white">{activeVip.tier}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <h5 className="text-[10px] uppercase tracking-widest font-bold text-white flex items-center">
+                          <Sparkles className="w-3 h-3 mr-2 text-primary" /> Exclusive Access Config
+                        </h5>
+                        <div className="space-y-4">
+                          {activeVip.assignedCollections.map(colId => (
+                            <div key={colId} className="p-4 bg-muted/30 border border-primary/20 flex justify-between items-center group">
+                               <span className="text-xs font-bold text-white uppercase italic">{colId.replace('-', ' ')}</span>
+                               <ShieldCheck className="w-4 h-4 text-primary" />
+                            </div>
+                          ))}
+                          <Button variant="ghost" className="w-full h-12 border border-dashed border-border text-[10px] tracking-widest uppercase text-muted-foreground hover:text-primary hover:border-primary">
+                             + Assign Private Collection
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="pt-8 border-t border-border">
+                         <div className="p-6 bg-primary/5 border border-primary/20 text-center space-y-4">
+                            <p className="text-[11px] text-muted-foreground italic">
+                              "This simulation will update the storefront for the active session to reflect {activeVip.name}'s personalized experience."
+                            </p>
+                            <Link href={`/${activeVip.country}`}>
+                               <Button className="w-full h-14 bg-primary hover:bg-secondary text-white text-[10px] font-bold tracking-[0.2em] uppercase">
+                                  PREVIEW AS {activeVip.name.toUpperCase()}
+                               </Button>
+                            </Link>
+                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card border-border shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-white">VIP Performance Analytics</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                          <span className="text-muted-foreground">Portfolio Appreciation</span>
+                          <span className="text-primary">+24.2%</span>
+                        </div>
+                        <Progress value={74} className="h-1 bg-muted" />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                          <span className="text-muted-foreground">Engagement Depth</span>
+                          <span className="text-secondary">High</span>
+                        </div>
+                        <Progress value={92} className="h-1 bg-muted" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center p-20 bg-muted/10 border border-dashed border-border">
+                  <div className="text-center space-y-6">
+                    <div className="w-20 h-20 rounded-full bg-muted border border-border flex items-center justify-center mx-auto">
+                      <Users className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-2xl font-headline font-bold text-white">Client Not Selected</h4>
+                      <p className="text-xs text-muted-foreground max-w-xs mx-auto">Select a private client from the roster to configure their artisanal experience.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -437,25 +524,6 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-primary/5 border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-xs font-bold uppercase tracking-widest text-primary flex items-center">
-                      <Clock className="w-4 h-4 mr-2" /> Distribution Queue
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {campaigns.filter(c => c.status === 'scheduled').map(c => (
-                      <div key={c.id} className="p-4 bg-muted/20 border border-border/20 flex justify-between items-center">
-                        <div>
-                          <div className="text-[10px] font-bold text-white uppercase">{c.title}</div>
-                          <div className="text-[8px] text-muted-foreground uppercase">{c.type} | {COUNTRIES[c.country]?.name}</div>
-                        </div>
-                        <Badge variant="outline" className="text-[8px] border-primary/40 text-primary">Pending</Badge>
-                      </div>
-                    ))}
                   </CardContent>
                 </Card>
               </div>
