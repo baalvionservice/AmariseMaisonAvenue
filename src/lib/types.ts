@@ -226,3 +226,34 @@ export interface VipClient {
   totalSpend: number;
   lastPurchase?: string;
 }
+
+// --- SUPPORT HUB EXTENSIONS ---
+
+export interface SupportTicket {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerTier: 'Silver' | 'Gold' | 'Diamond' | 'Guest';
+  subject: string;
+  status: 'open' | 'pending' | 'resolved' | 'escalated';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  category: 'Order Issue' | 'Product Query' | 'Return/Exchange' | 'VIP Request' | 'Technical';
+  assignedTo?: string; // Admin ID
+  lastMessage: string;
+  updatedAt: string;
+  createdAt: string;
+  messages: {
+    id: string;
+    sender: 'agent' | 'customer';
+    text: string;
+    timestamp: string;
+  }[];
+}
+
+export interface SupportStats {
+  openTickets: number;
+  resolvedToday: number;
+  avgResponseTime: string;
+  csatScore: number;
+  activeChats: number;
+}

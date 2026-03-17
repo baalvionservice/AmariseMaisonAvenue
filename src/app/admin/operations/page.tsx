@@ -30,7 +30,8 @@ import {
   Star,
   MapPin,
   PieChart,
-  LayoutTemplate
+  LayoutTemplate,
+  LifeBuoy
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,11 @@ export default function OperationsAdminPanel() {
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/admin/marketing">
               <PieChart className="w-4 h-4 mr-3" /> Marketing Hub
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
+            <Link href="/admin/support">
+              <LifeBuoy className="w-4 h-4 mr-3" /> Support Hub
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>

@@ -18,7 +18,9 @@ import {
   AuditLog,
   VipClient,
   GlobalSettings,
-  CustomerSegment
+  CustomerSegment,
+  SupportTicket,
+  SupportStats
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -33,7 +35,9 @@ import {
   CAMPAIGNS,
   AUDIT_LOGS,
   VIP_CLIENTS,
-  CUSTOMER_SEGMENTS
+  CUSTOMER_SEGMENTS,
+  SUPPORT_TICKETS,
+  SUPPORT_STATS
 } from './mock-data';
 
 interface AppContextType {
@@ -58,6 +62,10 @@ interface AppContextType {
   customerSegments: CustomerSegment[];
   globalSettings: GlobalSettings;
   
+  // Support Hub State
+  supportTickets: SupportTicket[];
+  supportStats: SupportStats;
+  
   // Showcase State
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
@@ -80,6 +88,11 @@ interface AppContextType {
   upsertCampaign: (campaign: Campaign) => void;
   updateGlobalSettings: (settings: GlobalSettings) => void;
   upsertSegment: (segment: CustomerSegment) => void;
+  
+  // Support Actions
+  updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
+  assignTicket: (ticketId: string, adminId: string) => void;
+  addTicketMessage: (ticketId: string, text: string, sender: 'agent' | 'customer') => void;
   
   // Social Actions
   toggleLike: (contentId: string, country: string) => void;
@@ -112,6 +125,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
   const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
   const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
+  
+  // Support Hub State
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
+  const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
+
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
     seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
@@ -258,6 +276,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Support Actions
+  const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
+    setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
+  };
+
+  const assignTicket = (ticketId: string, adminId: string) => {
+    setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, assignedTo: adminId, updatedAt: new Date().toISOString() } : t));
+  };
+
+  const addTicketMessage = (ticketId: string, text: string, sender: 'agent' | 'customer') => {
+    setSupportTickets(prev => prev.map(t => {
+      if (t.id === ticketId) {
+        const newMessage = { id: `msg-${Date.now()}`, sender, text, timestamp: new Date().toISOString() };
+        return { 
+          ...t, 
+          messages: [...t.messages, newMessage], 
+          lastMessage: text,
+          updatedAt: new Date().toISOString() 
+        };
+      }
+      return t;
+    }));
+  };
+
   const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
 
   const toggleLike = (contentId: string, country: string) => {
@@ -292,6 +334,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     vipClients,
     customerSegments,
     globalSettings,
+    supportTickets,
+    supportStats,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -309,12 +353,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCampaign,
     upsertSegment,
     updateGlobalSettings,
+    updateTicketStatus,
+    assignTicket,
+    addTicketMessage,
     toggleLike,
     trackShare,
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

@@ -2,7 +2,7 @@
 import { 
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
-  Vendor, Campaign, AuditLog, CustomerSegment 
+  Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats 
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -103,7 +103,8 @@ export const VIP_CLIENTS: VipClient[] = [
 
 export const ADMIN_ACCOUNTS: AdminAccount[] = [
   { id: 'adm-1', name: 'Maison Owner', email: 'ceo@amarise-luxe.com', role: 'CEO', permissions: ['all'], status: 'active', lastActive: '2024-03-15T10:00:00Z', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=owner' },
-  { id: 'adm-2', name: 'Market Manager', email: 'ops@amarise-luxe.com', role: 'Manager', permissions: ['ops', 'marketing'], status: 'active', lastActive: '2024-03-15T09:30:00Z' }
+  { id: 'adm-2', name: 'Market Manager', email: 'ops@amarise-luxe.com', role: 'Manager', permissions: ['ops', 'marketing'], status: 'active', lastActive: '2024-03-15T09:30:00Z' },
+  { id: 'adm-3', name: 'Concierge Lead', email: 'concierge@amarise-luxe.com', role: 'Support', permissions: ['support'], status: 'active', lastActive: '2024-03-15T11:00:00Z' }
 ];
 
 export const VENDORS: Vendor[] = [
@@ -128,6 +129,66 @@ export const AUDIT_LOGS: AuditLog[] = [
   { id: 'log-1', adminId: 'adm-1', adminName: 'Maison Owner', action: 'Approved Vendor Geneva Horology', module: 'Vendor Management', timestamp: '2024-03-15T08:00:00Z', ipAddress: '192.168.1.1', severity: 'low' },
   { id: 'log-2', adminId: 'adm-2', adminName: 'Market Manager', action: 'Updated Global Tax Rules (UAE)', module: 'Website Settings', timestamp: '2024-03-15T07:45:00Z', ipAddress: '192.168.1.5', severity: 'medium' }
 ];
+
+export const SUPPORT_TICKETS: SupportTicket[] = [
+  {
+    id: 'tix-1',
+    customerId: 'vip-1',
+    customerName: 'Julian Vandervilt',
+    customerTier: 'Diamond',
+    subject: 'Private Viewing Request - London',
+    status: 'open',
+    priority: 'urgent',
+    category: 'VIP Request',
+    assignedTo: 'adm-3',
+    lastMessage: 'How may I secure a private slot for the upcoming Bond St exhibition?',
+    createdAt: '2024-03-15T09:00:00Z',
+    updatedAt: '2024-03-15T10:30:00Z',
+    messages: [
+      { id: 'm1', sender: 'customer', text: 'I am planning a visit to London next week.', timestamp: '2024-03-15T09:00:00Z' },
+      { id: 'm2', sender: 'customer', text: 'How may I secure a private slot for the upcoming Bond St exhibition?', timestamp: '2024-03-15T09:05:00Z' }
+    ]
+  },
+  {
+    id: 'tix-2',
+    customerId: 'vip-2',
+    customerName: 'Sophia Chen',
+    customerTier: 'Gold',
+    subject: 'Exchange for Artisanal Silk Scarf',
+    status: 'pending',
+    priority: 'medium',
+    category: 'Return/Exchange',
+    assignedTo: 'adm-3',
+    lastMessage: 'The color palette is slightly different than expected.',
+    createdAt: '2024-03-14T14:00:00Z',
+    updatedAt: '2024-03-15T08:45:00Z',
+    messages: [
+      { id: 'm3', sender: 'customer', text: 'Received my order #AM-1002 today.', timestamp: '2024-03-14T14:00:00Z' }
+    ]
+  },
+  {
+    id: 'tix-3',
+    customerId: 'guest-1',
+    customerName: 'Anonymous Connoisseur',
+    customerTier: 'Guest',
+    subject: 'Product Availability - Heritage Timepiece',
+    status: 'resolved',
+    priority: 'low',
+    category: 'Product Query',
+    lastMessage: 'Thank you for the clarification on the movement specifications.',
+    createdAt: '2024-03-12T10:00:00Z',
+    updatedAt: '2024-03-13T16:00:00Z',
+    messages: []
+  }
+];
+
+export const SUPPORT_STATS: SupportStats = {
+  openTickets: 12,
+  resolvedToday: 45,
+  avgResponseTime: '14m 22s',
+  csatScore: 4.9,
+  activeChats: 3
+};
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;
