@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { PRODUCTS, COLLECTIONS, COUNTRIES, getLocalizedMockText } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Crown, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Sparkles, Crown, ShieldCheck, BookOpen } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -21,10 +21,12 @@ export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const { activeVip } = useAppStore();
+  const { activeVip, editorials } = useAppStore();
   
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
+
+  const latestEditorial = editorials.find(ed => ed.country === countryCode) || editorials[0];
 
   useEffect(() => {
     async function loadRecs() {
@@ -91,6 +93,40 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* From The Journal - Storytelling Engine Integration */}
+      {latestEditorial && (
+        <section className="container mx-auto px-6 py-24">
+          <div className="flex flex-col lg:flex-row items-center gap-20">
+            <div className="lg:w-1/2 relative aspect-[4/5] overflow-hidden group">
+              <Image 
+                src={latestEditorial.imageUrl} 
+                alt={latestEditorial.title} 
+                fill 
+                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
+            </div>
+            <div className="lg:w-1/2 space-y-8">
+              <div className="flex items-center space-x-4 text-primary">
+                <BookOpen className="w-8 h-8" />
+                <span className="text-[10px] font-bold tracking-[0.4em] uppercase">From The Journal</span>
+              </div>
+              <h2 className="text-6xl font-headline font-bold italic leading-tight">{latestEditorial.title}</h2>
+              <p className="text-xl text-muted-foreground font-light leading-relaxed italic">
+                {latestEditorial.excerpt}
+              </p>
+              <div className="pt-8 border-t border-border">
+                 <Link href={`/${countryCode}/journal/${latestEditorial.id}`}>
+                    <Button variant="outline" className="rounded-none border-foreground h-16 px-12 text-[10px] font-bold tracking-[0.4em]">
+                      READ THE NARRATIVE
+                    </Button>
+                 </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* VIP Private Atelier Section */}
       {activeVip && (

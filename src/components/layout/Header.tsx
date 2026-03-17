@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, Languages, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Globe, Crown, Languages, User, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CATEGORIES, COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -78,6 +79,9 @@ export const Header = () => {
               </div>
             </div>
           ))}
+          <Link href={`/${countryCode}/journal`} className="py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-all pb-1 border-b border-transparent hover:border-primary">
+            JOURNAL
+          </Link>
           <Link href={activeVip ? `/${countryCode}/collection/heritage` : `/${countryCode}/category/apparel`} className={cn(
             "py-8 text-[10px] font-bold uppercase tracking-[0.3em] transition-colors",
             activeVip ? "text-primary hover:text-secondary" : "text-muted-foreground hover:text-primary"

@@ -91,3 +91,17 @@ export interface VipClient {
   lastActive: string;
   assignedCollections: string[];
 }
+
+export interface Editorial {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+  category: 'Seasonal' | 'City Edit' | 'VIP Exclusive' | 'Artisanal';
+  country: string;
+  author: string;
+  date: string;
+  isVip: boolean;
+  featuredProducts: string[];
+}

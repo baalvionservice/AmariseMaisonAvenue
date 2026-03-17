@@ -1,5 +1,5 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient } from './types';
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US' },
@@ -21,6 +21,35 @@ export const COLLECTIONS: Collection[] = [
   { id: 'heritage', name: 'The Heritage Line', description: 'Timeless pieces that define generations. A tribute to the founding year of 1924.', imageUrl: 'https://picsum.photos/seed/heritage-luxe/1920/1080' },
   { id: 'nocturnal', name: 'Nocturnal Allure', description: 'Sophisticated evening wear and accessories for those who own the night.', imageUrl: 'https://picsum.photos/seed/nocturnal-luxe/1920/1080' },
   { id: 'privé-watches', name: 'Watchmakers Secret', description: 'Unreleased prototypes from the Swiss high-plateau. Strictly for Bespoke tier collectors.', imageUrl: 'https://picsum.photos/seed/prive-watches/1920/1080', isPrivate: true },
+];
+
+export const EDITOR_INITIAL: Editorial[] = [
+  {
+    id: 'ed-1',
+    title: 'The Alchemy of Silk',
+    excerpt: 'Deep in the heart of our Lyon atelier, master weavers breathe life into the finest threads.',
+    content: 'Luxury is not merely an object; it is a resonance between the hand of the artisan and the spirit of the material. At Amarisé, we believe that every yard of silk carries the weight of a century of tradition.\n\nOur current seasonal feature explores the metamorphosis of raw cocoon into the shimmering drapery that graces the shoulders of the world\'s most discerning individuals. It is a process of patience, precision, and unwavering dedication to the pursuit of perfection.',
+    imageUrl: 'https://picsum.photos/seed/silk-alchemy/1600/900',
+    category: 'Artisanal',
+    country: 'us',
+    author: 'Clara Montesque',
+    date: '2024-03-01',
+    isVip: false,
+    featuredProducts: ['prod-001', 'prod-002']
+  },
+  {
+    id: 'ed-2',
+    title: 'Dubai: The Gilded Oasis',
+    excerpt: 'An exploration of contemporary luxury in the city of future-heritage.',
+    content: 'In the vast expanse where the desert meets the sky, Dubai stands as a testament to human ambition. For the Maison Amarisé, this city represents the intersection of ancient trading heritage and the pinnacle of modern luxury.\n\nOur city-specific edit focuses on the "Golden Hour" — that ephemeral moment when the sun dips below the Burj Khalifa and the city transforms into a canvas of light and shadow. Here, we present pieces that mirror this transition: from high-jewelry that catches the dying rays to accessories designed for the city\'s vibrant nocturnal life.',
+    imageUrl: 'https://picsum.photos/seed/dubai-story/1600/900',
+    category: 'City Edit',
+    country: 'ae',
+    author: 'Omar Al-Sayed',
+    date: '2024-02-20',
+    isVip: false,
+    featuredProducts: ['prod-015', 'prod-030']
+  }
 ];
 
 export const CAMPAIGNS: Campaign[] = [
@@ -86,9 +115,6 @@ export const REVIEWS: Review[] = [
   { id: 'r3', userName: 'Aamir Al-Farsi', rating: 5, comment: 'The pinnacle of luxury. The attention to detail is breath-taking.', date: '2024-02-18' },
 ];
 
-/**
- * Enhanced mock localization utility for simulating regional translation and formatting.
- */
 export const getLocalizedMockText = (text: string, countryCode: string) => {
   if (countryCode === 'ae') return `[Localized UAE] ${text}`;
   if (countryCode === 'sg') return `[Localized SG] ${text}`;

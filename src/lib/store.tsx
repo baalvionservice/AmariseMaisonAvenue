@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification, VipClient } from './types';
+import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification, VipClient, Editorial } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
   COLLECTIONS as INITIAL_COLLECTIONS, 
@@ -9,7 +10,8 @@ import {
   CAMPAIGNS as INITIAL_CAMPAIGNS,
   AFFILIATES as INITIAL_AFFILIATES,
   NOTIFICATIONS as INITIAL_NOTIFICATIONS,
-  VIP_CLIENTS as INITIAL_VIP_CLIENTS
+  VIP_CLIENTS as INITIAL_VIP_CLIENTS,
+  EDITOR_INITIAL
 } from './mock-data';
 
 interface AppContextType {
@@ -22,6 +24,7 @@ interface AppContextType {
   affiliates: Affiliate[];
   notifications: Notification[];
   vipClients: VipClient[];
+  editorials: Editorial[];
   activeVip: VipClient | null;
   isShowcaseMode: boolean;
   setShowcaseMode: (val: boolean) => void;
@@ -34,6 +37,7 @@ interface AppContextType {
   updateCollectionNarrative: (collectionId: string, narrative: string) => void;
   addCampaign: (campaign: Campaign) => void;
   addNotification: (notification: Notification) => void;
+  addEditorial: (editorial: Editorial) => void;
   setActiveVip: (client: VipClient | null) => void;
   user: any | null; 
   isAuthenticated: boolean;
@@ -51,6 +55,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [affiliates, setAffiliates] = useState<Affiliate[]>(INITIAL_AFFILIATES);
   const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   const [vipClients, setVipClients] = useState<VipClient[]>(INITIAL_VIP_CLIENTS);
+  const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [isShowcaseMode, setShowcaseMode] = useState<boolean>(true);
   
@@ -60,6 +65,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedCart = localStorage.getItem('amarise_cart');
     const savedWishlist = localStorage.getItem('amarise_wishlist');
     const savedVipId = localStorage.getItem('amarise_active_vip');
+    const savedEditorials = localStorage.getItem('amarise_editorials');
     if (savedCart) {
       try { setCart(JSON.parse(savedCart)); } catch (e) {}
     }
@@ -70,6 +76,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const vip = INITIAL_VIP_CLIENTS.find(v => v.id === savedVipId);
       if (vip) setActiveVip(vip);
     }
+    if (savedEditorials) {
+      try { setEditorials(JSON.parse(savedEditorials)); } catch (e) {}
+    }
   }, []);
 
   useEffect(() => {
@@ -79,6 +88,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('amarise_editorials', JSON.stringify(editorials));
+  }, [editorials]);
 
   useEffect(() => {
     if (activeVip) {
@@ -140,6 +153,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setNotifications(prev => [notification, ...prev]);
   };
 
+  const addEditorial = (editorial: Editorial) => {
+    setEditorials(prev => [editorial, ...prev]);
+  };
+
   const value = useMemo(() => ({
     cart,
     wishlist,
@@ -150,6 +167,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     affiliates,
     notifications,
     vipClients,
+    editorials,
     activeVip,
     isShowcaseMode,
     setShowcaseMode,
@@ -162,10 +180,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateCollectionNarrative,
     addCampaign,
     addNotification,
+    addEditorial,
     setActiveVip,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, activeVip, isShowcaseMode, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, editorials, activeVip, isShowcaseMode, user]);
 
   return (
     <AppContext.Provider value={value}>
