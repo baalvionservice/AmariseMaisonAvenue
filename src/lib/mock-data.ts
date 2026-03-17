@@ -17,9 +17,9 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const COLLECTIONS: Collection[] = [
-  { id: 'spring-24', name: 'Spring/Summer 2024', description: 'Lightweight elegance for the modern aristocrat.', imageUrl: 'https://picsum.photos/seed/spring24/1200/600' },
-  { id: 'heritage', name: 'The Heritage Line', description: 'Timeless pieces that define generations.', imageUrl: 'https://picsum.photos/seed/heritage/1200/600' },
-  { id: 'nocturnal', name: 'Nocturnal Allure', description: 'Sophisticated evening wear and accessories.', imageUrl: 'https://picsum.photos/seed/nocturnal/1200/600' },
+  { id: 'spring-24', name: 'Spring/Summer 2024', description: 'Lightweight elegance for the modern aristocrat. Inspired by the soft hues of a Mediterranean dawn.', imageUrl: 'https://picsum.photos/seed/spring24-luxe/1920/1080' },
+  { id: 'heritage', name: 'The Heritage Line', description: 'Timeless pieces that define generations. A tribute to the founding year of 1924.', imageUrl: 'https://picsum.photos/seed/heritage-luxe/1920/1080' },
+  { id: 'nocturnal', name: 'Nocturnal Allure', description: 'Sophisticated evening wear and accessories for those who own the night.', imageUrl: 'https://picsum.photos/seed/nocturnal-luxe/1920/1080' },
 ];
 
 const generateProducts = (): Product[] => {
@@ -30,20 +30,20 @@ const generateProducts = (): Product[] => {
   for (let i = 1; i <= 24; i++) {
     const cat = categories[i % categories.length];
     
-    // Deterministic values to avoid hydration mismatch between server and client
-    const basePrice = ((i * 123) % 4501) + 500;
-    const rating = 4 + ((i * 7) % 11) / 10;
-    const reviewsCount = ((i * 17) % 46) + 5;
+    // Deterministic values for consistent hydration
+    const basePrice = 500 + ((i * 123) % 9500);
+    const rating = 4.2 + ((i * 3) % 9) / 10;
+    const reviewsCount = 5 + ((i * 13) % 40);
 
     products.push({
       id: `prod-${i}`,
-      name: `Amarisé ${cat} Item ${i}`,
+      name: `Amarisé ${cat} Selection ${i}`,
       category: cat,
-      subcategory: 'Exclusive',
+      subcategory: 'Exclusive Heritage',
       collectionId: collectionIds[i % collectionIds.length],
       basePrice,
-      imageUrl: `https://picsum.photos/seed/amarise-p-${i}/800/800`,
-      isVip: i % 5 === 0,
+      imageUrl: `https://picsum.photos/seed/amarise-lux-item-${i}/1200/1600`,
+      isVip: i % 4 === 0,
       rating,
       reviewsCount,
     });
@@ -54,14 +54,15 @@ const generateProducts = (): Product[] => {
 export const PRODUCTS = generateProducts();
 
 export const REVIEWS: Review[] = [
-  { id: 'r1', userName: 'Julian V.', rating: 5, comment: 'Absolutely divine craftsmanship. A centerpiece for any collection.', date: '2024-01-15' },
-  { id: 'r2', userName: 'Sophia L.', rating: 4, comment: 'Elegant and sophisticated. Shipping to London was exceptionally fast.', date: '2024-02-02' },
+  { id: 'r1', userName: 'Julian Vandervilt', rating: 5, comment: 'Absolutely divine craftsmanship. A centerpiece for any collection. The weight of the silk is unparalleled.', date: '2024-01-15' },
+  { id: 'r2', userName: 'Sophia Laurent', rating: 4, comment: 'Elegant and sophisticated. Shipping to London was exceptionally fast and the white-glove service was impeccable.', date: '2024-02-02' },
+  { id: 'r3', userName: 'Aamir Al-Farsi', rating: 5, comment: 'The pinnacle of luxury. The attention to detail in the gold hardware is simply breath-taking.', date: '2024-02-18' },
 ];
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;
   const rates: Record<string, number> = { us: 1, uk: 0.79, ae: 3.67, in: 83.2, sg: 1.34 };
-  const converted = price * rates[countryCode];
+  const converted = price * (rates[countryCode] || 1);
   return new Intl.NumberFormat(country.locale, {
     style: 'currency',
     currency: country.currency,

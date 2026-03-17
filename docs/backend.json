@@ -3,7 +3,7 @@
   "entities": {
     "Product": {
       "title": "Product",
-      "description": "A luxury item available for purchase.",
+      "description": "A luxury item available for purchase in the Amarisé catalog.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -21,7 +21,7 @@
     },
     "Collection": {
       "title": "Collection",
-      "description": "A themed set of luxury products.",
+      "description": "A themed set of luxury products curated by the Maison.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -32,16 +32,33 @@
     },
     "Order": {
       "title": "Order",
-      "description": "A customer purchase record.",
+      "description": "A record of a high-end customer purchase.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
-        "items": { "type": "array" },
+        "items": { 
+          "type": "array",
+          "items": { "type": "object" }
+        },
         "total": { "type": "number" },
         "currency": { "type": "string" },
         "status": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered"] },
+        "countryCode": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Client critique of a product.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "date": { "type": "string", "format": "date" }
       }
     }
   },
@@ -55,11 +72,19 @@
     },
     "/collections/{collectionId}": {
       "schema": "Collection",
-      "description": "Curated seasonal and heritage collections."
+      "description": "Seasonal and Heritage collections."
     },
     "/orders/{orderId}": {
       "schema": "Order",
-      "description": "Customer order history."
+      "description": "Global order tracking for VIP clientele."
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Verified client testimonials."
+    },
+    "/wishlists/{userId}": {
+      "schema": { "type": "object" },
+      "description": "Private selection records."
     }
   }
 }
