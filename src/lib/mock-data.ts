@@ -80,16 +80,16 @@ export const COUNTRIES: Record<string, Country> = {
 };
 
 export const CATEGORIES: Category[] = [
-  { id: 'women', name: 'Women', subcategories: ['Haute Couture', 'Evening Wear', 'Signature Bags', 'Silk Scarves'] },
-  { id: 'men', name: 'Men', subcategories: ['Bespoke Tailoring', 'Luxury Outerwear', 'Heritage Shoes', 'Fine Knits'] },
-  { id: 'kids', name: 'Kids', subcategories: ['Junior Couture', 'Nursery Heritage', 'Artisanal Toys'] },
-  { id: 'accessories', name: 'Accessories', subcategories: ['Exotic Leather', 'Heritage Belts', 'Luxury Eyewear'] },
-  { id: 'jewelry', name: 'Jewelry', subcategories: ['High Jewelry', 'Fine Gold', 'Bespoke Rings'] },
-  { id: 'watches', name: 'Watches', subcategories: ['Grand Complications', 'Heritage Collection', 'Limited Editions'] },
-  { id: 'beauty', name: 'Beauty', subcategories: ['Maison Fragrance', 'Elite Skincare', 'Atelier Cosmetics'] },
-  { id: 'lifestyle', name: 'Lifestyle', subcategories: ['Digital Heritage', 'Fine Stationery', 'Exclusive Gifts'] },
-  { id: 'home', name: 'Home', subcategories: ['Artisanal Decor', 'Heritage Linens', 'Sculptural Furniture'] },
-  { id: 'travel', name: 'Travel', subcategories: ['Luxury Luggage', 'Atelier Trunks', 'Bespoke Travel Kits'] },
+  { id: 'women', name: 'Women', subcategories: ['Haute Couture', 'Evening Wear', 'Signature Bags', 'Silk Scarves', 'Resort Collection'] },
+  { id: 'men', name: 'Men', subcategories: ['Bespoke Tailoring', 'Luxury Outerwear', 'Heritage Shoes', 'Fine Knits', 'Business Heritage'] },
+  { id: 'kids', name: 'Kids', subcategories: ['Junior Couture', 'Nursery Heritage', 'Artisanal Toys', 'Miniature Timepieces', 'Ceremony Wear'] },
+  { id: 'accessories', name: 'Accessories', subcategories: ['Exotic Leather', 'Heritage Belts', 'Luxury Eyewear', 'Bespoke Hats', 'Fragrance Charms'] },
+  { id: 'jewelry', name: 'Jewelry', subcategories: ['High Jewelry', 'Fine Gold', 'Bespoke Rings', 'Artisanal Silver', 'Heritage Gemstones'] },
+  { id: 'watches', name: 'Watches', subcategories: ['Grand Complications', 'Heritage Collection', 'Limited Editions', 'Metiers d’Art', 'Dive Heritage'] },
+  { id: 'beauty', name: 'Beauty', subcategories: ['Maison Fragrance', 'Elite Skincare', 'Atelier Cosmetics', 'Hair Couture', 'Scented Artifacts'] },
+  { id: 'lifestyle', name: 'Lifestyle', subcategories: ['Digital Heritage', 'Fine Stationery', 'Exclusive Gifts', 'Private Member Gear', 'Tech Couture'] },
+  { id: 'home', name: 'Home', subcategories: ['Artisanal Decor', 'Heritage Linens', 'Sculptural Furniture', 'Fragrance Diffusion', 'Crystal Heritage'] },
+  { id: 'travel', name: 'Travel', subcategories: ['Luxury Luggage', 'Atelier Trunks', 'Bespoke Travel Kits', 'Global Concierge Gear', 'Exotic Weekenders'] },
 ];
 
 export const COLLECTIONS: Collection[] = [
@@ -216,12 +216,13 @@ export const VIP_CLIENTS: VipClient[] = [
 
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
-  const categories = CATEGORIES.map(c => c.name);
+  const categories = CATEGORIES;
   const collectionIds = COLLECTIONS.map(c => c.id);
 
   for (let i = 1; i <= 500; i++) {
-    const catIndex = i % categories.length;
-    const cat = categories[catIndex];
+    const catObj = categories[i % categories.length];
+    const cat = catObj.name;
+    const sub = catObj.subcategories[i % catObj.subcategories.length];
     const collIndex = i % collectionIds.length;
     
     const basePrice = 1200 + ((i * 19) % 25000);
@@ -230,9 +231,9 @@ const generateProducts = (): Product[] => {
 
     products.push({
       id: `prod-${i}`,
-      name: `Amarisé ${cat} Piece No. ${i.toString().padStart(3, '0')}`,
+      name: `Amarisé ${sub} No. ${i.toString().padStart(3, '0')}`,
       category: cat,
-      subcategory: i % 2 === 0 ? 'Heritage Collection' : 'Limited Release',
+      subcategory: sub,
       collectionId: collectionIds[collIndex],
       basePrice,
       imageUrl: `https://picsum.photos/seed/amarise-enterprise-${i}/1200/1600`,

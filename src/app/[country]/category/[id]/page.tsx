@@ -2,8 +2,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
-import { PRODUCTS, CATEGORIES, formatPrice } from '@/lib/mock-data';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { PRODUCTS, CATEGORIES, COLLECTIONS, formatPrice } from '@/lib/mock-data';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { 
@@ -12,20 +12,27 @@ import {
   LayoutGrid,
   List,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  History,
+  Crown
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateCategoryNarrative } from '@/ai/flows/generate-category-narrative';
+import { cn } from '@/lib/utils';
 
 /**
  * CategoryPage: Redesigned for a Luxurious Digital Department experience.
- * Supports the 10 core departments with curated storytelling and artifact discovery.
+ * Features advanced filtering, SEO structured data, and AI-powered storytelling.
  */
 export default function CategoryPage() {
   const { country, id } = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  
   const sub = searchParams.get('sub');
+  const collectionFilter = searchParams.get('collection');
   const countryCode = (country as string) || 'us';
   
   const category = CATEGORIES.find(c => c.id === id);
@@ -41,22 +48,24 @@ export default function CategoryPage() {
     let list = PRODUCTS.filter(p => p.category.toLowerCase() === category.name.toLowerCase());
     
     if (sub) {
-      const lowerSub = sub.toLowerCase();
-      list = list.filter(p => 
-        p.subcategory.toLowerCase().includes(lowerSub) || 
-        p.name.toLowerCase().includes(lowerSub)
-      );
+      list = list.filter(p => p.subcategory.toLowerCase() === sub.toLowerCase());
+    }
+
+    if (collectionFilter) {
+      list = list.filter(p => p.collectionId === collectionFilter);
     }
     
     if (sortBy === 'price-low') list = [...list].sort((a, b) => a.basePrice - b.basePrice);
     if (sortBy === 'price-high') list = [...list].sort((a, b) => b.basePrice - a.basePrice);
+    if (sortBy === 'popularity') list = [...list].sort((a, b) => b.rating - a.rating);
     
     return list;
-  }, [category, sortBy, sub]);
+  }, [category, sortBy, sub, collectionFilter]);
 
   useEffect(() => {
     if (!category) return;
     async function fetchNarrative() {
+      setLoadingNarrative(true);
       try {
         const res = await generateCategoryNarrative({
           categoryName: category.name,
@@ -74,10 +83,44 @@ export default function CategoryPage() {
 
   if (!category) return <div className="py-40 text-center font-headline text-3xl">Department not found</div>;
 
+  const handleSubToggle = (s: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (params.get('sub') === s) params.delete('sub');
+    else params.set('sub', s);
+    router.push(`/${countryCode}/category/${id}?${params.toString()}`);
+  };
+
+  const handleCollectionToggle = (cid: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (params.get('collection') === cid) params.delete('collection');
+    else params.set('collection', cid);
+    router.push(`/${countryCode}/category/${id}?${params.toString()}`);
+  };
+
   return (
     <div className="animate-fade-in bg-ivory min-h-screen pb-40">
+      {/* SEO: JSON-LD ItemList Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `${category.name} Curated Collection`,
+            "description": `Discover our exclusive ${category.name} department featuring artisanal craftsmanship and heritage design.`,
+            "itemListElement": filteredProducts.slice(0, 20).map((p, idx) => ({
+              "@type": "ListItem",
+              "position": idx + 1,
+              "url": `https://amarise-luxe.com/${countryCode}/product/${p.id}`,
+              "name": p.name,
+              "image": p.imageUrl
+            }))
+          })
+        }}
+      />
+
       {/* Category Hero / Department Banner */}
-      <section className="relative h-[40vh] w-full flex items-end justify-center overflow-hidden border-b border-border">
+      <section className="relative h-[45vh] w-full flex items-end justify-center overflow-hidden border-b border-border">
         <Image 
           src={`https://picsum.photos/seed/amarise-dept-${id}/2560/1440`} 
           alt={category.name}
@@ -112,23 +155,40 @@ export default function CategoryPage() {
                 </div>
                 
                 <div className="space-y-10">
-                  <FilterGroup title="Specialized Collections">
+                  <FilterGroup title="Department Selection">
                     {category.subcategories.map(s => (
-                      <Link 
+                      <button 
                         key={s} 
-                        href={`/${countryCode}/category/${id}?sub=${s}`}
-                        className={`block text-xs font-light tracking-wide hover:text-plum transition-colors border-l-2 pl-4 py-1 ${sub === s ? 'text-plum border-gold font-bold' : 'text-muted-foreground border-transparent'}`}
+                        onClick={() => handleSubToggle(s)}
+                        className={cn(
+                          "block w-full text-left text-xs font-light tracking-wide hover:text-plum transition-all border-l-2 pl-4 py-1.5",
+                          sub === s ? 'text-plum border-gold font-bold bg-plum/5' : 'text-muted-foreground border-transparent'
+                        )}
                       >
                         {s}
-                      </Link>
+                      </button>
                     ))}
                   </FilterGroup>
 
                   <FilterGroup title="Atelier Preference">
-                    {['Heritage Series', 'Bespoke Private', 'Seasonal Runway', 'Artisanal Archive'].map(m => (
-                      <div key={m} className="flex items-center space-x-4 group cursor-pointer">
-                        <div className="w-4 h-4 border border-border group-hover:border-plum transition-colors" />
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground group-hover:text-gray-900">{m}</span>
+                    {COLLECTIONS.map(col => (
+                      <div 
+                        key={col.id} 
+                        onClick={() => handleCollectionToggle(col.id)}
+                        className="flex items-center space-x-4 group cursor-pointer"
+                      >
+                        <div className={cn(
+                          "w-4 h-4 border transition-all flex items-center justify-center",
+                          collectionFilter === col.id ? "bg-gold border-gold" : "border-border group-hover:border-plum"
+                        )}>
+                          {collectionFilter === col.id && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        </div>
+                        <span className={cn(
+                          "text-[10px] uppercase tracking-widest transition-colors",
+                          collectionFilter === col.id ? "text-gray-900 font-bold" : "text-muted-foreground group-hover:text-gray-900"
+                        )}>
+                          {col.name}
+                        </span>
                       </div>
                     ))}
                   </FilterGroup>
@@ -149,7 +209,9 @@ export default function CategoryPage() {
 
               {/* Sidebar Editorial Snippet */}
               <div className="bg-white p-8 border border-border shadow-luxury space-y-4">
-                 <h5 className="text-[10px] font-bold uppercase tracking-widest text-plum">Curator's Note</h5>
+                 <h5 className="text-[10px] font-bold uppercase tracking-widest text-plum flex items-center">
+                   <TrendingUp className="w-3 h-3 mr-2" /> Curator's Note
+                 </h5>
                  <p className="text-xs text-muted-foreground italic font-light leading-relaxed">
                    "Every artifact in the {category.name} department represents a marriage of centuries-old technique and contemporary vision."
                  </p>
@@ -160,15 +222,18 @@ export default function CategoryPage() {
           {/* Masterpiece Gallery */}
           <main className="flex-1 space-y-12">
             {/* Department Narrative (AI) */}
-            <div className="bg-white/50 p-12 border border-border/40 luxury-blur space-y-8 mb-12">
+            <div className="bg-white/50 p-12 border border-border/40 luxury-blur space-y-8 mb-12 relative overflow-hidden group">
                <div className="h-px w-20 bg-gold" />
+               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <History className="w-40 h-40" />
+               </div>
                {loadingNarrative ? (
                 <div className="space-y-4 animate-pulse">
                   <div className="h-4 bg-muted w-full" />
                   <div className="h-4 bg-muted w-5/6" />
                 </div>
               ) : (
-                <p className="text-2xl text-gray-700 font-light leading-relaxed italic font-headline">
+                <p className="text-2xl text-gray-700 font-light leading-relaxed italic font-headline relative z-10">
                   {narrative}
                 </p>
               )}
@@ -186,6 +251,7 @@ export default function CategoryPage() {
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   <option value="featured">Maison Featured</option>
+                  <option value="popularity">Critique Rating</option>
                   <option value="price-low">Value: Low to High</option>
                   <option value="price-high">Value: High to Low</option>
                 </select>
@@ -207,7 +273,10 @@ export default function CategoryPage() {
             </div>
 
             {/* Product Gallery */}
-            <div className={`grid gap-12 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+            <div className={cn(
+              "grid gap-12 transition-all duration-500",
+              viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
+            )}>
               {filteredProducts.slice(0, 24).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -227,11 +296,22 @@ export default function CategoryPage() {
             )}
 
             {filteredProducts.length === 0 && (
-              <div className="py-40 text-center space-y-4">
-                <p className="text-xl text-muted-foreground font-light italic">The curators are currently preparing new artifacts for this selection.</p>
-                <Link href={`/${countryCode}`}>
-                  <Button variant="link" className="text-plum uppercase tracking-widest text-[10px] font-bold">Return to Main Gallery</Button>
-                </Link>
+              <div className="py-40 text-center space-y-8">
+                <div className="flex justify-center">
+                  <div className="p-8 bg-plum/5 rounded-full">
+                    <Crown className="w-16 h-16 text-plum/20" />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <p className="text-xl text-muted-foreground font-light italic">The curators are currently preparing new artifacts for this selection.</p>
+                  <Button 
+                    variant="link" 
+                    className="text-plum uppercase tracking-widest text-[10px] font-bold"
+                    onClick={() => router.push(`/${countryCode}/category/${id}`)}
+                  >
+                    Clear All Filters
+                  </Button>
+                </div>
               </div>
             )}
           </main>
