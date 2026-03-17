@@ -56,6 +56,9 @@ export interface Campaign {
   engagement: number;
   country: string;
   performance: number;
+  subject?: string;
+  body?: string;
+  scheduledAt?: string;
 }
 
 export interface Affiliate {
@@ -71,6 +74,7 @@ export interface Notification {
   id: string;
   type: 'Email' | 'Push';
   subject: string;
+  body?: string;
   recipients: string;
   scheduledAt: string;
   status: 'Queued' | 'Sent' | 'Failed';

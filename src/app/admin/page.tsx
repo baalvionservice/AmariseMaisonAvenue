@@ -34,10 +34,15 @@ import {
   LayoutDashboard,
   PieChart,
   LineChart,
-  Layers
+  Layers,
+  Calendar,
+  Clock,
+  Phone
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   CAMPAIGNS, 
   AFFILIATES, 
@@ -50,35 +55,27 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
+import { generateCampaignCopy } from '@/ai/flows/generate-campaign-copy';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  ChartContainer, 
-  ChartTooltip, 
-  ChartTooltipContent, 
-  ChartLegend, 
-  ChartLegendContent 
-} from "@/components/ui/chart";
 import { 
   Bar, 
   BarChart, 
-  CartesianGrid, 
   XAxis, 
   YAxis, 
   ResponsiveContainer, 
   Tooltip, 
   Area, 
   AreaChart,
-  Pie,
   Cell,
   PieChart as RePieChart,
-  Line,
+  Pie,
+  Line as ReLine,
   LineChart as ReLineChart
 } from "recharts";
 
 type AdminRole = 'admin' | 'marketing';
 type ActiveTab = 'dashboard' | 'analytics' | 'inventory' | 'marketing' | 'affiliates' | 'ai-studio' | 'notifications' | 'settings';
 
-// Mock Analytics Data
 const REVENUE_TREND = [
   { month: 'Jan', revenue: 2400, conversions: 400 },
   { month: 'Feb', revenue: 1398, conversions: 300 },
@@ -107,18 +104,21 @@ const CATEGORY_DATA = [
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [role, setRole] = useState<AdminRole>('admin');
-  const [isStressTest, setIsStressTest] = useState(false);
-  const { products, updateProductDescription } = useAppStore();
+  const { products, updateProductDescription, campaigns, addCampaign, addNotification } = useAppStore();
   const { toast } = useToast();
 
   const [aiLogs, setAiLogs] = useState<{ id: string, action: string, target: string, time: string }[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('us');
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsStressTest(true), 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Marketing Form State
+  const [newCampaign, setNewCampaign] = useState({
+    title: '',
+    type: 'email' as 'email' | 'push',
+    product: products[0]?.id || '',
+    subject: '',
+    body: ''
+  });
 
   const filteredNavItems = useMemo(() => {
     const items = [
@@ -126,70 +126,63 @@ export default function AdminDashboard() {
       { id: 'analytics', icon: <BarChart3 />, label: 'Insights', roles: ['admin', 'marketing'] },
       { id: 'inventory', icon: <Package />, label: 'Inventory', roles: ['admin'] },
       { id: 'ai-studio', icon: <Sparkles />, label: 'AI Studio', roles: ['admin', 'marketing'] },
-      { id: 'marketing', icon: <Target />, label: 'Campaigns', roles: ['admin', 'marketing'] },
+      { id: 'marketing', icon: <Target />, label: 'Marketing', roles: ['admin', 'marketing'] },
       { id: 'affiliates', icon: <Briefcase />, label: 'Partners', roles: ['admin', 'marketing'] },
-      { id: 'notifications', icon: <Mail />, label: 'Messaging', roles: ['admin', 'marketing'] },
       { id: 'settings', icon: <Settings />, label: 'System', roles: ['admin'] },
     ];
     return items.filter(item => item.roles.includes(role));
   }, [role]);
 
-  const handleGenerateDescription = async (productId: string) => {
+  const handleSuggestCopy = async () => {
+    const prod = products.find(p => p.id === newCampaign.product);
+    if (!prod) return;
+    
     setIsGenerating(true);
     try {
-      const product = products.find(p => p.id === productId);
-      if (!product) return;
-
-      const res = await generateProductDescription({
-        productName: product.name,
-        category: product.category
+      const res = await generateCampaignCopy({
+        campaignType: newCampaign.type,
+        productName: prod.name,
+        category: prod.category,
+        country: COUNTRIES[selectedCountry].name
       });
-
-      updateProductDescription(productId, res.description);
-      
-      const newLog = {
-        id: Math.random().toString(36).substr(2, 9),
-        action: 'Refreshed Narrative',
-        target: product.name,
-        time: new Date().toLocaleTimeString()
-      };
-      setAiLogs(prev => [newLog, ...prev].slice(0, 10));
-
-      toast({
-        title: "AI Generation Complete",
-        description: `Bespoke narrative crafted for ${product.name}.`,
-      });
+      setNewCampaign(prev => ({
+        ...prev,
+        subject: res.subjectLine,
+        body: res.bodyText
+      }));
+      toast({ title: "AI Copy Ready", description: "Localized luxury copy has been crafted." });
     } catch (e) {
-      toast({
-        variant: "destructive",
-        title: "Generation Failed",
-        description: "The AI atelier is currently busy.",
-      });
+      toast({ variant: "destructive", title: "Copy Engine Offline" });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleBulkGenerate = async () => {
-    setIsGenerating(true);
-    toast({
-      title: "Bulk Process Initiated",
-      description: "Automating narratives for the entire heritage series...",
+  const handleLaunchCampaign = () => {
+    const campaign: any = {
+      id: 'cmp-' + Date.now(),
+      title: newCampaign.title,
+      type: newCampaign.type,
+      status: 'scheduled',
+      reach: 0,
+      engagement: 0,
+      country: selectedCountry,
+      performance: 0,
+      subject: newCampaign.subject,
+      body: newCampaign.body,
+      scheduledAt: new Date(Date.now() + 86400000).toISOString()
+    };
+    addCampaign(campaign);
+    addNotification({
+      id: 'not-' + Date.now(),
+      type: newCampaign.type === 'email' ? 'Email' : 'Push',
+      subject: newCampaign.subject,
+      recipients: 'Global Client List',
+      scheduledAt: campaign.scheduledAt,
+      status: 'Queued'
     });
-
-    setTimeout(() => {
-      setIsGenerating(false);
-      toast({
-        title: "Bulk Success",
-        description: "24 new artisanal narratives have been synchronized.",
-      });
-      setAiLogs(prev => [{
-        id: 'bulk-' + Date.now(),
-        action: 'Bulk Sync',
-        target: 'Heritage Collection',
-        time: new Date().toLocaleTimeString()
-      }, ...prev]);
-    }, 2000);
+    toast({ title: "Campaign Scheduled", description: `${newCampaign.title} is queued for ${COUNTRIES[selectedCountry].name}.` });
+    setNewCampaign({ title: '', type: 'email', product: products[0].id, subject: '', body: '' });
   };
 
   return (
@@ -205,10 +198,7 @@ export default function AdminDashboard() {
              <select 
                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-full cursor-pointer text-white"
                value={role}
-               onChange={(e) => {
-                 setRole(e.target.value as AdminRole);
-                 setActiveTab('dashboard');
-               }}
+               onChange={(e) => setRole(e.target.value as AdminRole)}
              >
                <option value="admin">Director (Admin)</option>
                <option value="marketing">Curator (Marketing)</option>
@@ -228,16 +218,7 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <div className="pt-8 space-y-4 border-t border-border">
-          {isStressTest && (
-            <div className="p-4 bg-primary/5 border border-primary/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[8px] uppercase tracking-widest font-bold text-primary">Enterprise Node</span>
-                <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              </div>
-              <p className="text-[9px] text-muted-foreground font-light italic">Global Hubs: Active & Synced.</p>
-            </div>
-          )}
+        <div className="pt-8 border-t border-border">
           <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive group" asChild>
             <Link href="/us">
               <LogOut className="w-4 h-4 mr-3 transition-transform group-hover:-translate-x-1" /> Exit to Maison
@@ -249,26 +230,19 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-12 space-y-12">
         <header className="flex justify-between items-center bg-card/50 luxury-blur p-6 -m-6 mb-6 border-b border-border sticky top-0 z-10">
-          <div className="flex items-center space-x-6">
-            <div>
-              <h1 className="text-4xl font-headline font-bold italic text-white">
-                {activeTab === 'dashboard' ? 'Maison Overview' : 
-                 activeTab === 'analytics' ? 'Global Insights' :
-                 activeTab === 'ai-studio' ? 'AI Content Studio' :
-                 activeTab === 'marketing' ? 'Global Growth' : 
-                 activeTab === 'affiliates' ? 'Heritage Partners' : 
-                 activeTab === 'notifications' ? 'Client Messaging' : 'Atelier Management'}
-              </h1>
-              <p className="text-muted-foreground text-sm tracking-widest uppercase font-bold mt-1">
-                {role === 'admin' ? 'Executive Director' : 'Marketing Curator'} | 5 Global Regions
-              </p>
-            </div>
+          <div>
+            <h1 className="text-4xl font-headline font-bold italic text-white uppercase tracking-widest">
+              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            </h1>
+            <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-bold mt-1">
+              Global Operations Center | {COUNTRIES[selectedCountry].name} Market
+            </p>
           </div>
           <div className="flex items-center space-x-6">
             <div className="relative group">
                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                <select 
-                 className="bg-muted/30 border border-border h-12 pl-10 pr-8 text-[10px] tracking-widest uppercase font-bold outline-none focus:border-primary transition-all appearance-none cursor-pointer text-white"
+                 className="bg-muted/30 border border-border h-12 pl-10 pr-8 text-[10px] tracking-widest uppercase font-bold outline-none appearance-none cursor-pointer text-white"
                  value={selectedCountry}
                  onChange={(e) => setSelectedCountry(e.target.value)}
                >
@@ -277,13 +251,7 @@ export default function AdminDashboard() {
                  ))}
                </select>
             </div>
-            <Button variant="outline" size="icon" className="border-border relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full animate-pulse border-2 border-background" />
-            </Button>
-            <div className="flex items-center space-x-3 pl-6 border-l border-border">
-              <div className="w-12 h-12 bg-primary flex items-center justify-center font-headline text-2xl font-bold italic text-white">V</div>
-            </div>
+            <div className="w-12 h-12 bg-primary flex items-center justify-center font-headline text-2xl font-bold italic text-white shadow-lg">A</div>
           </div>
         </header>
 
@@ -299,35 +267,27 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2 space-y-12">
                 <Card className="bg-card border-border shadow-2xl">
-                  <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-6">
-                    <div>
-                      <CardTitle className="font-headline text-3xl font-bold text-white">Global Campaigns</CardTitle>
-                      <CardDescription className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold mt-2">Enterprise-wide marketing performance</CardDescription>
-                    </div>
+                  <CardHeader className="border-b border-border pb-6">
+                    <CardTitle className="font-headline text-2xl font-bold text-white">Active Campaigns</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-8">
-                    <div className="space-y-6">
-                      {CAMPAIGNS.map(c => (
+                    <div className="space-y-4">
+                      {campaigns.map(c => (
                         <div key={c.id} className="flex items-center justify-between p-6 bg-muted/20 border border-border/20 group hover:border-primary/40 transition-all">
                           <div className="flex items-center space-x-6">
-                            <div className={cn("p-4", c.type === 'email' ? 'bg-primary/10' : c.type === 'push' ? 'bg-secondary/10' : 'bg-accent/10')}>
+                            <div className={cn("p-4", c.type === 'email' ? 'bg-primary/10' : 'bg-secondary/10')}>
                                {c.type === 'email' ? <Mail className="w-5 h-5 text-primary" /> : <Zap className="w-5 h-5 text-secondary" />}
                             </div>
                             <div>
                               <div className="font-headline text-xl font-bold text-white">{c.title}</div>
-                              <div className="flex items-center space-x-3 text-[10px] text-muted-foreground uppercase tracking-widest font-bold mt-1">
-                                <span>{c.type}</span>
-                                <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-                                <span>Region: {c.country.toUpperCase()}</span>
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mt-1">
+                                {c.status} | {COUNTRIES[c.country]?.name}
                               </div>
                             </div>
                           </div>
-                          <div className="text-right space-y-2">
-                             <div className="text-[10px] font-bold uppercase tracking-widest text-white">Reach: {c.reach.toLocaleString()}</div>
-                             <div className="flex items-center space-x-3">
-                                <Progress value={c.performance} className="w-24 h-1" />
-                                <span className="text-[10px] font-bold text-primary">{c.performance}%</span>
-                             </div>
+                          <div className="text-right">
+                             <div className="text-[10px] font-bold uppercase tracking-widest text-primary">{c.performance}% Impact</div>
+                             <Progress value={c.performance} className="w-24 h-1 mt-2" />
                           </div>
                         </div>
                       ))}
@@ -335,241 +295,167 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               </div>
-              <div className="space-y-12">
-                 <Card className="bg-card border-border shadow-2xl">
-                    <CardHeader className="border-b border-border pb-6">
-                      <CardTitle className="font-headline text-2xl font-bold text-white">Heritage Partners</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-8 pt-8">
-                      {AFFILIATES.map(a => (
-                        <div key={a.id} className="flex justify-between items-center p-4 bg-muted/20 border border-border/20">
-                          <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-white">{a.name}</div>
-                            <Badge variant="outline" className="mt-1 text-[8px] tracking-[0.2em] border-primary/40 text-primary">{a.tier}</Badge>
-                          </div>
-                          <div className="text-right">
-                             <div className="text-sm font-light text-white">${(a.salesGenerated / 1000).toFixed(1)}k</div>
-                             <div className="text-[9px] text-muted-foreground uppercase">Revenue</div>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                 </Card>
-              </div>
+              <Card className="bg-card border-border">
+                <CardHeader className="border-b border-border">
+                  <CardTitle className="font-headline text-2xl text-white">Partner Index</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                  {AFFILIATES.map(a => (
+                    <div key={a.id} className="flex justify-between items-center p-4 border border-border/20">
+                      <div>
+                        <div className="text-xs font-bold uppercase text-white">{a.name}</div>
+                        <Badge variant="outline" className="text-[8px] tracking-widest border-primary/40 text-primary mt-1">{a.tier}</Badge>
+                      </div>
+                      <div className="text-right text-xs font-light text-white">${(a.salesGenerated/1000).toFixed(0)}k</div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
 
-        {activeTab === 'analytics' && (
+        {activeTab === 'marketing' && (
           <div className="animate-fade-in space-y-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Revenue Trends */}
               <Card className="bg-card border-border shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl text-white">Global Revenue Trends</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Monthly financial performance across all hubs</CardDescription>
+                <CardHeader className="border-b border-border pb-6">
+                  <CardTitle className="font-headline text-3xl font-bold text-white flex items-center">
+                    <Target className="w-6 h-6 mr-3 text-primary" /> Global Studio
+                  </CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Orchestrate localized luxury campaigns</CardDescription>
                 </CardHeader>
-                <CardContent className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={REVENUE_TREND}>
-                      <defs>
-                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                      <Tooltip content={<ChartTooltipContent />} />
-                      <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorRevenue)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Regional Performance */}
-              <Card className="bg-card border-border shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl text-white">Regional Sales Index</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Comparative market analysis</CardDescription>
-                </CardHeader>
-                <CardContent className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={REGIONAL_PERFORMANCE}>
-                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                      <Tooltip content={<ChartTooltipContent />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-                      <Bar dataKey="sales" fill="hsl(var(--secondary))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Category Distribution */}
-              <Card className="bg-card border-border shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl text-white">Department Allocation</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Revenue distribution by luxury category</CardDescription>
-                </CardHeader>
-                <CardContent className="h-[400px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RePieChart>
-                      <Pie
-                        data={CATEGORY_DATA}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
+                <CardContent className="pt-8 space-y-8">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] uppercase tracking-widest">Internal Title</Label>
+                      <Input 
+                        value={newCampaign.title}
+                        onChange={(e) => setNewCampaign(prev => ({...prev, title: e.target.value}))}
+                        className="bg-muted/30 border-border h-12 text-sm text-white" 
+                        placeholder="e.g., Heritage Autumn Launch" 
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] uppercase tracking-widest">Medium</Label>
+                      <select 
+                        className="w-full bg-muted/30 border border-border h-12 px-4 text-sm text-white outline-none"
+                        value={newCampaign.type}
+                        onChange={(e) => setNewCampaign(prev => ({...prev, type: e.target.value as any}))}
                       >
-                        {CATEGORY_DATA.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<ChartTooltipContent />} />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </RePieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* AI Conversion Metrics */}
-              <Card className="bg-card border-border shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl text-white">AI Content Impact</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Conversion correlation for artisanal narratives</CardDescription>
-                </CardHeader>
-                <CardContent className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ReLineChart data={REVENUE_TREND}>
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
-                      <Tooltip content={<ChartTooltipContent />} />
-                      <Line type="stepAfter" dataKey="conversions" stroke="hsl(var(--accent))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--accent))' }} />
-                    </ReLineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'ai-studio' && (
-          <div className="space-y-12 animate-fade-in">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2 space-y-12">
-                <Card className="bg-card border-border shadow-2xl">
-                  <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-6">
-                    <div>
-                      <CardTitle className="font-headline text-3xl font-bold text-white">Master Content Engine</CardTitle>
-                      <CardDescription className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold mt-2">Automate artisanal narratives for the global collection</CardDescription>
+                        <option value="email">Luxury Email</option>
+                        <option value="push">Mobile Concierge (Push)</option>
+                      </select>
                     </div>
-                    <Button 
-                      onClick={handleBulkGenerate} 
-                      disabled={isGenerating}
-                      className="bg-primary hover:bg-secondary text-white rounded-none px-6 text-[10px] font-bold tracking-[0.2em]"
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] uppercase tracking-widest">Hero Selection</Label>
+                    <select 
+                      className="w-full bg-muted/30 border border-border h-12 px-4 text-sm text-white outline-none"
+                      value={newCampaign.product}
+                      onChange={(e) => setNewCampaign(prev => ({...prev, product: e.target.value}))}
                     >
-                      {isGenerating ? <RefreshCcw className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                      BULK SYNC ATELIER
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="max-h-[600px] overflow-y-auto">
-                      <table className="w-full text-left">
-                        <thead className="bg-muted/30 sticky top-0 z-10">
-                          <tr className="border-b border-border">
-                            <th className="p-6 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Product</th>
-                            <th className="p-6 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Category</th>
-                            <th className="p-6 text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Narrative Status</th>
-                            <th className="p-6 text-right text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/40">
-                          {products.slice(0, 15).map(p => (
-                            <tr key={p.id} className="hover:bg-muted/20 transition-colors">
-                              <td className="p-6">
-                                <div className="text-sm font-bold text-white">{p.name}</div>
-                                <div className="text-[10px] text-muted-foreground uppercase tracking-tighter">ID: {p.id}</div>
-                              </td>
-                              <td className="p-6">
-                                <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-primary/20 text-primary">
-                                  {p.category}
-                                </Badge>
-                              </td>
-                              <td className="p-6">
-                                <div className="flex items-center space-x-2">
-                                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                                  <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Curated</span>
-                                </div>
-                              </td>
-                              <td className="p-6 text-right">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="text-[10px] tracking-widest uppercase hover:text-primary"
-                                  onClick={() => handleGenerateDescription(p.id)}
-                                >
-                                  <RefreshCcw className="w-3 h-3 mr-2" /> Refresh
-                                </Button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      {products.slice(0, 20).map(p => (
+                        <option key={p.id} value={p.id}>{p.name} — {p.category}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-6 pt-6 border-t border-border/20">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-[10px] uppercase tracking-widest text-primary">Artisanal Copy (AI)</Label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] tracking-widest uppercase hover:text-primary"
+                        onClick={handleSuggestCopy}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
+                        Craft Narrative
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <Input 
+                      value={newCampaign.subject}
+                      onChange={(e) => setNewCampaign(prev => ({...prev, subject: e.target.value}))}
+                      className="bg-muted/30 border-border h-12 text-sm text-white italic" 
+                      placeholder="Subject Line..." 
+                    />
+                    <textarea 
+                      value={newCampaign.body}
+                      onChange={(e) => setNewCampaign(prev => ({...prev, body: e.target.value}))}
+                      className="w-full bg-muted/30 border border-border p-6 text-sm text-white font-light italic h-32 outline-none"
+                      placeholder="Narrative Body..."
+                    />
+                  </div>
+
+                  <Button 
+                    className="w-full h-16 bg-primary hover:bg-secondary text-white text-[10px] font-bold tracking-[0.3em] uppercase"
+                    onClick={handleLaunchCampaign}
+                  >
+                    DEPLOY TO {COUNTRIES[selectedCountry].name} HUB
+                  </Button>
+                </CardContent>
+              </Card>
 
               <div className="space-y-12">
                 <Card className="bg-card border-border shadow-2xl">
-                  <CardHeader className="border-b border-border pb-6">
-                    <CardTitle className="font-headline text-2xl font-bold flex items-center text-white">
-                      <History className="w-5 h-5 mr-3 text-primary" /> Atelier Log
-                    </CardTitle>
+                  <CardHeader className="border-b border-border">
+                    <CardTitle className="font-headline text-2xl text-white">Preview Lab</CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-8">
-                    <div className="space-y-6">
-                      {aiLogs.length === 0 ? (
-                        <div className="text-center py-10 text-muted-foreground italic text-xs">
-                          No recent generations recorded.
-                        </div>
-                      ) : (
-                        aiLogs.map(log => (
-                          <div key={log.id} className="p-4 bg-muted/20 border border-border/20 space-y-1 animate-fade-in">
-                            <div className="flex justify-between items-start">
-                              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{log.action}</span>
-                              <span className="text-[9px] text-muted-foreground">{log.time}</span>
-                            </div>
-                            <div className="text-xs font-light text-white italic truncate">{log.target}</div>
+                  <CardContent className="pt-8 flex justify-center">
+                    {newCampaign.type === 'push' ? (
+                      <div className="w-64 h-[450px] bg-black rounded-[3rem] border-4 border-muted/50 p-4 relative overflow-hidden">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-6 bg-black rounded-b-2xl z-10" />
+                        <div className="mt-20 space-y-4 animate-fade-in">
+                          <div className="bg-white/10 luxury-blur rounded-2xl p-4 border border-white/5 space-y-2">
+                             <div className="flex justify-between items-center">
+                               <div className="flex items-center space-x-2">
+                                 <div className="w-4 h-4 bg-primary flex items-center justify-center text-[6px] font-bold">A</div>
+                                 <span className="text-[8px] font-bold text-white/60">AMARISÉ</span>
+                               </div>
+                               <span className="text-[8px] text-white/40">Now</span>
+                             </div>
+                             <div className="text-[10px] font-bold text-white">{newCampaign.subject || "Luxury Awaits"}</div>
+                             <div className="text-[9px] text-white/80 line-clamp-2 italic">{newCampaign.body || "A bespoke notification for the discerning individual."}</div>
                           </div>
-                        ))
-                      )}
-                    </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full max-w-md aspect-[3/4] bg-white text-black p-10 space-y-8 shadow-2xl overflow-hidden">
+                        <div className="text-center font-headline text-2xl tracking-tighter border-b border-black/10 pb-4">AMARISÉ <span className="text-gray-400 font-normal text-sm">LUXE</span></div>
+                        <div className="space-y-4 text-center">
+                          <h4 className="text-xl font-headline italic">{newCampaign.subject || "Your Private Invitation"}</h4>
+                          <div className="w-full aspect-video bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 uppercase tracking-widest italic">Artisanal Visual</div>
+                          <p className="text-xs font-light leading-relaxed italic text-gray-600">
+                            {newCampaign.body || "We invite you to experience the pinnacle of global craft, tailored exclusively for our clients."}
+                          </p>
+                          <div className="pt-6">
+                            <div className="inline-block bg-black text-white px-8 py-3 text-[8px] font-bold tracking-widest uppercase">Explore Gallery</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
                 <Card className="bg-primary/5 border-primary/20">
                   <CardHeader>
-                    <CardTitle className="text-xs uppercase tracking-[0.2em] font-bold text-primary">AI Control Panel</CardTitle>
+                    <CardTitle className="text-xs font-bold uppercase tracking-widest text-primary flex items-center">
+                      <Clock className="w-4 h-4 mr-2" /> Distribution Queue
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                     <div className="space-y-2">
-                        <label className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground">Regional Tone</label>
-                        <select className="w-full bg-muted/50 border border-border h-10 px-4 text-[10px] font-bold uppercase tracking-widest outline-none text-white">
-                          <option>Sophisticated Parisian</option>
-                          <option>Modern Minimalist</option>
-                          <option>Heritage Storyteller</option>
-                        </select>
-                     </div>
-                     <div className="space-y-2">
-                        <label className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground">Creativity Index</label>
-                        <Progress value={75} className="h-1 bg-muted" />
-                     </div>
-                     <Button className="w-full h-12 bg-white text-black hover:bg-primary hover:text-white rounded-none text-[10px] font-bold tracking-[0.2em]">
-                       RE-INDEX RECOMMENDATIONS
-                     </Button>
+                  <CardContent className="space-y-4">
+                    {campaigns.filter(c => c.status === 'scheduled').map(c => (
+                      <div key={c.id} className="p-4 bg-muted/20 border border-border/20 flex justify-between items-center">
+                        <div>
+                          <div className="text-[10px] font-bold text-white uppercase">{c.title}</div>
+                          <div className="text-[8px] text-muted-foreground uppercase">{c.type} | {COUNTRIES[c.country]?.name}</div>
+                        </div>
+                        <Badge variant="outline" className="text-[8px] border-primary/40 text-primary">Pending</Badge>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               </div>

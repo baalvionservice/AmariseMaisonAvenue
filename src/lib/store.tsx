@@ -2,29 +2,34 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { CartItem, Product, Collection, Category } from './types';
-import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES } from './mock-data';
+import { CartItem, Product, Collection, Category, Campaign, Affiliate, Notification } from './types';
+import { 
+  PRODUCTS as INITIAL_PRODUCTS, 
+  COLLECTIONS as INITIAL_COLLECTIONS, 
+  CATEGORIES as INITIAL_CATEGORIES,
+  CAMPAIGNS as INITIAL_CAMPAIGNS,
+  AFFILIATES as INITIAL_AFFILIATES,
+  NOTIFICATIONS as INITIAL_NOTIFICATIONS
+} from './mock-data';
 
-/**
- * AppState Interface
- * Extended to include live management of products and collections for the AI Engine.
- */
 interface AppContextType {
   cart: CartItem[];
   wishlist: Product[];
   products: Product[];
   collections: Collection[];
   categories: Category[];
+  campaigns: Campaign[];
+  affiliates: Affiliate[];
+  notifications: Notification[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: Product) => void;
   clearCart: () => void;
-  // AI Engine Updates
   updateProductDescription: (productId: string, description: string) => void;
   updateCollectionNarrative: (collectionId: string, narrative: string) => void;
-  updateCategoryNarrative: (categoryId: string, narrative: string) => void;
-  // Mock Security/Auth placeholders
+  addCampaign: (campaign: Campaign) => void;
+  addNotification: (notification: Notification) => void;
   user: any | null; 
   isAuthenticated: boolean;
 }
@@ -37,22 +42,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [collections, setCollections] = useState<Collection[]>(INITIAL_COLLECTIONS);
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
+  const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(INITIAL_AFFILIATES);
+  const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   
   const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const savedCart = localStorage.getItem('amarise_cart');
     const savedWishlist = localStorage.getItem('amarise_wishlist');
-    const savedProducts = localStorage.getItem('amarise_live_products');
-    
     if (savedCart) {
-      try { setCart(JSON.parse(savedCart)); } catch (e) { console.warn("Cart recovery failed"); }
+      try { setCart(JSON.parse(savedCart)); } catch (e) {}
     }
     if (savedWishlist) {
-      try { setWishlist(JSON.parse(savedWishlist)); } catch (e) { console.warn("Wishlist recovery failed"); }
-    }
-    if (savedProducts) {
-      try { setProducts(JSON.parse(savedProducts)); } catch (e) { console.warn("Product sync failed"); }
+      try { setWishlist(JSON.parse(savedWishlist)); } catch (e) {}
     }
   }, []);
 
@@ -63,10 +66,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
-
-  useEffect(() => {
-    localStorage.setItem('amarise_live_products', JSON.stringify(products));
-  }, [products]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -112,9 +111,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCollections(prev => prev.map(c => c.id === collectionId ? { ...c, description: narrative } : c));
   };
 
-  const updateCategoryNarrative = (categoryId: string, narrative: string) => {
-    // Categories are more static in our mock-data, but we simulate updating their metadata
-    console.log(`Updated category ${categoryId} with narrative: ${narrative.substring(0, 50)}...`);
+  const addCampaign = (campaign: Campaign) => {
+    setCampaigns(prev => [campaign, ...prev]);
+  };
+
+  const addNotification = (notification: Notification) => {
+    setNotifications(prev => [notification, ...prev]);
   };
 
   const value = useMemo(() => ({
@@ -123,6 +125,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     products,
     collections,
     categories,
+    campaigns,
+    affiliates,
+    notifications,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -130,10 +135,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     clearCart,
     updateProductDescription,
     updateCollectionNarrative,
-    updateCategoryNarrative,
+    addCampaign,
+    addNotification,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, user]);
 
   return (
     <AppContext.Provider value={value}>
