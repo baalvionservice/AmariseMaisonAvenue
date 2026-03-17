@@ -1,130 +1,38 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo, City, BuyingGuide } from './types';
+import { Country, Product, Category, Department, Collection, City, BuyingGuide, Editorial, MaisonStory, CustomerServiceInfo, VipClient } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
-  us: { 
-    code: 'us', 
-    name: 'United States', 
-    currency: 'USD', 
-    symbol: '$', 
-    locale: 'en-US',
-    office: {
-      city: 'New York',
-      address: '730 Fifth Avenue, New York, NY 10019',
-      phone: '+1 (212) 555-0192',
-      email: 'concierge.us@amarise-luxe.com',
-      mapUrl: 'https://maps.google.com/?q=730+Fifth+Avenue+New+York',
-      image: 'https://picsum.photos/seed/amarise-ny/1200/800',
-    }
-  },
-  uk: { 
-    code: 'uk', 
-    name: 'United Kingdom', 
-    currency: 'GBP', 
-    symbol: '£', 
-    locale: 'en-GB',
-    office: {
-      city: 'London',
-      address: '17-18 Old Bond Street, London W1S 4PT',
-      phone: '+44 20 7555 0192',
-      email: 'concierge.uk@amarise-luxe.com',
-      mapUrl: 'https://maps.google.com/?q=Old+Bond+Street+London',
-      image: 'https://picsum.photos/seed/amarise-london/1200/800',
-    }
-  },
-  ae: { 
-    code: 'ae', 
-    name: 'United Arab Emirates', 
-    currency: 'AED', 
-    symbol: 'د.إ', 
-    locale: 'ar-AE',
-    office: {
-      city: 'Dubai',
-      address: 'The Dubai Mall, Fashion Avenue, Downtown Dubai',
-      phone: '+971 4 555 0192',
-      email: 'concierge.ae@amarise-luxe.com',
-      mapUrl: 'https://maps.google.com/?q=Dubai+Mall+Fashion+Avenue',
-      image: 'https://picsum.photos/seed/amarise-dubai/1200/800',
-    }
-  },
-  in: { 
-    code: 'in', 
-    name: 'India', 
-    currency: 'INR', 
-    symbol: '₹', 
-    locale: 'en-IN',
-    office: {
-      city: 'Mumbai',
-      address: 'Jio World Centre, BKC, Mumbai, Maharashtra 400051',
-      phone: '+91 22 5555 0192',
-      email: 'concierge.in@amarise-luxe.com',
-      mapUrl: 'https://maps.google.com/?q=Jio+World+Centre+Mumbai',
-      image: 'https://picsum.photos/seed/amarise-mumbai/1200/800',
-    }
-  },
-  sg: { 
-    code: 'sg', 
-    name: 'Singapore', 
-    currency: 'SGD', 
-    symbol: 'S$', 
-    locale: 'en-SG',
-    office: {
-      city: 'Singapore',
-      address: '2 Bayfront Ave, Marina Bay Sands, Singapore 018972',
-      phone: '+65 6555 0192',
-      email: 'concierge.sg@amarise-luxe.com',
-      mapUrl: 'https://maps.google.com/?q=Marina+Bay+Sands+Singapore',
-      image: 'https://picsum.photos/seed/amarise-sg/1200/800',
-    }
-  },
+  us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US', office: { city: 'New York', address: '730 Fifth Avenue, New York, NY 10019', phone: '+1 (212) 555-0192', email: 'concierge.us@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=730+Fifth+Avenue+New+York', image: 'https://picsum.photos/seed/amarise-ny/1200/800' } },
+  uk: { code: 'uk', name: 'United Kingdom', currency: 'GBP', symbol: '£', locale: 'en-GB', office: { city: 'London', address: '17-18 Old Bond Street, London W1S 4PT', phone: '+44 20 7555 0192', email: 'concierge.uk@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=Old+Bond+Street+London', image: 'https://picsum.photos/seed/amarise-london/1200/800' } },
+  ae: { code: 'ae', name: 'United Arab Emirates', currency: 'AED', symbol: 'د.إ', locale: 'ar-AE', office: { city: 'Dubai', address: 'The Dubai Mall, Fashion Avenue, Downtown Dubai', phone: '+971 4 555 0192', email: 'concierge.ae@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=Dubai+Mall+Fashion+Avenue', image: 'https://picsum.photos/seed/amarise-dubai/1200/800' } },
+  in: { code: 'in', name: 'India', currency: 'INR', symbol: '₹', locale: 'en-IN', office: { city: 'Mumbai', address: 'Jio World Centre, BKC, Mumbai, Maharashtra 400051', phone: '+91 22 5555 0192', email: 'concierge.in@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=Jio+World+Centre+Mumbai', image: 'https://picsum.photos/seed/amarise-mumbai/1200/800' } },
+  sg: { code: 'sg', name: 'Singapore', currency: 'SGD', symbol: 'S$', locale: 'en-SG', office: { city: 'Singapore', address: '2 Bayfront Ave, Marina Bay Sands, Singapore 018972', phone: '+65 6555 0192', email: 'concierge.sg@amarise-luxe.com', mapUrl: 'https://maps.google.com/?q=Marina+Bay+Sands+Singapore', image: 'https://picsum.photos/seed/amarise-sg/1200/800' } },
 };
 
-export const CITIES: City[] = [
-  { id: 'new-york', name: 'New York', countryCode: 'us', description: 'The global pulse of contemporary luxury.', heroImage: 'https://picsum.photos/seed/nyc-luxe/2560/1440', featuredCollections: ['heritage', 'spring-24'], featuredProducts: ['prod-1', 'prod-2', 'prod-3'], office: COUNTRIES.us.office!, trends: [{ title: 'Fifth Avenue Minimalism', description: 'Monochrome tailoring meets architectural jewelry.' }, { title: 'The Gallery Edit', description: 'Bespoke leather accessories for the modern art connoisseur.' }] },
-  { id: 'los-angeles', name: 'Los Angeles', countryCode: 'us', description: 'Cinematic elegance and sun-drenched sophistication.', heroImage: 'https://picsum.photos/seed/la-luxe/2560/1440', featuredCollections: ['spring-24', 'nocturnal'], featuredProducts: ['prod-4', 'prod-5'], office: { ...COUNTRIES.us.office!, city: 'Beverly Hills', address: 'Rodeo Drive, Beverly Hills, CA 90210' }, trends: [{ title: 'Pacific Riviera', description: 'Lightweight silk heritage scarves and oversized eyewear.' }] },
-  { id: 'miami', name: 'Miami', countryCode: 'us', description: 'Art Deco vibrance meets high-end resort living.', heroImage: 'https://picsum.photos/seed/miami-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-6'], office: { ...COUNTRIES.us.office!, city: 'Design District', address: 'NE 40th St, Miami, FL 33137' }, trends: [] },
-  { id: 'chicago', name: 'Chicago', countryCode: 'us', description: 'The architectural heart of American luxury.', heroImage: 'https://picsum.photos/seed/chi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-7'], office: { ...COUNTRIES.us.office!, city: 'Magnificent Mile', address: 'N Michigan Ave, Chicago, IL 60611' }, trends: [] },
-  { id: 'san-francisco', name: 'San Francisco', countryCode: 'us', description: 'Innovating the future of the heritage aesthetic.', heroImage: 'https://picsum.photos/seed/sf-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-8'], office: { ...COUNTRIES.us.office!, city: 'Union Square', address: 'Post St, San Francisco, CA 94108' }, trends: [] },
-  { id: 'london', name: 'London', countryCode: 'uk', description: 'The intersection of royal heritage and avant-garde craft.', heroImage: 'https://picsum.photos/seed/london-luxe/2560/1440', featuredCollections: ['heritage', 'nocturnal'], featuredProducts: ['prod-10', 'prod-11'], office: COUNTRIES.uk.office!, trends: [{ title: 'Mayfair Tradition', description: 'Bespoke Savile Row-inspired outerwear.' }] },
-  { id: 'manchester', name: 'Manchester', countryCode: 'uk', description: 'Industrial legacy reimagined for the modern connoisseur.', heroImage: 'https://picsum.photos/seed/mcr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-12'], office: { ...COUNTRIES.uk.office!, city: 'Spinningfields', address: 'The Avenue, Manchester M3 3FL' }, trends: [] },
-  { id: 'edinburgh', name: 'Edinburgh', countryCode: 'uk', description: 'Historic grandeur and artisanal resilience.', heroImage: 'https://picsum.photos/seed/edi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-13'], office: { ...COUNTRIES.uk.office!, city: 'Multrees Walk', address: 'St Andrew Sq, Edinburgh EH1 3DQ' }, trends: [] },
-  { id: 'birmingham', name: 'Birmingham', countryCode: 'uk', description: 'The artisanal heart of the British Midlands.', heroImage: 'https://picsum.photos/seed/bhx-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-14'], office: { ...COUNTRIES.uk.office!, city: 'Mailbox', address: 'Royal Mail St, Birmingham B1 1RD' }, trends: [] },
-  { id: 'glasgow', name: 'Glasgow', countryCode: 'uk', description: 'The architectural spirit of the North.', heroImage: 'https://picsum.photos/seed/gla-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-15'], office: { ...COUNTRIES.uk.office!, city: 'Buchanan St', address: 'Glasgow G1 3HL' }, trends: [] },
-  { id: 'dubai', name: 'Dubai', countryCode: 'ae', description: 'Where gravity-defying ambition meets ancient gold.', heroImage: 'https://picsum.photos/seed/dxb-luxe/2560/1440', featuredCollections: ['privé-watches', 'heritage'], featuredProducts: ['prod-20', 'prod-21'], office: COUNTRIES.ae.office!, trends: [{ title: 'Desert Rose Gold', description: 'High-jewelry inspired by the Arabian dawn.' }] },
-  { id: 'abu-dhabi', name: 'Abu Dhabi', countryCode: 'ae', description: 'Cultural preservation and palatial elegance.', heroImage: 'https://picsum.photos/seed/auh-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-22'], office: { ...COUNTRIES.ae.office!, city: 'Galleria', address: 'Al Maryah Island, Abu Dhabi' }, trends: [] },
-  { id: 'sharjah', name: 'Sharjah', countryCode: 'ae', description: 'The intellectual soul of the Emirates.', heroImage: 'https://picsum.photos/seed/shj-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-23'], office: { ...COUNTRIES.ae.office!, city: 'University City', address: 'Sharjah, UAE' }, trends: [] },
-  { id: 'al-ain', name: 'Al Ain', countryCode: 'ae', description: 'The oasis of heritage and tranquility.', heroImage: 'https://picsum.photos/seed/aln-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-24'], office: { ...COUNTRIES.ae.office!, city: 'Al Ain Mall', address: 'Al Ain, UAE' }, trends: [] },
-  { id: 'ras-al-khaimah', name: 'Ras Al Khaimah', countryCode: 'ae', description: 'The untamed luxury of the northern mountains.', heroImage: 'https://picsum.photos/seed/rak-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-25'], office: { ...COUNTRIES.ae.office!, city: 'Al Marjan', address: 'RAK, UAE' }, trends: [] },
-  { id: 'mumbai', name: 'Mumbai', countryCode: 'in', description: 'The high-velocity heart of Indian Haute Couture.', heroImage: 'https://picsum.photos/seed/bom-luxe/2560/1440', featuredCollections: ['heritage', 'spring-24'], featuredProducts: ['prod-30', 'prod-31'], office: COUNTRIES.in.office!, trends: [{ title: 'Colaba Heritage', description: 'Silk-woven artifacts and temple-inspired gold.' }] },
-  { id: 'delhi', name: 'Delhi', countryCode: 'in', description: 'Imperial grandeur and contemporary political style.', heroImage: 'https://picsum.photos/seed/del-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-32'], office: { ...COUNTRIES.in.office!, city: 'Emporio', address: 'Vasant Kunj, New Delhi' }, trends: [] },
-  { id: 'bangalore', name: 'Bangalore', countryCode: 'in', description: 'Innovation meets the classic Indian aesthetic.', heroImage: 'https://picsum.photos/seed/blr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-33'], office: { ...COUNTRIES.in.office!, city: 'UB City', address: 'Vittal Mallya Rd, Bangalore' }, trends: [] },
-  { id: 'hyderabad', name: 'Hyderabad', countryCode: 'in', description: 'The city of Nizams and timeless pearl heritage.', heroImage: 'https://picsum.photos/seed/hyd-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-34'], office: { ...COUNTRIES.in.office!, city: 'Banjara Hills', address: 'Road No. 1, Hyderabad' }, trends: [] },
-  { id: 'chennai', name: 'Chennai', countryCode: 'in', description: 'The artistic soul of Southern Indian craft.', heroImage: 'https://picsum.photos/seed/maa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-35'], office: { ...COUNTRIES.in.office!, city: 'Nungambakkam', address: 'Khader Nawaz Khan Rd, Chennai' }, trends: [] },
-  { id: 'orchard-road', name: 'Orchard Road', countryCode: 'sg', description: 'The world-renowned avenue of high-end discovery.', heroImage: 'https://picsum.photos/seed/orchard-luxe/2560/1440', featuredCollections: ['spring-24', 'heritage'], featuredProducts: ['prod-40', 'prod-41'], office: COUNTRIES.sg.office!, trends: [{ title: 'Tropical Sophisticate', description: 'Linen-silk blends and marine-grade complications.' }] },
-  { id: 'marina-bay', name: 'Marina Bay', countryCode: 'sg', description: 'Futuristic architectural excellence.', heroImage: 'https://picsum.photos/seed/mbs-luxe/2560/1440', featuredCollections: ['privé-watches'], featuredProducts: ['prod-42'], office: { ...COUNTRIES.sg.office!, city: 'MBS South', address: 'Marina Bay Sands Level 1' }, trends: [] },
-  { id: 'sentosa', name: 'Sentosa', countryCode: 'sg', description: 'Elite island living and private resort luxury.', heroImage: 'https://picsum.photos/seed/sentosa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-43'], office: { ...COUNTRIES.sg.office!, city: 'Sentosa Cove', address: 'Quayside Isle, Singapore' }, trends: [] },
-  { id: 'bugis', name: 'Bugis', countryCode: 'sg', description: 'Heritage blocks and artisanal vibrance.', heroImage: 'https://picsum.photos/seed/bugis-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-44'], office: { ...COUNTRIES.sg.office!, city: 'Victoria St', address: 'Singapore 188067' }, trends: [] },
-  { id: 'raffles-place', name: 'Raffles Place', countryCode: 'sg', description: 'The financial heart with a heritage pulse.', heroImage: 'https://picsum.photos/seed/raffles-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-45'], office: { ...COUNTRIES.sg.office!, city: 'Battery Rd', address: 'Singapore 049909' }, trends: [] },
+export const DEPARTMENTS: Department[] = [
+  { id: 'women', name: 'Women', description: 'The peak of feminine elegance.', imageUrl: 'https://picsum.photos/seed/amarise-women/1920/1080', categories: ['w-couture', 'w-bags', 'w-shoes', 'w-accessories'] },
+  { id: 'men', name: 'Men', description: 'Crafted for the modern aristocrat.', imageUrl: 'https://picsum.photos/seed/amarise-men/1920/1080', categories: ['m-tailoring', 'm-shoes', 'm-outerwear', 'm-accessories'] },
+  { id: 'kids', name: 'Kids', description: 'Junior couture heritage.', imageUrl: 'https://picsum.photos/seed/amarise-kids/1920/1080', categories: ['k-junior', 'k-gifts'] },
+  { id: 'jewelry', name: 'Jewelry', description: 'Artifacts of light and stone.', imageUrl: 'https://picsum.photos/seed/amarise-jewelry/1920/1080', categories: ['j-high', 'j-gold', 'j-diamonds'] },
+  { id: 'watches', name: 'Watches', description: 'Precision for eternity.', imageUrl: 'https://picsum.photos/seed/amarise-watches/1920/1080', categories: ['wa-complications', 'wa-heritage'] },
+  { id: 'beauty', name: 'Beauty', description: 'Elite skincare rituals.', imageUrl: 'https://picsum.photos/seed/amarise-beauty/1920/1080', categories: ['b-fragrance', 'b-skincare'] },
+  { id: 'lifestyle', name: 'Lifestyle', description: 'The spirit of the Maison.', imageUrl: 'https://picsum.photos/seed/amarise-life/1920/1080', categories: ['l-objects', 'l-wellness'] },
+  { id: 'home', name: 'Home', description: 'Sculptural sanctuary decor.', imageUrl: 'https://picsum.photos/seed/amarise-home/1920/1080', categories: ['h-decor', 'h-textiles'] },
+  { id: 'travel', name: 'Travel', description: 'Bespoke global discovery.', imageUrl: 'https://picsum.photos/seed/amarise-travel/1920/1080', categories: ['t-luggage', 't-acc'] },
+  { id: 'accessories', name: 'Accessories', description: 'Defining the Maison.', imageUrl: 'https://picsum.photos/seed/amarise-acc/1920/1080', categories: ['a-leather', 'a-silk'] },
 ];
 
 export const CATEGORIES: Category[] = [
-  { id: 'women', name: 'Women', description: 'Experience the pinnacle of feminine elegance.', subcategories: ['Haute Couture', 'Evening Wear', 'Signature Bags', 'Silk Series', 'Lace Series'] },
-  { id: 'men', name: 'Men', description: 'Crafted for the modern aristocrat.', subcategories: ['Bespoke Tailoring', 'Heritage Shoes', 'Luxury Outerwear', 'Cashmere Series', 'Leather Series'] },
-  { id: 'jewelry', name: 'Jewelry', description: 'Rare artifacts of light and stone.', subcategories: ['High Jewelry', 'Bespoke Rings', 'Gold Series', 'Diamond Series', 'Heritage Gems'] },
-  { id: 'watches', name: 'Watches', description: 'Precision engineered for eternity.', subcategories: ['Grand Complications', 'Heritage Watches', 'Marine Series', 'Pilot Series', 'Skeleton Series'] },
-  { id: 'accessories', name: 'Accessories', description: 'The details that define the Maison.', subcategories: ['Exotic Leather', 'Silk Scarves', 'Eyewear', 'Belts', 'Travel Kits'] },
-  { id: 'kids', name: 'Kids', description: 'Junior couture for the next generation.', subcategories: ['Junior Heritage', 'Luxe Play', 'Ceremony', 'Newborn', 'Signature Gifts'] },
-  { id: 'beauty', name: 'Beauty', description: 'Scented artifacts and elite skincare.', subcategories: ['Atelier Fragrance', 'Elite Serum', 'Lipstick Library', 'Skincare Rituals', 'Bath & Body'] },
-  { id: 'lifestyle', name: 'Lifestyle', description: 'The spirit of the Maison in every object.', subcategories: ['Exclusive Gear', 'Artisanal Gifts', 'Stationery', 'Wellness', 'Pet Luxury'] },
-  { id: 'home', name: 'Home', description: 'Sculptural decor for your sanctuary.', subcategories: ['Heritage Decor', 'Fragrance Diffusers', 'Textiles', 'Tableware', 'Objet d\'Art'] },
-  { id: 'travel', name: 'Travel', description: 'Luxury luggage for global connoisseurs.', subcategories: ['Bespoke Trunks', 'Carry-on', 'Suitcases', 'Weekenders', 'Travel Accessories'] },
+  { id: 'w-couture', departmentId: 'women', name: 'Haute Couture', subcategories: ['Evening Gowns', 'Cocktail Dresses', 'Silk Separates'] },
+  { id: 'w-bags', departmentId: 'women', name: 'Signature Bags', subcategories: ['Top Handle', 'Clutches', 'Exotic Series'] },
+  { id: 'm-tailoring', departmentId: 'men', name: 'Bespoke Tailoring', subcategories: ['Heritage Suits', 'Luxury Blazers', 'Trousers'] },
+  { id: 'j-high', departmentId: 'jewelry', name: 'High Jewelry', subcategories: ['Rare Gems', 'Atelier Necklaces', 'Earrings'] },
+  { id: 'wa-complications', departmentId: 'watches', name: 'Grand Complications', subcategories: ['Tourbillons', 'Perpetual Calendars'] },
 ];
 
 export const COLLECTIONS: Collection[] = [
-  { id: 'spring-24', name: 'Spring/Summer 2024', description: 'Lightweight elegance for the modern aristocrat. Inspired by the soft hues of a Mediterranean dawn.', imageUrl: 'https://picsum.photos/seed/spring24-luxe/1920/1080' },
-  { id: 'heritage', name: 'The Heritage Line', description: 'Timeless pieces that define generations. A tribute to the founding year of 1924.', imageUrl: 'https://picsum.photos/seed/heritage-luxe/1920/1080' },
-  { id: 'nocturnal', name: 'Nocturnal Allure', description: 'Sophisticated evening wear and accessories for those who own the night.', imageUrl: 'https://picsum.photos/seed/nocturnal-luxe/1920/1080' },
-  { id: 'privé-watches', name: 'Watchmakers Secret', description: 'Unreleased prototypes from the Swiss high-plateau. Strictly for Bespoke tier collectors.', imageUrl: 'https://picsum.photos/seed/prive-watches/1920/1080', isPrivate: true },
+  { id: 'heritage', name: 'The Heritage Line', description: 'Founding Year 1924.', imageUrl: 'https://picsum.photos/seed/heritage/1920/1080' },
+  { id: 'spring-24', name: 'Spring Summer 2024', description: 'Mediterranean Dawn.', imageUrl: 'https://picsum.photos/seed/ss24/1920/1080' },
 ];
 
 export const COLORS = ['Ivory', 'Gold', 'Plum', 'Midnight', 'Emerald', 'Sapphire', 'Onyx'];
@@ -132,32 +40,26 @@ export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'One Size', 'Bespoke'];
 
 const generateProducts = (): Product[] => {
   const products: Product[] = [];
-  const categories = CATEGORIES;
-  const collectionIds = COLLECTIONS.map(c => c.id);
-
-  for (let i = 1; i <= 600; i++) {
-    const catObj = categories[i % categories.length];
-    const cat = catObj.name;
-    const sub = catObj.subcategories[i % catObj.subcategories.length];
-    const collIndex = i % collectionIds.length;
-    
-    const basePrice = 1200 + ((i * 19) % 35000);
-    const rating = 4.0 + ((i * 3) % 11) / 10;
-    const reviewsCount = 10 + ((i * 7) % 300);
-
+  // For the demo, we generate 1000 representative products
+  // In production, this would be fetched from a massive database
+  for (let i = 1; i <= 1000; i++) {
+    const cat = CATEGORIES[i % CATEGORIES.length];
+    const sub = cat.subcategories[i % cat.subcategories.length];
     products.push({
       id: `prod-${i}`,
-      name: `Amarisé ${sub.split(' ').slice(0, 2).join(' ')} Artifact ${i}`,
-      category: cat,
-      subcategory: sub,
-      collectionId: collectionIds[collIndex],
-      basePrice,
-      imageUrl: `https://picsum.photos/seed/amarise-product-${i}/1200/1600`,
-      isVip: i % 12 === 0,
-      rating: rating > 5 ? 5 : rating,
-      reviewsCount,
+      name: `Amarisé ${sub} Piece ${i}`,
+      departmentId: cat.departmentId,
+      categoryId: cat.id,
+      subcategoryId: sub.toLowerCase().replace(/ /g, '-'),
+      collectionId: COLLECTIONS[i % COLLECTIONS.length].id,
+      basePrice: 1500 + (i * 123) % 45000,
+      imageUrl: `https://picsum.photos/seed/amarise-p-${i}/1200/1600`,
+      isVip: i % 10 === 0,
+      rating: 4.5 + (i % 5) / 10,
+      reviewsCount: 12 + (i % 200),
       colors: [COLORS[i % COLORS.length], COLORS[(i + 1) % COLORS.length]],
-      sizes: cat === 'Watches' || cat === 'Accessories' ? ['One Size'] : [SIZES[i % SIZES.length], SIZES[(i + 1) % SIZES.length]],
+      sizes: [SIZES[i % SIZES.length], SIZES[(i + 1) % SIZES.length]],
+      stock: 1 + (i % 10),
     });
   }
   return products;
@@ -165,225 +67,41 @@ const generateProducts = (): Product[] => {
 
 export const PRODUCTS = generateProducts();
 
-export const BUYING_GUIDES: BuyingGuide[] = [
-  {
-    id: 'guide-watches',
-    title: 'The Horological Investment Guide',
-    excerpt: 'Mastering the art of selecting heritage timepieces with enduring value.',
-    content: 'Deep in the Jura Mountains, watchmaking is more than an industry—it is a spiritual pursuit. When selecting a timepiece from the Amarisé vault, one must consider not just the movement, but the provenance of the craft...',
-    tips: [
-      'Prioritize Grand Complications for long-term heritage value.',
-      'Ensure the atelier certification remains within the physical vault.',
-      'Consider the architectural symmetry of the watch face.',
-      'Seek limited edition artisanal signatures.'
-    ],
-    featuredProducts: ['prod-4', 'prod-14', 'prod-24'],
-    featuredCollections: ['privé-watches'],
-    imageUrl: 'https://picsum.photos/seed/guide-watches/1600/900',
-    category: 'Watches',
-    country: 'us',
-    date: '2024-03-10',
-    author: 'Elena Vance'
-  },
-  {
-    id: 'guide-jewelry',
-    title: 'Rare Stones & Eternal Radiance',
-    excerpt: 'A connoisseurs journey through the Amarisé High Jewelry archives.',
-    content: 'The brilliance of a diamond is a dialogue between light and stone. In this guide, our master gemologists reveal the secrets behind the Amarisé selection process...',
-    tips: [
-      'Focus on stone clarity under the morning light.',
-      'Understand the heritage significance of the setting metal.',
-      'Coordinate jewelry with the tone of the skin and the weight of the occasion.'
-    ],
-    featuredProducts: ['prod-3', 'prod-13', 'prod-23'],
-    featuredCollections: ['heritage'],
-    imageUrl: 'https://picsum.photos/seed/guide-jewelry/1600/900',
-    category: 'Jewelry',
-    country: 'ae',
-    date: '2024-03-12',
-    author: 'Aamir Al-Farsi'
-  },
-  {
-    id: 'guide-couture',
-    title: 'The Bespoke Tailoring Manifesto',
-    excerpt: 'Navigating the world of Haute Couture and custom tailoring.',
-    content: 'A suit from the Amarisé atelier is a second skin. It is built upon the measurements of a lifetime. To wear couture is to wear a piece of history...',
-    tips: [
-      'Measure twice, cut once—the golden rule of the Paris atelier.',
-      'Select fabrics based on the climate of your global destination.',
-      'Trust the master tailor’s eye for silhouette.'
-    ],
-    featuredProducts: ['prod-1', 'prod-11', 'prod-21'],
-    featuredCollections: ['spring-24'],
-    imageUrl: 'https://picsum.photos/seed/guide-couture/1600/900',
-    category: 'Women',
-    country: 'uk',
-    date: '2024-03-15',
-    author: 'Sophia Laurent'
-  },
-  {
-    id: 'guide-leather',
-    title: 'Exotic Leathers: A Mastery of Form',
-    excerpt: 'Understanding the artisanal depth of our bespoke accessory lines.',
-    content: 'The grain of an exotic hide tells a story of survival and luxury. At Amarisé, we only source from ethical heritage farms...',
-    tips: [
-      'Inspect the stitch density—the hallmark of high-end leatherwork.',
-      'Condition your accessories quarterly with Maison-approved creams.',
-      'Store in low-humidity, temperature-controlled environments.'
-    ],
-    featuredProducts: ['prod-5', 'prod-15', 'prod-25'],
-    featuredCollections: ['heritage'],
-    imageUrl: 'https://picsum.photos/seed/guide-leather/1600/900',
-    category: 'Accessories',
-    country: 'sg',
-    date: '2024-03-18',
-    author: 'Li Wei'
-  },
-  {
-    id: 'guide-investment',
-    title: 'Curating a Luxury Asset Portfolio',
-    excerpt: 'Strategic acquisition of heritage artifacts for the modern era.',
-    content: 'In an era of flux, the tangible brilliance of an Amarisé artifact remains a pillar of stability. This guide explores the strategic acquisition of luxury goods...',
-    tips: [
-      'Diversify across categories—Jewelry, Watches, and Bespoke Art.',
-      'Retain all original provenance documentation in physical form.',
-      'Monitor global auction trends for similar artisanal markers.'
-    ],
-    featuredProducts: ['prod-10', 'prod-20', 'prod-30'],
-    featuredCollections: ['privé-watches', 'heritage'],
-    imageUrl: 'https://picsum.photos/seed/guide-investment/1600/900',
-    category: 'Lifestyle',
-    country: 'in',
-    date: '2024-03-22',
-    author: 'Vikram Mehta'
-  }
-];
-
-export const REVIEWS: Review[] = [
-  { id: 'r1', userName: 'Julian Vandervilt', rating: 5, comment: 'Absolutely divine craftsmanship. A masterpiece for any serious collector.', date: '2024-01-15' },
-  { id: 'r2', userName: 'Sophia Laurent', rating: 4, comment: 'Elegant and sophisticated. Shipping was exceptionally white-glove.', date: '2024-02-02' },
-  { id: 'r3', userName: 'Aamir Al-Farsi', rating: 5, comment: 'The pinnacle of luxury. The attention to detail is breath-taking.', date: '2024-02-18' },
-];
-
-export const CAMPAIGNS: Campaign[] = [
-  { id: 'camp-1', title: 'Spring Awakening', type: 'email', status: 'active', reach: 50000, engagement: 1500, country: 'us', performance: 85 },
-  { id: 'camp-2', title: 'Heritage Push', type: 'push', status: 'scheduled', reach: 120000, engagement: 0, country: 'uk', performance: 0 },
-];
-
-export const AFFILIATES: Affiliate[] = [
-  { id: 'aff-1', name: 'Luxe Curator', tier: 'diamond', salesGenerated: 1200000, commissionPaid: 120000, status: 'active' },
-  { id: 'aff-2', name: 'Elite Style', tier: 'gold', salesGenerated: 450000, commissionPaid: 45000, status: 'active' },
-];
-
-export const NOTIFICATIONS: Notification[] = [
-  { id: 'not-1', type: 'Email', subject: 'Your Private Invitation', recipients: 'VIP-1, VIP-2', scheduledAt: '2024-03-20', status: 'Queued' },
-];
-
-export const VIP_CLIENTS: VipClient[] = [
-  { id: 'vip-1', name: 'Alexandra Sterling', email: 'alexandra@sterling.com', tier: 'Bespoke', country: 'us', totalSpend: 850000, lastActive: '2024-03-15', assignedCollections: ['heritage', 'privé-watches'] },
-  { id: 'vip-2', name: 'Maximilian Von Haus', email: 'max@haus.de', tier: 'Platinum', country: 'uk', totalSpend: 420000, lastActive: '2024-03-12', assignedCollections: ['heritage'] },
+export const CITIES: City[] = [
+  { id: 'new-york', name: 'New York', countryCode: 'us', description: 'The global pulse.', heroImage: 'https://picsum.photos/seed/nyc/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-1', 'prod-2'], office: COUNTRIES.us.office!, trends: [{ title: 'Fifth Ave Minimalism', description: 'Monochrome tailoring.' }] },
 ];
 
 export const EDITOR_INITIAL: Editorial[] = [
-  {
-    id: 'ed-1',
-    title: 'The Architecture of Time',
-    excerpt: 'Exploring the horological heritage of the Swiss high-plateau.',
-    content: 'Deep in the Jura Mountains, where time seems to stand still, the masters of the Amarisé watchmaking atelier are crafting the next generation of grand complications...',
-    imageUrl: 'https://picsum.photos/seed/editorial-watches/1600/900',
-    category: 'Artisanal',
-    country: 'us',
-    author: 'Elena Vance',
-    date: '2024-03-01',
-    isVip: false,
-    featuredProducts: ['prod-1', 'prod-2']
-  },
-  {
-    id: 'ed-2',
-    title: 'Dubai: A Golden Dawn',
-    excerpt: 'How the desert metropolis is shaping the future of High Jewelry.',
-    content: 'As the sun rises over the Burj Khalifa, the reflection off the Amarisé flagship in the Dubai Mall signals a new era for the world of rare stones...',
-    imageUrl: 'https://picsum.photos/seed/editorial-dubai/1600/900',
-    category: 'City Edit',
-    country: 'ae',
-    author: 'Omar Al-Sayed',
-    date: '2024-03-05',
-    isVip: true,
-    featuredProducts: ['prod-5', 'prod-12']
-  }
+  { id: 'ed-1', title: 'The Architecture of Time', excerpt: 'Swiss heritage.', content: 'Long form content...', imageUrl: 'https://picsum.photos/seed/ed1/1600/900', category: 'Artisanal', country: 'us', author: 'Elena Vance', date: '2024-03-01', isVip: false, featuredProducts: ['prod-1'] },
+];
+
+export const BUYING_GUIDES: BuyingGuide[] = [
+  { id: 'bg-1', title: 'Horological Investment', excerpt: 'Mastering selection.', content: 'Guide content...', tips: ['Check movement', 'Check provenance'], featuredProducts: ['prod-1'], featuredCollections: ['heritage'], imageUrl: 'https://picsum.photos/seed/bg1/1600/900', category: 'Watches', country: 'us', date: '2024-03-10', author: 'Elena Vance' },
 ];
 
 export const MAISON_STORY: MaisonStory = {
   title: 'A Legacy of Radiance',
-  subtitle: 'Since 1924, we have curated the extraordinary.',
-  history: [
-    { year: '1924', milestone: 'The First Atelier', description: 'Founded in the heart of Paris by Henri Amarisé.' },
-    { year: '1952', milestone: 'Global Expansion', description: 'Opening the flagship on 5th Avenue, New York.' },
-    { year: '1988', milestone: 'The Grand Complication', description: 'Unveiling our first bespoke heritage timepiece.' },
-    { year: '2024', milestone: 'Centennial Excellence', description: 'Celebrating 100 years of artisanal mastery.' },
-  ],
-  philosophy: 'We believe that luxury is not merely an object, but an experience of human brilliance. Every artifact is a testament to the pursuit of perfection.',
-  craftsmanship: [
-    { title: 'Haute Couture', description: 'Hand-sewn by master tailors with decades of experience.', imageUrl: 'https://picsum.photos/seed/craft-couture/1200/800' },
-    { title: 'Fine Jewelry', description: 'Rare stones ethically sourced from the world\'s most remote mines.', imageUrl: 'https://picsum.photos/seed/craft-jewelry/1200/800' },
-  ],
-  sustainability: 'Our commitment is to preserve the earth that provides our materials and the cultures that provide our inspiration.'
+  subtitle: 'Since 1924.',
+  history: [{ year: '1924', milestone: 'The First Atelier', description: 'Founded in Paris.' }],
+  philosophy: 'Luxury is human brilliance.',
+  craftsmanship: [{ title: 'Haute Couture', description: 'Hand-sewn.', imageUrl: 'https://picsum.photos/seed/craft1/1200/800' }],
+  sustainability: 'Preserving the earth.'
 };
 
 export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
-  us: {
-    shipping: 'Complimentary white-glove shipping within the continental United States. Delivery within 2-3 business hours for local NYC residents.',
-    returns: '30-day artisanal returns policy for unused and unsealed items.',
-    faqs: [
-      { question: 'How do I book a private viewing?', answer: 'Please contact our New York concierge at +1 (212) 555-0192.' },
-    ]
-  },
-  uk: {
-    shipping: 'Next-day courier service across the United Kingdom. International shipping to Europe within 48 hours.',
-    returns: 'Complimentary returns within 30 days for all heritage artifacts.',
-    faqs: [
-      { question: 'Do you offer tailoring services?', answer: 'Yes, our Bond Street atelier provides full bespoke tailoring.' },
-    ]
-  },
-  ae: {
-    shipping: 'Same-day white-glove delivery in Dubai and Abu Dhabi.',
-    returns: '30-day exchange or return for all luxury boutique items.',
-    faqs: [
-      { question: 'Where is your Dubai boutique?', answer: 'We are located on Fashion Avenue in The Dubai Mall.' },
-    ]
-  },
-  in: {
-    shipping: 'Global standard shipping with local courier partnerships across major metropolitan hubs.',
-    returns: '15-day artisanal inspection and return window.',
-    faqs: [
-      { question: 'Are prices inclusive of taxes?', answer: 'Yes, all displayed prices include relevant local duties and taxes.' },
-    ]
-  },
-  sg: {
-    shipping: 'Complimentary white-glove delivery across Singapore.',
-    returns: '30-day hassle-free return for boutique-sealed items.',
-    faqs: [
-      { question: 'Can I pick up in-store?', answer: 'Yes, visit our Marina Bay Sands boutique for click-and-collect.' },
-    ]
-  },
-};
-
-export const getLocalizedMockText = (text: string, countryCode: string) => {
-  if (countryCode === 'ae') return `[Localized UAE] ${text}`;
-  if (countryCode === 'sg') return `[Localized SG] ${text}`;
-  if (countryCode === 'in') return `[Localized IN] ${text}`;
-  if (countryCode === 'uk') return `[Localized UK] ${text}`;
-  return text;
+  us: { shipping: 'White-glove delivery.', returns: '30-day policy.', faqs: [{ question: 'Book a viewing?', answer: 'Contact concierge.' }] }
 };
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
   const country = COUNTRIES[countryCode] || COUNTRIES.us;
   const rates: Record<string, number> = { us: 1, uk: 0.79, ae: 3.67, in: 83.2, sg: 1.34 };
   const converted = price * (rates[countryCode] || 1);
-  return new Intl.NumberFormat(country.locale, {
-    style: 'currency',
-    currency: country.currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(converted);
+  return new Intl.NumberFormat(country.locale, { style: 'currency', currency: country.currency, maximumFractionDigits: 0 }).format(converted);
 };
+
+export const getLocalizedMockText = (text: string, countryCode: string) => text;
+
+export const VIP_CLIENTS: VipClient[] = [];
+export const AFFILIATES: any[] = [];
+export const CAMPAIGNS: any[] = [];
+export const NOTIFICATIONS: any[] = [];

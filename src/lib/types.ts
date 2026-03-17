@@ -34,19 +34,35 @@ export interface Country {
   office?: Office;
 }
 
+export interface Subcategory {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
   description?: string;
   imageUrl?: string;
   subcategories: string[];
+  departmentId: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  categories: string[]; // Category IDs
 }
 
 export interface Product {
   id: string;
   name: string;
-  category: string;
-  subcategory: string;
+  departmentId: string;
+  categoryId: string;
+  subcategoryId: string;
   collectionId: string;
   basePrice: number;
   imageUrl: string;
@@ -55,62 +71,20 @@ export interface Product {
   reviewsCount: number;
   colors?: string[];
   sizes?: string[];
+  stock: number;
 }
 
 export interface CartItem extends Product {
   quantity: number;
 }
 
-export interface Review {
-  id: string;
-  userName: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
-
-export interface Campaign {
-  id: string;
-  title: string;
-  type: 'email' | 'push' | 'social';
-  status: 'draft' | 'scheduled' | 'active' | 'completed';
-  reach: number;
-  engagement: number;
-  country: string;
-  performance: number;
-  subject?: string;
-  body?: string;
-  scheduledAt?: string;
-}
-
-export interface Affiliate {
+export interface Collection {
   id: string;
   name: string;
-  tier: 'silver' | 'gold' | 'diamond';
-  salesGenerated: number;
-  commissionPaid: number;
-  status: 'active' | 'pending' | 'on_hold';
-}
-
-export interface Notification {
-  id: string;
-  type: 'Email' | 'Push';
-  subject: string;
-  body?: string;
-  recipients: string;
-  scheduledAt: string;
-  status: 'Queued' | 'Sent' | 'Failed';
-}
-
-export interface VipClient {
-  id: string;
-  name: string;
-  email: string;
-  tier: 'Gold' | 'Platinum' | 'Bespoke';
-  country: string;
-  totalSpend: number;
-  lastActive: string;
-  assignedCollections: string[];
+  description: string;
+  imageUrl: string;
+  departmentId?: string;
+  isPrivate?: boolean;
 }
 
 export interface Editorial {
@@ -154,7 +128,6 @@ export interface SocialInteraction {
   type: 'like' | 'share' | 'comment';
   country: string;
   timestamp: string;
-  commentText?: string;
 }
 
 export interface MaisonStory {
