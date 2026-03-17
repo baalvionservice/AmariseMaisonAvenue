@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 /**
  * HomePage: The Cinematic Flagship.
  * Optimized for LCP and visual impact with localized AI curation and multi-language support.
+ * Uses priority loading for the hero to satisfy Core Web Vitals.
  */
 export default function HomePage() {
   const { country } = useParams();
@@ -45,7 +46,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-32">
-      {/* Cinematic Hero */}
+      {/* Cinematic Hero - Priority Loaded for LCP */}
       <section className="relative h-[98vh] w-full flex items-center justify-center overflow-hidden">
         <Image 
           src="https://picsum.photos/seed/amarise-hero-main-hq/2560/1440" 
@@ -117,7 +118,7 @@ export default function HomePage() {
             <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
                {COLLECTIONS.filter(c => activeVip.assignedCollections.includes(c.id)).map(col => (
                  <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-video overflow-hidden border border-primary/30">
-                   <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                   <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" sizes="(max-width: 1024px) 100vw, 50vw" />
                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
                       <span className="text-primary text-[9px] font-bold tracking-[0.4em] uppercase">Private Preview</span>
@@ -150,7 +151,7 @@ export default function HomePage() {
             recommendations.map(rec => (
               <div key={rec.id} className="group space-y-6">
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted border border-border">
-                   <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                   <Image src={rec.imageUrl} alt={rec.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 33vw" />
                    <div className="absolute bottom-6 left-6 right-6 p-4 luxury-blur bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
                       <p className="text-[10px] text-white font-bold uppercase tracking-widest text-center">In Stock: {currentCountry.code.toUpperCase()}</p>
                    </div>
@@ -165,8 +166,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
-      {/* Brand chapters footer section removed for brevity as it's static */}
     </div>
   );
 }

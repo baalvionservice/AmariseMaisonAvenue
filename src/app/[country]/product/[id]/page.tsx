@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { PRODUCTS, REVIEWS, formatPrice } from '@/lib/mock-data';
@@ -81,13 +82,43 @@ export default function ProductPage() {
 
   return (
     <div className="container mx-auto px-6 py-12">
+      {/* JSON-LD Product Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": [product.imageUrl],
+            "description": aiDescription || `Exclusive ${product.category} piece from Amarisé Luxe.`,
+            "brand": {
+              "@type": "Brand",
+              "name": "AMARISÉ Luxe"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://amarise-luxe.com/${countryCode}/product/${product.id}`,
+              "priceCurrency": countryCode === 'uk' ? 'GBP' : countryCode === 'ae' ? 'AED' : 'USD',
+              "price": product.basePrice,
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating,
+              "reviewCount": product.reviewsCount
+            }
+          })
+        }}
+      />
+
       {/* Breadcrumbs */}
-      <nav className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground">
         <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Home</Link>
         <ChevronRight className="w-3 h-3" />
         <Link href={`/${countryCode}/category/${product.category.toLowerCase()}`} className="hover:text-primary transition-colors">{product.category}</Link>
         <ChevronRight className="w-3 h-3" />
-        <span className="text-foreground">{product.name}</span>
+        <span className="text-foreground" aria-current="page">{product.name}</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-20">
@@ -100,15 +131,16 @@ export default function ProductPage() {
               fill
               className="object-cover transition-transform duration-1000 group-hover:scale-110"
               priority
+              sizes="(max-width: 1024px) 100vw, 60vw"
             />
             <div className="absolute inset-0 bg-black/5 pointer-events-none" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="relative aspect-square bg-card bg-muted overflow-hidden border border-border/40">
-               <Image src={`https://picsum.photos/seed/${product.id}-alt1/800/800`} alt="Detail 1" fill className="object-cover" />
+               <Image src={`https://picsum.photos/seed/${product.id}-alt1/800/800`} alt="Detail View 1" fill className="object-cover" sizes="30vw" />
             </div>
             <div className="relative aspect-square bg-card bg-muted overflow-hidden border border-border/40">
-               <Image src={`https://picsum.photos/seed/${product.id}-alt2/800/800`} alt="Detail 2" fill className="object-cover" />
+               <Image src={`https://picsum.photos/seed/${product.id}-alt2/800/800`} alt="Detail View 2" fill className="object-cover" sizes="30vw" />
             </div>
           </div>
         </div>

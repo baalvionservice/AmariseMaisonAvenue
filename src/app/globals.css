@@ -71,6 +71,7 @@
   @apply transition-transform duration-700 ease-in-out hover:-translate-y-2;
 }
 
+/* Scrollbar Optimization */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -81,4 +82,13 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-primary/30 hover:bg-primary transition-colors;
+}
+
+/* Aspect Ratio Utility for preventing CLS */
+.aspect-luxury-card {
+  aspect-ratio: 3/4;
+}
+
+.aspect-luxury-banner {
+  aspect-ratio: 16/9;
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { memo } from 'react';
@@ -17,8 +18,8 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard optimized for high-volume enterprise rendering.
- * Wrapped in memo to prevent unnecessary re-renders during stress tests.
+ * ProductCard optimized for high-volume enterprise rendering and Core Web Vitals.
+ * Uses strict aspect-ratio to prevent Cumulative Layout Shift (CLS).
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -44,7 +45,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40 animate-fade-in">
+    <article className="group relative flex flex-col bg-card overflow-hidden transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-border/40 animate-fade-in h-full">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
         <Image 
           src={product.imageUrl} 
@@ -82,10 +83,12 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
       </Link>
       
-      <Link href={`/${countryCode}/product/${product.id}`} className="p-8 flex-1 flex flex-col space-y-4">
+      <div className="p-8 flex-1 flex flex-col space-y-4">
         <div className="space-y-1">
           <div className="text-[9px] text-primary uppercase tracking-[0.3em] font-bold">{product.category}</div>
-          <h3 className="font-headline text-xl text-foreground group-hover:text-primary transition-colors duration-500 leading-tight line-clamp-1">{product.name}</h3>
+          <Link href={`/${countryCode}/product/${product.id}`}>
+            <h3 className="font-headline text-xl text-foreground group-hover:text-primary transition-colors duration-500 leading-tight line-clamp-1">{product.name}</h3>
+          </Link>
         </div>
         
         <div className="flex items-center justify-between">
@@ -102,14 +105,14 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           </span>
         </div>
 
-        <div className="pt-4 border-t border-border/40 flex items-center justify-between">
+        <div className="pt-4 border-t border-border/40 flex items-center justify-between mt-auto">
           <span className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Atelier Paris</span>
-          <div className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+          <Link href={`/${countryCode}/product/${product.id}`} className="flex items-center text-[9px] text-primary font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
             Explore <Eye className="w-3 h-3 ml-2" />
-          </div>
+          </Link>
         </div>
-      </Link>
-    </div>
+      </div>
+    </article>
   );
 });
 

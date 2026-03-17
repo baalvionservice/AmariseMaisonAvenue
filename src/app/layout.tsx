@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
  * Features hreflang support and canonical link logic for multi-country hubs.
  */
 export const metadata: Metadata = {
-  metadataBase: new URL('https://amarise-luxe.com'), // Replace with actual production URL
+  metadataBase: new URL('https://amarise-luxe.com'),
   title: {
     default: 'AMARISÉ Luxe | The Pinnacle of Global Luxury',
     template: '%s | AMARISÉ Luxe'
@@ -66,8 +66,28 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
-        {/* Mock Security Header: Pre-connect to identity provider */}
-        <link rel="preconnect" href="https://apis.google.com" />
+        {/* JSON-LD Structured Data for the Maison */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "AMARISÉ Luxe",
+              "url": "https://amarise-luxe.com",
+              "logo": "https://picsum.photos/seed/amarise-logo/512/512",
+              "sameAs": [
+                "https://instagram.com/amariseluxe",
+                "https://twitter.com/amariseluxe"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+1-800-AMARISE",
+                "contactType": "customer service"
+              }
+            })
+          }}
+        />
       </head>
       <body className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-white">
         {children}
