@@ -1,9 +1,7 @@
-
 'use client';
 
 import React from 'react';
 import { Header } from '@/components/layout/Header';
-import { AppProvider } from '@/lib/store';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 import Link from 'next/link';
@@ -17,7 +15,7 @@ export default function CountryLayout({
   const countryCode = (country as string) || 'us';
   
   return (
-    <AppProvider>
+    <>
       <Header />
       <main className="min-h-screen pt-20 animate-fade-in relative bg-ivory">
         {children}
@@ -74,6 +72,6 @@ export default function CountryLayout({
           </div>
         </div>
       </footer>
-    </AppProvider>
+    </>
   );
 }

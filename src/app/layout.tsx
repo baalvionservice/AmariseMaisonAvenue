@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { AppProvider } from '@/lib/store';
 
 /**
  * RootLayout optimized for Global SEO and Asset Delivery.
@@ -89,7 +90,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-gold selection:text-gray-900">
-        {children}
+        <AppProvider>
+          {children}
+        </AppProvider>
         <Toaster />
       </body>
     </html>
