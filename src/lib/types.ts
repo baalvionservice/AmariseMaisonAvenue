@@ -127,6 +127,21 @@ export interface Editorial {
   featuredProducts: string[];
 }
 
+export interface BuyingGuide {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  tips: string[];
+  featuredProducts: string[];
+  featuredCollections: string[];
+  imageUrl: string;
+  category: string;
+  country: string;
+  date: string;
+  author: string;
+}
+
 export interface SocialMetrics {
   likes: number;
   shares: number;

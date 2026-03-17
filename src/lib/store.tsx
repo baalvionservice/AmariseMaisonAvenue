@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -11,6 +12,7 @@ import {
   Notification, 
   VipClient, 
   Editorial,
+  BuyingGuide,
   SocialMetrics,
   SocialInteraction
 } from './types';
@@ -22,7 +24,8 @@ import {
   AFFILIATES as INITIAL_AFFILIATES,
   NOTIFICATIONS as INITIAL_NOTIFICATIONS,
   VIP_CLIENTS as INITIAL_VIP_CLIENTS,
-  EDITOR_INITIAL
+  EDITOR_INITIAL,
+  BUYING_GUIDES as INITIAL_GUIDES
 } from './mock-data';
 
 interface AppContextType {
@@ -36,6 +39,7 @@ interface AppContextType {
   notifications: Notification[];
   vipClients: VipClient[];
   editorials: Editorial[];
+  buyingGuides: BuyingGuide[];
   activeVip: VipClient | null;
   isShowcaseMode: boolean;
   socialMetrics: Record<string, SocialMetrics>;
@@ -51,6 +55,7 @@ interface AppContextType {
   addCampaign: (campaign: Campaign) => void;
   addNotification: (notification: Notification) => void;
   addEditorial: (editorial: Editorial) => void;
+  addBuyingGuide: (guide: BuyingGuide) => void;
   setActiveVip: (client: VipClient | null) => void;
   toggleLike: (contentId: string, country: string) => void;
   trackShare: (contentId: string, country: string) => void;
@@ -72,10 +77,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   const [vipClients, setVipClients] = useState<VipClient[]>(INITIAL_VIP_CLIENTS);
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
+  const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [isShowcaseMode, setShowcaseMode] = useState<boolean>(true);
   
-  // Social State
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   const [socialInteractions, setSocialInteractions] = useState<SocialInteraction[]>([]);
 
@@ -86,6 +91,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedWishlist = localStorage.getItem('amarise_wishlist');
     const savedVipId = localStorage.getItem('amarise_active_vip');
     const savedEditorials = localStorage.getItem('amarise_editorials');
+    const savedGuides = localStorage.getItem('amarise_buying_guides');
     const savedSocial = localStorage.getItem('amarise_social_metrics');
     
     if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
@@ -95,9 +101,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (vip) setActiveVip(vip);
     }
     if (savedEditorials) try { setEditorials(JSON.parse(savedEditorials)); } catch (e) {}
+    if (savedGuides) try { setBuyingGuides(JSON.parse(savedGuides)); } catch (e) {}
     if (savedSocial) try { setSocialMetrics(JSON.parse(savedSocial)); } catch (e) {}
 
-    // Initialize metrics for existing products if not present
     if (!savedSocial) {
       const initialMetrics: Record<string, SocialMetrics> = {};
       INITIAL_PRODUCTS.forEach(p => {
@@ -114,6 +120,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => localStorage.setItem('amarise_cart', JSON.stringify(cart)), [cart]);
   useEffect(() => localStorage.setItem('amarise_wishlist', JSON.stringify(wishlist)), [wishlist]);
   useEffect(() => localStorage.setItem('amarise_editorials', JSON.stringify(editorials)), [editorials]);
+  useEffect(() => localStorage.setItem('amarise_buying_guides', JSON.stringify(buyingGuides)), [buyingGuides]);
   useEffect(() => localStorage.setItem('amarise_social_metrics', JSON.stringify(socialMetrics)), [socialMetrics]);
 
   useEffect(() => {
@@ -158,7 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const toggleLike = (contentId: string, country: string) => {
     setSocialMetrics(prev => {
       const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
-      const isLiked = wishlist.some(w => w.id === contentId); // Reuse wishlist as "liked" status for demo
+      const isLiked = wishlist.some(w => w.id === contentId);
       return {
         ...prev,
         [contentId]: {
@@ -228,6 +235,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addCampaign = (campaign: Campaign) => setCampaigns(prev => [campaign, ...prev]);
   const addNotification = (notification: Notification) => setNotifications(prev => [notification, ...prev]);
   const addEditorial = (editorial: Editorial) => setEditorials(prev => [editorial, ...prev]);
+  const addBuyingGuide = (guide: BuyingGuide) => setBuyingGuides(prev => [guide, ...prev]);
 
   const value = useMemo(() => ({
     cart,
@@ -240,6 +248,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     notifications,
     vipClients,
     editorials,
+    buyingGuides,
     activeVip,
     isShowcaseMode,
     socialMetrics,
@@ -255,13 +264,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addCampaign,
     addNotification,
     addEditorial,
+    addBuyingGuide,
     setActiveVip,
     toggleLike,
     trackShare,
     simulateGlobalEngagement,
     user,
     isAuthenticated: !!user,
-  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, editorials, activeVip, isShowcaseMode, socialMetrics, socialInteractions, user]);
+  }), [cart, wishlist, products, collections, categories, campaigns, affiliates, notifications, vipClients, editorials, buyingGuides, activeVip, isShowcaseMode, socialMetrics, socialInteractions, user]);
 
   return (
     <AppContext.Provider value={value}>

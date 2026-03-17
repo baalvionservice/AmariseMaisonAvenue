@@ -1,5 +1,5 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo, City } from './types';
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory, CustomerServiceInfo, City, BuyingGuide } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { 
@@ -80,60 +80,26 @@ export const COUNTRIES: Record<string, Country> = {
 };
 
 export const CITIES: City[] = [
-  // US Cities
-  {
-    id: 'new-york',
-    name: 'New York',
-    countryCode: 'us',
-    description: 'The global pulse of contemporary luxury.',
-    heroImage: 'https://picsum.photos/seed/nyc-luxe/2560/1440',
-    featuredCollections: ['heritage', 'spring-24'],
-    featuredProducts: ['prod-1', 'prod-2', 'prod-3'],
-    office: COUNTRIES.us.office!,
-    trends: [
-      { title: 'Fifth Avenue Minimalism', description: 'Monochrome tailoring meets architectural jewelry.' },
-      { title: 'The Gallery Edit', description: 'Bespoke leather accessories for the modern art connoisseur.' }
-    ]
-  },
-  {
-    id: 'los-angeles',
-    name: 'Los Angeles',
-    countryCode: 'us',
-    description: 'Cinematic elegance and sun-drenched sophistication.',
-    heroImage: 'https://picsum.photos/seed/la-luxe/2560/1440',
-    featuredCollections: ['spring-24', 'nocturnal'],
-    featuredProducts: ['prod-4', 'prod-5'],
-    office: { ...COUNTRIES.us.office!, city: 'Beverly Hills', address: 'Rodeo Drive, Beverly Hills, CA 90210' },
-    trends: [
-      { title: 'Pacific Riviera', description: 'Lightweight silk heritage scarves and oversized eyewear.' }
-    ]
-  },
+  { id: 'new-york', name: 'New York', countryCode: 'us', description: 'The global pulse of contemporary luxury.', heroImage: 'https://picsum.photos/seed/nyc-luxe/2560/1440', featuredCollections: ['heritage', 'spring-24'], featuredProducts: ['prod-1', 'prod-2', 'prod-3'], office: COUNTRIES.us.office!, trends: [{ title: 'Fifth Avenue Minimalism', description: 'Monochrome tailoring meets architectural jewelry.' }, { title: 'The Gallery Edit', description: 'Bespoke leather accessories for the modern art connoisseur.' }] },
+  { id: 'los-angeles', name: 'Los Angeles', countryCode: 'us', description: 'Cinematic elegance and sun-drenched sophistication.', heroImage: 'https://picsum.photos/seed/la-luxe/2560/1440', featuredCollections: ['spring-24', 'nocturnal'], featuredProducts: ['prod-4', 'prod-5'], office: { ...COUNTRIES.us.office!, city: 'Beverly Hills', address: 'Rodeo Drive, Beverly Hills, CA 90210' }, trends: [{ title: 'Pacific Riviera', description: 'Lightweight silk heritage scarves and oversized eyewear.' }] },
   { id: 'miami', name: 'Miami', countryCode: 'us', description: 'Art Deco vibrance meets high-end resort living.', heroImage: 'https://picsum.photos/seed/miami-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-6'], office: { ...COUNTRIES.us.office!, city: 'Design District', address: 'NE 40th St, Miami, FL 33137' }, trends: [] },
   { id: 'chicago', name: 'Chicago', countryCode: 'us', description: 'The architectural heart of American luxury.', heroImage: 'https://picsum.photos/seed/chi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-7'], office: { ...COUNTRIES.us.office!, city: 'Magnificent Mile', address: 'N Michigan Ave, Chicago, IL 60611' }, trends: [] },
   { id: 'san-francisco', name: 'San Francisco', countryCode: 'us', description: 'Innovating the future of the heritage aesthetic.', heroImage: 'https://picsum.photos/seed/sf-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-8'], office: { ...COUNTRIES.us.office!, city: 'Union Square', address: 'Post St, San Francisco, CA 94108' }, trends: [] },
-
-  // UK Cities
   { id: 'london', name: 'London', countryCode: 'uk', description: 'The intersection of royal heritage and avant-garde craft.', heroImage: 'https://picsum.photos/seed/london-luxe/2560/1440', featuredCollections: ['heritage', 'nocturnal'], featuredProducts: ['prod-10', 'prod-11'], office: COUNTRIES.uk.office!, trends: [{ title: 'Mayfair Tradition', description: 'Bespoke Savile Row-inspired outerwear.' }] },
   { id: 'manchester', name: 'Manchester', countryCode: 'uk', description: 'Industrial legacy reimagined for the modern connoisseur.', heroImage: 'https://picsum.photos/seed/mcr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-12'], office: { ...COUNTRIES.uk.office!, city: 'Spinningfields', address: 'The Avenue, Manchester M3 3FL' }, trends: [] },
   { id: 'edinburgh', name: 'Edinburgh', countryCode: 'uk', description: 'Historic grandeur and artisanal resilience.', heroImage: 'https://picsum.photos/seed/edi-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-13'], office: { ...COUNTRIES.uk.office!, city: 'Multrees Walk', address: 'St Andrew Sq, Edinburgh EH1 3DQ' }, trends: [] },
   { id: 'birmingham', name: 'Birmingham', countryCode: 'uk', description: 'The artisanal heart of the British Midlands.', heroImage: 'https://picsum.photos/seed/bhx-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-14'], office: { ...COUNTRIES.uk.office!, city: 'Mailbox', address: 'Royal Mail St, Birmingham B1 1RD' }, trends: [] },
   { id: 'glasgow', name: 'Glasgow', countryCode: 'uk', description: 'The architectural spirit of the North.', heroImage: 'https://picsum.photos/seed/gla-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-15'], office: { ...COUNTRIES.uk.office!, city: 'Buchanan St', address: 'Glasgow G1 3HL' }, trends: [] },
-
-  // UAE Cities
   { id: 'dubai', name: 'Dubai', countryCode: 'ae', description: 'Where gravity-defying ambition meets ancient gold.', heroImage: 'https://picsum.photos/seed/dxb-luxe/2560/1440', featuredCollections: ['privé-watches', 'heritage'], featuredProducts: ['prod-20', 'prod-21'], office: COUNTRIES.ae.office!, trends: [{ title: 'Desert Rose Gold', description: 'High-jewelry inspired by the Arabian dawn.' }] },
   { id: 'abu-dhabi', name: 'Abu Dhabi', countryCode: 'ae', description: 'Cultural preservation and palatial elegance.', heroImage: 'https://picsum.photos/seed/auh-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-22'], office: { ...COUNTRIES.ae.office!, city: 'Galleria', address: 'Al Maryah Island, Abu Dhabi' }, trends: [] },
   { id: 'sharjah', name: 'Sharjah', countryCode: 'ae', description: 'The intellectual soul of the Emirates.', heroImage: 'https://picsum.photos/seed/shj-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-23'], office: { ...COUNTRIES.ae.office!, city: 'University City', address: 'Sharjah, UAE' }, trends: [] },
   { id: 'al-ain', name: 'Al Ain', countryCode: 'ae', description: 'The oasis of heritage and tranquility.', heroImage: 'https://picsum.photos/seed/aln-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-24'], office: { ...COUNTRIES.ae.office!, city: 'Al Ain Mall', address: 'Al Ain, UAE' }, trends: [] },
   { id: 'ras-al-khaimah', name: 'Ras Al Khaimah', countryCode: 'ae', description: 'The untamed luxury of the northern mountains.', heroImage: 'https://picsum.photos/seed/rak-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-25'], office: { ...COUNTRIES.ae.office!, city: 'Al Marjan', address: 'RAK, UAE' }, trends: [] },
-
-  // India Cities
   { id: 'mumbai', name: 'Mumbai', countryCode: 'in', description: 'The high-velocity heart of Indian Haute Couture.', heroImage: 'https://picsum.photos/seed/bom-luxe/2560/1440', featuredCollections: ['heritage', 'spring-24'], featuredProducts: ['prod-30', 'prod-31'], office: COUNTRIES.in.office!, trends: [{ title: 'Colaba Heritage', description: 'Silk-woven artifacts and temple-inspired gold.' }] },
   { id: 'delhi', name: 'Delhi', countryCode: 'in', description: 'Imperial grandeur and contemporary political style.', heroImage: 'https://picsum.photos/seed/del-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-32'], office: { ...COUNTRIES.in.office!, city: 'Emporio', address: 'Vasant Kunj, New Delhi' }, trends: [] },
   { id: 'bangalore', name: 'Bangalore', countryCode: 'in', description: 'Innovation meets the classic Indian aesthetic.', heroImage: 'https://picsum.photos/seed/blr-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-33'], office: { ...COUNTRIES.in.office!, city: 'UB City', address: 'Vittal Mallya Rd, Bangalore' }, trends: [] },
   { id: 'hyderabad', name: 'Hyderabad', countryCode: 'in', description: 'The city of Nizams and timeless pearl heritage.', heroImage: 'https://picsum.photos/seed/hyd-luxe/2560/1440', featuredCollections: ['heritage'], featuredProducts: ['prod-34'], office: { ...COUNTRIES.in.office!, city: 'Banjara Hills', address: 'Road No. 1, Hyderabad' }, trends: [] },
   { id: 'chennai', name: 'Chennai', countryCode: 'in', description: 'The artistic soul of Southern Indian craft.', heroImage: 'https://picsum.photos/seed/maa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-35'], office: { ...COUNTRIES.in.office!, city: 'Nungambakkam', address: 'Khader Nawaz Khan Rd, Chennai' }, trends: [] },
-
-  // Singapore Cities (Areas)
   { id: 'orchard-road', name: 'Orchard Road', countryCode: 'sg', description: 'The world-renowned avenue of high-end discovery.', heroImage: 'https://picsum.photos/seed/orchard-luxe/2560/1440', featuredCollections: ['spring-24', 'heritage'], featuredProducts: ['prod-40', 'prod-41'], office: COUNTRIES.sg.office!, trends: [{ title: 'Tropical Sophisticate', description: 'Linen-silk blends and marine-grade complications.' }] },
   { id: 'marina-bay', name: 'Marina Bay', countryCode: 'sg', description: 'Futuristic architectural excellence.', heroImage: 'https://picsum.photos/seed/mbs-luxe/2560/1440', featuredCollections: ['privé-watches'], featuredProducts: ['prod-42'], office: { ...COUNTRIES.sg.office!, city: 'MBS South', address: 'Marina Bay Sands Level 1' }, trends: [] },
   { id: 'sentosa', name: 'Sentosa', countryCode: 'sg', description: 'Elite island living and private resort luxury.', heroImage: 'https://picsum.photos/seed/sentosa-luxe/2560/1440', featuredCollections: ['spring-24'], featuredProducts: ['prod-43'], office: { ...COUNTRIES.sg.office!, city: 'Sentosa Cove', address: 'Quayside Isle, Singapore' }, trends: [] },
@@ -141,21 +107,17 @@ export const CITIES: City[] = [
   { id: 'raffles-place', name: 'Raffles Place', countryCode: 'sg', description: 'The financial heart with a heritage pulse.', heroImage: 'https://picsum.photos/seed/raffles-luxe/2560/1440', featuredCollections: ['nocturnal'], featuredProducts: ['prod-45'], office: { ...COUNTRIES.sg.office!, city: 'Battery Rd', address: 'Singapore 049909' }, trends: [] },
 ];
 
-const generateDetailedSubcategories = (prefix: string, count: number) => {
-  return Array.from({ length: count }, (_, i) => `${prefix} Series ${i + 1}`);
-};
-
 export const CATEGORIES: Category[] = [
-  { id: 'women', name: 'Women', description: 'Experience the pinnacle of feminine elegance.', subcategories: generateDetailedSubcategories('Haute Couture', 40).concat(generateDetailedSubcategories('Evening Wear', 40)).concat(generateDetailedSubcategories('Signature Bags', 40)) },
-  { id: 'men', name: 'Men', description: 'Crafted for the modern aristocrat.', subcategories: generateDetailedSubcategories('Bespoke Tailoring', 35).concat(generateDetailedSubcategories('Heritage Shoes', 35)).concat(generateDetailedSubcategories('Luxury Outerwear', 40)) },
-  { id: 'jewelry', name: 'Jewelry', description: 'Rare artifacts of light and stone.', subcategories: generateDetailedSubcategories('High Jewelry', 50).concat(generateDetailedSubcategories('Bespoke Rings', 50)) },
-  { id: 'watches', name: 'Watches', description: 'Precision engineered for eternity.', subcategories: generateDetailedSubcategories('Grand Complications', 40).concat(generateDetailedSubcategories('Heritage Watches', 40)) },
-  { id: 'accessories', name: 'Accessories', description: 'The details that define the Maison.', subcategories: generateDetailedSubcategories('Exotic Leather', 50) },
-  { id: 'kids', name: 'Kids', description: 'Junior couture for the next generation.', subcategories: generateDetailedSubcategories('Junior Heritage', 30) },
-  { id: 'beauty', name: 'Beauty', description: 'Scented artifacts and elite skincare.', subcategories: generateDetailedSubcategories('Atelier Fragrance', 40) },
-  { id: 'lifestyle', name: 'Lifestyle', description: 'The spirit of the Maison in every object.', subcategories: generateDetailedSubcategories('Exclusive Gear', 40) },
-  { id: 'home', name: 'Home', description: 'Sculptural decor for your sanctuary.', subcategories: generateDetailedSubcategories('Heritage Decor', 50) },
-  { id: 'travel', name: 'Travel', description: 'Luxury luggage for global connoisseurs.', subcategories: generateDetailedSubcategories('Bespoke Trunks', 40) },
+  { id: 'women', name: 'Women', description: 'Experience the pinnacle of feminine elegance.', subcategories: ['Haute Couture', 'Evening Wear', 'Signature Bags', 'Silk Series', 'Lace Series'] },
+  { id: 'men', name: 'Men', description: 'Crafted for the modern aristocrat.', subcategories: ['Bespoke Tailoring', 'Heritage Shoes', 'Luxury Outerwear', 'Cashmere Series', 'Leather Series'] },
+  { id: 'jewelry', name: 'Jewelry', description: 'Rare artifacts of light and stone.', subcategories: ['High Jewelry', 'Bespoke Rings', 'Gold Series', 'Diamond Series', 'Heritage Gems'] },
+  { id: 'watches', name: 'Watches', description: 'Precision engineered for eternity.', subcategories: ['Grand Complications', 'Heritage Watches', 'Marine Series', 'Pilot Series', 'Skeleton Series'] },
+  { id: 'accessories', name: 'Accessories', description: 'The details that define the Maison.', subcategories: ['Exotic Leather', 'Silk Scarves', 'Eyewear', 'Belts', 'Travel Kits'] },
+  { id: 'kids', name: 'Kids', description: 'Junior couture for the next generation.', subcategories: ['Junior Heritage', 'Luxe Play', 'Ceremony', 'Newborn', 'Signature Gifts'] },
+  { id: 'beauty', name: 'Beauty', description: 'Scented artifacts and elite skincare.', subcategories: ['Atelier Fragrance', 'Elite Serum', 'Lipstick Library', 'Skincare Rituals', 'Bath & Body'] },
+  { id: 'lifestyle', name: 'Lifestyle', description: 'The spirit of the Maison in every object.', subcategories: ['Exclusive Gear', 'Artisanal Gifts', 'Stationery', 'Wellness', 'Pet Luxury'] },
+  { id: 'home', name: 'Home', description: 'Sculptural decor for your sanctuary.', subcategories: ['Heritage Decor', 'Fragrance Diffusers', 'Textiles', 'Tableware', 'Objet d\'Art'] },
+  { id: 'travel', name: 'Travel', description: 'Luxury luggage for global connoisseurs.', subcategories: ['Bespoke Trunks', 'Carry-on', 'Suitcases', 'Weekenders', 'Travel Accessories'] },
 ];
 
 export const COLLECTIONS: Collection[] = [
@@ -202,6 +164,100 @@ const generateProducts = (): Product[] => {
 };
 
 export const PRODUCTS = generateProducts();
+
+export const BUYING_GUIDES: BuyingGuide[] = [
+  {
+    id: 'guide-watches',
+    title: 'The Horological Investment Guide',
+    excerpt: 'Mastering the art of selecting heritage timepieces with enduring value.',
+    content: 'Deep in the Jura Mountains, watchmaking is more than an industry—it is a spiritual pursuit. When selecting a timepiece from the Amarisé vault, one must consider not just the movement, but the provenance of the craft...',
+    tips: [
+      'Prioritize Grand Complications for long-term heritage value.',
+      'Ensure the atelier certification remains within the physical vault.',
+      'Consider the architectural symmetry of the watch face.',
+      'Seek limited edition artisanal signatures.'
+    ],
+    featuredProducts: ['prod-4', 'prod-14', 'prod-24'],
+    featuredCollections: ['privé-watches'],
+    imageUrl: 'https://picsum.photos/seed/guide-watches/1600/900',
+    category: 'Watches',
+    country: 'us',
+    date: '2024-03-10',
+    author: 'Elena Vance'
+  },
+  {
+    id: 'guide-jewelry',
+    title: 'Rare Stones & Eternal Radiance',
+    excerpt: 'A connoisseurs journey through the Amarisé High Jewelry archives.',
+    content: 'The brilliance of a diamond is a dialogue between light and stone. In this guide, our master gemologists reveal the secrets behind the Amarisé selection process...',
+    tips: [
+      'Focus on stone clarity under the morning light.',
+      'Understand the heritage significance of the setting metal.',
+      'Coordinate jewelry with the tone of the skin and the weight of the occasion.'
+    ],
+    featuredProducts: ['prod-3', 'prod-13', 'prod-23'],
+    featuredCollections: ['heritage'],
+    imageUrl: 'https://picsum.photos/seed/guide-jewelry/1600/900',
+    category: 'Jewelry',
+    country: 'ae',
+    date: '2024-03-12',
+    author: 'Aamir Al-Farsi'
+  },
+  {
+    id: 'guide-couture',
+    title: 'The Bespoke Tailoring Manifesto',
+    excerpt: 'Navigating the world of Haute Couture and custom tailoring.',
+    content: 'A suit from the Amarisé atelier is a second skin. It is built upon the measurements of a lifetime. To wear couture is to wear a piece of history...',
+    tips: [
+      'Measure twice, cut once—the golden rule of the Paris atelier.',
+      'Select fabrics based on the climate of your global destination.',
+      'Trust the master tailor’s eye for silhouette.'
+    ],
+    featuredProducts: ['prod-1', 'prod-11', 'prod-21'],
+    featuredCollections: ['spring-24'],
+    imageUrl: 'https://picsum.photos/seed/guide-couture/1600/900',
+    category: 'Women',
+    country: 'uk',
+    date: '2024-03-15',
+    author: 'Sophia Laurent'
+  },
+  {
+    id: 'guide-leather',
+    title: 'Exotic Leathers: A Mastery of Form',
+    excerpt: 'Understanding the artisanal depth of our bespoke accessory lines.',
+    content: 'The grain of an exotic hide tells a story of survival and luxury. At Amarisé, we only source from ethical heritage farms...',
+    tips: [
+      'Inspect the stitch density—the hallmark of high-end leatherwork.',
+      'Condition your accessories quarterly with Maison-approved creams.',
+      'Store in low-humidity, temperature-controlled environments.'
+    ],
+    featuredProducts: ['prod-5', 'prod-15', 'prod-25'],
+    featuredCollections: ['heritage'],
+    imageUrl: 'https://picsum.photos/seed/guide-leather/1600/900',
+    category: 'Accessories',
+    country: 'sg',
+    date: '2024-03-18',
+    author: 'Li Wei'
+  },
+  {
+    id: 'guide-investment',
+    title: 'Curating a Luxury Asset Portfolio',
+    excerpt: 'Strategic acquisition of heritage artifacts for the modern era.',
+    content: 'In an era of flux, the tangible brilliance of an Amarisé artifact remains a pillar of stability. This guide explores the strategic acquisition of luxury goods...',
+    tips: [
+      'Diversify across categories—Jewelry, Watches, and Bespoke Art.',
+      'Retain all original provenance documentation in physical form.',
+      'Monitor global auction trends for similar artisanal markers.'
+    ],
+    featuredProducts: ['prod-10', 'prod-20', 'prod-30'],
+    featuredCollections: ['privé-watches', 'heritage'],
+    imageUrl: 'https://picsum.photos/seed/guide-investment/1600/900',
+    category: 'Lifestyle',
+    country: 'in',
+    date: '2024-03-22',
+    author: 'Vikram Mehta'
+  }
+];
 
 export const REVIEWS: Review[] = [
   { id: 'r1', userName: 'Julian Vandervilt', rating: 5, comment: 'Absolutely divine craftsmanship. A masterpiece for any serious collector.', date: '2024-01-15' },

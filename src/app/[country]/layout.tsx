@@ -51,7 +51,7 @@ export default function CountryLayout({
             <ul className="space-y-4 text-sm font-light text-gray-500">
               <li><Link href={`/${countryCode}/wishlist`} className="hover:text-gold transition-colors">VIP Salon</Link></li>
               <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Track Your Order</Link></li>
-              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Global Shipping</Link></li>
+              <li><Link href={`/${countryCode}/buying-guide`} className="hover:text-gold transition-colors font-bold text-plum">Buying Guides</Link></li>
               <li><Link href={`/${countryCode}/customer-service`} className="hover:text-gold transition-colors">Return Policy</Link></li>
             </ul>
           </div>
