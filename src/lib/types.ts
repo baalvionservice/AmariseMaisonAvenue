@@ -7,6 +7,14 @@ export interface Country {
   currency: string;
   symbol: string;
   locale: string;
+  office?: {
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    mapUrl: string;
+    image: string;
+  };
 }
 
 export interface Category {

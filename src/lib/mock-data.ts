@@ -2,11 +2,81 @@
 import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
-  us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US' },
-  uk: { code: 'uk', name: 'United Kingdom', currency: 'GBP', symbol: '£', locale: 'en-GB' },
-  ae: { code: 'ae', name: 'United Arab Emirates', currency: 'AED', symbol: 'د.إ', locale: 'ar-AE' },
-  in: { code: 'in', name: 'India', currency: 'INR', symbol: '₹', locale: 'en-IN' },
-  sg: { code: 'sg', name: 'Singapore', currency: 'SGD', symbol: 'S$', locale: 'en-SG' },
+  us: { 
+    code: 'us', 
+    name: 'United States', 
+    currency: 'USD', 
+    symbol: '$', 
+    locale: 'en-US',
+    office: {
+      city: 'New York',
+      address: '730 Fifth Avenue, New York, NY 10019',
+      phone: '+1 (212) 555-0192',
+      email: 'concierge.us@amarise-luxe.com',
+      mapUrl: 'https://maps.google.com/?q=730+Fifth+Avenue+New+York',
+      image: 'https://picsum.photos/seed/amarise-ny/1200/800',
+    }
+  },
+  uk: { 
+    code: 'uk', 
+    name: 'United Kingdom', 
+    currency: 'GBP', 
+    symbol: '£', 
+    locale: 'en-GB',
+    office: {
+      city: 'London',
+      address: '17-18 Old Bond Street, London W1S 4PT',
+      phone: '+44 20 7555 0192',
+      email: 'concierge.uk@amarise-luxe.com',
+      mapUrl: 'https://maps.google.com/?q=Old+Bond+Street+London',
+      image: 'https://picsum.photos/seed/amarise-london/1200/800',
+    }
+  },
+  ae: { 
+    code: 'ae', 
+    name: 'United Arab Emirates', 
+    currency: 'AED', 
+    symbol: 'د.إ', 
+    locale: 'ar-AE',
+    office: {
+      city: 'Dubai',
+      address: 'The Dubai Mall, Fashion Avenue, Downtown Dubai',
+      phone: '+971 4 555 0192',
+      email: 'concierge.ae@amarise-luxe.com',
+      mapUrl: 'https://maps.google.com/?q=Dubai+Mall+Fashion+Avenue',
+      image: 'https://picsum.photos/seed/amarise-dubai/1200/800',
+    }
+  },
+  in: { 
+    code: 'in', 
+    name: 'India', 
+    currency: 'INR', 
+    symbol: '₹', 
+    locale: 'en-IN',
+    office: {
+      city: 'Mumbai',
+      address: 'Jio World Centre, BKC, Mumbai, Maharashtra 400051',
+      phone: '+91 22 5555 0192',
+      email: 'concierge.in@amarise-luxe.com',
+      mapUrl: 'https://maps.google.com/?q=Jio+World+Centre+Mumbai',
+      image: 'https://picsum.photos/seed/amarise-mumbai/1200/800',
+    }
+  },
+  sg: { 
+    code: 'sg', 
+    name: 'Singapore', 
+    currency: 'SGD', 
+    symbol: 'S$', 
+    locale: 'en-SG',
+    office: {
+      city: 'Singapore',
+      address: '2 Bayfront Ave, Marina Bay Sands, Singapore 018972',
+      phone: '+65 6555 0192',
+      email: 'concierge.sg@amarise-luxe.com',
+      mapUrl: 'https://maps.google.com/?q=Marina+Bay+Sands+Singapore',
+      image: 'https://picsum.photos/seed/amarise-sg/1200/800',
+    }
+  },
 };
 
 export const CATEGORIES: Category[] = [
