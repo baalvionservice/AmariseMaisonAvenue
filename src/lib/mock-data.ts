@@ -1,5 +1,5 @@
 
-import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial } from './types';
+import { Country, Product, Category, Collection, Review, Campaign, Affiliate, Notification, VipClient, Editorial, MaisonStory } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
   us: { code: 'us', name: 'United States', currency: 'USD', symbol: '$', locale: 'en-US' },
@@ -51,6 +51,23 @@ export const EDITOR_INITIAL: Editorial[] = [
     featuredProducts: ['prod-015', 'prod-030']
   }
 ];
+
+export const MAISON_STORY: MaisonStory = {
+  title: "The Heritage of Amarisé",
+  subtitle: "Curating excellence since 1924, from the heart of Paris to the corners of the globe.",
+  history: [
+    { year: "1924", milestone: "The First Atelier", description: "Amarisé opens its flagship atelier on Avenue Montaigne, Paris, specializing in bespoke silk drapery." },
+    { year: "1948", milestone: "Horological Expansion", description: "The Maison partners with Swiss master watchmakers to introduce the first Heritage Timepiece collection." },
+    { year: "1972", milestone: "Fine Jewelry Debut", description: "Amarisé reveals its first high-jewelry collection, featuring rare emeralds sourced from the Zambian plateaus." },
+    { year: "2024", milestone: "Global Maison Avenue", description: "Launch of the digital global flagship, bridging artisanal tradition with futuristic intelligence." }
+  ],
+  philosophy: "At Amarisé, we believe that luxury is a living archive. Every stitch, every gear, and every gemstone is a chapter in a story of human brilliance. We do not just create objects; we preserve the resonance between material and mastery.",
+  craftsmanship: [
+    { title: "The Silk Weaver", description: "Using 18th-century looms, our master weavers in Lyon create fabrics that flow like water and endure like heritage.", imageUrl: "https://picsum.photos/seed/craft-silk/800/1000" },
+    { title: "The Gem Carver", description: "Our lapidaries spend hundreds of hours on a single stone, revealing the inner light hidden by nature.", imageUrl: "https://picsum.photos/seed/craft-gem/800/1000" }
+  ],
+  sustainability: "Our Heritage of Responsibility ensures that 100% of our raw materials are ethically sourced, supporting the communities that provide us with nature's rarest gifts."
+};
 
 export const CAMPAIGNS: Campaign[] = [
   { id: 'c1', title: 'Ramadan 2024 - Exclusive Edit', type: 'email', status: 'active', reach: 450000, engagement: 12.4, country: 'ae', performance: 88 },

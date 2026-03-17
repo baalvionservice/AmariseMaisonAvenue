@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -5,6 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { AppProvider } from '@/lib/store';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
+import Link from 'next/link';
 
 export default function CountryLayout({
   children,
@@ -38,28 +40,28 @@ export default function CountryLayout({
           <div>
             <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-plum">Departments</h4>
             <ul className="space-y-4 text-sm font-light text-gray-500">
-              <li><a href="#" className="hover:text-gold transition-colors">Fine Jewelry</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Haute Couture</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Heritage Watches</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Bespoke Accessories</a></li>
+              <li><Link href={`/${countryCode}/category/jewelry`} className="hover:text-gold transition-colors">Fine Jewelry</Link></li>
+              <li><Link href={`/${countryCode}/category/apparel`} className="hover:text-gold transition-colors">Haute Couture</Link></li>
+              <li><Link href={`/${countryCode}/category/timepieces`} className="hover:text-gold transition-colors">Heritage Watches</Link></li>
+              <li><Link href={`/${countryCode}/category/accessories`} className="hover:text-gold transition-colors">Bespoke Accessories</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-plum">Client Services</h4>
             <ul className="space-y-4 text-sm font-light text-gray-500">
-              <li><a href="#" className="hover:text-gold transition-colors">VIP Salon</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Track Your Order</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Global Shipping</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Return Policy</a></li>
+              <li><Link href={`/${countryCode}/wishlist`} className="hover:text-gold transition-colors">VIP Salon</Link></li>
+              <li><Link href={`/${countryCode}/checkout`} className="hover:text-gold transition-colors">Track Your Order</Link></li>
+              <li><Link href={`/${countryCode}/cart`} className="hover:text-gold transition-colors">Global Shipping</Link></li>
+              <li><Link href={`/${countryCode}/cart`} className="hover:text-gold transition-colors">Return Policy</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-plum">Maison Amarisé</h4>
             <ul className="space-y-4 text-sm font-light text-gray-500">
-              <li><a href="#" className="hover:text-gold transition-colors">Our Story</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Ateliers</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Sustainability</a></li>
-              <li><a href="#" className="hover:text-gold transition-colors">Careers</a></li>
+              <li><Link href={`/${countryCode}/about`} className="hover:text-gold transition-colors">Our Story</Link></li>
+              <li><Link href={`/${countryCode}/about`} className="hover:text-gold transition-colors">Ateliers</Link></li>
+              <li><Link href={`/${countryCode}/journal`} className="hover:text-gold transition-colors">Sustainability</Link></li>
+              <li><Link href="/admin" className="hover:text-gold transition-colors">Careers</Link></li>
             </ul>
           </div>
         </div>

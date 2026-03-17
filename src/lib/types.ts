@@ -120,3 +120,20 @@ export interface SocialInteraction {
   timestamp: string;
   commentText?: string;
 }
+
+export interface MaisonStory {
+  title: string;
+  subtitle: string;
+  history: {
+    year: string;
+    milestone: string;
+    description: string;
+  }[];
+  philosophy: string;
+  craftsmanship: {
+    title: string;
+    description: string;
+    imageUrl: string;
+  }[];
+  sustainability: string;
+}
