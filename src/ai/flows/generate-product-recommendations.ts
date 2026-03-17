@@ -60,7 +60,7 @@ User Scenario: {{{scenario}}}
 The user is currently viewing product with ID: {{{currentProductId}}}. Consider this in your recommendations.
 {{/if}}
 
-Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. Provide a unique ID, a concise name, a brief description, a mock price (between 500 and 10000), a currency (USD, GBP, AED, INR, SGD), a placeholder image URL (e.g., 'https://via.placeholder.com/150/0D2678/FFFFFF?text=AMARISE'), and a category for each product.`,
+Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. Provide a unique ID, a concise name, a brief description, a mock price (between 500 and 10000), a currency (USD, GBP, AED, INR, SGD), a placeholder image URL (use https://picsum.photos/seed/<unique_id>/800/800), and a category for each product.`,
 });
 
 const generateProductRecommendationsFlow = ai.defineFlow(
