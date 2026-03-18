@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PRODUCTS, formatPrice, COUNTRIES } from '@/lib/mock-data';
+import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
@@ -15,7 +16,11 @@ import {
   Gift,
   Play,
   Maximize2,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp,
+  Award,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -23,6 +28,7 @@ import { generateProductRecommendations } from '@/ai/flows/generate-product-reco
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from '@/components/product/ProductCard';
+import { InquiryModal } from '@/components/product/InquiryModal';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -34,6 +40,7 @@ export default function ProductPage() {
   const { addToCart, toggleWishlist, wishlist } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
+  const monetization = useMemo(() => PRODUCTS_EXTENDED[id as string] || { priceVisible: true }, [id]);
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   
   const [aiDescription, setAiDescription] = useState<string | null>(null);
@@ -41,8 +48,7 @@ export default function ProductPage() {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [is360Active, setIs360Active] = useState(false);
-  const [isVideoActive, setIsVideoActive] = useState(false);
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   
   const isWishlisted = wishlist.some(i => i.id === product?.id);
 
@@ -87,34 +93,10 @@ export default function ProductPage() {
 
   return (
     <div className="bg-ivory min-h-screen">
-      {/* Structured Data: SEO Schema.org Product */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": product.name,
-            "image": product.imageUrl,
-            "description": aiDescription || "Luxury artisanal artifact from Maison Amarisé.",
-            "brand": {
-              "@type": "Brand",
-              "name": "AMARISÉ MAISON AVENUE"
-            },
-            "offers": {
-              "@type": "Offer",
-              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`,
-              "priceCurrency": currentCountry.currency,
-              "price": product.basePrice,
-              "availability": "https://schema.org/InStock"
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": product.rating,
-              "reviewCount": product.reviewsCount
-            }
-          })
-        }}
+      <InquiryModal 
+        isOpen={isInquiryOpen} 
+        onClose={() => setIsInquiryOpen(false)} 
+        product={product} 
       />
 
       <div className="container mx-auto px-6 py-12">
@@ -129,46 +111,28 @@ export default function ProductPage() {
         <div className="flex flex-col lg:flex-row gap-24">
           <div className="w-full lg:w-3/5 space-y-8">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              {is360Active ? (
-                <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-ivory">
-                   <RotateCcw className="w-12 h-12 text-gold animate-spin-slow" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Initializing Immersive 360° Perspective</p>
-                   <Button variant="ghost" className="text-[9px] uppercase font-bold" onClick={() => setIs360Active(false)}>Return to Archive</Button>
-                </div>
-              ) : isVideoActive ? (
-                <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-gray-900 text-white">
-                   <Play className="w-12 h-12 text-gold" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest">Streaming Artisanal Narrative</p>
-                   <Button variant="ghost" className="text-[9px] uppercase font-bold text-white hover:text-gold" onClick={() => setIsVideoActive(false)}>Close Video</Button>
-                </div>
-              ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
-                  Atelier Perspective {activeMediaIndex + 1}
-                </div>
-              )}
+              <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
+                Atelier Perspective {activeMediaIndex + 1}
+              </div>
               
               <div className="absolute bottom-8 left-8 flex space-x-2">
                  {[...Array(4)].map((_, idx) => (
                    <button 
                     key={idx} 
-                    onClick={() => {
-                      setActiveMediaIndex(idx);
-                      setIs360Active(idx === 2);
-                      setIsVideoActive(idx === 3);
-                    }}
+                    onClick={() => setActiveMediaIndex(idx)}
                     className={cn(
                       "w-12 h-16 border transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter",
                       activeMediaIndex === idx ? "border-plum bg-ivory text-plum scale-110 shadow-lg" : "border-border bg-muted text-gray-400 opacity-60"
                     )}
                    >
-                     {idx === 2 ? '360°' : idx === 3 ? 'VIDEO' : `FRAME ${idx+1}`}
+                     FRAME {idx+1}
                    </button>
                  ))}
               </div>
 
-              {product.isVip && (
-                <div className="absolute top-8 left-8 bg-plum px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80">
-                  Private Edition
+              {monetization.scarcityTag && (
+                <div className="absolute top-8 left-8 bg-black px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80">
+                  {monetization.scarcityTag}
                 </div>
               )}
             </div>
@@ -178,7 +142,7 @@ export default function ProductPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-primary text-[10px] font-bold tracking-[0.5em] uppercase border-b border-gold/40 pb-1">
-                  Maison Global Flagship
+                  Private Acquisition Flow
                 </span>
                 <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={() => toggleWishlist(product)}>
                   <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
@@ -187,61 +151,97 @@ export default function ProductPage() {
               
               <div className="space-y-2">
                 <h1 className="text-5xl md:text-7xl font-headline font-bold leading-tight text-gray-900 italic">{product.name}</h1>
-                {product.listingType === 'auction' && (
-                  <div className="flex items-center space-x-2 bg-gold/10 p-3 border border-gold/20 inline-flex">
-                    <Gavel className="w-4 h-4 text-gold" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold">Current Bid: {formatPrice(product.currentBid || 0, countryCode)}</span>
-                  </div>
-                )}
+                <div className="flex items-center space-x-4">
+                   <div className="flex text-gold">
+                    {[...Array(5)].map((_, i) => <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />)}
+                   </div>
+                   <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold">{product.reviewsCount} Appreciations</span>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-6">
-                <div className="flex text-gold">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />
-                  ))}
-                </div>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold">{product.reviewsCount} Appreciations</span>
-              </div>
               <div className="text-6xl font-light tracking-tighter pt-4 text-gray-900">
-                {formatPrice(product.basePrice, countryCode)}
+                {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Price on Request"}
               </div>
             </div>
 
+            {/* High-Ticket Intelligence Block */}
+            <div className="grid grid-cols-2 gap-4">
+               <div className="bg-white p-6 border border-border space-y-2">
+                  <div className="flex items-center space-x-2 text-secondary">
+                     <Award className="w-4 h-4" />
+                     <span className="text-[9px] font-bold uppercase tracking-widest">Collector Value</span>
+                  </div>
+                  <p className="text-lg font-headline font-bold italic">{monetization.collectorValue || 'Signature'}</p>
+               </div>
+               <div className="bg-white p-6 border border-border space-y-2">
+                  <div className="flex items-center space-x-2 text-secondary">
+                     <TrendingUp className="w-4 h-4" />
+                     <span className="text-[9px] font-bold uppercase tracking-widest">Market Status</span>
+                  </div>
+                  <p className="text-lg font-headline font-bold italic">{monetization.marketRange || 'Stable'}</p>
+               </div>
+            </div>
+
             <div className="space-y-4">
-              <Button 
-                size="lg" 
-                className="w-full bg-plum text-white hover:bg-gold hover:text-gray-900 h-20 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl transition-all"
-                onClick={handleAddToCart}
-              >
-                {product.listingType === 'auction' ? 'PARTICIPATE IN AUCTION' : 'SECURE IN SHOPPING BAG'}
-              </Button>
+              {monetization.priceVisible ? (
+                <Button 
+                  size="lg" 
+                  className="w-full bg-black text-white hover:bg-gold hover:text-black h-20 rounded-none text-[10px] font-bold tracking-[0.4em] shadow-2xl transition-all"
+                  onClick={handleAddToCart}
+                >
+                  SECURE IN SHOPPING BAG
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  className="w-full bg-plum text-white hover:bg-gold hover:text-black h-20 rounded-none text-[10px] font-bold tracking-[0.4em] shadow-2xl transition-all"
+                  onClick={() => setIsInquiryOpen(true)}
+                >
+                  REQUEST PRIVATE ACQUISITION
+                </Button>
+              )}
+              
               <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
+                  onClick={() => setIsInquiryOpen(true)}
+                >
+                  <Lock className="w-4 h-4 mr-2" /> DISCREET INQUIRY
+                </Button>
                 <Button 
                   variant="outline" 
                   className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
                   onClick={() => router.push(`/${countryCode}/appointments`)}
                 >
-                  <Calendar className="w-4 h-4 mr-2" /> BOOK ATELIER VIEWING
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
-                  onClick={() => router.push(`/${countryCode}/gift-registry`)}
-                >
-                  <Gift className="w-4 h-4 mr-2" /> GIFT REGISTRY
+                  <Calendar className="w-4 h-4 mr-2" /> ATELIER VIEWING
                 </Button>
               </div>
             </div>
 
-            <Tabs defaultValue="narrative" className="w-full pt-12">
+            <Tabs defaultValue="intelligence" className="w-full pt-12">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12 overflow-x-auto">
+                <TabsTrigger value="intelligence" className="tab-trigger">Collector Intelligence</TabsTrigger>
                 <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
                 <TabsTrigger value="provenance" className="tab-trigger">Provenance</TabsTrigger>
-                <TabsTrigger value="inventory" className="tab-trigger">Regional Availability</TabsTrigger>
-                <TabsTrigger value="compliance" className="tab-trigger">Maison Compliance</TabsTrigger>
               </TabsList>
               
+              <TabsContent value="intelligence" className="pt-10 space-y-8 animate-fade-in min-h-[250px]">
+                 <div className="p-10 bg-ivory border border-border shadow-sm space-y-6">
+                    <div className="flex items-center space-x-3 text-plum">
+                       <Zap className="w-5 h-5" />
+                       <h3 className="text-[10px] font-bold uppercase tracking-[0.4em]">Investment Insight</h3>
+                    </div>
+                    <p className="text-lg text-gray-600 font-light leading-relaxed italic border-l-2 border-plum/20 pl-8">
+                      {monetization.investmentInsight || "This artifact represents a stable position within the Maison archives, historically outperforming standard market benchmarks for its category."}
+                    </p>
+                 </div>
+                 <div className="flex items-center space-x-4 text-gray-400">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span className="text-[9px] font-bold uppercase tracking-widest">Heritage Registry Certified</span>
+                 </div>
+              </TabsContent>
+
               <TabsContent value="narrative" className="pt-10 animate-fade-in min-h-[250px]">
                 {loadingAi ? (
                   <div className="space-y-4 animate-pulse">
@@ -250,7 +250,7 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="text-gray-600 font-light leading-relaxed whitespace-pre-wrap first-letter:text-6xl first-letter:font-headline first-letter:mr-3 first-letter:float-left first-letter:text-plum italic">
-                    {aiDescription || "This artifact represents the pinnacle of Maison Amarisé's century-long pursuit of excellence. Hand-finished in our central atelier, it serves as a testament to human brilliance."}
+                    {aiDescription || "This artifact represents the pinnacle of Maison Amarisé's century-long pursuit of excellence."}
                   </div>
                 )}
               </TabsContent>
@@ -262,34 +262,6 @@ export default function ProductPage() {
                   <DetailRow label="Certification" value="NFC-enabled authenticity chip included" />
                 </ul>
               </TabsContent>
-
-              <TabsContent value="inventory" className="pt-10">
-                <div className="space-y-6">
-                   {product.regionalStock?.map(rs => (
-                     <div key={rs.warehouseId} className="flex justify-between items-center border-b border-border pb-4">
-                        <div className="flex flex-col">
-                           <span className="text-[10px] font-bold uppercase">{rs.warehouseName}</span>
-                           <span className="text-[8px] text-muted-foreground uppercase">{rs.region} Market Hub</span>
-                        </div>
-                        <span className={cn("text-xs font-bold", rs.stockCount < 5 ? "text-red-500" : "text-gray-900")}>
-                          {rs.stockCount} Pieces Remaining
-                        </span>
-                     </div>
-                   ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="compliance" className="pt-10 space-y-6">
-                 <div className="p-6 bg-plum/5 border border-plum/10 rounded-sm">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest mb-2">Artisanal Responsibility</h4>
-                    <p className="text-[9px] text-gray-500 leading-relaxed italic">
-                      This artifact complies with global {currentCountry.name} heritage regulations. Full GDPR data protection applies to your acquisition registry.
-                    </p>
-                 </div>
-                 <Button variant="outline" className="w-full h-12 text-[9px] font-bold uppercase tracking-widest border-border" onClick={() => toast({ title: "Maison Archive", description: "Compliance certification downloaded." })}>
-                    VIEW HERITAGE DOCUMENTS
-                 </Button>
-              </TabsContent>
             </Tabs>
           </div>
         </div>
@@ -298,8 +270,8 @@ export default function ProductPage() {
           <div className="flex items-end justify-between mb-20">
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-plum">
-                 <Zap className="w-5 h-5 text-gold" />
-                 <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Intelligence Selection</span>
+                 <Award className="w-5 h-5 text-gold" />
+                 <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Private Selection</span>
               </div>
               <h2 className="text-5xl font-headline font-bold italic text-gray-900">Resonant Artifacts</h2>
             </div>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -28,7 +27,8 @@ import {
   Appointment,
   Invoice,
   Affiliate,
-  ReturnRequest
+  ReturnRequest,
+  PrivateInquiry
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -81,6 +81,7 @@ interface AppContextType {
   globalSettings: GlobalSettings;
   appointments: Appointment[];
   invoices: Invoice[];
+  privateInquiries: PrivateInquiry[];
   
   // Support Hub State
   supportTickets: SupportTicket[];
@@ -121,6 +122,7 @@ interface AppContextType {
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
   updateReturnStatus: (id: string, status: ReturnRequest['status']) => void;
   createInvoice: (invoice: Invoice) => void;
+  upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
   
   // Support Actions
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
@@ -170,6 +172,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
+  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>([]);
   
   // Support Hub State
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
@@ -408,6 +411,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInvoices(prev => [invoice, ...prev]);
   };
 
+  const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
+    setPrivateInquiries(prev => [inquiry, ...prev]);
+    recordLog(`New Private Inquiry: ${inquiry.id}`, 'Monetization');
+  };
+
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
     setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
   };
@@ -509,6 +517,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     indexingLogs,
     appointments,
     invoices,
+    privateInquiries,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -530,6 +539,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateAppointmentStatus,
     updateReturnStatus,
     createInvoice,
+    upsertPrivateInquiry,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
@@ -543,7 +553,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, privateInquiries, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

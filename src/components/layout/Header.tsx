@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Diamond } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
+import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { 
@@ -12,7 +13,8 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger,
-  DropdownMenuLabel
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -50,9 +52,9 @@ export const Header = () => {
     { name: 'COLLECTIONS', href: `/${countryCode}/collections` },
     { name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
     { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
-    { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
     { name: 'ACCESSORIES', href: `/${countryCode}/category/accessories` },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
+    { name: 'MAISON SERVICES', href: '#', services: true },
     { name: 'THE JOURNAL', href: `/${countryCode}/journal` },
   ];
 
@@ -160,23 +162,42 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Primary Navigation with Mega Menu */}
+      {/* Primary Navigation */}
       <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-12">
         {navLinks.map((link) => (
           <div key={link.name} className="group h-full flex items-center">
-            <Link 
-              href={link.href} 
-              className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all relative"
-            >
-              {link.name}
-              <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-secondary transition-all group-hover:w-full group-hover:left-0" />
-            </Link>
+            {link.services ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all outline-none">
+                  {link.name}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="bg-white border-border w-72 p-2 rounded-none shadow-2xl">
+                  <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.5em] text-gray-400 p-4">Elite Services</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {MAISON_SERVICES.map(s => (
+                    <DropdownMenuItem key={s.id} asChild className="p-4 rounded-none cursor-pointer hover:bg-ivory group/item">
+                      <Link href={`/${countryCode}/services/${s.id}`} className="flex flex-col space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-black group-hover/item:text-plum">{s.name}</span>
+                        <span className="text-[8px] text-gray-400 uppercase tracking-tighter">{s.tagline}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link 
+                href={link.href} 
+                className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all relative"
+              >
+                {link.name}
+                <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-secondary transition-all group-hover:w-full group-hover:left-0" />
+              </Link>
+            )}
 
             {/* Mega Menu implementation */}
             {link.mega && (
               <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50">
                 <div className="container mx-auto px-20 flex gap-40 max-w-[1600px]">
-                  {/* Left Column: Navigation Links */}
                   <div className="w-72 space-y-10">
                     <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">New Arrivals</h3>
                     <div className="flex flex-col space-y-6">
@@ -192,7 +213,6 @@ export const Header = () => {
                     </div>
                   </div>
 
-                  {/* Right Column: Featured Image Area */}
                   <div className="flex-1 space-y-10">
                     <div className="aspect-[21/9] w-full bg-muted border border-gray-100 flex items-center justify-center group/img relative overflow-hidden shadow-sm">
                       <Image 
@@ -200,7 +220,6 @@ export const Header = () => {
                         alt="New Arrivals" 
                         fill 
                         className="object-cover transition-transform duration-[3s] group-hover/img:scale-105"
-                        data-ai-hint="luxury handbags"
                       />
                       <div className="absolute inset-0 bg-black/10 group-hover/img:bg-transparent transition-colors" />
                     </div>

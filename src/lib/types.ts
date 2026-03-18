@@ -141,6 +141,52 @@ export interface BuyingGuide {
   provenanceChecklist?: string[];
 }
 
+// --- MONETIZATION & HIGH-TICKET EXTENSIONS ---
+
+export interface ProductExtended extends Product {
+  collectorValue: string;
+  marketRange: string;
+  investmentInsight: string;
+  scarcityTag: string;
+  priceVisible: boolean;
+}
+
+export interface MaisonService {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  priceRange: string;
+  features: string[];
+  imageUrl: string;
+}
+
+export interface MaisonReport {
+  id: string;
+  title: string;
+  summary: string;
+  date: string;
+  author: string;
+  isPremium: boolean;
+  fullContent?: string;
+  previewImage: string;
+}
+
+export interface PrivateInquiry {
+  id: string;
+  productId?: string;
+  serviceId?: string;
+  customerName: string;
+  email: string;
+  country: string;
+  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3';
+  intent: 'Collector' | 'Personal' | 'Investment';
+  message?: string;
+  contactMethod: 'WhatsApp' | 'Email';
+  status: 'new' | 'contacted' | 'closed';
+  timestamp: string;
+}
+
 export interface SocialMetrics {
   likes: number;
   shares: number;
@@ -169,8 +215,6 @@ export interface CustomerServiceInfo {
   returns: string;
   faqs: { question: string; answer: string }[];
 }
-
-// --- ENTERPRISE & ADMIN EXTENSIONS ---
 
 export interface AdminAccount {
   id: string;

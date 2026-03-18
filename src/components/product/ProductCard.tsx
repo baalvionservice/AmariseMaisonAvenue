@@ -1,12 +1,12 @@
-
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Heart, ShoppingBag, Eye, Share2 } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Share2, Lock } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { formatPrice } from '@/lib/mock-data';
+import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -17,8 +17,7 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Refined for elite luxury aesthetics.
- * Features minimalist metadata and cinematic interaction.
+ * ProductCard: Updated for elite luxury aesthetics and high-ticket monetization.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -28,6 +27,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   
   const isWishlisted = wishlist.some(i => i.id === product.id);
   const metrics = socialMetrics[product.id] || { likes: 0, shares: 0, engagementRate: 0 };
+  const monetization = useMemo(() => PRODUCTS_EXTENDED[product.id] || { priceVisible: true }, [product.id]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,16 +66,15 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   return (
     <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
-        {/* Gallery-Style Card Box */}
         <div className="w-full h-full bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-[1.5s] group-hover:scale-105 group-hover:bg-ivory">
           Atelier Archive Asset
         </div>
         
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         
-        {product.isVip && (
+        {(product.isVip || monetization.scarcityTag) && (
           <div className="absolute top-6 left-6 bg-black px-4 py-1.5 text-[8px] font-bold tracking-[0.3em] text-white uppercase shadow-lg z-10 rounded-none">
-            Private Edition
+            {monetization.scarcityTag || 'Private Edition'}
           </div>
         )}
 
@@ -84,14 +83,21 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
            <span className="text-[9px] font-bold text-gray-900 tracking-tighter">{metrics.likes.toLocaleString()}</span>
         </div>
 
-        {/* Minimal Bottom CTA Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
-          <Button 
-            className="w-full h-14 rounded-none bg-black text-white hover:bg-gray-900 transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
-            onClick={handleAddToCart}
-          >
-            <ShoppingBag className="w-3.5 h-3.5 mr-2" /> Secure Piece
-          </Button>
+          {monetization.priceVisible ? (
+            <Button 
+              className="w-full h-14 rounded-none bg-black text-white hover:bg-gray-900 transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
+              onClick={handleAddToCart}
+            >
+              <ShoppingBag className="w-3.5 h-3.5 mr-2" /> Secure Piece
+            </Button>
+          ) : (
+            <Button 
+              className="w-full h-14 rounded-none bg-plum text-white hover:bg-gold hover:text-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
+            >
+              <Lock className="w-3.5 h-3.5 mr-2" /> Inquire Privately
+            </Button>
+          )}
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
@@ -122,7 +128,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         
         <div className="flex flex-col items-center space-y-2">
           <span className="text-sm font-bold tracking-tight text-gray-900">
-            {formatPrice(product.basePrice, countryCode)}
+            {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Price"}
           </span>
           <div className="w-8 h-px bg-gray-100 group-hover:w-16 transition-all duration-1000" />
         </div>
