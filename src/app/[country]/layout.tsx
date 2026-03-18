@@ -1,9 +1,11 @@
+
 'use client';
 
 import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
+import { MaisonPopup } from '@/components/layout/MaisonPopup';
 import Link from 'next/link';
 import { Smartphone, Phone, Mail, MessageCircle, Facebook, Twitter, Instagram, Youtube, Music2 } from 'lucide-react';
 
@@ -17,6 +19,7 @@ export default function CountryLayout({
   
   return (
     <>
+      <MaisonPopup />
       <Header />
       <main className="min-h-screen pt-[148px] animate-fade-in relative bg-white">
         {children}
