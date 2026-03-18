@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
  */
 export default function CollectionsPage() {
   const { country } = useParams();
-  const { collections, products } = useAppStore();
+  const { collections } = useAppStore();
   const countryCode = (country as string) || 'us';
 
   return (
@@ -37,7 +37,6 @@ export default function CollectionsPage() {
         {/* Collections Grid - 3 Columns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-40">
           {collections.map((col) => {
-            const count = products.filter(p => p.collectionId === col.id).length;
             return (
               <div key={col.id} className="flex flex-col items-center text-center group">
                 {/* Circular Structural Asset - Exact match to reference image */}
@@ -60,11 +59,7 @@ export default function CollectionsPage() {
                 </Link>
 
                 {/* Info & CTA */}
-                <div className="space-y-10 w-full flex flex-col items-center">
-                  <p className="text-[13px] font-normal text-black lowercase tracking-tight">
-                    {count} products
-                  </p>
-                  
+                <div className="w-full flex flex-col items-center">
                   <Link href={`/${countryCode}/collection/${col.id}`} className="w-full max-w-[220px]">
                     <Button variant="outline" className="w-full h-12 rounded-none border border-black bg-transparent text-[11px] font-bold tracking-[0.25em] text-black uppercase hover:bg-black hover:text-white transition-all duration-300">
                       SHOP NOW
