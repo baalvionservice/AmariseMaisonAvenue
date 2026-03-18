@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { ChevronRight, Ban, Smartphone, Plus } from 'lucide-react';
+import { ChevronRight, Ban, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -64,41 +64,6 @@ export default function CollectionsPage() {
             );
           })}
         </div>
-      </div>
-
-      {/* Join the VIP Email List Section - More compact padding */}
-      <section className="bg-[#f9f7f9] py-20 border-t border-black/5">
-        <div className="container mx-auto px-6 max-w-3xl text-center space-y-6">
-          <div className="space-y-3">
-            <h2 className="text-3xl font-headline font-medium text-gray-900">Join the VIP Email List</h2>
-            <p className="text-[12px] text-gray-500 font-light leading-relaxed max-w-md mx-auto">
-              Join our VIP email list and get first access new product launches and all the latest updates from Amarisé Maison Avenue!
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center max-w-lg mx-auto bg-white border border-gray-200 h-12 overflow-hidden">
-            <input 
-              type="email" 
-              placeholder="Enter your email address" 
-              className="flex-1 h-full px-5 text-xs font-light text-gray-600 outline-none placeholder:text-gray-300"
-            />
-            <button className="h-full px-8 text-[10px] font-bold tracking-[0.3em] uppercase text-black hover:text-plum transition-colors border-l border-gray-100">
-              SUBMIT
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Floating App Badge - Slightly smaller */}
-      <div className="fixed bottom-6 left-6 z-[60]">
-        <button className="flex items-center space-x-3 bg-gradient-to-r from-[#e8def8] to-[#f3e8f5] px-4 py-2.5 rounded-full shadow-lg border border-white/50 hover:shadow-xl transition-all group">
-          <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center shadow-sm">
-            <Smartphone className="w-4 h-4 text-gray-800" />
-          </div>
-          <span className="text-[9px] font-bold tracking-widest text-gray-800 uppercase">
-            GET OUR APP • $300 OFF
-          </span>
-        </button>
       </div>
     </div>
   );
