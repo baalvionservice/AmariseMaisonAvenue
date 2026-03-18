@@ -30,7 +30,11 @@ import {
   ReturnRequest,
   PrivateInquiry,
   LeadConversation,
-  CuratorMessage
+  CuratorMessage,
+  CMSSection,
+  SEOMetadata,
+  SalesScript,
+  AutomationRule
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -58,11 +62,13 @@ import {
   RETURNS
 } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
+import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 
 interface AppContextType {
-  // Data State
-  cart: CartItem[];
-  wishlist: Product[];
+  // --- Dynamic State Modules ---
+  
+  // CMS State
+  cmsSections: CMSSection[];
   products: Product[];
   collections: Collection[];
   categories: Category[];
@@ -70,9 +76,22 @@ interface AppContextType {
   cities: City[];
   buyingGuides: BuyingGuide[];
   editorials: Editorial[];
-  socialMetrics: Record<string, SocialMetrics>;
   
-  // High-Level Admin State
+  // CRM & Sales State
+  privateInquiries: PrivateInquiry[];
+  leadConversations: LeadConversation[];
+  messagingTemplates: SalesScript[];
+  
+  // SEO State
+  seoRegistry: SEOMetadata[];
+  
+  // Automation State
+  automationRules: AutomationRule[];
+  
+  // Logistics & Admin State
+  cart: CartItem[];
+  wishlist: Product[];
+  socialMetrics: Record<string, SocialMetrics>;
   admins: AdminAccount[];
   vendors: Vendor[];
   affiliates: Affiliate[];
@@ -82,82 +101,73 @@ interface AppContextType {
   vipClients: VipClient[];
   customerSegments: CustomerSegment[];
   globalSettings: GlobalSettings;
-  appointments: Appointment[];
-  invoices: Invoice[];
-  privateInquiries: PrivateInquiry[];
-  leadConversations: LeadConversation[];
-  
-  // Support Hub State
   supportTickets: SupportTicket[];
   supportStats: SupportStats;
-
-  // Integration Hub State
   integrations: MaisonIntegration[];
   apiLogs: ApiLog[];
-  
-  // Indexing State
   indexingStatus: IndexingStatus;
   indexingLogs: IndexingLog[];
+  appointments: Appointment[];
+  invoices: Invoice[];
 
-  // Showcase State
+  // Showcase / Multi-Persona State
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
   activeVendor: Vendor | null;
   
-  // Actions
+  // --- Actions & Methods ---
+  
+  // CMS Actions
+  upsertCMSSection: (section: CMSSection) => void;
+  upsertProduct: (product: Product) => void;
+  deleteProduct: (id: string) => void;
+  upsertCollection: (collection: Collection) => void;
+  upsertEditorial: (editorial: Editorial) => void;
+  
+  // Sales & CRM Actions
+  upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
+  updateInquiryStatus: (id: string, status: PrivateInquiry['status']) => void;
+  addLeadMessage: (inquiryId: string, text: string, sender: 'curator' | 'client') => void;
+  updateLeadTier: (id: string, tier: 1 | 2 | 3) => void;
+  addInquiryNote: (id: string, note: string) => void;
+  
+  // SEO Actions
+  upsertSEOMetadata: (meta: SEOMetadata) => void;
+  
+  // Messaging Actions
+  upsertTemplate: (template: SalesScript) => void;
+  
+  // Automation Actions
+  toggleRule: (id: string) => void;
+  upsertRule: (rule: AutomationRule) => void;
+
+  // Global Actions
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, delta: number) => void;
   toggleWishlist: (product: Product) => void;
   clearCart: () => void;
-  
-  // Admin Actions
-  upsertProduct: (product: Product) => void;
-  deleteProduct: (id: string) => void;
-  upsertCollection: (collection: Collection) => void;
-  upsertEditorial: (editorial: Editorial) => void;
-  upsertAdmin: (admin: AdminAccount) => void;
-  upsertVendor: (vendor: Vendor) => void;
-  upsertAffiliate: (affiliate: Affiliate) => void;
-  upsertCampaign: (campaign: Campaign) => void;
   updateGlobalSettings: (settings: GlobalSettings) => void;
-  upsertSegment: (segment: CustomerSegment) => void;
-  upsertAppointment: (apt: Appointment) => void;
-  updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
-  updateReturnStatus: (id: string, status: ReturnRequest['status']) => void;
-  createInvoice: (invoice: Invoice) => void;
-  upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
-  updateInquiryStatus: (id: string, status: PrivateInquiry['status']) => void;
-  addLeadMessage: (inquiryId: string, text: string, sender: 'curator' | 'client') => void;
-  
-  // Support Actions
-  updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
-  assignTicket: (ticketId: string, adminId: string) => void;
-  addTicketMessage: (ticketId: string, text: string, sender: 'agent' | 'customer') => void;
-
-  // Integration Actions
-  toggleIntegration: (id: string) => void;
-  toggleEmergencyMode: () => void;
-  
-  // Indexing Actions
-  triggerReindex: (type: 'catalog' | 'sitemap' | 'search') => void;
-  toggleAutoSync: () => void;
-
-  // Social Actions
-  toggleLike: (contentId: string, country: string) => void;
-  trackShare: (contentId: string, country: string) => void;
   
   // System Controls
   setShowcaseMode: (val: boolean) => void;
   setActiveVip: (vip: VipClient | null) => void;
   setActiveVendor: (vendor: Vendor | null) => void;
+  
+  // Utility
+  recordLog: (action: string, module: string, severity?: AuditLog['severity']) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  // CMS Module
+  const [cmsSections, setCmsSections] = useState<CMSSection[]>([
+    { id: 'hero', title: 'The Heritage Registry', subtitle: 'Institutional Acquisition House', visible: true, featured: true },
+    { id: 'editorial-home', title: 'The Standard of the Absolute', visible: true, featured: false },
+    { id: 'departments', title: 'Global Departments', visible: true, featured: false },
+    { id: 'private-salon', title: 'Private Acquisition Salon', visible: true, featured: true }
+  ]);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [collections, setCollections] = useState<Collection[]>(INITIAL_COLLECTIONS);
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
@@ -165,9 +175,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cities, setCities] = useState<City[]>(INITIAL_CITIES);
   const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES);
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
+
+  // CRM Module
+  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES);
+  const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS);
+  const [messagingTemplates, setMessagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS);
+
+  // SEO Module
+  const [seoRegistry, setSeoRegistry] = useState<SEOMetadata[]>([
+    { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub for US collectors.', keywords: 'luxury, heritage, acquisition', h1: 'The Heritage Registry' },
+    { id: 'home-uk', path: '/uk', title: 'AMARISÉ | London Heritage Souce', description: 'Traditional craftsmanship for the UK market.', keywords: 'london luxury, bond street', h1: 'The London Archive' }
+  ]);
+
+  // Automation Module
+  const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
+    { id: 'rule-1', name: 'Auto-Reply: New Inquiry', trigger: 'inquiry_submitted', action: 'send_script', params: { scriptId: 'script-init' }, enabled: true },
+    { id: 'rule-2', name: 'Priority Route: Tier 1', trigger: 'tier_assigned', action: 'notify_admin', params: { priority: 'urgent' }, enabled: true },
+    { id: 'rule-3', name: 'Keyword: Investment Detect', trigger: 'keyword_match', action: 'send_script', params: { scriptId: 'script-investor' }, enabled: true }
+  ]);
+
+  // Global Logistics
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
-  
-  // Admin & Sales State
   const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
@@ -178,425 +208,132 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
-  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES);
-  const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS);
-  
-  // Support Hub State
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
-  const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
-
-  // Integration Hub State
-  const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
-  const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
-
-  // Indexing State
-  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
-  const [indexingLogs, setIndexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
+  const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
+  const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
+  const [apiLogs] = useState<ApiLog[]>(API_LOGS);
+  const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
+  const [indexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
 
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
-    theme: { primary: '#7E3F98', accent: '#D4AF37', fontFamily: 'Inter' },
-    seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
+    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
+    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
     payments: { cards: true, wallets: true, crypto: false },
     compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
     performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
     emergencyMode: false
   });
-  
+
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(VENDORS[0]);
 
-  const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => {
-    const newLog: AuditLog = {
-      id: `log-${Date.now()}`,
-      adminId: 'adm-current',
-      adminName: 'Maison CEO',
-      action,
-      module,
-      timestamp: new Date().toISOString(),
-      ipAddress: '127.0.0.1',
-      severity
-    };
-    setAuditLogs(prev => [newLog, ...prev]);
-  };
-
-  const simulateApiCall = (endpoint: string, method: ApiLog['method'], status: number = 200) => {
-    const newLog: ApiLog = {
-      id: `apilog-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      endpoint,
-      method,
-      status,
-      latency: `${Math.floor(Math.random() * 200) + 20}ms`,
-      integrationId: 'int-dynamic'
-    };
-    setApiLogs(prev => [newLog, ...prev.slice(0, 9)]);
-  };
-
-  useEffect(() => {
-    const initialMetrics: Record<string, SocialMetrics> = {};
-    products.forEach(p => {
-      initialMetrics[p.id] = {
-        likes: Math.floor(Math.random() * 1000) + 100,
-        shares: Math.floor(Math.random() * 200) + 50,
-        engagementRate: Math.random() * 5 + 2
-      };
-    });
-    editorials.forEach(ed => {
-      initialMetrics[ed.id] = {
-        likes: Math.floor(Math.random() * 5000) + 500,
-        shares: Math.floor(Math.random() * 1000) + 100,
-        engagementRate: Math.random() * 8 + 4
-      };
-    });
-    buyingGuides.forEach(bg => {
-      initialMetrics[bg.id] = {
-        likes: Math.floor(Math.random() * 3000) + 300,
-        shares: Math.floor(Math.random() * 800) + 50,
-        engagementRate: Math.random() * 6 + 3
-      };
-    });
-    setSocialMetrics(initialMetrics);
-  }, [products, editorials, buyingGuides]);
-
-  const addToCart = (product: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-    simulateApiCall('/cart/add', 'POST');
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
-    simulateApiCall('/cart/remove', 'DELETE');
-  };
-
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) => prev.map(item => {
-      if (item.id === productId) {
-        const newQty = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }));
-  };
-
-  const toggleWishlist = (product: Product) => {
-    setWishlist((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
-      if (exists) return prev.filter((item) => item.id !== product.id);
-      return [...prev, product];
-    });
-    simulateApiCall('/wishlist/toggle', 'POST');
-  };
-
-  const clearCart = () => setCart([]);
+  // --- CMS Actions ---
+  const upsertCMSSection = (s: CMSSection) => setCmsSections(prev => {
+    const idx = prev.findIndex(item => item.id === s.id);
+    return idx > -1 ? prev.map(item => item.id === s.id ? s : item) : [...prev, s];
+  });
 
   const upsertProduct = (p: Product) => {
     setProducts(prev => {
       const idx = prev.findIndex(item => item.id === p.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = p;
-        return next;
-      }
-      return [p, ...prev];
+      return idx > -1 ? prev.map(item => item.id === p.id ? p : item) : [p, ...prev];
     });
-    recordLog(`Upserted Artifact: ${p.name}`, 'Catalog Atelier');
+    recordLog(`Catalog Update: ${p.name}`, 'CMS');
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    recordLog(`Deleted Artifact: ${id}`, 'Catalog Atelier', 'medium');
-  };
+  const deleteProduct = (id: string) => setProducts(prev => prev.filter(p => p.id !== id));
 
-  const upsertCollection = (c: Collection) => {
-    setCollections(prev => {
-      const idx = prev.findIndex(item => item.id === c.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = c;
-        return next;
-      }
-      return [c, ...prev];
-    });
-  };
+  const upsertCollection = (c: Collection) => setCollections(prev => {
+    const idx = prev.findIndex(item => item.id === c.id);
+    return idx > -1 ? prev.map(item => item.id === c.id ? c : item) : [c, ...prev];
+  });
 
-  const upsertEditorial = (ed: Editorial) => {
-    setEditorials(prev => {
-      const idx = prev.findIndex(item => item.id === ed.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = ed;
-        return next;
-      }
-      return [ed, ...prev];
-    });
-  };
+  const upsertEditorial = (ed: Editorial) => setEditorials(prev => {
+    const idx = prev.findIndex(item => item.id === ed.id);
+    return idx > -1 ? prev.map(item => item.id === ed.id ? ed : item) : [ed, ...prev];
+  });
 
-  const upsertAdmin = (admin: AdminAccount) => {
-    setAdmins(prev => {
-      const idx = prev.findIndex(a => a.id === admin.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = admin;
-        return next;
-      }
-      return [admin, ...prev];
-    });
-  };
-
-  const upsertVendor = (vendor: Vendor) => {
-    setVendors(prev => {
-      const idx = prev.findIndex(v => v.id === vendor.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = vendor;
-        return next;
-      }
-      return [vendor, ...prev];
-    });
-  };
-
-  const upsertAffiliate = (aff: Affiliate) => {
-    setAffiliates(prev => {
-      const idx = prev.findIndex(a => a.id === aff.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = aff;
-        return next;
-      }
-      return [aff, ...prev];
-    });
-  };
-
-  const upsertCampaign = (campaign: Campaign) => {
-    setActiveCampaigns(prev => {
-      const idx = prev.findIndex(c => c.id === campaign.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = campaign;
-        return next;
-      }
-      return [campaign, ...prev];
-    });
-  };
-
-  const upsertSegment = (seg: CustomerSegment) => {
-    setCustomerSegments(prev => {
-      const idx = prev.findIndex(s => s.id === seg.id);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = seg;
-        return next;
-      }
-      return [seg, ...prev];
-    });
-  };
-
-  const upsertAppointment = (apt: Appointment) => {
-    setAppointments(prev => [...prev, apt]);
-  };
-
-  const updateAppointmentStatus = (id: string, status: Appointment['status']) => {
-    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
-  };
-
-  const updateReturnStatus = (id: string, status: ReturnRequest['status']) => {
-    setReturns(prev => prev.map(r => r.id === id ? { ...r, status } : r));
-    recordLog(`Return ${id} set to ${status}`, 'Operations');
-  };
-
-  const createInvoice = (invoice: Invoice) => {
-    setInvoices(prev => [invoice, ...prev]);
-  };
-
+  // --- Sales & CRM Actions ---
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
-    // Lead Tier Logic: 1 ($50k+), 2 ($10k-$50k), 3 (<$10k)
-    let leadTier: 1 | 2 | 3 = 3;
-    if (inquiry.budgetRange === 'Tier 1') leadTier = 1;
-    else if (inquiry.budgetRange === 'Tier 2') leadTier = 2;
-
-    const enrichedInquiry = { ...inquiry, leadTier };
-    setPrivateInquiries(prev => [enrichedInquiry, ...prev]);
-    
-    // Create initial mock conversation
-    const newConv: LeadConversation = {
-      id: `conv-${enrichedInquiry.id}`,
-      inquiryId: enrichedInquiry.id,
-      status: 'active',
-      messages: []
-    };
-    setLeadConversations(prev => [newConv, ...prev]);
-    recordLog(`New Acquisition Lead: ${inquiry.customerName}`, 'Sales Desk');
+    setPrivateInquiries(prev => [inquiry, ...prev]);
+    if (!leadConversations.find(c => c.inquiryId === inquiry.id)) {
+      setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active' }]);
+    }
+    recordLog(`New Acquisition Intent: ${inquiry.customerName}`, 'CRM');
   };
 
-  const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => {
+  const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => 
     setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
-  };
+
+  const updateLeadTier = (id: string, leadTier: 1 | 2 | 3) => 
+    setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, leadTier } : i));
+
+  const addInquiryNote = (id: string, adminNotes: string) => 
+    setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, adminNotes } : i));
 
   const addLeadMessage = (inquiryId: string, text: string, sender: 'curator' | 'client') => {
     setLeadConversations(prev => prev.map(c => {
       if (c.inquiryId === inquiryId) {
-        const newMessage: CuratorMessage = {
-          id: `msg-${Date.now()}`,
-          sender,
-          text,
-          timestamp: new Date().toISOString()
-        };
+        const newMessage: CuratorMessage = { id: `msg-${Date.now()}`, sender, text, timestamp: new Date().toISOString() };
         return { ...c, messages: [...c.messages, newMessage] };
       }
       return c;
     }));
   };
 
-  const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
-    setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
+  // --- SEO Actions ---
+  const upsertSEOMetadata = (m: SEOMetadata) => setSeoRegistry(prev => {
+    const idx = prev.findIndex(item => item.id === m.id);
+    return idx > -1 ? prev.map(item => item.id === m.id ? m : item) : [...prev, m];
+  });
+
+  // --- Messaging Actions ---
+  const upsertTemplate = (t: SalesScript) => setMessagingTemplates(prev => {
+    const idx = prev.findIndex(item => item.id === t.id);
+    return idx > -1 ? prev.map(item => item.id === t.id ? t : item) : [...prev, t];
+  });
+
+  // --- Automation Actions ---
+  const toggleRule = (id: string) => setAutomationRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
+  const upsertRule = (r: AutomationRule) => setAutomationRules(prev => {
+    const idx = prev.findIndex(item => item.id === r.id);
+    return idx > -1 ? prev.map(item => item.id === r.id ? r : item) : [...prev, r];
+  });
+
+  // --- Global State ---
+  const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => {
+    setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: 'Maison CEO', action, module, timestamp: new Date().toISOString(), ipAddress: '127.0.0.1', severity }, ...prev]);
   };
 
-  const assignTicket = (ticketId: string, adminId: string) => {
-    setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, assignedTo: adminId, updatedAt: new Date().toISOString() } : t));
-  };
-
-  const addTicketMessage = (ticketId: string, text: string, sender: 'agent' | 'customer') => {
-    setSupportTickets(prev => prev.map(t => {
-      if (t.id === ticketId) {
-        const newMessage = { id: `msg-${Date.now()}`, sender, text, timestamp: new Date().toISOString() };
-        return { 
-          ...t, 
-          messages: [...t.messages, newMessage], 
-          lastMessage: text,
-          updatedAt: new Date().toISOString() 
-        };
-      }
-      return t;
-    }));
-  };
-
-  const toggleIntegration = (id: string) => {
-    setIntegrations(prev => prev.map(i => {
-      if (i.id === id) {
-        const newStatus = i.status === 'Connected' ? 'Disconnected' : 'Connected';
-        return { ...i, status: newStatus as any };
-      }
-      return i;
-    }));
-  };
-
-  const toggleEmergencyMode = () => {
-    setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
-    recordLog('Emergency Mode Toggled', 'IT Architecture', 'high');
-  };
-
-  const triggerReindex = (type: 'catalog' | 'sitemap' | 'search') => {
-    const newLog: IndexingLog = {
-      id: `idx-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      action: `Manual ${type.charAt(0).toUpperCase() + type.slice(1)} Refresh`,
-      itemsAffected: indexingStatus.catalogItems,
-      duration: '45s',
-      status: 'Success'
-    };
-    setIndexingLogs(prev => [newLog, ...prev]);
-    setIndexingStatus(prev => ({ ...prev, lastFullScan: new Date().toISOString() }));
-  };
-
-  const toggleAutoSync = () => {
-    setIndexingStatus(prev => ({ ...prev, autoSyncEnabled: !prev.autoSyncEnabled }));
-  };
-
-  const updateGlobalSettings = (settings: GlobalSettings) => {
-    setGlobalSettings(settings);
-  };
-
-  const toggleLike = (contentId: string, country: string) => {
-    setSocialMetrics(prev => {
-      const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
-      return { ...prev, [contentId]: { ...current, likes: current.likes + 1 } };
+  const addToCart = (product: Product) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
+      if (existing) return prev.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const trackShare = (contentId: string, country: string) => {
-    setSocialMetrics(prev => {
-      const current = prev[contentId] || { likes: 0, shares: 0, engagementRate: 0 };
-      return { ...prev, [contentId]: { ...current, shares: current.shares + 1 } };
-    });
+  const removeFromCart = (productId: string) => setCart((prev) => prev.filter((item) => item.id !== productId));
+  const updateQuantity = (productId: string, delta: number) => {
+    setCart((prev) => prev.map(item => item.id === productId ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
   };
+  const toggleWishlist = (product: Product) => setWishlist((prev) => prev.some(i => i.id === product.id) ? prev.filter(i => i.id !== product.id) : [...prev, product]);
+  const clearCart = () => setCart([]);
+  const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
 
   const value = useMemo(() => ({
-    cart,
-    wishlist,
-    products,
-    collections,
-    categories,
-    departments,
-    cities,
-    buyingGuides,
-    editorials,
-    socialMetrics,
-    admins,
-    vendors,
-    affiliates,
-    returns,
-    activeCampaigns,
-    auditLogs,
-    vipClients,
-    customerSegments,
-    globalSettings,
-    supportTickets,
-    supportStats,
-    integrations,
-    apiLogs,
-    indexingStatus,
-    indexingLogs,
-    appointments,
-    invoices,
-    privateInquiries,
-    leadConversations,
-    isShowcaseMode,
-    activeVip,
-    activeVendor,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    toggleWishlist,
-    clearCart,
-    upsertProduct,
-    deleteProduct,
-    upsertCollection,
-    upsertEditorial,
-    upsertAdmin,
-    upsertVendor,
-    upsertAffiliate,
-    upsertCampaign,
-    upsertSegment,
-    upsertAppointment,
-    updateAppointmentStatus,
-    updateReturnStatus,
-    createInvoice,
-    upsertPrivateInquiry,
-    updateInquiryStatus,
-    addLeadMessage,
-    updateGlobalSettings,
-    updateTicketStatus,
-    assignTicket,
-    addTicketMessage,
-    toggleIntegration,
-    toggleEmergencyMode,
-    triggerReindex,
-    toggleAutoSync,
-    toggleLike,
-    trackShare,
-    setShowcaseMode,
-    setActiveVip,
-    setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, privateInquiries, leadConversations, isShowcaseMode, activeVip, activeVendor]);
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
+    privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
+    cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
+    vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
+    indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
+    upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
+    upsertPrivateInquiry, updateInquiryStatus, addLeadMessage, updateLeadTier, addInquiryNote,
+    upsertSEOMetadata, upsertTemplate, toggleRule, upsertRule,
+    addToCart, removeFromCart, updateQuantity, toggleWishlist, clearCart, updateGlobalSettings,
+    setShowcaseMode, setActiveVip, setActiveVendor, recordLog
+  }), [cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

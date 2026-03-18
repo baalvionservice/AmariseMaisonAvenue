@@ -1,77 +1,33 @@
-
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { 
+  LayoutDashboard, 
+  LayoutTemplate, 
+  Target, 
+  TrendingUp, 
+  Globe, 
+  Mail, 
+  Zap, 
   BarChart3, 
-  Settings, 
-  DollarSign, 
-  LogOut,
-  ChevronRight,
-  ArrowUpRight,
-  ArrowDownRight,
-  Globe,
+  ChevronRight, 
+  Settings,
+  ShieldCheck,
   Building2,
-  History,
   Users,
   CreditCard,
-  LayoutTemplate,
-  PieChart,
-  LifeBuoy,
-  Cpu,
-  ShieldCheck,
-  ShieldAlert,
-  Plus,
+  History,
   ActivitySquare,
-  Lock
+  DollarSign
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { COUNTRIES } from '@/lib/mock-data';
-import { cn } from '@/lib/utils';
-import { Badge } from "@/components/ui/badge";
 import { useAppStore } from '@/lib/store';
-import { 
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as ChartTooltip,
-  ResponsiveContainer,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell
-} from 'recharts';
-
-type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives' | 'compliance';
-
-const REVENUE_DATA = [
-  { name: 'Jan', value: 450000, forecast: 460000 },
-  { name: 'Feb', value: 520000, forecast: 530000 },
-  { name: 'Mar', value: 480000, forecast: 500000 },
-  { name: 'Apr', value: 610000, forecast: 620000 },
-  { name: 'May', value: 590000, forecast: 640000 },
-  { name: 'Jun', value: 720000, forecast: 750000 },
-];
-
-const DEMO_DATA = [
-  { name: 'Diamond', value: 45, color: '#D4AF37' },
-  { name: 'Gold', value: 30, color: '#7E3F98' },
-  { name: 'Silver', value: 25, color: '#BFA2DB' },
-];
+import { cn } from '@/lib/utils';
 
 export default function SuperAdminPanel() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('intelligence');
-  const { 
-    admins,
-    auditLogs,
-    globalSettings
-  } = useAppStore();
-
-  const [selectedCountry, setSelectedCountry] = useState('us');
-  const currentCountry = COUNTRIES[selectedCountry] || COUNTRIES.us;
+  const { privateInquiries, socialMetrics } = useAppStore();
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -80,58 +36,26 @@ export default function SuperAdminPanel() {
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
             AMARISÉ <span className="text-plum text-xs font-normal tracking-[0.4em] ml-2">MASTER</span>
           </div>
-          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Maison Master Control v5.0</p>
+          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Business OS v5.0</p>
         </div>
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
-          <AdminNavItem icon={<BarChart3 />} label="Intelligence" active={activeTab === 'intelligence'} onClick={() => setActiveTab('intelligence')} />
-          <AdminNavItem icon={<ShieldCheck />} label="Compliance" active={activeTab === 'compliance'} onClick={() => setActiveTab('compliance')} />
-          <AdminNavItem icon={<Users />} label="Governance" active={activeTab === 'governance'} onClick={() => setActiveTab('governance')} />
-          <AdminNavItem icon={<Building2 />} label="Ecosystem" active={activeTab === 'ecosystem'} onClick={() => setActiveTab('ecosystem')} />
-          <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture')} />
-          <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
+          <AdminNavItem icon={<LayoutDashboard />} label="Intelligence" active={true} href="/admin" />
+          <AdminNavItem icon={<LayoutTemplate />} label="Content (CMS)" active={false} href="/admin/content" />
+          <AdminNavItem icon={<Target />} label="Sales (CRM)" active={false} href="/admin/sales" />
+          <AdminNavItem icon={<Globe />} label="SEO Authority" active={false} href="/admin/seo" />
+          <AdminNavItem icon={<Mail />} label="Outreach" active={false} href="/admin/messaging" />
+          <AdminNavItem icon={<Zap />} label="Automation" active={false} href="/admin/automation" />
           
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
-          <div className="space-y-1 px-4">
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
-              <Link href="/admin/finance">
-                <CreditCard className="w-4 h-4 mr-3" /> Finance Hub
-              </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
-              <Link href="/admin/operations">
-                <LayoutTemplate className="w-4 h-4 mr-3" /> Operations Hub
-              </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-              <Link href="/admin/marketing">
-                <PieChart className="w-4 h-4 mr-3" /> Marketing Hub
-              </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-              <Link href="/admin/support">
-                <LifeBuoy className="w-4 h-4 mr-3" /> Support Hub
-              </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-              <Link href="/admin/integrations">
-                <Cpu className="w-4 h-4 mr-3" /> Sync / API Hub
-              </Link>
-            </Button>
-          </div>
+          <AdminNavItem icon={<CreditCard />} label="Finance Hub" active={false} href="/admin/finance" />
+          <AdminNavItem icon={<Settings />} label="Operations Hub" active={false} href="/admin/operations" />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
-          <div className="flex items-center space-x-3 px-4 py-3 bg-plum/5 border border-plum/10 rounded-sm">
-             <ShieldAlert className="w-4 h-4 text-plum" />
-             <div className="flex flex-col">
-                <span className="text-[9px] font-bold uppercase tracking-widest">Security: Optimal</span>
-                <span className="text-[8px] text-gray-400">2FA Enforced</span>
-             </div>
-          </div>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href={`/${selectedCountry}`}>
-              <LogOut className="w-4 h-4 mr-3 transition-transform group-hover:-translate-x-1" /> Exit Control
+            <Link href="/us">
+              <History className="w-4 h-4 mr-3" /> Exit Control
             </Link>
           </Button>
         </div>
@@ -140,248 +64,72 @@ export default function SuperAdminPanel() {
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
-            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              {activeTab}
-            </h1>
-            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Global Platform Oversight • {currentCountry.name} Market Context
-            </p>
+            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Command Center</h1>
+            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Platform Intelligence & Unit Economics</p>
           </div>
-          
-          <div className="flex items-center space-x-6">
-            <div className="relative">
-               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-plum" />
-               <select 
-                 className="bg-white border border-border h-10 pl-10 pr-8 text-[10px] tracking-widest uppercase font-bold outline-none appearance-none cursor-pointer text-gray-700 hover:border-gold transition-colors"
-                 value={selectedCountry}
-                 onChange={(e) => setSelectedCountry(e.target.value)}
-               >
-                 {Object.entries(COUNTRIES).map(([code, c]) => (
-                   <option key={code} value={code}>{c.name}</option>
-                 ))}
-               </select>
-            </div>
-            <div className="flex items-center space-x-4 border-l border-border pl-6">
-               <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase tracking-widest">Maison CEO</p>
-                  <p className="text-[8px] text-gray-400 uppercase">Master Access</p>
-               </div>
-               <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MC</div>
-            </div>
-          </div>
+          <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MC</div>
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {activeTab === 'intelligence' && (
-            <div className="space-y-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard icon={<DollarSign />} label="Global Revenue" value="$4.2M" trend="+12.5%" positive />
-                <StatCard icon={<Building2 />} label="Avg. Order Value" value="$8,450" trend="+4.2%" positive />
-                <StatCard icon={<ActivitySquare />} label="VIP Retention" value="94%" trend="Live" positive />
-                <StatCard icon={<BarChart3 />} label="Predicted Growth" value="18.2%" trend="AI Forecast" positive />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <StatCard icon={<DollarSign />} label="Estimated Rev." value="$1.2M" trend="+12.4%" positive />
+            <StatCard icon={<Users />} label="Active Leads" value={privateInquiries.length.toString()} trend="High Value" positive />
+            <StatCard icon={<ShieldCheck />} label="Registry Health" value="100%" trend="Optimal" positive />
+            <StatCard icon={<ActivitySquare />} label="Conv. Rate" value="4.2%" trend="+0.8%" positive />
+          </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Revenue Architecture & AI Forecasting</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Growth trajectory vs predicted artisanal volume</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-8 h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={REVENUE_DATA}>
-                        <defs>
-                          <linearGradient id="colorValue" x1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.1}/>
-                            <stop offset="95%" stopColor="#7E3F98" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 'bold'}} />
-                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 'bold'}} tickFormatter={(v) => `$${v/1000}k`} />
-                        <ChartTooltip 
-                          contentStyle={{backgroundColor: '#fff', border: '1px solid #eee', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase'}}
-                        />
-                        <Area type="monotone" dataKey="value" name="Actual" stroke="#7E3F98" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
-                        <Area type="monotone" dataKey="forecast" name="AI Forecast" stroke="#D4AF37" strokeDasharray="5 5" fill="transparent" strokeWidth={2} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="font-headline text-2xl">Maison System Health</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of business modules</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <ModuleStatus label="Atelier CMS" status="Synchronized" progress={100} />
+                <ModuleStatus label="Acquisition CRM" status="Live" progress={100} />
+                <ModuleStatus label="SEO Authority Matrix" status="Indexing" progress={92} />
+                <ModuleStatus label="Logic Automation" status="Active" progress={100} />
+              </CardContent>
+            </Card>
 
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by loyalty tier</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-8 flex flex-col items-center">
-                    <div className="h-48 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RechartsPieChart>
-                          <Pie
-                            data={DEMO_DATA}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                          >
-                            {DEMO_DATA.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <ChartTooltip />
-                        </RechartsPieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="w-full space-y-4 mt-6">
-                      {DEMO_DATA.map(d => (
-                        <div key={d.name} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full" style={{backgroundColor: d.color}} />
-                            <span className="text-gray-500">{d.name}</span>
-                          </div>
-                          <span>{d.value}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'governance' && (
-            <div className="space-y-12">
-              <div className="flex justify-between items-end">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Maison Governance</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Oversee administrative roles and permissions</p>
-                </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
-                  <Plus className="w-4 h-4 mr-2" /> Appoint New Admin
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {admins.map(admin => (
-                  <Card key={admin.id} className="bg-white border-border shadow-luxury hover:border-plum transition-all group overflow-hidden">
-                    <CardContent className="p-8 space-y-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-muted rounded-sm flex items-center justify-center border border-border group-hover:border-plum transition-colors overflow-hidden text-[8px] font-bold uppercase text-gray-300">
-                          Profile
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-xl font-headline font-bold leading-tight">{admin.name}</h4>
-                          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold mt-1">{admin.email}</p>
-                        </div>
-                        <Badge className={cn("text-[8px] uppercase tracking-widest", admin.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600')}>
-                          {admin.status}
-                        </Badge>
-                      </div>
-                      <div className="pt-6 border-t border-border space-y-4">
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                          <span>Role</span>
-                          <span className="text-plum">{admin.role}</span>
-                        </div>
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                          <span>2FA Status</span>
-                          <span className={admin.twoFactorEnabled ? "text-green-600" : "text-red-600"}>{admin.twoFactorEnabled ? "Verified" : "Missing"}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'compliance' && (
-            <div className="space-y-12">
-              <h2 className="text-2xl font-headline font-bold italic">Security & Regulatory Compliance</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <ComplianceCard icon={<ShieldCheck />} label="GDPR / CCPA Status" value={globalSettings.compliance.gdprEnabled ? "Active" : "Disabled"} status="Optimal" />
-                <ComplianceCard icon={<Lock />} label="PCI-DSS v4.0" value={globalSettings.compliance.pciStatus} status="Verified" />
-                <ComplianceCard icon={<ActivitySquare />} label="Fraud Shield" value="99.9% Protection" status="Active" />
-              </div>
-              
-              <Card className="bg-white border-border shadow-luxury">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Platform Security Policies</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Enterprise-level safety protocols</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <SecuritySettingRow label="Mandatory Two-Factor Authentication (2FA)" active={true} />
-                  <SecuritySettingRow label="IP Whitelisting for Admin Operations" active={true} />
-                  <SecuritySettingRow label="Automated PII Masking in Logs" active={true} />
-                  <SecuritySettingRow label="Real-time Intrusion Detection (IDS)" active={true} />
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {activeTab === 'archives' && (
-            <div className="space-y-12">
-              <div className="flex justify-between items-center border-b border-border pb-8">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic text-gray-900">Maison Archives</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Platform-wide audit and activity footprint</p>
+            <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
+              <div className="relative z-10 space-y-6">
+                <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
+                <div className="space-y-4">
+                  <Link href="/admin/content" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Update Catalog</p>
+                  </Link>
+                  <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
+                  </Link>
+                  <Link href="/admin/seo" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Refresh Sitemap</p>
+                  </Link>
                 </div>
               </div>
-
-              <div className="space-y-4">
-                {auditLogs.map(log => (
-                  <div key={log.id} className="flex items-center justify-between p-6 bg-white border border-border hover:border-plum transition-all group">
-                    <div className="flex items-center space-x-8">
-                      <div className="text-center w-24">
-                        <p className="text-[9px] font-bold text-gray-400 uppercase">{new Date(log.timestamp).toLocaleDateString()}</p>
-                        <p className="text-[8px] text-gray-300">{new Date(log.timestamp).toLocaleTimeString()}</p>
-                      </div>
-                      <div className="h-8 w-px bg-border" />
-                      <div className="space-y-1">
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-900">{log.action}</p>
-                        <div className="flex items-center space-x-3">
-                          <span className="text-[9px] text-plum font-bold uppercase tracking-widest">{log.adminName}</span>
-                          <span className="text-[8px] text-gray-300">•</span>
-                          <span className="text-[9px] text-gray-400 uppercase font-bold tracking-widest">{log.module}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <Badge className={cn(
-                      "text-[8px] uppercase tracking-widest",
-                      log.severity === 'high' ? 'bg-red-50 text-red-600' : log.severity === 'medium' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'
-                    )}>
-                      {log.severity} RISK
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            </Card>
+          </div>
         </div>
       </main>
     </div>
   );
 }
 
-function AdminNavItem({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) {
+function AdminNavItem({ icon, label, active, href }: { icon: any, label: string, active: boolean, href: string }) {
   return (
-    <button 
-      onClick={onClick}
-      className={cn(
+    <Link href={href}>
+      <button className={cn(
         "w-full flex items-center space-x-4 px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-all group rounded-sm border",
-        active 
-          ? "bg-gold text-gray-900 border-gold shadow-md scale-105 z-10" 
-          : "text-gray-400 hover:bg-ivory hover:text-plum border-transparent"
-      )}
-    >
-      <span className={cn("transition-transform group-hover:scale-110", active ? "text-gray-900" : "text-gold")}>
-        {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
-      </span>
-      <span>{label}</span>
-      {active && <ChevronRight className="w-4 h-4 ml-auto" />}
-    </button>
+        active ? "bg-plum text-white border-plum shadow-md" : "text-gray-400 hover:bg-ivory hover:text-plum border-transparent"
+      )}>
+        <span className={cn("transition-transform group-hover:scale-110", active ? "text-white" : "text-gold")}>
+          {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
+        </span>
+        <span>{label}</span>
+        {active && <ChevronRight className="w-4 h-4 ml-auto" />}
+      </button>
+    </Link>
   );
 }
 
@@ -391,11 +139,8 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
       <CardContent className="p-8 space-y-6">
         <div className="flex justify-between items-start">
           <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
-          <div className={cn(
-            "flex items-center text-xs font-bold tracking-widest",
-            positive ? "text-gold" : "text-destructive"
-          )}>
-            {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : <ArrowDownRight className="ml-1 w-3 h-3" />}
+          <div className={cn("text-[10px] font-bold uppercase tracking-widest", positive ? "text-gold" : "text-red-500")}>
+            {trend}
           </div>
         </div>
         <div>
@@ -407,29 +152,16 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
   );
 }
 
-function ComplianceCard({ icon, label, value, status }: { icon: any, label: string, value: string, status: string }) {
+function ModuleStatus({ label, status, progress }: { label: string, status: string, progress: number }) {
   return (
-    <Card className="bg-white border-border shadow-sm p-6 space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="p-3 bg-ivory rounded-sm text-plum">{icon}</div>
-        <Badge className="bg-green-50 text-green-600 text-[8px] uppercase">{status}</Badge>
+    <div className="space-y-2">
+      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+        <span className="text-gray-500">{label}</span>
+        <span className="text-plum">{status}</span>
       </div>
-      <div>
-        <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest">{label}</p>
-        <p className="text-xl font-headline font-bold mt-1">{value}</p>
+      <div className="h-1 bg-ivory w-full overflow-hidden rounded-full">
+        <div className="h-full bg-plum transition-all" style={{ width: `${progress}%` }} />
       </div>
-    </Card>
-  );
-}
-
-function SecuritySettingRow({ label, active }: { label: string, active: boolean }) {
-  return (
-    <div className="flex items-center justify-between p-4 border border-border rounded-sm hover:bg-ivory/50 transition-colors">
-      <div className="flex items-center space-x-4">
-        <div className={cn("w-2.5 h-2.5 rounded-full", active ? "bg-green-500" : "bg-gray-200")} />
-        <span className="text-xs font-bold uppercase tracking-widest text-gray-700">{label}</span>
-      </div>
-      <Badge variant="outline" className="text-[8px] uppercase">{active ? "Enforced" : "Optional"}</Badge>
     </div>
   );
 }

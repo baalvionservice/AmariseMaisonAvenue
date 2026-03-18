@@ -3,6 +3,7 @@ import { SalesScript } from './types';
 export const ACQUISITION_SCRIPTS: SalesScript[] = [
   {
     id: 'script-init',
+    name: 'Initial Curatorial Response',
     stage: 'new',
     template: `Thank you for your inquiry. Your request has been personally reviewed by our acquisition desk.
 
@@ -17,6 +18,7 @@ We curate differently based on purpose.
   },
   {
     id: 'script-investor',
+    name: 'Investment Advisory Lead',
     stage: 'qualifying',
     triggerKeywords: ['investment', 'roi', 'appreciate', 'market', 'value'],
     template: `Understood. Our Investment Advisory specializes in artifacts with proven resale liquidity and historical appreciation trajectories. 
@@ -25,6 +27,7 @@ I am currently analyzing the provenance of this piece against recent secondary m
   },
   {
     id: 'script-personal',
+    name: 'Personal Legacy Lead',
     stage: 'qualifying',
     triggerKeywords: ['personal', 'gift', 'myself', 'wear', 'use', 'wedding'],
     template: `A distinguished choice. This artifact was crafted to be an extension of one's legacy. 
@@ -33,6 +36,7 @@ In our Parisian atelier, we believe such pieces find their rightful guardians. M
   },
   {
     id: 'script-price',
+    name: 'Price & Value Handling',
     stage: 'presenting',
     triggerKeywords: ['price', 'cost', 'how much', 'expensive'],
     template: `The acquisition value for an artifact of this rarity is optimized for market stability. 
@@ -41,6 +45,7 @@ For private clients, we provide a bespoke allocation quote that includes global 
   },
   {
     id: 'script-scarcity',
+    name: 'Inventory Scarcity Push',
     stage: 'closing',
     triggerKeywords: ['wait', 'thinking', 'later', 'available'],
     template: `I must inform you that this specific archive entry has attracted significant interest from a collector in our Dubai hub. 
@@ -49,6 +54,7 @@ Due to its provenance, we can only maintain a private hold for the next 24 busin
   },
   {
     id: 'script-closing',
+    name: 'Final Reservation Protocol',
     stage: 'closing',
     template: `Your acquisition request has been moved to final verification. 
 

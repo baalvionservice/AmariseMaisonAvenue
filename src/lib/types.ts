@@ -141,7 +141,7 @@ export interface BuyingGuide {
   provenanceChecklist?: string[];
 }
 
-// --- SALES & MONETIZATION EXTENSIONS ---
+// --- SALES & CRM EXTENSIONS ---
 
 export interface ProductExtended extends Product {
   collectorValue: string;
@@ -180,13 +180,14 @@ export interface PrivateInquiry {
   customerName: string;
   email: string;
   country: string;
-  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3'; // Tier 1: $50k+, Tier 2: $10k-$50k, Tier 3: <$10k
+  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3'; 
   intent: 'Collector' | 'Personal' | 'Investment';
   message?: string;
   contactMethod: 'WhatsApp' | 'Email';
   status: 'new' | 'contacted' | 'qualifying' | 'presenting' | 'closing' | 'won' | 'lost';
   leadTier: 1 | 2 | 3;
   timestamp: string;
+  adminNotes?: string;
 }
 
 export interface CuratorMessage {
@@ -205,10 +206,42 @@ export interface LeadConversation {
 
 export interface SalesScript {
   id: string;
+  name: string;
   stage: PrivateInquiry['status'];
   triggerKeywords?: string[];
   template: string;
 }
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  trigger: 'inquiry_submitted' | 'keyword_match' | 'tier_assigned';
+  action: 'send_script' | 'notify_admin' | 'change_status';
+  params?: any;
+  enabled: boolean;
+}
+
+export interface SEOMetadata {
+  id: string;
+  path: string;
+  title: string;
+  description: string;
+  keywords: string;
+  h1: string;
+  structuredData?: any;
+}
+
+export interface CMSSection {
+  id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  visible: boolean;
+  featured: boolean;
+  contentId?: string; // Links to a specific entity
+}
+
+// --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {
   likes: number;
@@ -256,7 +289,7 @@ export interface Vendor {
   id: string;
   name: string;
   category: string;
-  performance: number; // 0-100
+  performance: number;
   productCount: number;
   salesTotal: number;
   status: 'active' | 'pending' | 'rejected';
@@ -400,7 +433,7 @@ export interface SupportTicket {
   status: 'open' | 'pending' | 'resolved' | 'escalated';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   category: 'Order Issue' | 'Product Query' | 'Return/Exchange' | 'VIP Request' | 'Technical';
-  assignedTo?: string; // Admin ID
+  assignedTo?: string; 
   lastMessage: string;
   updatedAt: string;
   createdAt: string;
@@ -428,7 +461,7 @@ export interface MaisonIntegration {
   status: 'Connected' | 'Disconnected' | 'Error' | 'Degraded';
   lastSync: string;
   latency?: string;
-  uptime: number; // 0-100
+  uptime: number; 
   logo?: string;
 }
 
