@@ -1,10 +1,11 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Globe } from 'lucide-react';
-import { COUNTRIES, DEPARTMENTS, CATEGORIES } from '@/lib/mock-data';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
 import { 
   DropdownMenu, 
@@ -14,6 +15,7 @@ import {
   DropdownMenuLabel
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export const Header = () => {
   const { country } = useParams();
@@ -43,6 +45,17 @@ export const Header = () => {
     router.push(`/${code}`);
   };
 
+  const navLinks = [
+    { name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals`, mega: true },
+    { name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
+    { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
+    { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
+    { name: 'OTHER BRANDS', href: `/${countryCode}/category/accessories` },
+    { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
+    { name: 'LIVE SHOP', href: `/${countryCode}/buying-guide` },
+    { name: 'BLOG', href: `/${countryCode}/journal` },
+  ];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
       {/* Top Ticker Bar - Light Lavender Style */}
@@ -64,7 +77,7 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Black Utility Bar - Matches Reference */}
+      {/* Black Utility Bar */}
       <div className="bg-[#1a1a1a] text-white h-10 flex items-center justify-between px-6 text-[10px] tracking-widest font-bold uppercase">
         <div className="flex items-center space-x-2">
           <ShieldCheck className="w-3.5 h-3.5 text-white/80" />
@@ -147,31 +160,60 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Primary Navigation */}
+      {/* Primary Navigation with Mega Menu */}
       <nav className="h-14 bg-white border-b border-border px-6 hidden lg:flex items-center justify-center space-x-10">
-        <Link href={`/${countryCode}/category/new-arrivals`} className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gold transition-colors">New Arrivals</Link>
-        {DEPARTMENTS.slice(0, 6).map((dept) => (
-          <div key={dept.id} className="group relative">
+        {navLinks.map((link) => (
+          <div key={link.name} className="group h-full flex items-center">
             <Link 
-              href={`/${countryCode}/${dept.id}`} 
-              className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gold transition-colors block h-14 flex items-center"
+              href={link.href} 
+              className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-black transition-colors relative"
             >
-              {dept.name}
+              {link.name}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full" />
             </Link>
-            <div className="absolute top-full left-0 hidden group-hover:block w-screen max-w-sm bg-white border border-border shadow-luxury animate-in fade-in slide-in-from-top-1 duration-200 z-50">
-              <div className="p-6 grid grid-cols-1 gap-4">
-                <DropdownMenuLabel className="text-[9px] uppercase tracking-widest text-muted-foreground p-0">Collections</DropdownMenuLabel>
-                {CATEGORIES.filter(c => c.departmentId === dept.id).map(cat => (
-                  <Link key={cat.id} href={`/${countryCode}/${dept.id}/${cat.id}`} className="text-[11px] uppercase tracking-wider text-gray-600 hover:text-gold transition-colors">
-                    {cat.name}
-                  </Link>
-                ))}
+
+            {/* Mega Menu implementation */}
+            {link.mega && (
+              <div className="absolute top-full left-0 w-full bg-white border-b border-border shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pt-16 pb-20">
+                <div className="container mx-auto px-32 flex gap-32">
+                  {/* Left Column: Navigation Links */}
+                  <div className="w-64 space-y-8">
+                    <h3 className="text-[10px] font-bold tracking-[0.3em] text-black uppercase">NEW ARRIVALS</h3>
+                    <div className="flex flex-col space-y-5">
+                      {['Hermès', 'Chanel', 'Other Brands', 'Jewelry'].map((sub) => (
+                        <Link 
+                          key={sub} 
+                          href="#" 
+                          className="text-lg font-light text-gray-600 hover:text-black transition-colors"
+                        >
+                          {sub}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Featured Image Area */}
+                  <div className="flex-1 space-y-8">
+                    <div className="aspect-[16/8] w-full bg-muted border border-border flex items-center justify-center group/img relative overflow-hidden">
+                      <Image 
+                        src="https://picsum.photos/seed/amarise-arrivals-bags/1200/800" 
+                        alt="New Arrivals" 
+                        fill 
+                        className="object-cover transition-transform duration-1000 group-hover/img:scale-105"
+                        data-ai-hint="luxury handbags"
+                      />
+                      <div className="absolute inset-0 bg-black/5 group-hover/img:bg-transparent transition-colors" />
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-4xl font-headline font-bold text-black uppercase tracking-wider">NEW ARRIVALS</h4>
+                      <p className="text-base font-light text-gray-500 italic">Hermès New Arrivals</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
-        <Link href={`/${countryCode}/journal`} className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gold transition-colors">Journal</Link>
-        <Link href={`/${countryCode}/buying-guide`} className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold hover:text-black transition-colors animate-pulse">Live Shop</Link>
       </nav>
 
       {/* Mobile Trigger */}
@@ -180,7 +222,7 @@ export const Header = () => {
           {isMenuOpen ? <X /> : <Menu />}
         </button>
         <span className="text-[10px] font-bold uppercase tracking-widest">Menu</span>
-        <div className="w-10" /> {/* balance */}
+        <div className="w-10" />
       </div>
     </header>
   );

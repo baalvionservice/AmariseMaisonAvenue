@@ -42,6 +42,12 @@
       "description": "VIP Private Collection",
       "imageUrl": "https://picsum.photos/seed/prive-exclusive/1920/1080",
       "imageHint": "exclusive watches"
+    },
+    {
+      "id": "mega-menu-arrivals",
+      "description": "New Arrivals Luxury Handbags",
+      "imageUrl": "https://picsum.photos/seed/amarise-arrivals-bags/1200/800",
+      "imageHint": "luxury handbags"
     }
   ]
 }
