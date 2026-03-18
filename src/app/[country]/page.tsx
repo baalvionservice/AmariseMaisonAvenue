@@ -97,7 +97,38 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <div className="space-y-40 pt-40">
+      {/* NEW: Editorial Story Section - "The Pulse of Mastery" */}
+      <section className="container mx-auto px-12 py-40 max-w-[1600px]">
+        <div className="flex flex-col lg:flex-row items-center gap-24 lg:gap-40">
+          <div className="lg:w-1/2 relative aspect-[4/5] w-full overflow-hidden shadow-luxury group">
+            <Image 
+              src="https://picsum.photos/seed/amarise-mastery/1200/1500" 
+              alt="Maison Mastery" 
+              fill 
+              className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+              data-ai-hint="fashion atelier"
+            />
+          </div>
+          <div className="lg:w-1/2 space-y-10 text-center lg:text-left">
+            <div className="space-y-4">
+              <span className="text-secondary text-[10px] font-bold tracking-[0.5em] uppercase">Maison Narrative</span>
+              <h2 className="text-5xl md:text-7xl font-headline font-medium italic text-gray-900 tracking-tight leading-tight">
+                The Pulse <br /> of Mastery
+              </h2>
+            </div>
+            <p className="text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l-2 border-secondary/20 pl-10">
+              "Beyond the artifact lies the intention. A dialogue between the master's hand and the collector's soul, curated for those who seek the absolute."
+            </p>
+            <div className="pt-6">
+              <Link href={`/${countryCode}/about`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2">
+                Discover the Heritage
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="space-y-40">
         {/* Featured Departments - Architectural Grid */}
         <section className="container mx-auto px-12 max-w-[1600px]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
@@ -119,6 +150,27 @@ export default function HomePage() {
               desc="Swiss precision and horological secrets."
               href={`/${countryCode}/category/timepieces`}
             />
+          </div>
+        </section>
+
+        {/* NEW: Asymmetric Pause Section - "Architecture of Rarity" */}
+        <section className="relative h-[60vh] w-full flex items-center overflow-hidden bg-ivory">
+          <div className="absolute right-0 top-0 w-2/3 h-full overflow-hidden">
+            <Image 
+              src="https://picsum.photos/seed/amarise-pause/1920/1080" 
+              alt="Atelier Silence" 
+              fill 
+              className="object-cover opacity-40 grayscale"
+              data-ai-hint="minimal architecture"
+            />
+          </div>
+          <div className="container mx-auto px-12 relative z-10 max-w-[1600px]">
+            <div className="max-w-2xl space-y-8">
+              <h2 className="text-6xl md:text-8xl font-headline font-medium italic text-black leading-none">Architecture <br /> of Rarity</h2>
+              <p className="text-lg text-gray-600 font-light italic max-w-md">
+                Exploring the silent intervals where craftsmanship transforms into legacy.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -217,6 +269,16 @@ export default function HomePage() {
                 <ProductCard key={rec.id} product={rec} />
               ))
             )}
+          </div>
+        </section>
+
+        {/* NEW: Signature Brand Statement */}
+        <section className="py-40 text-center bg-ivory">
+          <div className="container mx-auto px-12 max-w-4xl">
+            <h3 className="text-4xl md:text-5xl font-headline font-medium italic text-black tracking-widest leading-relaxed">
+              "A curated world of rare expressions, <br /> defined by the absolute."
+            </h3>
+            <div className="mt-12 w-16 h-px bg-secondary mx-auto" />
           </div>
         </section>
 

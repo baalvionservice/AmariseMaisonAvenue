@@ -67,11 +67,11 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
     <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
         {/* Gallery-Style Card Box */}
-        <div className="w-full h-full bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-700 group-hover:scale-105 group-hover:bg-ivory">
+        <div className="w-full h-full bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-[1.5s] group-hover:scale-105 group-hover:bg-ivory">
           Atelier Archive Asset
         </div>
         
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         
         {product.isVip && (
           <div className="absolute top-6 left-6 bg-black px-4 py-1.5 text-[8px] font-bold tracking-[0.3em] text-white uppercase shadow-lg z-10 rounded-none">
@@ -79,13 +79,13 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           </div>
         )}
 
-        <div className="absolute top-6 right-6 flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-all duration-500 z-10 border border-gray-100 shadow-sm">
+        <div className="absolute top-6 right-6 flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-all duration-700 z-10 border border-gray-100 shadow-sm">
            <Heart className={cn("w-3 h-3", isWishlisted ? "fill-black text-black" : "text-gray-400")} />
            <span className="text-[9px] font-bold text-gray-900 tracking-tighter">{metrics.likes.toLocaleString()}</span>
         </div>
 
         {/* Minimal Bottom CTA Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-700 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
+        <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
           <Button 
             className="w-full h-14 rounded-none bg-black text-white hover:bg-gray-900 transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
             onClick={handleAddToCart}
@@ -114,7 +114,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
       <div className="pt-8 pb-4 flex-1 flex flex-col space-y-3 bg-transparent text-center">
         <div className="space-y-1">
           <Link href={`/${countryCode}/product/${product.id}`}>
-            <h3 className="font-headline text-xl text-gray-900 group-hover:text-secondary transition-colors duration-500 leading-tight tracking-tight px-4 line-clamp-1 italic">
+            <h3 className="font-headline text-xl text-gray-900 group-hover:text-secondary transition-colors duration-700 leading-tight tracking-tight px-4 line-clamp-1 italic">
               {product.name}
             </h3>
           </Link>
@@ -124,11 +124,11 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           <span className="text-sm font-bold tracking-tight text-gray-900">
             {formatPrice(product.basePrice, countryCode)}
           </span>
-          <div className="w-8 h-px bg-gray-100 group-hover:w-16 transition-all duration-700" />
+          <div className="w-8 h-px bg-gray-100 group-hover:w-16 transition-all duration-1000" />
         </div>
 
-        <div className="pt-4 opacity-0 group-hover:opacity-100 transition-all duration-700">
-          <Link href={`/${countryCode}/product/${product.id}`} className="text-[9px] text-secondary font-bold tracking-[0.5em] uppercase hover:opacity-60">
+        <div className="pt-4 opacity-0 group-hover:opacity-100 transition-all duration-1000">
+          <Link href={`/${countryCode}/product/${product.id}`} className="text-[9px] text-secondary font-bold tracking-[0.5em] uppercase hover:opacity-60 italic">
             View Archive Details
           </Link>
         </div>
