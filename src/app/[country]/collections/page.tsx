@@ -19,16 +19,20 @@ export default function CollectionsPage() {
 
   return (
     <div className="bg-white min-h-screen pb-40 relative">
-      <div className="container mx-auto px-6 py-8">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center space-x-2 text-[11px] font-medium text-gray-500 mb-12">
+      <div className="container mx-auto px-6 py-12">
+        {/* Breadcrumbs - Refined to match image */}
+        <nav className="flex items-center space-x-2 text-[13px] font-normal text-gray-600 mb-8">
           <Link href={`/${countryCode}`} className="hover:text-black transition-colors">Home</Link>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-black">Collections</span>
+          <span className="text-gray-400 font-light flex items-center justify-center">
+            <ChevronRight className="w-3 h-3 mx-1" strokeWidth={1.5} />
+          </span>
+          <span className="text-gray-900">Collections</span>
         </nav>
 
-        {/* Page Title */}
-        <h1 className="text-6xl font-headline font-medium text-black mb-24">Collections</h1>
+        {/* Page Title - High-Fidelity Serif to match image */}
+        <h1 className="text-7xl font-headline font-medium text-black mb-24 tracking-tight">
+          Collections
+        </h1>
 
         {/* Collections Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-32">
