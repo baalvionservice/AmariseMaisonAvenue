@@ -313,8 +313,6 @@ export interface VipClient {
   subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
 }
 
-// --- SUPPORT HUB EXTENSIONS ---
-
 export interface SupportTicket {
   id: string;
   customerId: string;
@@ -344,8 +342,6 @@ export interface SupportStats {
   activeChats: number;
 }
 
-// --- INTEGRATION EXTENSIONS ---
-
 export interface MaisonIntegration {
   id: string;
   name: string;
@@ -367,8 +363,6 @@ export interface ApiLog {
   latency: string;
   integrationId: string;
 }
-
-// --- INDEXING & SYNC HUB ---
 
 export interface IndexingStatus {
   catalogItems: number;

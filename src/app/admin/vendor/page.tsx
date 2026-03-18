@@ -12,22 +12,16 @@ import {
   UserCircle,
   LogOut,
   ChevronRight,
-  Search,
   Plus,
   Edit3,
   Trash2,
   Eye,
   TrendingUp,
-  AlertCircle,
-  RefreshCcw,
-  CheckCircle2,
   Clock,
-  ArrowUpRight,
+  RefreshCcw,
   Zap,
   Globe,
-  Settings,
-  ShieldCheck,
-  FileText
+  Briefcase
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,9 +48,6 @@ import {
 
 type VendorTab = 'dashboard' | 'catalog' | 'orders' | 'reports' | 'finances' | 'profile';
 
-/**
- * VendorAdminPanel: The exclusive workspace for Maison Amarisé artisanal partners.
- */
 export default function VendorAdminPanel() {
   const [activeTab, setActiveTab] = useState<VendorTab>('dashboard');
   const { activeVendor, setActiveVendor, vendors, products, deleteProduct } = useAppStore();
@@ -68,16 +59,15 @@ export default function VendorAdminPanel() {
   );
 
   const handleAction = (msg: string) => {
-    toast({ title: "Vendor Action", description: msg });
+    toast({ title: "Atelier Action", description: msg });
   };
 
   if (!activeVendor) {
-    return <div className="h-screen flex items-center justify-center bg-ivory">Unauthorized.</div>;
+    return <div className="h-screen flex items-center justify-center bg-ivory uppercase tracking-[0.5em] font-headline">Access Denied</div>;
   }
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
-      {/* Vendor Sidebar */}
       <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
@@ -89,7 +79,7 @@ export default function VendorAdminPanel() {
           </div>
         </div>
         
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <VendorNavItem icon={<LayoutDashboard />} label="Resonance" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <VendorNavItem icon={<Package />} label="Atelier Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
           <VendorNavItem icon={<Truck />} label="Fulfillment" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
@@ -100,12 +90,12 @@ export default function VendorAdminPanel() {
 
         <div className="pt-8 border-t border-border space-y-4">
           <div className="space-y-2">
-             <p className="text-[8px] text-gray-400 uppercase tracking-widest px-4 font-bold">Demo: Switch Brand</p>
+             <p className="text-[8px] text-gray-400 uppercase tracking-widest px-4 font-bold">Switch Identity</p>
              <Select value={activeVendor.id} onValueChange={(id) => setActiveVendor(vendors.find(v => v.id === id) || null)}>
-                <SelectTrigger className="bg-ivory border-border text-[10px] font-bold uppercase h-10">
+                <SelectTrigger className="bg-ivory border-border text-[10px] font-bold uppercase h-10 rounded-none">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-white border-border shadow-luxury">
                   {vendors.map(v => (
                     <SelectItem key={v.id} value={v.id} className="text-[10px] uppercase font-bold">{v.name}</SelectItem>
                   ))}
@@ -120,7 +110,6 @@ export default function VendorAdminPanel() {
         </div>
       </aside>
 
-      {/* Main Workspace */}
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
@@ -128,18 +117,18 @@ export default function VendorAdminPanel() {
               {activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              {activeVendor.name} • Global Partner Terminal
+              {activeVendor.name} • Global Partner Hub
             </p>
           </div>
           <div className="flex items-center space-x-6">
             <div className="text-right">
-               <p className="text-[10px] font-bold uppercase tracking-widest">Trust Index</p>
+               <p className="text-[10px] font-bold uppercase tracking-widest">Brand performance</p>
                <div className="flex items-center space-x-2 mt-1">
                   <Progress value={activeVendor.performance} className="h-1 w-20 bg-ivory" />
                   <span className="text-[10px] font-bold text-gold">{activeVendor.performance}%</span>
                </div>
             </div>
-            <div className="w-10 h-10 bg-ivory border border-border rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-plum">
+            <div className="w-10 h-10 bg-ivory border border-border rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-plum border-plum/20">
               {activeVendor.name.charAt(0)}
             </div>
           </div>
@@ -147,13 +136,12 @@ export default function VendorAdminPanel() {
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           
-          {/* RESONANCE (DASHBOARD) */}
           {activeTab === 'dashboard' && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard icon={<TrendingUp />} label="Artisanal Revenue" value={`$${(activeVendor.salesTotal / 1000).toFixed(1)}k`} trend="+8.4%" positive={true} />
                 <StatCard icon={<Clock />} label="Pending Orders" value="04" trend="Immediate" positive={false} />
-                <StatCard icon={<AlertCircle />} label="Stock Alerts" value="02" trend="Low Stock" positive={false} />
+                <StatCard icon={<Package />} label="Collection Health" value={`${vendorProducts.length} Pieces`} trend="Optimal" positive={true} />
                 <StatCard icon={<Zap />} label="Engagement" value="4.2%" trend="High" positive={true} />
               </div>
 
@@ -161,15 +149,15 @@ export default function VendorAdminPanel() {
                 <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
                     <CardTitle className="font-headline text-2xl">Fulfillment Stream</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Active orders for your pieces</CardDescription>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Active acquisitions for your brand</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader className="bg-ivory/50">
                         <TableRow>
                           <TableHead className="text-[9px] uppercase font-bold pl-8">Order ID</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Artifact</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Country</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Piece</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Region</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                         </TableRow>
@@ -179,7 +167,7 @@ export default function VendorAdminPanel() {
                           <TableRow key={i} className="hover:bg-ivory/30">
                             <TableCell className="text-xs font-bold font-mono pl-8">#AM-{(2000 + i)}</TableCell>
                             <TableCell className="text-xs font-light italic truncate max-w-[150px]">
-                              {vendorProducts[i % vendorProducts.length]?.name || "Artifact"}
+                              {vendorProducts[i % vendorProducts.length]?.name || "Artisanal Artifact"}
                             </TableCell>
                             <TableCell className="text-[10px] uppercase tracking-widest font-bold">US</TableCell>
                             <TableCell className="text-center">
@@ -196,14 +184,14 @@ export default function VendorAdminPanel() {
                 </Card>
 
                 <Card className="bg-white border-border shadow-luxury overflow-hidden">
-                  <div className="aspect-[4/5] relative">
-                     <img src="https://picsum.photos/seed/amarise-atelier/800/1000" className="w-full h-full object-cover opacity-80" alt="Atelier" />
-                     <div className="absolute inset-0 bg-gradient-to-t from-plum via-transparent to-transparent opacity-60" />
+                  <div className="aspect-[4/5] relative bg-muted flex items-center justify-center border-b border-border">
+                     <div className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-300">Maison Concierge View</div>
+                     <div className="absolute inset-0 bg-gradient-to-t from-plum/80 via-transparent to-transparent opacity-60" />
                      <div className="absolute bottom-0 inset-x-0 p-8 text-white space-y-2">
-                        <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-gold">Maison Support</span>
-                        <h4 className="text-2xl font-headline font-bold italic">Speak with a Curator</h4>
-                        <p className="text-[10px] font-light italic opacity-80">Our global vendor managers are available for logistical assistance.</p>
-                        <Button className="w-full h-10 bg-white text-plum mt-4 rounded-none text-[10px] font-bold tracking-widest uppercase">Contact Manager</Button>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-gold">Brand support</span>
+                        <h4 className="text-2xl font-headline font-bold italic">Atelier Manager</h4>
+                        <p className="text-[10px] font-light italic opacity-80">Our global partner curators are available for logistical coordination.</p>
+                        <Button className="w-full h-10 bg-white text-plum mt-4 rounded-none text-[10px] font-bold tracking-widest uppercase shadow-lg">Contact Manager</Button>
                      </div>
                   </div>
                 </Card>
@@ -211,20 +199,19 @@ export default function VendorAdminPanel() {
             </div>
           )}
 
-          {/* ATELIER CATALOG (PRODUCT MGMT) */}
           {activeTab === 'catalog' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Brand Collection</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Manage your artisanal catalog on Maison Amarisé</p>
+                  <h2 className="text-2xl font-headline font-bold italic">Atelier Registry</h2>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Manage your exclusive artisanal collection</p>
                 </div>
                 <div className="flex space-x-4">
-                   <Button variant="outline" className="border-border text-gray-400 h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={() => handleAction("Bulk CSV export initiated.")}>
-                     Export Catalog
+                   <Button variant="outline" className="border-border text-gray-400 h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={() => handleAction("Bulk collection export initiated.")}>
+                     Export catalog
                    </Button>
                    <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
-                     <Plus className="w-4 h-4 mr-2" /> Add New Piece
+                     <Plus className="w-4 h-4 mr-2" /> CREATE NEW ENTRY
                    </Button>
                 </div>
               </div>
@@ -235,8 +222,8 @@ export default function VendorAdminPanel() {
                     <TableRow>
                       <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold">Category</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">In Stock</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right">MSRP</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">In Registry</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right">Value</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -245,8 +232,8 @@ export default function VendorAdminPanel() {
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
-                            <div className="w-10 h-12 bg-ivory rounded-sm overflow-hidden flex-shrink-0">
-                              <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                            <div className="w-10 h-12 bg-muted rounded-sm overflow-hidden flex-shrink-0 flex items-center justify-center text-[6px] font-bold uppercase text-gray-400 border border-border">
+                              Asset
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-bold leading-tight">{product.name}</span>
@@ -257,7 +244,7 @@ export default function VendorAdminPanel() {
                         <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{product.category}</Badge></TableCell>
                         <TableCell className="text-center">
                           <span className={cn("text-xs font-bold", product.stock < 5 ? "text-red-500" : "text-gray-500")}>
-                            {product.stock}
+                            {product.stock} Units
                           </span>
                         </TableCell>
                         <TableCell className="text-right text-xs font-light">${product.basePrice.toLocaleString()}</TableCell>
@@ -275,48 +262,7 @@ export default function VendorAdminPanel() {
             </div>
           )}
 
-          {/* REPORTS (ANALYTICS) */}
-          {activeTab === 'reports' && (
-            <div className="space-y-12">
-               <h2 className="text-2xl font-headline font-bold italic">Brand Resonance Analytics</h2>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <Card className="bg-white border-border shadow-luxury p-8 space-y-6">
-                     <div className="flex justify-between items-center">
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-plum">Market Share</h4>
-                        <Globe className="w-4 h-4 text-gold" />
-                     </div>
-                     <div className="space-y-4">
-                        <MarketShareRow label="United States" val={45} />
-                        <MarketShareRow label="United Kingdom" val={25} />
-                        <MarketShareRow label="United Arab Emirates" val={30} />
-                     </div>
-                  </Card>
-                  <Card className="bg-white border-border shadow-luxury p-8 space-y-6">
-                     <div className="flex justify-between items-center">
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-plum">Product Engagement</h4>
-                        <Zap className="w-4 h-4 text-gold" />
-                     </div>
-                     <div className="space-y-2">
-                        <p className="text-2xl font-headline font-bold italic text-gray-900">High Velocity</p>
-                        <p className="text-[9px] text-gray-400 uppercase leading-relaxed italic">"Your Heritage Silk Series is currently trending in the Dubai Market."</p>
-                     </div>
-                  </Card>
-                  <Card className="bg-white border-border shadow-luxury p-8 space-y-6">
-                     <div className="flex justify-between items-center">
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-plum">Client Sentiment</h4>
-                        <CheckCircle2 className="w-4 h-4 text-gold" />
-                     </div>
-                     <div className="space-y-2">
-                        <p className="text-2xl font-headline font-bold italic text-gray-900">4.8 / 5.0</p>
-                        <p className="text-[9px] text-gray-400 uppercase leading-relaxed italic">Average critique score for the last 30 days.</p>
-                     </div>
-                  </Card>
-               </div>
-            </div>
-          )}
-
-          {/* PLACEHOLDERS FOR REMAINING TABS */}
-          {['orders', 'finances', 'profile'].includes(activeTab) && (
+          {['reports', 'finances', 'profile'].includes(activeTab) && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
@@ -324,7 +270,7 @@ export default function VendorAdminPanel() {
                 </div>
               </div>
               <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} terminal is currently synchronizing with the Maison Master Registry.
+                The {activeTab} workspace is currently synchronizing with the global Maison Brand registry.
               </p>
             </div>
           )}
@@ -365,7 +311,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
             "flex items-center text-[10px] font-bold tracking-widest uppercase",
             positive ? "text-gold" : "text-gray-400"
           )}>
-            {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : null}
+            {trend}
           </div>
         </div>
         <div>
@@ -374,17 +320,5 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function MarketShareRow({ label, val }: { label: string, val: number }) {
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-        <span>{label}</span>
-        <span className="text-plum">{val}%</span>
-      </div>
-      <Progress value={val} className="h-1 bg-ivory" />
-    </div>
   );
 }

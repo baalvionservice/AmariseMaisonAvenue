@@ -4,39 +4,26 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
-  Headphones, 
   MessageSquare, 
   LifeBuoy, 
   Undo, 
   Smile, 
   Clock, 
-  User,
   LogOut,
   ChevronRight,
   Search,
-  Plus,
-  Filter,
-  MoreVertical,
-  Edit3,
-  CheckCircle2,
   RefreshCcw,
-  ArrowUpRight,
-  ArrowDownRight,
   Eye,
-  Mail,
-  Smartphone,
-  ShieldCheck,
   Send,
-  Flag,
   FileText,
   LayoutDashboard,
   PieChart,
   Users,
-  Cpu
+  Cpu,
+  Ear
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
@@ -50,14 +37,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 
 type SupportTab = 'dashboard' | 'tickets' | 'chats' | 'clients' | 'knowledge' | 'analytics';
 
@@ -78,16 +58,15 @@ export default function SupportAdminPanel() {
     if (!selectedTicketId || !replyText.trim()) return;
     addTicketMessage(selectedTicketId, replyText, 'agent');
     setReplyText('');
-    toast({ title: "Response Transmitted", description: "Your message has been sent to the client." });
+    toast({ title: "Concierge Response Sent", description: "Your artisanal guidance has been transmitted." });
   };
 
   const handleAction = (msg: string) => {
-    toast({ title: "Concierge Action", description: msg });
+    toast({ title: "Care Action", description: msg });
   };
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
-      {/* Support Sidebar */}
       <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
@@ -96,13 +75,13 @@ export default function SupportAdminPanel() {
           <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Client Concierge Suite</p>
         </div>
         
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <SupportNavItem icon={<LayoutDashboard />} label="Care Overview" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <SupportNavItem icon={<LifeBuoy />} label="Ticket Terminal" active={activeTab === 'tickets'} onClick={() => setActiveTab('tickets')} />
-          <SupportNavItem icon={<MessageSquare />} label="Live Dialogues" active={activeTab === 'chats'} onClick={() => setActiveTab('chats')} />
-          <SupportNavItem icon={<Users />} label="Client Profiles" active={activeTab === 'clients'} onClick={() => setActiveTab('clients')} />
-          <SupportNavItem icon={<FileText />} label="Maison Intelligence" active={activeTab === 'knowledge'} onClick={() => setActiveTab('knowledge')} />
-          <SupportNavItem icon={<PieChart />} label="Sentiment & Velocity" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+          <SupportNavItem icon={<MessageSquare />} label="Live dialogues" active={activeTab === 'chats'} onClick={() => setActiveTab('chats')} />
+          <SupportNavItem icon={<Users />} label="Client resonance" active={activeTab === 'clients'} onClick={() => setActiveTab('clients')} />
+          <SupportNavItem icon={<FileText />} label="Maison intelligence" active={activeTab === 'knowledge'} onClick={() => setActiveTab('knowledge')} />
+          <SupportNavItem icon={<PieChart />} label="Care Analytics" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -112,19 +91,13 @@ export default function SupportAdminPanel() {
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/admin/integrations">
-              <Cpu className="w-4 h-4 mr-3" /> Sync Hub
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/us">
-              <LogOut className="w-4 h-4 mr-3" /> Exit Suite
+              <LogOut className="w-4 h-4 mr-3" /> Exit Hub
             </Link>
           </Button>
         </div>
       </aside>
 
-      {/* Main Workspace */}
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
@@ -132,14 +105,14 @@ export default function SupportAdminPanel() {
               {activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Support Oversight • Global Care Terminal
+              Global Support Oversight • Artisanal Resolution Terminal
             </p>
           </div>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4 bg-plum/5 px-4 py-2 border border-plum/10 rounded-sm">
                <Clock className="w-4 h-4 text-plum" />
                <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Avg. Velocity</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Avg. velocity</span>
                   <span className="text-[9px] text-gray-400">{supportStats.avgResponseTime}</span>
                </div>
             </div>
@@ -149,28 +122,27 @@ export default function SupportAdminPanel() {
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           
-          {/* DASHBOARD (CARE OVERVIEW) */}
           {activeTab === 'dashboard' && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard icon={<LifeBuoy />} label="Inquiries Awaiting" value={supportStats.openTickets.toString()} trend="Action Priority" positive={false} />
-                <StatCard icon={<CheckCircle2 />} label="Resolved Today" value={supportStats.resolvedToday.toString()} trend="+12% Vol" positive={true} />
-                <StatCard icon={<Smile />} label="Client Satisfaction" value={`${supportStats.csatScore}/5.0`} trend="Target: 4.8" positive={true} />
-                <StatCard icon={<MessageSquare />} label="Active Dialogues" value={supportStats.activeChats.toString()} trend="Real-time" positive={true} />
+                <StatCard icon={<LifeBuoy />} label="Pending inquiries" value={supportStats.openTickets.toString()} trend="Action Priority" positive={false} />
+                <StatCard icon={<CheckCircle2 />} label="Resolved today" value={supportStats.resolvedToday.toString()} trend="+12% Vol" positive={true} />
+                <StatCard icon={<Smile />} label="Client CSAT" value={`${supportStats.csatScore}/5.0`} trend="Maison Goal: 4.9" positive={true} />
+                <StatCard icon={<MessageSquare />} label="Active dialogues" value={supportStats.activeChats.toString()} trend="Real-time" positive={true} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Urgent VIP Inquiries</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">High-priority requests from Diamond & Gold clients</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Urgent VIP care requests</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">High-priority dialogues from Diamond & Gold tiers</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader className="bg-ivory/50">
                         <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">Client</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Subject</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold pl-8">Connoisseur</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Inquiry</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold">Category</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
@@ -182,7 +154,7 @@ export default function SupportAdminPanel() {
                             <TableCell className="pl-8">
                               <div className="flex flex-col">
                                 <span className="text-xs font-bold leading-tight">{t.customerName}</span>
-                                <span className="text-[8px] text-plum uppercase tracking-widest font-bold">{t.customerTier} Tier</span>
+                                <span className="text-[8px] text-plum uppercase tracking-widest font-bold">{t.customerTier} Member</span>
                               </div>
                             </TableCell>
                             <TableCell className="text-xs font-light italic truncate max-w-[200px]">{t.subject}</TableCell>
@@ -206,30 +178,27 @@ export default function SupportAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Resolution Velocity</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Global response benchmarks</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Resolution velocity</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Maison service benchmarks</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 space-y-8">
-                    <PerformanceRow label="First Response" val={92} goal="15m" />
-                    <PerformanceRow label="Issue Resolution" val={85} goal="4h" />
-                    <PerformanceRow label="VIP Expedited" val={98} goal="5m" />
-                    <PerformanceRow label="Artisanal Returns" val={78} goal="24h" />
+                    <PerformanceRow label="First interaction" val={92} goal="15m" />
+                    <PerformanceRow label="Artisanal resolution" val={85} goal="4h" />
+                    <PerformanceRow label="VIP priority care" val={98} goal="5m" />
                   </CardContent>
                 </Card>
               </div>
             </div>
           )}
 
-          {/* TICKETS (TERMINAL) */}
           {activeTab === 'tickets' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
               <Card className="lg:col-span-1 bg-white border-border shadow-luxury h-[70vh] flex flex-col">
                 <CardHeader className="border-b border-border">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="font-headline text-xl">All Tickets</CardTitle>
+                    <CardTitle className="font-headline text-xl">Care Registry</CardTitle>
                     <div className="flex space-x-2">
                       <Button variant="ghost" size="icon" className="h-8 w-8"><Search className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8"><Filter className="w-4 h-4" /></Button>
                     </div>
                   </div>
                 </CardHeader>
@@ -240,21 +209,21 @@ export default function SupportAdminPanel() {
                       onClick={() => setSelectedTicketId(t.id)}
                       className={cn(
                         "w-full text-left p-6 border-b border-border hover:bg-ivory transition-colors",
-                        selectedTicketId === t.id && "bg-plum/5 border-l-4 border-l-plum"
+                        selectedTicketId === t.id && "bg-plum/5 border-l-4 border-l-plum shadow-inner"
                       )}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">#{t.id}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">ID: {t.id}</span>
                         <Badge className={cn("text-[7px] uppercase tracking-tighter", 
-                          t.priority === 'urgent' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-500'
+                          t.priority === 'urgent' ? 'bg-red-500 text-white border-none' : 'bg-gray-100 text-gray-500'
                         )}>
                           {t.priority}
                         </Badge>
                       </div>
-                      <h4 className="text-xs font-bold truncate mb-1">{t.subject}</h4>
+                      <h4 className="text-xs font-bold truncate mb-1 uppercase tracking-tight">{t.subject}</h4>
                       <p className="text-[10px] text-gray-500 italic line-clamp-1">{t.lastMessage}</p>
                       <div className="flex justify-between items-center mt-4">
-                        <span className="text-[8px] font-bold uppercase text-plum">{t.customerTier} Client</span>
+                        <span className="text-[8px] font-bold uppercase text-plum">{t.customerTier} Member</span>
                         <span className="text-[8px] text-gray-400">{new Date(t.updatedAt).toLocaleTimeString()}</span>
                       </div>
                     </button>
@@ -267,36 +236,33 @@ export default function SupportAdminPanel() {
                   <>
                     <CardHeader className="border-b border-border flex flex-row justify-between items-center bg-ivory/30">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-plum/10 rounded-full flex items-center justify-center font-headline text-lg font-bold text-plum">
+                        <div className="w-10 h-10 bg-plum/10 rounded-full flex items-center justify-center font-headline text-lg font-bold text-plum border border-plum/20">
                           {selectedTicket.customerName.charAt(0)}
                         </div>
                         <div>
-                          <CardTitle className="text-lg font-headline font-bold">{selectedTicket.customerName}</CardTitle>
+                          <CardTitle className="text-lg font-headline font-bold uppercase tracking-tight">{selectedTicket.customerName}</CardTitle>
                           <div className="flex items-center space-x-2">
-                            <Badge variant="outline" className="text-[7px] uppercase">{selectedTicket.customerTier} TIER</Badge>
-                            <span className="text-[8px] text-gray-400 uppercase tracking-widest">Region: Global Ateliers</span>
+                            <Badge variant="outline" className="text-[7px] uppercase">{selectedTicket.customerTier} Tier</Badge>
+                            <span className="text-[8px] text-gray-400 uppercase tracking-widest font-bold">Maison Hub: Global</span>
                           </div>
                         </div>
                       </div>
                       <div className="flex space-x-3">
-                        <Button variant="outline" size="sm" className="h-8 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => updateTicketStatus(selectedTicket.id, 'resolved')}>Resolve</Button>
-                        <Button variant="outline" size="sm" className="h-8 border-border text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50" onClick={() => handleAction("Ticket escalated to Super Admin.")}>Escalate</Button>
+                        <Button variant="outline" size="sm" className="h-8 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => updateTicketStatus(selectedTicket.id, 'resolved')}>Resolve inquiry</Button>
+                        <Button variant="outline" size="sm" className="h-8 border-border text-[9px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50" onClick={() => handleAction("Ticket escalated to supervision.")}>Escalate care</Button>
                       </div>
                     </CardHeader>
                     
                     <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-ivory/10 custom-scrollbar">
-                      <div className="flex justify-center mb-8">
-                        <Badge className="bg-gray-100 text-gray-400 text-[8px] uppercase tracking-widest px-4">Ticket Opened {new Date(selectedTicket.createdAt).toLocaleDateString()}</Badge>
-                      </div>
                       {selectedTicket.messages.map(m => (
                         <div key={m.id} className={cn("flex", m.sender === 'agent' ? "justify-end" : "justify-start")}>
                           <div className={cn(
-                            "max-w-[70%] p-6 rounded-sm shadow-sm",
-                            m.sender === 'agent' ? "bg-plum text-white" : "bg-white border border-border"
+                            "max-w-[70%] p-6 rounded-sm shadow-sm border",
+                            m.sender === 'agent' ? "bg-plum text-white border-plum" : "bg-white border-border"
                           )}>
                             <p className="text-xs font-light italic leading-relaxed">{m.text}</p>
                             <p className={cn("text-[8px] mt-2 font-bold uppercase tracking-widest", m.sender === 'agent' ? "text-white/60" : "text-gray-400")}>
-                              {m.sender === 'agent' ? 'Concierge' : 'Client'} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {m.sender === 'agent' ? 'Maison Concierge' : 'Connoisseur'} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
                         </div>
@@ -309,12 +275,12 @@ export default function SupportAdminPanel() {
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
                           placeholder="Draft your artisanal response..."
-                          className="min-h-[100px] rounded-none border-border focus:ring-plum text-xs italic font-light"
+                          className="min-h-[100px] rounded-none border-border focus:ring-plum text-xs italic font-light bg-ivory/20"
                         />
                         <div className="absolute bottom-4 right-4 flex space-x-2">
                           <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-plum"><Smile className="w-4 h-4" /></Button>
                           <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-plum"><Undo className="w-4 h-4" /></Button>
-                          <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold tracking-widest uppercase ml-4" onClick={handleSendReply}>
+                          <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest uppercase ml-4 shadow-md" onClick={handleSendReply}>
                             Transmit Reply <Send className="w-3 h-3 ml-2" />
                           </Button>
                         </div>
@@ -323,41 +289,17 @@ export default function SupportAdminPanel() {
                   </>
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center space-y-6 text-center p-12">
-                    <div className="p-8 bg-ivory rounded-full animate-pulse">
-                      <LifeBuoy className="w-12 h-12 text-gold/30" />
+                    <div className="p-8 bg-ivory border border-border rounded-full animate-pulse">
+                      <Ear className="w-12 h-12 text-gold/30 mx-auto" />
                     </div>
-                    <p className="text-2xl text-muted-foreground font-light italic font-headline">Select an inquiry from the terminal to begin dialogue.</p>
+                    <p className="text-2xl text-muted-foreground font-light italic font-headline">Select a care inquiry from the terminal to begin dialogue.</p>
                   </div>
                 )}
               </Card>
             </div>
           )}
 
-          {/* KNOWLEDGE BASE (FAQ) */}
-          {activeTab === 'knowledge' && (
-            <div className="space-y-12">
-              <div className="flex justify-between items-end">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Maison Intelligence Base</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Curate artisanal guidance and frequently asked inquiries</p>
-                </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
-                  <Plus className="w-4 h-4 mr-2" /> Add Article
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <KnowledgeCard title="Artisanal Care Guide" category="Product Knowledge" status="Published" />
-                <KnowledgeCard title="Global Shipping Logistics" category="Operations" status="Internal Only" />
-                <KnowledgeCard title="Returns Charter v2.4" category="Legal/Terms" status="Draft" />
-                <KnowledgeCard title="VIP Salon Protocols" category="Concierge" status="Published" />
-                <KnowledgeCard title="Heritage Verification" category="Product Knowledge" status="Published" />
-              </div>
-            </div>
-          )}
-
-          {/* PLACEHOLDERS FOR REMAINING TABS */}
-          {['chats', 'clients', 'analytics'].includes(activeTab) && (
+          {['chats', 'clients', 'knowledge', 'analytics'].includes(activeTab) && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
@@ -365,7 +307,7 @@ export default function SupportAdminPanel() {
                 </div>
               </div>
               <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} terminal is currently synchronizing with the Maison Master Registry.
+                The {activeTab} workspace is currently synchronizing with the Maison Care Registry.
               </p>
             </div>
           )}
@@ -406,7 +348,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
             "flex items-center text-[10px] font-bold tracking-widest uppercase",
             positive ? "text-gold" : "text-gray-400"
           )}>
-            {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : null}
+            {trend}
           </div>
         </div>
         <div>
@@ -425,29 +367,10 @@ function PerformanceRow({ label, val, goal }: { label: string, val: number, goal
         <span className="text-gray-500">{label}</span>
         <div className="flex items-center space-x-2">
           <span className="text-plum">{val}%</span>
-          <span className="text-[8px] text-gray-300">Goal: {goal}</span>
+          <span className="text-[8px] text-gray-300">Target: {goal}</span>
         </div>
       </div>
       <Progress value={val} className="h-1 bg-ivory" />
     </div>
-  );
-}
-
-function KnowledgeCard({ title, category, status }: { title: string, category: string, status: string }) {
-  return (
-    <Card className="bg-white border-border shadow-luxury hover:border-gold transition-all group p-8 space-y-6">
-      <div className="flex justify-between items-start">
-        <div className="p-3 bg-ivory rounded-sm text-plum group-hover:bg-gold/10"><FileText className="w-5 h-5" /></div>
-        <Badge variant="outline" className={cn("text-[8px] uppercase", status === 'Published' ? 'text-green-600 border-green-100 bg-green-50' : 'text-gray-400')}>{status}</Badge>
-      </div>
-      <div className="space-y-1">
-        <h4 className="text-xl font-headline font-bold italic group-hover:text-plum transition-colors">{title}</h4>
-        <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">{category}</p>
-      </div>
-      <div className="pt-4 flex justify-between items-center border-t border-border">
-        <button className="text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold">Edit Content</button>
-        <ChevronRight className="w-3 h-3 text-gray-300" />
-      </div>
-    </Card>
   );
 }

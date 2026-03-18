@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -18,7 +19,9 @@ import {
   Clock,
   RotateCcw,
   Boxes,
-  Star
+  Star,
+  MapPin,
+  RefreshCcw
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,7 +56,7 @@ export default function OperationsAdminPanel() {
       subcategoryId: 'evening-gowns',
       collectionId: 'spring-24',
       basePrice: 4500,
-      imageUrl: '', // Asset placeholder
+      imageUrl: '', 
       isVip: false,
       rating: 5.0,
       reviewsCount: 0,
@@ -61,7 +64,7 @@ export default function OperationsAdminPanel() {
       vendorId: 'vend-1'
     };
     upsertProduct(newProduct);
-    toast({ title: "Maison Entry Created", description: "The new artifact has been added to the catalog." });
+    toast({ title: "Maison Entry Created", description: "The new artifact has been added to the global catalog." });
   };
 
   return (
@@ -71,18 +74,18 @@ export default function OperationsAdminPanel() {
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
             AMARISÉ <span className="text-gold text-xs font-normal tracking-[0.4em] ml-2">OPS</span>
           </div>
-          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Maison Operations Hub</p>
+          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Global Operations Hub</p>
         </div>
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <OpsNavItem icon={<Package />} label="Catalog Atelier" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
+          <OpsNavItem icon={<Package />} label="Ateliers Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
           <OpsNavItem icon={<Boxes />} label="Multi-Warehouse" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
           <OpsNavItem icon={<Truck />} label="Orders & Fulfillment" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
           <OpsNavItem icon={<RotateCcw />} label="Reverse Logistics" active={activeTab === 'returns'} onClick={() => setActiveTab('returns')} />
           <OpsNavItem icon={<FileText />} label="Storytelling CMS" active={activeTab === 'cms'} onClick={() => setActiveTab('cms')} />
-          <OpsNavItem icon={<Users />} label="Connoisseurs" active={activeTab === 'customers'} onClick={() => setActiveTab('customers')} />
-          <OpsNavItem icon={<Settings />} label="Logistics Config" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
+          <OpsNavItem icon={<Users />} label="Connoisseur Registry" active={activeTab === 'customers'} onClick={() => setActiveTab('customers')} />
+          <OpsNavItem icon={<Settings />} label="Logistics Matrix" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -106,13 +109,13 @@ export default function OperationsAdminPanel() {
               {activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Operational Oversight • Global Logistics Terminal
+              Operational Oversight • Artisanal Logistics Terminal
             </p>
           </div>
           <div className="flex items-center space-x-6">
             <div className="relative group">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-plum transition-colors" />
-               <input className="bg-ivory border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-gold w-64 transition-all" placeholder="SEARCH CATALOG / ORDERS" />
+               <input className="bg-ivory border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-gold w-64 transition-all" placeholder="SEARCH PIECE / ORDER" />
             </div>
             <div className="w-10 h-10 bg-ivory border border-border rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-plum">OP</div>
           </div>
@@ -125,13 +128,13 @@ export default function OperationsAdminPanel() {
                 <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
                 <StatCard icon={<RotateCcw />} label="Active Returns" value={returns.length.toString()} trend="Inspect Now" positive={false} />
                 <StatCard icon={<Boxes />} label="Low Stock Alerts" value="12" trend="Replenish" positive={false} />
-                <StatCard icon={<Star />} label="VIP Enquiries" value="08" trend="Immediate" positive={false} />
+                <StatCard icon={<Star />} label="VIP Inquiries" value="08" trend="Immediate" positive={false} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Regional Fulfillment Velocity</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Regional Fulfillment velocity</CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of artisanal hubs</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
@@ -141,7 +144,7 @@ export default function OperationsAdminPanel() {
                           <TableHead className="text-[9px] uppercase font-bold pl-8">Atelier Hub</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold">Region</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Load</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Operational Load</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -149,13 +152,13 @@ export default function OperationsAdminPanel() {
                           <TableCell className="pl-8 text-xs font-bold">New York Fifth Ave</TableCell>
                           <TableCell><Badge variant="outline" className="text-[8px] uppercase">US Market</Badge></TableCell>
                           <TableCell className="text-center text-green-600 font-bold text-[9px] uppercase">Optimal</TableCell>
-                          <TableCell className="text-right pr-8"><Progress value={45} className="h-1" /></TableCell>
+                          <TableCell className="text-right pr-8"><Progress value={45} className="h-1 bg-ivory" /></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-8 text-xs font-bold">London Bond Street</TableCell>
                           <TableCell><Badge variant="outline" className="text-[8px] uppercase">UK Market</Badge></TableCell>
                           <TableCell className="text-center text-gold font-bold text-[9px] uppercase">High Load</TableCell>
-                          <TableCell className="text-right pr-8"><Progress value={88} className="h-1" /></TableCell>
+                          <TableCell className="text-right pr-8"><Progress value={88} className="h-1 bg-ivory" /></TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
@@ -164,11 +167,11 @@ export default function OperationsAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Return Sentiment</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Global reverse logistics analysis</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Reverse Logistics analysis</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Global return sentiment & velocity</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 space-y-8">
-                    <PerformanceRow label="Average Return Rate" val={1.8} />
+                    <PerformanceRow label="Avg. Return Rate" val={1.8} />
                     <PerformanceRow label="Inspection Velocity" val={92} />
                     <PerformanceRow label="Refund Latency" val={12} />
                   </CardContent>
@@ -182,10 +185,10 @@ export default function OperationsAdminPanel() {
               <div className="flex justify-between items-end">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-headline font-bold italic">Artifact Management</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the Maison's creations</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the Maison's global creations</p>
                 </div>
                 <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={handleAddMockProduct}>
-                  <Plus className="w-4 h-4 mr-2" /> Add New Artifact
+                  <Plus className="w-4 h-4 mr-2" /> CREATE NEW ARCHIVE ENTRY
                 </Button>
               </div>
 
@@ -194,9 +197,9 @@ export default function OperationsAdminPanel() {
                   <TableHeader className="bg-ivory/50">
                     <TableRow>
                       <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Stock</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right">Value</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Department</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Global Stock</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right">Acquisition Value</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -205,8 +208,8 @@ export default function OperationsAdminPanel() {
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
-                            <div className="w-10 h-12 bg-muted rounded-sm flex-shrink-0 flex items-center justify-center text-[6px] font-bold uppercase text-gray-400">
-                              Piece
+                            <div className="w-10 h-12 bg-muted rounded-sm flex-shrink-0 flex items-center justify-center text-[6px] font-bold uppercase text-gray-400 border border-border">
+                              Asset
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-bold leading-tight">{product.name}</span>
@@ -215,13 +218,11 @@ export default function OperationsAdminPanel() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={cn("text-[8px] uppercase tracking-widest", product.listingType === 'auction' ? 'border-gold text-gold' : 'border-border text-gray-400')}>
-                            {product.listingType || 'Fixed'}
-                          </Badge>
+                          <Badge variant="outline" className="text-[8px] uppercase tracking-widest">{product.departmentId}</Badge>
                         </TableCell>
                         <TableCell className="text-center">
                           <span className={cn("text-xs font-bold", product.stock < 5 ? "text-red-500" : "text-gray-500")}>
-                            {product.stock}
+                            {product.stock} Units
                           </span>
                         </TableCell>
                         <TableCell className="text-right text-xs font-light">${product.basePrice.toLocaleString()}</TableCell>
@@ -236,6 +237,19 @@ export default function OperationsAdminPanel() {
                   </TableBody>
                 </Table>
               </Card>
+            </div>
+          )}
+
+          {['inventory', 'orders', 'returns', 'cms', 'customers', 'logistics'].includes(activeTab) && (
+            <div className="py-40 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
+                  <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto" />
+                </div>
+              </div>
+              <p className="text-2xl text-muted-foreground font-light italic font-headline">
+                The {activeTab} workspace is currently synchronizing with global Maison registries.
+              </p>
             </div>
           )}
         </div>

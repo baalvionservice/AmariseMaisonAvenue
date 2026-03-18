@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -12,7 +13,10 @@ import {
   Zap,
   Gavel,
   Calendar,
-  Gift
+  Gift,
+  Play,
+  Maximize2,
+  ShieldCheck
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -28,7 +32,7 @@ export default function ProductPage() {
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
-  const { addToCart, toggleWishlist, wishlist, socialMetrics } = useAppStore();
+  const { addToCart, toggleWishlist, wishlist } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
@@ -39,6 +43,7 @@ export default function ProductPage() {
   const [loadingRecs, setLoadingRecs] = useState(true);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [is360Active, setIs360Active] = useState(false);
+  const [isVideoActive, setIsVideoActive] = useState(false);
   
   const isWishlisted = wishlist.some(i => i.id === product?.id);
 
@@ -98,29 +103,36 @@ export default function ProductPage() {
               {is360Active ? (
                 <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-ivory">
                    <RotateCcw className="w-12 h-12 text-gold animate-spin-slow" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Initializing Immersive 360° View</p>
-                   <Button variant="ghost" className="text-[9px] uppercase font-bold" onClick={() => setIs360Active(false)}>Return to Still</Button>
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Initializing Immersive 360° Perspective</p>
+                   <Button variant="ghost" className="text-[9px] uppercase font-bold" onClick={() => setIs360Active(false)}>Return to Archive</Button>
+                </div>
+              ) : isVideoActive ? (
+                <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-gray-900 text-white">
+                   <Play className="w-12 h-12 text-gold" />
+                   <p className="text-[10px] font-bold uppercase tracking-widest">Streaming Artisanal Narrative</p>
+                   <Button variant="ghost" className="text-[9px] uppercase font-bold text-white hover:text-gold" onClick={() => setIsVideoActive(false)}>Close Video</Button>
                 </div>
               ) : (
                 <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
-                  Artisanal Perspective {activeMediaIndex + 1}
+                  Atelier Perspective {activeMediaIndex + 1}
                 </div>
               )}
               
               <div className="absolute bottom-8 left-8 flex space-x-2">
-                 {product.mediaGallery?.map((m, idx) => (
+                 {[...Array(4)].map((_, idx) => (
                    <button 
                     key={idx} 
                     onClick={() => {
                       setActiveMediaIndex(idx);
-                      setIs360Active(m.type === '360');
+                      setIs360Active(idx === 2);
+                      setIsVideoActive(idx === 3);
                     }}
                     className={cn(
-                      "w-12 h-16 border bg-muted transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter text-gray-400",
-                      activeMediaIndex === idx ? "border-plum scale-110 shadow-lg bg-ivory text-plum" : "border-border opacity-60"
+                      "w-12 h-16 border transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter",
+                      activeMediaIndex === idx ? "border-plum bg-ivory text-plum scale-110 shadow-lg" : "border-border bg-muted text-gray-400 opacity-60"
                     )}
                    >
-                     {m.type === 'video' ? 'VIDEO' : m.type === '360' ? '360°' : `P-${idx+1}`}
+                     {idx === 2 ? '360°' : idx === 3 ? 'VIDEO' : `FRAME ${idx+1}`}
                    </button>
                  ))}
               </div>
@@ -137,13 +149,11 @@ export default function ProductPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-primary text-[10px] font-bold tracking-[0.5em] uppercase border-b border-gold/40 pb-1">
-                  Atelier {currentCountry.office?.city}
+                  Maison Global Flagship
                 </span>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={() => toggleWishlist(product)}>
-                    <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
-                  </Button>
-                </div>
+                <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={() => toggleWishlist(product)}>
+                  <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
+                </Button>
               </div>
               
               <div className="space-y-2">
@@ -151,7 +161,7 @@ export default function ProductPage() {
                 {product.listingType === 'auction' && (
                   <div className="flex items-center space-x-2 bg-gold/10 p-3 border border-gold/20 inline-flex">
                     <Gavel className="w-4 h-4 text-gold" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold">Active Bid: {formatPrice(product.currentBid || 0, countryCode)}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold">Current Bid: {formatPrice(product.currentBid || 0, countryCode)}</span>
                   </div>
                 )}
               </div>
@@ -162,7 +172,7 @@ export default function ProductPage() {
                     <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />
                   ))}
                 </div>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold">{product.reviewsCount} Critiques</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold">{product.reviewsCount} Appreciations</span>
               </div>
               <div className="text-6xl font-light tracking-tighter pt-4 text-gray-900">
                 {formatPrice(product.basePrice, countryCode)}
@@ -175,7 +185,7 @@ export default function ProductPage() {
                 className="w-full bg-plum text-white hover:bg-gold hover:text-gray-900 h-20 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl transition-all"
                 onClick={handleAddToCart}
               >
-                {product.listingType === 'auction' ? 'PLACE YOUR BID' : 'ADD TO SHOPPING BAG'}
+                {product.listingType === 'auction' ? 'PARTICIPATE IN AUCTION' : 'SECURE IN SHOPPING BAG'}
               </Button>
               <div className="grid grid-cols-2 gap-4">
                 <Button 
@@ -183,7 +193,7 @@ export default function ProductPage() {
                   className="h-16 rounded-none border-gray-900 text-[9px] font-bold tracking-widest uppercase hover:bg-gray-900 hover:text-white"
                   onClick={() => router.push(`/${countryCode}/appointments`)}
                 >
-                  <Calendar className="w-4 h-4 mr-2" /> BOOK APPOINTMENT
+                  <Calendar className="w-4 h-4 mr-2" /> BOOK ATELIER VIEWING
                 </Button>
                 <Button 
                   variant="outline" 
@@ -197,10 +207,10 @@ export default function ProductPage() {
 
             <Tabs defaultValue="narrative" className="w-full pt-12">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12 overflow-x-auto">
-                <TabsTrigger value="narrative" className="tab-trigger">Narrative</TabsTrigger>
+                <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
                 <TabsTrigger value="provenance" className="tab-trigger">Provenance</TabsTrigger>
-                <TabsTrigger value="inventory" className="tab-trigger">Stock</TabsTrigger>
-                <TabsTrigger value="compliance" className="tab-trigger">Legal</TabsTrigger>
+                <TabsTrigger value="inventory" className="tab-trigger">Regional Availability</TabsTrigger>
+                <TabsTrigger value="compliance" className="tab-trigger">Maison Compliance</TabsTrigger>
               </TabsList>
               
               <TabsContent value="narrative" className="pt-10 animate-fade-in min-h-[250px]">
@@ -211,30 +221,29 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="text-gray-600 font-light leading-relaxed whitespace-pre-wrap first-letter:text-6xl first-letter:font-headline first-letter:mr-3 first-letter:float-left first-letter:text-plum italic">
-                    {aiDescription || "A testament to the Maison's century-long pursuit of excellence."}
+                    {aiDescription || "This artifact represents the pinnacle of Maison Amarisé's century-long pursuit of excellence. Hand-finished in our central atelier, it serves as a testament to human brilliance."}
                   </div>
                 )}
               </TabsContent>
 
               <TabsContent value="provenance" className="pt-10">
                 <ul className="space-y-6">
-                  <DetailRow label="Origin" value={`Maison Amarisé Ateliers, ${currentCountry.office?.city}`} />
-                  <DetailRow label="Atelier Craft" value="Hand-finished heritage series" />
-                  <DetailRow label="Authenticity" value="NFC-enabled certification included" />
+                  <DetailRow label="Atelier Origin" value={`Maison Amarisé Ateliers, Paris Flagship`} />
+                  <DetailRow label="Heritage Series" value="Hand-curated archives" />
+                  <DetailRow label="Certification" value="NFC-enabled authenticity chip included" />
                 </ul>
               </TabsContent>
 
               <TabsContent value="inventory" className="pt-10">
                 <div className="space-y-6">
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Regional Availability</p>
                    {product.regionalStock?.map(rs => (
                      <div key={rs.warehouseId} className="flex justify-between items-center border-b border-border pb-4">
                         <div className="flex flex-col">
                            <span className="text-[10px] font-bold uppercase">{rs.warehouseName}</span>
-                           <span className="text-[8px] text-muted-foreground uppercase">{rs.region} Market</span>
+                           <span className="text-[8px] text-muted-foreground uppercase">{rs.region} Market Hub</span>
                         </div>
                         <span className={cn("text-xs font-bold", rs.stockCount < 5 ? "text-red-500" : "text-gray-900")}>
-                          {rs.stockCount} Available
+                          {rs.stockCount} Pieces Remaining
                         </span>
                      </div>
                    ))}
@@ -243,13 +252,13 @@ export default function ProductPage() {
 
               <TabsContent value="compliance" className="pt-10 space-y-6">
                  <div className="p-6 bg-plum/5 border border-plum/10 rounded-sm">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest mb-2">Heritage Compliance</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest mb-2">Artisanal Responsibility</h4>
                     <p className="text-[9px] text-gray-500 leading-relaxed italic">
-                      This artifact complies with global {currentCountry.name} import regulations and Maison sustainability charters. Full GDPR data protection applies to your acquisition registry.
+                      This artifact complies with global {currentCountry.name} heritage regulations. Full GDPR data protection applies to your acquisition registry.
                     </p>
                  </div>
-                 <Button variant="outline" className="w-full h-12 text-[9px] font-bold uppercase tracking-widest border-border" onClick={() => toast({ title: "Document Downloaded", description: "Maison Sustainability Charter" })}>
-                    VIEW COMPLIANCE DOCS
+                 <Button variant="outline" className="w-full h-12 text-[9px] font-bold uppercase tracking-widest border-border" onClick={() => toast({ title: "Maison Archive", description: "Compliance certification downloaded." })}>
+                    VIEW HERITAGE DOCUMENTS
                  </Button>
               </TabsContent>
             </Tabs>
@@ -261,9 +270,9 @@ export default function ProductPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-plum">
                  <Zap className="w-5 h-5 text-gold" />
-                 <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Intelligence Curation</span>
+                 <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Intelligence Selection</span>
               </div>
-              <h2 className="text-5xl font-headline font-bold italic text-gray-900">Complementary Artifacts</h2>
+              <h2 className="text-5xl font-headline font-bold italic text-gray-900">Resonant Artifacts</h2>
             </div>
           </div>
           

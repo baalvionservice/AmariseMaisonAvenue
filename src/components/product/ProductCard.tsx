@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { memo } from 'react';
@@ -16,9 +17,8 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Optimized for high-volume enterprise rendering.
- * Redesigned with a minimalist light aesthetic, soft shadows, and gold accents.
- * Images removed and replaced with Artisanal Asset Frames.
+ * ProductCard: Optimized for structural luxury aesthetics.
+ * Uses persistent Card Boxes instead of standard imagery.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -68,7 +68,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-ivory">
         {/* Card Box Placeholder */}
         <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.4em] text-gray-300 uppercase transition-colors group-hover:bg-ivory group-hover:text-gold">
-          Maison Piece
+          Maison Archive Asset
         </div>
         
         <div className="absolute inset-0 bg-gradient-to-t from-lavender/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -79,13 +79,11 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Social Metrics Bubble */}
         <div className="absolute top-4 right-4 flex items-center space-x-2 luxury-blur px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 border border-border rounded-full shadow-sm">
            <Heart className={cn("w-3 h-3", isWishlisted ? "fill-plum text-plum" : "text-gray-400")} />
            <span className="text-[9px] font-bold text-gray-700">{metrics.likes.toLocaleString()}</span>
         </div>
 
-        {/* Quick Actions Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury-blur z-20">
           <Button 
             className="w-full h-12 rounded-sm bg-gold text-gray-900 hover:shadow-gold-glow hover:scale-102 transition-all text-[10px] font-bold tracking-widest uppercase border-none"
@@ -135,9 +133,9 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
 
         <div className="pt-4 border-t border-border flex items-center justify-between mt-auto">
-          <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-bold">Atelier Paris</span>
+          <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-bold">Atelier Global</span>
           <Link href={`/${countryCode}/product/${product.id}`} className="flex items-center text-[9px] text-gold font-bold tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-            Explore <Eye className="w-3 h-3 ml-2" />
+            Explore Piece <Eye className="w-3 h-3 ml-2" />
           </Link>
         </div>
       </div>

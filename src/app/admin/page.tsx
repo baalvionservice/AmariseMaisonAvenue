@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -30,17 +31,8 @@ import { Button } from "@/components/ui/button";
 import { COUNTRIES } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import {
   AreaChart,
   Area,
   XAxis,
@@ -74,7 +66,6 @@ export default function SuperAdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('intelligence');
   const { 
     admins,
-    vendors,
     auditLogs,
     globalSettings
   } = useAppStore();
@@ -278,9 +269,8 @@ export default function SuperAdminPanel() {
                   <Card key={admin.id} className="bg-white border-border shadow-luxury hover:border-plum transition-all group overflow-hidden">
                     <CardContent className="p-8 space-y-6">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-muted rounded-sm flex items-center justify-center border border-border group-hover:border-plum transition-colors overflow-hidden">
-                          {/* Admin Avatar Placeholder */}
-                          <Users className="w-8 h-8 text-plum opacity-20" />
+                        <div className="w-16 h-16 bg-muted rounded-sm flex items-center justify-center border border-border group-hover:border-plum transition-colors overflow-hidden text-[8px] font-bold uppercase text-gray-300">
+                          Profile
                         </div>
                         <div className="flex-1">
                           <h4 className="text-xl font-headline font-bold leading-tight">{admin.name}</h4>
