@@ -20,10 +20,24 @@ export const Header = () => {
   const router = useRouter();
   const { cart, wishlist } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
+
+  const slides = [
+    "Call to schedule an appointment in our NYC Showroom or Virtually via FaceTime",
+    "Spring Collector's Auction"
+  ];
+
+  const handlePrevSlide = () => {
+    setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setActiveSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
 
   const handleCountryChange = (code: string) => {
     router.push(`/${code}`);
@@ -34,9 +48,19 @@ export const Header = () => {
       {/* Top Ticker Bar - Light Lavender Style */}
       <div className="bg-[#f3ebf7] text-gray-800 h-9 flex items-center justify-center px-6 text-[10px] tracking-widest font-medium uppercase border-b border-black/5">
         <div className="flex items-center space-x-6">
-          <ChevronLeft className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" />
-          <span className="tracking-[0.15em]">Call to schedule an appointment in our NYC Showroom or Virtually via FaceTime</span>
-          <ChevronRight className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" />
+          <ChevronLeft 
+            className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" 
+            onClick={handlePrevSlide}
+          />
+          <div className="overflow-hidden relative flex items-center justify-center min-w-[400px]">
+            <span className="tracking-[0.15em] animate-fade-in text-center" key={activeSlide}>
+              {slides[activeSlide]}
+            </span>
+          </div>
+          <ChevronRight 
+            className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" 
+            onClick={handleNextSlide}
+          />
         </div>
       </div>
 
@@ -56,7 +80,7 @@ export const Header = () => {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center space-x-2 hover:opacity-80 transition-all group">
                 <span className="text-sm leading-none">{currentCountry.flag}</span>
-                <span className="font-bold tracking-tighter text-[11px] text-white">{currentCountry.currency}</span>
+                <span className="font-bold tracking-tighter text-[11px] text-white uppercase">{currentCountry.name}</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2 rounded-none shadow-luxury">
