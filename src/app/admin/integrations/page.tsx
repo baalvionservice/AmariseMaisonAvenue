@@ -34,13 +34,13 @@ import {
   TrendingUp,
   Cpu,
   Server,
-  Search as SearchIcon,
   Globe2,
   DatabaseZap,
   ArrowRightLeft,
   FastForward,
   RotateCw,
-  Gauge
+  Gauge,
+  Power
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ type IntegrationTab = 'dashboard' | 'payments' | 'logistics' | 'indexing' | 'sec
 
 export default function IntegrationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<IntegrationTab>('dashboard');
-  const { integrations, apiLogs, toggleIntegration, indexingStatus, indexingLogs, triggerReindex, toggleAutoSync, globalSettings } = useAppStore();
+  const { integrations, apiLogs, globalSettings, indexingStatus, toggleEmergencyMode, triggerReindex } = useAppStore();
   const { toast } = useToast();
 
   const handleAction = (msg: string) => {
@@ -89,14 +89,23 @@ export default function IntegrationsAdminPanel() {
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
+          <div className="p-4 bg-red-50 border border-red-100 rounded-sm space-y-3">
+             <div className="flex items-center space-x-2 text-red-600">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-[9px] font-bold uppercase tracking-widest">Emergency Fallback</span>
+             </div>
+             <p className="text-[8px] text-red-400 leading-relaxed italic">Activate offline/emergency mock mode for the global flagship.</p>
+             <Button 
+              variant={globalSettings.emergencyMode ? "destructive" : "outline"} 
+              className="w-full h-10 text-[9px] font-bold uppercase"
+              onClick={toggleEmergencyMode}
+             >
+               <Power className="w-3 h-3 mr-2" /> {globalSettings.emergencyMode ? 'DEACTIVATE EMERGENCY' : 'ACTIVATE EMERGENCY'}
+             </Button>
+          </div>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/admin">
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/us">
-              <LogOut className="w-4 h-4 mr-3" /> Exit Sync
             </Link>
           </Button>
         </div>
@@ -253,7 +262,7 @@ export default function IntegrationsAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="pb-4">
-                    <SearchIcon className="w-5 h-5 text-gold" />
+                    <Search className="w-5 h-5 text-gold" />
                     <CardTitle className="font-headline text-xl pt-4">Search Engine</CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest">{indexingStatus.searchEngineStatus}</CardDescription>
                   </CardHeader>

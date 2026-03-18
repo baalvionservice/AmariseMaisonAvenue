@@ -3,7 +3,8 @@ import {
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
   Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats,
-  MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice
+  MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice,
+  Affiliate, ReturnRequest
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -64,6 +65,18 @@ const generateProducts = (): Product[] => {
       sizes: [SIZES[i % SIZES.length], SIZES[(i + 1) % SIZES.length]],
       stock: 1 + (i % 10),
       vendorId: `vend-${(i % 5) + 1}`,
+      regionalStock: [
+        { warehouseId: 'wh-ny', warehouseName: 'NY Atelier', stockCount: 10, region: 'us' },
+        { warehouseId: 'wh-ldn', warehouseName: 'London Hub', stockCount: 5, region: 'uk' }
+      ],
+      mediaGallery: [
+        { type: 'image', url: `https://picsum.photos/seed/amarise-p-${i}/1200/1600`, alt: 'Main View' },
+        { type: 'video', url: 'https://www.w3schools.com/html/mov_bbb.mp4', alt: 'Artisanal Craft' },
+        { type: '360', url: `https://picsum.photos/seed/360-${i}/1200/1600`, alt: '360 Degree View' }
+      ],
+      listingType: i % 50 === 0 ? 'auction' : 'fixed',
+      currentBid: i % 50 === 0 ? 5000 + (i * 100) : undefined,
+      auctionEndsAt: i % 50 === 0 ? new Date(Date.now() + 86400000).toISOString() : undefined
     });
   }
   return products;
@@ -97,9 +110,18 @@ export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
 };
 
 export const VIP_CLIENTS: VipClient[] = [
-  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10' },
-  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28' },
-  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14' }
+  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10', isSubscriber: true, subscriptionPlan: 'Maison Privé' },
+  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28', isSubscriber: false },
+  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14', isSubscriber: true, subscriptionPlan: 'Atelier Reserve' }
+];
+
+export const AFFILIATES: Affiliate[] = [
+  { id: 'aff-1', name: 'Elena Vance', tier: 'Diamond', referralCode: 'ELENA1924', salesGenerated: 125000, commissionEarned: 12500, status: 'active' },
+  { id: 'aff-2', name: 'Marcus Aurelius', tier: 'Gold', referralCode: 'MARCUS', salesGenerated: 45000, commissionEarned: 4500, status: 'active' }
+];
+
+export const RETURNS: ReturnRequest[] = [
+  { id: 'ret-1', orderId: 'AM-1001', productId: 'prod-1', reason: 'Size mismatch', status: 'pending', warehouseId: 'wh-ny', requestedAt: '2024-03-15T10:00:00Z' }
 ];
 
 export const ADMIN_ACCOUNTS: AdminAccount[] = [
@@ -132,8 +154,8 @@ export const APPOINTMENTS: Appointment[] = [
 ];
 
 export const INVOICES: Invoice[] = [
-  { id: 'inv-1001', orderId: 'AM-1001', customerName: 'Julian Vandervilt', amount: 45000, currency: 'USD', status: 'paid', date: '2024-03-10', taxAmount: 3600 },
-  { id: 'inv-1002', orderId: 'AM-1002', customerName: 'Sophia Chen', amount: 12500, currency: 'GBP', status: 'issued', date: '2024-03-14', taxAmount: 2500 }
+  { id: 'inv-1001', orderId: 'AM-1001', customerName: 'Julian Vandervilt', amount: 45000, currency: 'USD', status: 'paid', date: '2024-03-10', taxAmount: 3600, taxRate: 8, complianceCertified: true },
+  { id: 'inv-1002', orderId: 'AM-1002', customerName: 'Sophia Chen', amount: 12500, currency: 'GBP', status: 'issued', date: '2024-03-14', taxAmount: 2500, taxRate: 20, complianceCertified: true }
 ];
 
 export const AUDIT_LOGS: AuditLog[] = [

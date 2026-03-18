@@ -51,6 +51,19 @@ export interface Department {
   categories: string[]; // Category IDs
 }
 
+export interface RegionalStock {
+  warehouseId: string;
+  warehouseName: string;
+  stockCount: number;
+  region: CountryCode | 'global';
+}
+
+export interface ProductMedia {
+  type: 'image' | 'video' | '360';
+  url: string;
+  alt: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -67,6 +80,13 @@ export interface Product {
   sizes?: string[];
   stock: number;
   vendorId?: string;
+  // Enterprise Extensions
+  regionalStock?: RegionalStock[];
+  mediaGallery?: ProductMedia[];
+  listingType?: 'fixed' | 'auction';
+  currentBid?: number;
+  auctionEndsAt?: string;
+  isSubscriptionOnly?: boolean;
 }
 
 export interface CartItem extends Product {
@@ -171,6 +191,16 @@ export interface Vendor {
   };
 }
 
+export interface Affiliate {
+  id: string;
+  name: string;
+  tier: 'Silver' | 'Gold' | 'Diamond';
+  referralCode: string;
+  salesGenerated: number;
+  commissionEarned: number;
+  status: 'active' | 'pending';
+}
+
 export interface Campaign {
   id: string;
   title: string;
@@ -208,6 +238,16 @@ export interface Appointment {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
 }
 
+export interface ReturnRequest {
+  id: string;
+  orderId: string;
+  productId: string;
+  reason: string;
+  status: 'pending' | 'received' | 'inspecting' | 'refunded' | 'rejected';
+  warehouseId: string;
+  requestedAt: string;
+}
+
 export interface Invoice {
   id: string;
   orderId: string;
@@ -217,6 +257,8 @@ export interface Invoice {
   status: 'issued' | 'paid' | 'overdue';
   date: string;
   taxAmount: number;
+  taxRate: number;
+  complianceCertified: boolean;
 }
 
 export interface AuditLog {
@@ -255,7 +297,8 @@ export interface GlobalSettings {
     cdnEnabled: boolean;
     cachingEnabled: boolean;
     autoScalingStatus: string;
-  }
+  };
+  emergencyMode: boolean;
 }
 
 export interface VipClient {
@@ -266,6 +309,8 @@ export interface VipClient {
   loyaltyPoints: number;
   totalSpend: number;
   lastPurchase?: string;
+  isSubscriber: boolean;
+  subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
 }
 
 // --- SUPPORT HUB EXTENSIONS ---

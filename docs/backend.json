@@ -15,7 +15,10 @@
         "imageUrl": { "type": "string" },
         "isVip": { "type": "boolean" },
         "rating": { "type": "number" },
-        "reviewsCount": { "type": "number" }
+        "reviewsCount": { "type": "number" },
+        "stock": { "type": "number" },
+        "listingType": { "type": "string", "enum": ["fixed", "auction"] },
+        "isSubscriptionOnly": { "type": "boolean" }
       },
       "required": ["id", "name", "category", "basePrice"]
     },
@@ -30,49 +33,29 @@
         "imageUrl": { "type": "string" }
       }
     },
-    "Campaign": {
-      "title": "Campaign",
-      "description": "A global marketing initiative targeting specific regions.",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "type": { "type": "string", "enum": ["email", "push", "social"] },
-        "status": { "type": "string", "enum": ["draft", "scheduled", "active", "completed"] },
-        "reach": { "type": "number" },
-        "engagement": { "type": "number" },
-        "country": { "type": "string" }
-      }
-    },
     "Affiliate": {
       "title": "Affiliate",
-      "description": "A luxury brand partner or influencer.",
+      "description": "A brand partner or influencer.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
-        "tier": { "type": "string", "enum": ["silver", "gold", "diamond"] },
+        "tier": { "type": "string", "enum": ["Silver", "Gold", "Diamond"] },
+        "referralCode": { "type": "string" },
         "salesGenerated": { "type": "number" },
-        "commissionPaid": { "type": "number" },
-        "status": { "type": "string" }
+        "commissionEarned": { "type": "number" }
       }
     },
-    "Order": {
-      "title": "Order",
-      "description": "A record of a high-end customer purchase.",
+    "ReturnRequest": {
+      "title": "ReturnRequest",
+      "description": "Reverse logistics tracking for an artisanal artifact.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "userId": { "type": "string" },
-        "items": { 
-          "type": "array",
-          "items": { "type": "object" }
-        },
-        "total": { "type": "number" },
-        "currency": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered"] },
-        "countryCode": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "orderId": { "type": "string" },
+        "productId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "received", "inspecting", "refunded", "rejected"] },
+        "warehouseId": { "type": "string" }
       }
     }
   },
@@ -81,10 +64,8 @@
   },
   "firestore": {
     "/products/{productId}": { "schema": "Product", "description": "Global catalog of luxury items." },
-    "/collections/{collectionId}": { "schema": "Collection", "description": "Seasonal and Heritage collections." },
-    "/campaigns/{campaignId}": { "schema": "Campaign", "description": "Global marketing campaigns." },
-    "/affiliates/{affiliateId}": { "schema": "Affiliate", "description": "Brand partner management." },
-    "/orders/{orderId}": { "schema": "Order", "description": "Global order tracking." },
-    "/reviews/{reviewId}": { "schema": { "$ref": "#/entities/Review" }, "description": "Client testimonials." }
+    "/collections/{collectionId}": { "schema": "Collection", "description": "Seasonal curations." },
+    "/affiliates/{affiliateId}": { "schema": "Affiliate", "description": "Partner program management." },
+    "/returns/{returnId}": { "schema": "ReturnRequest", "description": "Reverse logistics terminal." }
   }
 }

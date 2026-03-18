@@ -20,7 +20,11 @@ import {
   Copy,
   Info,
   Calendar,
-  Gift
+  Gift,
+  Eye,
+  RotateCcw,
+  Zap,
+  Gavel
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -52,17 +56,13 @@ export default function ProductPage() {
   const [loadingAi, setLoadingAi] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [is360Active, setIs360Active] = useState(false);
   
   const isWishlisted = wishlist.some(i => i.id === product?.id);
-  const sku = useMemo(() => `AM-${id?.split('-')[1]}-${countryCode.toUpperCase()}`, [id, countryCode]);
-  const stockCount = useMemo(() => Math.floor(Math.random() * 8) + 1, [id]);
 
   useEffect(() => {
     if (!product) return;
-    if (product.colors?.[0]) setSelectedColor(product.colors[0]);
-    if (product.sizes?.[0]) setSelectedSize(product.sizes[0]);
     
     async function fetchData() {
       try {
@@ -100,19 +100,6 @@ export default function ProductPage() {
     });
   };
 
-  const handleToggleLike = () => {
-    toggleWishlist(product);
-    toggleLike(product.id, countryCode);
-  };
-
-  const handleShare = (platform: string) => {
-    trackShare(product.id, countryCode);
-    toast({
-      title: `Shared to ${platform}`,
-      description: `The Maison's vision has been broadcasted.`,
-    });
-  };
-
   return (
     <div className="bg-ivory min-h-screen">
       <div className="container mx-auto px-6 py-12">
@@ -127,26 +114,47 @@ export default function ProductPage() {
         <div className="flex flex-col lg:flex-row gap-24">
           <div className="w-full lg:w-3/5 space-y-8">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              <Image 
-                src={product.imageUrl} 
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-[2.5s] group-hover:scale-105"
-                priority
-              />
+              {is360Active ? (
+                <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-ivory">
+                   <RotateCcw className="w-12 h-12 text-gold animate-spin-slow" />
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Initializing Immersive 360° View</p>
+                   <Button variant="ghost" className="text-[9px] uppercase font-bold" onClick={() => setIs360Active(false)}>Return to Still</Button>
+                </div>
+              ) : (
+                <Image 
+                  src={product.mediaGallery?.[activeMediaIndex]?.url || product.imageUrl} 
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-transform duration-[2.5s] group-hover:scale-105"
+                  priority
+                />
+              )}
+              
+              <div className="absolute bottom-8 left-8 flex space-x-2">
+                 {product.mediaGallery?.map((m, idx) => (
+                   <button 
+                    key={idx} 
+                    onClick={() => {
+                      setActiveMediaIndex(idx);
+                      setIs360Active(m.type === '360');
+                    }}
+                    className={cn(
+                      "w-12 h-16 border bg-white transition-all overflow-hidden relative",
+                      activeMediaIndex === idx ? "border-plum scale-110 shadow-lg" : "border-border opacity-60"
+                    )}
+                   >
+                     <Image src={m.url} alt={m.alt} fill className="object-cover" />
+                     {m.type === 'video' && <Zap className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-md" />}
+                     {m.type === '360' && <RotateCcw className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-md" />}
+                   </button>
+                 ))}
+              </div>
+
               {product.isVip && (
                 <div className="absolute top-8 left-8 bg-plum px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80">
                   Private Edition
                 </div>
               )}
-            </div>
-            <div className="grid grid-cols-2 gap-8">
-              <div className="relative aspect-[4/5] bg-white overflow-hidden border border-border shadow-sm group">
-                 <Image src={`https://picsum.photos/seed/${id}-detail/1200/1600`} alt="Artisanal Detail" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-              </div>
-              <div className="relative aspect-[4/5] bg-white overflow-hidden border border-border shadow-sm group">
-                 <Image src={`https://picsum.photos/seed/${id}-lifestyle/1200/1600`} alt="Maison Lifestyle" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-              </div>
             </div>
           </div>
 
@@ -157,13 +165,22 @@ export default function ProductPage() {
                   Atelier {currentCountry.office?.city}
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={handleToggleLike}>
+                  <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={() => toggleWishlist(product)}>
                     <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
                   </Button>
-                  <ShareDropdown onShare={handleShare} />
                 </div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-headline font-bold leading-tight text-gray-900 italic">{product.name}</h1>
+              
+              <div className="space-y-2">
+                <h1 className="text-5xl md:text-7xl font-headline font-bold leading-tight text-gray-900 italic">{product.name}</h1>
+                {product.listingType === 'auction' && (
+                  <div className="flex items-center space-x-2 bg-gold/10 p-3 border border-gold/20 inline-flex">
+                    <Gavel className="w-4 h-4 text-gold" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold">Active Bid: {formatPrice(product.currentBid || 0, countryCode)}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center space-x-6">
                 <div className="flex text-gold">
                   {[...Array(5)].map((_, i) => (
@@ -183,7 +200,7 @@ export default function ProductPage() {
                 className="w-full bg-plum text-white hover:bg-gold hover:text-gray-900 h-20 rounded-none text-[10px] tracking-[0.4em] font-bold shadow-2xl transition-all"
                 onClick={handleAddToCart}
               >
-                ADD TO SHOPPING BAG
+                {product.listingType === 'auction' ? 'PLACE YOUR BID' : 'ADD TO SHOPPING BAG'}
               </Button>
               <div className="grid grid-cols-2 gap-4">
                 <Button 
@@ -204,11 +221,13 @@ export default function ProductPage() {
             </div>
 
             <Tabs defaultValue="narrative" className="w-full pt-12">
-              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12">
-                <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
+              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12 overflow-x-auto">
+                <TabsTrigger value="narrative" className="tab-trigger">Narrative</TabsTrigger>
                 <TabsTrigger value="provenance" className="tab-trigger">Provenance</TabsTrigger>
-                <TabsTrigger value="logistics" className="tab-trigger">Logistics</TabsTrigger>
+                <TabsTrigger value="inventory" className="tab-trigger">Stock</TabsTrigger>
+                <TabsTrigger value="compliance" className="tab-trigger">Legal</TabsTrigger>
               </TabsList>
+              
               <TabsContent value="narrative" className="pt-10 animate-fade-in min-h-[250px]">
                 {loadingAi ? (
                   <div className="space-y-4 animate-pulse">
@@ -221,6 +240,7 @@ export default function ProductPage() {
                   </div>
                 )}
               </TabsContent>
+
               <TabsContent value="provenance" className="pt-10">
                 <ul className="space-y-6">
                   <DetailRow label="Origin" value={`Maison Amarisé Ateliers, ${currentCountry.office?.city}`} />
@@ -228,9 +248,34 @@ export default function ProductPage() {
                   <DetailRow label="Authenticity" value="NFC-enabled certification included" />
                 </ul>
               </TabsContent>
-              <TabsContent value="logistics" className="pt-10 space-y-8">
-                <Benefit icon={<Truck className="w-4 h-4" />} title="White-Glove Delivery" desc={`Complimentary in ${currentCountry.name}`} />
-                <Benefit icon={<ShieldCheck className="w-4 h-4" />} title="Insured Transit" desc="Full value insurance included" />
+
+              <TabsContent value="inventory" className="pt-10">
+                <div className="space-y-6">
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Regional Availability</p>
+                   {product.regionalStock?.map(rs => (
+                     <div key={rs.warehouseId} className="flex justify-between items-center border-b border-border pb-4">
+                        <div className="flex flex-col">
+                           <span className="text-[10px] font-bold uppercase">{rs.warehouseName}</span>
+                           <span className="text-[8px] text-muted-foreground uppercase">{rs.region} Market</span>
+                        </div>
+                        <span className={cn("text-xs font-bold", rs.stockCount < 5 ? "text-red-500" : "text-gray-900")}>
+                          {rs.stockCount} Available
+                        </span>
+                     </div>
+                   ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="compliance" className="pt-10 space-y-6">
+                 <div className="p-6 bg-plum/5 border border-plum/10 rounded-sm">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest mb-2">Heritage Compliance</h4>
+                    <p className="text-[9px] text-gray-500 leading-relaxed italic">
+                      This artifact complies with global {currentCountry.name} import regulations and Maison sustainability charters. Full GDPR data protection applies to your acquisition registry.
+                    </p>
+                 </div>
+                 <Button variant="outline" className="w-full h-12 text-[9px] font-bold uppercase tracking-widest border-border" onClick={() => toast({ title: "Document Downloaded", description: "Maison Sustainability Charter" })}>
+                    VIEW COMPLIANCE DOCS
+                 </Button>
               </TabsContent>
             </Tabs>
           </div>
@@ -262,49 +307,11 @@ export default function ProductPage() {
   );
 }
 
-function ShareDropdown({ onShare }: { onShare: (platform: string) => void }) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="hover:text-primary">
-          <Share2 className="w-5 h-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-white border-border luxury-blur w-56 p-2 shadow-luxury">
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Facebook')}>
-          <Facebook className="w-4 h-4 mr-3" /> Facebook
-        </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Twitter')}>
-          <Twitter className="w-4 h-4 mr-3" /> Twitter
-        </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('LinkedIn')}>
-          <Linkedin className="w-4 h-4 mr-3" /> LinkedIn
-        </DropdownMenuItem>
-        <DropdownMenuItem className="p-3 text-[10px] font-bold uppercase tracking-widest cursor-pointer" onClick={() => onShare('Copy Link')}>
-          <Copy className="w-4 h-4 mr-3" /> Copy Link
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 function DetailRow({ label, value }: { label: string, value: string }) {
   return (
     <div className="grid grid-cols-3 gap-8 py-4 border-b border-border/40 last:border-0">
       <span className="text-[10px] font-bold uppercase tracking-widest text-plum">{label}</span>
       <span className="col-span-2 text-xs text-gray-500 font-light italic">{value}</span>
-    </div>
-  );
-}
-
-function Benefit({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
-  return (
-    <div className="flex items-start space-x-6">
-      <div className="p-3 bg-ivory rounded-full text-plum border border-border">{icon}</div>
-      <div className="space-y-1">
-        <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-900">{title}</h4>
-        <p className="text-xs text-gray-500 font-light italic">{desc}</p>
-      </div>
     </div>
   );
 }

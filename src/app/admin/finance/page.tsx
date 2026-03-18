@@ -20,7 +20,9 @@ import {
   LayoutDashboard,
   Building2,
   Lock,
-  Cpu
+  Cpu,
+  ShieldCheck,
+  Globe
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,10 +60,10 @@ export default function FinanceHub() {
         
         <nav className="flex-1 space-y-1">
           <FinanceNavItem icon={<LayoutDashboard />} label="Ledger Overview" active={true} />
-          <FinanceNavItem icon={<FileText />} label="Invoicing" active={false} />
-          <FinanceNavItem icon={<Building2 />} label="Vendor Payouts" active={false} />
-          <FinanceNavItem icon={<PieChart />} label="Tax Reporting" active={false} />
-          <FinanceNavItem icon={<Lock />} label="Reconciliation" active={false} />
+          <FinanceNavItem icon={<FileText />} label="Invoicing & Docs" active={false} />
+          <FinanceNavItem icon={<Building2 />} label="Partner Payouts" active={false} />
+          <FinanceNavItem icon={<Globe />} label="Intl. Tax & Compliance" active={false} />
+          <FinanceNavItem icon={<ShieldCheck />} label="Reconciliation" active={false} />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -82,10 +84,10 @@ export default function FinanceHub() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              Ledger & Invoicing
+              Treasury Ledger
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Global Transactional Oversight
+              Global Financial Oversight • Automated Compliance
             </p>
           </div>
           <div className="flex items-center space-x-6">
@@ -98,27 +100,27 @@ export default function FinanceHub() {
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatCard icon={<DollarSign />} label="Net Revenue (MTD)" value="$1.2M" trend="+12.4%" positive />
-            <StatCard icon={<CreditCard />} label="Pending Payouts" value="$245k" trend="Scheduled" positive />
-            <StatCard icon={<TrendingUp />} label="Avg. Order Value" value="$8,450" trend="+2.1%" positive />
-            <StatCard icon={<CheckCircle2 />} label="Reconciled Today" value="98.2%" trend="Optimal" positive />
+            <StatCard icon={<DollarSign />} label="Net Revenue (Global)" value="$1.2M" trend="+12.4%" positive />
+            <StatCard icon={<Globe />} label="Total Tax Accrued" value="$245k" trend="Compliance: 100%" positive />
+            <StatCard icon={<ShieldCheck />} label="Verified Orders" value="98.2%" trend="Optimal" positive />
+            <StatCard icon={<Clock />} label="Awaiting Settlement" value="$180k" trend="Scheduled" positive />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
               <CardHeader className="border-b border-border">
-                <CardTitle className="font-headline text-2xl">Invoice Registry</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Automated artisanal transaction logs</CardDescription>
+                <CardTitle className="font-headline text-2xl">Invoice & Document Registry</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Automated artisanal transaction logs & legal exports</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader className="bg-ivory/50">
                     <TableRow>
-                      <TableHead className="text-[9px] uppercase font-bold pl-8">Invoice ID</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Doc ID</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold">Client</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold">Amount</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Tax Info</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Legal Export</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -128,12 +130,13 @@ export default function FinanceHub() {
                         <TableCell className="text-xs font-light">{inv.customerName}</TableCell>
                         <TableCell className="text-xs font-bold text-plum">{inv.currency} {inv.amount.toLocaleString()}</TableCell>
                         <TableCell className="text-center">
-                          <Badge className={cn("text-[8px] uppercase tracking-widest", inv.status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-gold/10 text-gold')}>
-                            {inv.status}
-                          </Badge>
+                          <span className="text-[9px] font-bold uppercase">{inv.taxRate}% VAT/GST</span>
                         </TableCell>
                         <TableCell className="text-right pr-8">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleAction("Downloading PDF.")}><Download className="w-4 h-4" /></Button>
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleAction("Generating PDF.")}><FileText className="w-4 h-4" /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleAction("Compliance record exported.")}><ShieldCheck className="w-4 h-4 text-green-600" /></Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -145,13 +148,13 @@ export default function FinanceHub() {
             <Card className="bg-white border-border shadow-luxury">
               <CardHeader className="border-b border-border">
                 <CardTitle className="font-headline text-2xl">Regional Tax Compliance</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Global jurisdictional reporting</CardDescription>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Global jurisdictional reporting status</CardDescription>
               </CardHeader>
               <CardContent className="pt-8 space-y-8">
                 <ComplianceRow label="VAT (United Kingdom)" status="Ready" progress={100} />
                 <ComplianceRow label="Sales Tax (US)" status="Optimal" progress={95} />
                 <ComplianceRow label="GST (Singapore)" status="Ready" progress={100} />
-                <ComplianceRow label="Customs (UAE)" status="Processing" progress={65} />
+                <ComplianceRow label="Import Duty (UAE)" status="Reporting" progress={65} />
               </CardContent>
             </Card>
           </div>

@@ -26,7 +26,9 @@ import {
   IndexingStatus,
   IndexingLog,
   Appointment,
-  Invoice
+  Invoice,
+  Affiliate,
+  ReturnRequest
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -49,7 +51,9 @@ import {
   INDEXING_STATUS,
   INDEXING_LOGS,
   APPOINTMENTS,
-  INVOICES
+  INVOICES,
+  AFFILIATES,
+  RETURNS
 } from './mock-data';
 
 interface AppContextType {
@@ -68,6 +72,8 @@ interface AppContextType {
   // High-Level Admin State
   admins: AdminAccount[];
   vendors: Vendor[];
+  affiliates: Affiliate[];
+  returns: ReturnRequest[];
   activeCampaigns: Campaign[];
   auditLogs: AuditLog[];
   vipClients: VipClient[];
@@ -107,11 +113,13 @@ interface AppContextType {
   upsertEditorial: (editorial: Editorial) => void;
   upsertAdmin: (admin: AdminAccount) => void;
   upsertVendor: (vendor: Vendor) => void;
+  upsertAffiliate: (affiliate: Affiliate) => void;
   upsertCampaign: (campaign: Campaign) => void;
   updateGlobalSettings: (settings: GlobalSettings) => void;
   upsertSegment: (segment: CustomerSegment) => void;
   upsertAppointment: (apt: Appointment) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
+  updateReturnStatus: (id: string, status: ReturnRequest['status']) => void;
   createInvoice: (invoice: Invoice) => void;
   
   // Support Actions
@@ -121,6 +129,7 @@ interface AppContextType {
 
   // Integration Actions
   toggleIntegration: (id: string) => void;
+  toggleEmergencyMode: () => void;
   
   // Indexing Actions
   triggerReindex: (type: 'catalog' | 'sitemap' | 'search') => void;
@@ -139,7 +148,6 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Persistence Simulation: Load from localStorage if available
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -154,6 +162,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Admin State
   const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
+  const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
   const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
@@ -178,14 +188,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     seo: { defaultTitle: 'Amarisé Luxe', defaultDesc: 'Global Luxury Flagship', sitemapUrl: '/sitemap.xml' },
     payments: { cards: true, wallets: true, crypto: false },
     compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
-    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' }
+    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
+    emergencyMode: false
   });
   
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(VENDORS[0]);
 
-  // Utility: Record an audit log
   const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => {
     const newLog: AuditLog = {
       id: `log-${Date.now()}`,
@@ -200,7 +210,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAuditLogs(prev => [newLog, ...prev]);
   };
 
-  // Utility: Simulate API Traffic
   const simulateApiCall = (endpoint: string, method: ApiLog['method'], status: number = 200) => {
     const newLog: ApiLog = {
       id: `apilog-${Date.now()}`,
@@ -225,20 +234,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     setSocialMetrics(initialMetrics);
   }, [products]);
-
-  // Auto-Indexing Simulator
-  useEffect(() => {
-    if (indexingStatus.autoSyncEnabled) {
-      const interval = setInterval(() => {
-        setIndexingStatus(prev => ({
-          ...prev,
-          indexedItems: prev.catalogItems,
-          lastFullScan: new Date().toISOString()
-        }));
-      }, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [indexingStatus.autoSyncEnabled]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -290,13 +285,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return [p, ...prev];
     });
     recordLog(`Upserted Artifact: ${p.name}`, 'Catalog Atelier');
-    setIndexingStatus(prev => ({ ...prev, catalogItems: prev.catalogItems + 1 }));
   };
 
   const deleteProduct = (id: string) => {
     setProducts(prev => prev.filter(p => p.id !== id));
     recordLog(`Deleted Artifact: ${id}`, 'Catalog Atelier', 'medium');
-    setIndexingStatus(prev => ({ ...prev, catalogItems: prev.catalogItems - 1 }));
   };
 
   const upsertCollection = (c: Collection) => {
@@ -309,7 +302,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [c, ...prev];
     });
-    recordLog(`Updated Collection: ${c.name}`, 'Curations');
   };
 
   const upsertEditorial = (ed: Editorial) => {
@@ -322,7 +314,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [ed, ...prev];
     });
-    recordLog(`Published Journal Story: ${ed.title}`, 'Storytelling CMS');
   };
 
   const upsertAdmin = (admin: AdminAccount) => {
@@ -335,7 +326,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [admin, ...prev];
     });
-    recordLog(`Governance Update: Admin ${admin.name}`, 'Governance', 'high');
   };
 
   const upsertVendor = (vendor: Vendor) => {
@@ -348,7 +338,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [vendor, ...prev];
     });
-    recordLog(`Vendor Performance Updated: ${vendor.name}`, 'Ecosystem');
+  };
+
+  const upsertAffiliate = (aff: Affiliate) => {
+    setAffiliates(prev => {
+      const idx = prev.findIndex(a => a.id === aff.id);
+      if (idx > -1) {
+        const next = [...prev];
+        next[idx] = aff;
+        return next;
+      }
+      return [aff, ...prev];
+    });
   };
 
   const upsertCampaign = (campaign: Campaign) => {
@@ -361,7 +362,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [campaign, ...prev];
     });
-    recordLog(`Campaign State Changed: ${campaign.title}`, 'Marketing Engage');
   };
 
   const upsertSegment = (seg: CustomerSegment) => {
@@ -374,28 +374,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [seg, ...prev];
     });
-    recordLog(`Customer Segment Re-defined: ${seg.name}`, 'Marketing Engage');
   };
 
   const upsertAppointment = (apt: Appointment) => {
     setAppointments(prev => [...prev, apt]);
-    simulateApiCall('/appointments/create', 'POST');
   };
 
   const updateAppointmentStatus = (id: string, status: Appointment['status']) => {
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
-    recordLog(`Appointment ${id} status: ${status}`, 'Concierge');
+  };
+
+  const updateReturnStatus = (id: string, status: ReturnRequest['status']) => {
+    setReturns(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+    recordLog(`Return ${id} set to ${status}`, 'Operations');
   };
 
   const createInvoice = (inv: Invoice) => {
     setInvoices(prev => [inv, ...prev]);
-    simulateApiCall('/billing/invoice/generate', 'POST');
   };
 
-  // Support Actions
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
     setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
-    recordLog(`Ticket ${id} marked as ${status}`, 'Support Care');
   };
 
   const assignTicket = (ticketId: string, adminId: string) => {
@@ -415,21 +414,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return t;
     }));
-    simulateApiCall('/support/message/send', 'POST');
   };
 
   const toggleIntegration = (id: string) => {
     setIntegrations(prev => prev.map(i => {
       if (i.id === id) {
         const newStatus = i.status === 'Connected' ? 'Disconnected' : 'Connected';
-        recordLog(`Integration ${i.name} set to ${newStatus}`, 'Architecture', 'medium');
         return { ...i, status: newStatus as any };
       }
       return i;
     }));
   };
 
-  // Indexing Actions
+  const toggleEmergencyMode = () => {
+    setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
+    recordLog('Emergency Mode Toggled', 'IT Architecture', 'high');
+  };
+
   const triggerReindex = (type: 'catalog' | 'sitemap' | 'search') => {
     const newLog: IndexingLog = {
       id: `idx-${Date.now()}`,
@@ -441,7 +442,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setIndexingLogs(prev => [newLog, ...prev]);
     setIndexingStatus(prev => ({ ...prev, lastFullScan: new Date().toISOString() }));
-    recordLog(`Manual Re-indexing Triggered: ${type}`, 'Architecture');
   };
 
   const toggleAutoSync = () => {
@@ -450,7 +450,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateGlobalSettings = (settings: GlobalSettings) => {
     setGlobalSettings(settings);
-    recordLog('Global Platform Settings Updated', 'Architecture', 'high');
   };
 
   const toggleLike = (contentId: string, country: string) => {
@@ -480,6 +479,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     socialMetrics,
     admins,
     vendors,
+    affiliates,
+    returns,
     activeCampaigns,
     auditLogs,
     vipClients,
@@ -507,16 +508,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertEditorial,
     upsertAdmin,
     upsertVendor,
+    upsertAffiliate,
     upsertCampaign,
     upsertSegment,
     upsertAppointment,
     updateAppointmentStatus,
+    updateReturnStatus,
     createInvoice,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
     addTicketMessage,
     toggleIntegration,
+    toggleEmergencyMode,
     triggerReindex,
     toggleAutoSync,
     toggleLike,
@@ -524,7 +528,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

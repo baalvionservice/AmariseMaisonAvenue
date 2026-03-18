@@ -32,7 +32,9 @@ import {
   PieChart,
   LayoutTemplate,
   LifeBuoy,
-  Cpu
+  Cpu,
+  Boxes,
+  RotateCcw
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,11 +54,11 @@ import {
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/types';
 
-type OpsTab = 'dashboard' | 'catalog' | 'curations' | 'orders' | 'cms' | 'customers' | 'reports' | 'logistics';
+type OpsTab = 'dashboard' | 'catalog' | 'inventory' | 'orders' | 'returns' | 'cms' | 'customers' | 'logistics';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { products, editorials, vipClients, deleteProduct, upsertProduct } = useAppStore();
+  const { products, editorials, returns, updateReturnStatus, deleteProduct, upsertProduct } = useAppStore();
   const { toast } = useToast();
 
   const handleAddMockProduct = () => {
@@ -92,12 +94,12 @@ export default function OperationsAdminPanel() {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <OpsNavItem icon={<Package />} label="Catalog Atelier" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
-          <OpsNavItem icon={<Tags />} label="Curations" active={activeTab === 'curations'} onClick={() => setActiveTab('curations')} />
-          <OpsNavItem icon={<Truck />} label="Orders & Returns" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
+          <OpsNavItem icon={<Boxes />} label="Multi-Warehouse" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
+          <OpsNavItem icon={<Truck />} label="Orders & Fulfillment" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
+          <OpsNavItem icon={<RotateCcw />} label="Reverse Logistics" active={activeTab === 'returns'} onClick={() => setActiveTab('returns')} />
           <OpsNavItem icon={<FileText />} label="Storytelling CMS" active={activeTab === 'cms'} onClick={() => setActiveTab('cms')} />
           <OpsNavItem icon={<Users />} label="Connoisseurs" active={activeTab === 'customers'} onClick={() => setActiveTab('customers')} />
-          <OpsNavItem icon={<BarChart3 />} label="Analytics" active={activeTab === 'reports'} onClick={() => setActiveTab('reports')} />
-          <OpsNavItem icon={<Settings />} label="Logistics" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
+          <OpsNavItem icon={<Settings />} label="Logistics Config" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -138,42 +140,40 @@ export default function OperationsAdminPanel() {
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
-                <StatCard icon={<AlertTriangle />} label="Inventory Alerts" value="12" trend="Low Stock" positive={false} />
-                <StatCard icon={<Plus />} label="Orders Today" value="84" trend="+15%" positive={true} />
-                <StatCard icon={<Star />} label="Client Enquiries" value="08" trend="Unread" positive={false} />
+                <StatCard icon={<RotateCcw />} label="Active Returns" value={returns.length.toString()} trend="Inspect Now" positive={false} />
+                <StatCard icon={<Boxes />} label="Low Stock Alerts" value="12" trend="Replenish" positive={false} />
+                <StatCard icon={<Star />} label="VIP Enquiries" value="08" trend="Immediate" positive={false} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Daily Logistics Stream</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of artisanal fulfillment</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Regional Fulfillment Velocity</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of artisanal hubs</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader className="bg-ivory/50">
                         <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">Order ID</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Connoisseur</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Atelier</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold pl-8">Atelier Hub</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Region</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Load</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[1, 2, 3, 4, 5].map(i => (
-                          <TableRow key={i} className="hover:bg-ivory/30">
-                            <TableCell className="text-xs font-bold font-mono pl-8">#AM-{(1000 + i)}</TableCell>
-                            <TableCell className="text-xs font-light italic">Julian Vandervilt</TableCell>
-                            <TableCell className="text-[10px] uppercase tracking-widest text-plum font-bold">New York</TableCell>
-                            <TableCell className="text-center">
-                              <Badge className="bg-plum/10 text-plum text-[8px] uppercase tracking-widest">Processing</Badge>
-                            </TableCell>
-                            <TableCell className="text-right pr-8">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gold"><Eye className="w-4 h-4" /></Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        <TableRow>
+                          <TableCell className="pl-8 text-xs font-bold">New York Fifth Ave</TableCell>
+                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">US Market</Badge></TableCell>
+                          <TableCell className="text-center text-green-600 font-bold text-[9px] uppercase">Optimal</TableCell>
+                          <TableCell className="text-right pr-8"><Progress value={45} className="h-1" /></TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="pl-8 text-xs font-bold">London Bond Street</TableCell>
+                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">UK Market</Badge></TableCell>
+                          <TableCell className="text-center text-gold font-bold text-[9px] uppercase">High Load</TableCell>
+                          <TableCell className="text-right pr-8"><Progress value={88} className="h-1" /></TableCell>
+                        </TableRow>
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -181,17 +181,80 @@ export default function OperationsAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Atelier Performance</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Regional fulfillment velocity</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Return Sentiment</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Global reverse logistics analysis</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 space-y-8">
-                    <PerformanceRow label="Paris Flagship" val={98} />
-                    <PerformanceRow label="London Bond St." val={92} />
-                    <PerformanceRow label="Dubai Mall" val={95} />
-                    <PerformanceRow label="New York 5th Ave" val={88} />
+                    <PerformanceRow label="Average Return Rate" val={1.8} />
+                    <PerformanceRow label="Inspection Velocity" val={92} />
+                    <PerformanceRow label="Refund Latency" val={12} />
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <div className="space-y-12">
+              <h2 className="text-2xl font-headline font-bold italic text-gray-900">Multi-Warehouse Inventory</h2>
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Atelier NY</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Atelier London</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Atelier Dubai</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Global Agg.</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {products.slice(0, 10).map(p => (
+                      <TableRow key={p.id}>
+                        <TableCell className="pl-8 text-xs font-bold">{p.name}</TableCell>
+                        <TableCell className="text-xs">{p.regionalStock?.[0]?.stockCount || 0}</TableCell>
+                        <TableCell className="text-xs">{p.regionalStock?.[1]?.stockCount || 0}</TableCell>
+                        <TableCell className="text-xs">0</TableCell>
+                        <TableCell className="text-right pr-8 text-xs font-bold text-plum">{p.stock}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'returns' && (
+            <div className="space-y-12">
+              <h2 className="text-2xl font-headline font-bold italic text-gray-900">Reverse Logistics & Returns</h2>
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Return ID</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Order</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Reason</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {returns.map(r => (
+                      <TableRow key={r.id}>
+                        <TableCell className="pl-8 text-xs font-mono font-bold">{r.id}</TableCell>
+                        <TableCell className="text-xs font-bold text-plum">{r.orderId}</TableCell>
+                        <TableCell className="text-xs italic text-gray-500">{r.reason}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge className="bg-gold/10 text-gold text-[8px] uppercase">{r.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-8">
+                          <Button variant="outline" size="sm" className="h-8 border-border text-[8px] uppercase font-bold" onClick={() => updateReturnStatus(r.id, 'inspecting')}>Inspect</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           )}
 
@@ -212,7 +275,7 @@ export default function OperationsAdminPanel() {
                   <TableHeader className="bg-ivory/50">
                     <TableRow>
                       <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Category</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-center">Stock</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right">Value</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
@@ -232,7 +295,11 @@ export default function OperationsAdminPanel() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{product.category}</Badge></TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={cn("text-[8px] uppercase tracking-widest", product.listingType === 'auction' ? 'border-gold text-gold' : 'border-border text-gray-400')}>
+                            {product.listingType || 'Fixed'}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-center">
                           <span className={cn("text-xs font-bold", product.stock < 5 ? "text-red-500" : "text-gray-500")}>
                             {product.stock}
