@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Globe } from 'lucide-react';
 import { COUNTRIES, DEPARTMENTS, CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
 import { 
@@ -31,26 +31,32 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
-      {/* Announcement Bar - Updated to Light Lavender Style */}
-      <div className="bg-[#f3ebf7] text-gray-800 h-10 flex items-center justify-between px-6 text-[10px] tracking-widest font-bold uppercase border-b border-black/5">
-        <div className="flex items-center space-x-2">
-          <span className="opacity-70">100% Authentic Guaranteed</span>
-        </div>
-        <div className="flex-1 flex justify-center items-center overflow-hidden">
-          <div className="flex items-center space-x-6">
-            <ChevronLeft className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors" />
-            <span className="tracking-[0.2em]">Spring Collector's Auction</span>
-            <ChevronRight className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors" />
-          </div>
-        </div>
+      {/* Top Ticker Bar - Light Lavender Style */}
+      <div className="bg-[#f3ebf7] text-gray-800 h-9 flex items-center justify-center px-6 text-[10px] tracking-widest font-medium uppercase border-b border-black/5">
         <div className="flex items-center space-x-6">
-          <Link href={`/${countryCode}/appointments`} className="hover:text-plum transition-colors">Appointments</Link>
-          <Link href={`/${countryCode}/contact`} className="hover:text-plum transition-colors">Contact</Link>
+          <ChevronLeft className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" />
+          <span className="tracking-[0.15em]">Call to schedule an appointment in our NYC Showroom or Virtually via FaceTime</span>
+          <ChevronRight className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors opacity-60" />
+        </div>
+      </div>
+
+      {/* Black Utility Bar - Matches Reference */}
+      <div className="bg-[#1a1a1a] text-white h-10 flex items-center justify-between px-6 text-[10px] tracking-widest font-bold uppercase">
+        <div className="flex items-center space-x-2">
+          <ShieldCheck className="w-3.5 h-3.5 text-white/80" />
+          <span className="text-white">100% Authentic Guaranteed</span>
+        </div>
+        
+        <div className="flex items-center space-x-6">
+          <Link href="#" className="hover:text-gold transition-colors">Sell</Link>
+          <Link href={`/${countryCode}/appointments`} className="hover:text-gold transition-colors">Appointments</Link>
+          <Link href={`/${countryCode}/contact`} className="hover:text-gold transition-colors">Contact</Link>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:bg-white/50 transition-all px-3 py-1 border border-black/10 group">
-                <span className="text-base leading-none grayscale group-hover:grayscale-0 transition-all">{currentCountry.flag}</span>
-                <span className="font-bold tracking-tighter text-[11px] text-gray-800">{currentCountry.name}</span>
+              <button className="flex items-center space-x-2 hover:opacity-80 transition-all group">
+                <span className="text-sm leading-none">{currentCountry.flag}</span>
+                <span className="font-bold tracking-tighter text-[11px] text-white">{currentCountry.currency}</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2 rounded-none shadow-luxury">
@@ -61,7 +67,7 @@ export const Header = () => {
                   onClick={() => handleCountryChange(c.code)} 
                   className={cn(
                     "cursor-pointer flex items-center justify-between p-3 rounded-none transition-colors",
-                    countryCode === c.code ? "bg-black text-white" : "hover:bg-ivory"
+                    countryCode === c.code ? "bg-black text-white" : "hover:bg-ivory text-black"
                   )}
                 >
                   <div className="flex items-center space-x-3">
