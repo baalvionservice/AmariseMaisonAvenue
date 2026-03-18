@@ -41,6 +41,7 @@ export interface Category {
   imageUrl?: string;
   subcategories: string[];
   departmentId: string;
+  brandId?: string;
 }
 
 export interface Department {
@@ -49,6 +50,7 @@ export interface Department {
   description: string;
   imageUrl: string;
   categories: string[]; // Category IDs
+  brandId?: string;
 }
 
 export interface RegionalStock {
@@ -80,6 +82,9 @@ export interface Product {
   sizes?: string[];
   stock: number;
   vendorId?: string;
+  brandId: string;
+  countryCode?: CountryCode;
+  isGlobal: boolean;
   // Enterprise Extensions
   regionalStock?: RegionalStock[];
   mediaGallery?: ProductMedia[];
@@ -100,6 +105,9 @@ export interface Collection {
   imageUrl: string;
   departmentId?: string;
   isPrivate?: boolean;
+  brandId: string;
+  countryCode?: CountryCode;
+  isGlobal: boolean;
 }
 
 export interface Editorial {
@@ -114,6 +122,8 @@ export interface Editorial {
   date: string;
   isVip: boolean;
   featuredProducts: string[];
+  brandId: string;
+  isGlobal: boolean;
   // SEO Authority Fields
   targetKeyword?: string;
   metaDescription?: string;
@@ -134,6 +144,8 @@ export interface BuyingGuide {
   country: string;
   date: string;
   author: string;
+  brandId: string;
+  isGlobal: boolean;
   // SEO Authority Fields
   targetKeyword?: string;
   metaDescription?: string;
@@ -160,6 +172,8 @@ export interface MaisonService {
   priceRange: string;
   features: string[];
   imageUrl: string;
+  brandId: string;
+  isGlobal: boolean;
 }
 
 export interface MaisonReport {
@@ -171,6 +185,7 @@ export interface MaisonReport {
   isPremium: boolean;
   fullContent?: string;
   previewImage: string;
+  brandId: string;
 }
 
 export interface PrivateInquiry {
@@ -188,6 +203,7 @@ export interface PrivateInquiry {
   leadTier: 1 | 2 | 3;
   timestamp: string;
   adminNotes?: string;
+  brandId: string;
 }
 
 export interface CuratorMessage {
@@ -202,6 +218,7 @@ export interface LeadConversation {
   inquiryId: string;
   messages: CuratorMessage[];
   status: 'active' | 'archived';
+  brandId: string;
 }
 
 export interface SalesScript {
@@ -210,6 +227,8 @@ export interface SalesScript {
   stage: PrivateInquiry['status'];
   triggerKeywords?: string[];
   template: string;
+  brandId: string;
+  countryCode?: CountryCode; // Specific override
 }
 
 export interface AutomationRule {
@@ -219,6 +238,7 @@ export interface AutomationRule {
   action: 'send_script' | 'notify_admin' | 'change_status';
   params?: any;
   enabled: boolean;
+  brandId: string;
 }
 
 export interface SEOMetadata {
@@ -229,6 +249,8 @@ export interface SEOMetadata {
   keywords: string;
   h1: string;
   structuredData?: any;
+  brandId: string;
+  isGlobal: boolean;
 }
 
 export interface CMSSection {
@@ -239,6 +261,33 @@ export interface CMSSection {
   visible: boolean;
   featured: boolean;
   contentId?: string; // Links to a specific entity
+  brandId: string;
+  countryCode?: CountryCode;
+}
+
+// --- GLOBAL INFRASTRUCTURE ---
+
+export interface CountryConfig {
+  code: CountryCode;
+  enabled: boolean;
+  currency: string;
+  symbol: string;
+  locale: string;
+  messagingStrategy: 'WhatsApp' | 'Email' | 'Concierge';
+  pricingVisibility: 'public' | 'gated' | 'mixed';
+  featuredCategories: string[];
+}
+
+export interface BrandConfig {
+  id: string;
+  name: string;
+  domain: string;
+  theme: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+  enabled: boolean;
 }
 
 // --- LOGISTICS & ADMIN ---
@@ -265,6 +314,7 @@ export interface MaisonStory {
   }[];
   sustainability: string;
   institutionalCharter?: string;
+  brandId: string;
 }
 
 export interface CustomerServiceInfo {
@@ -277,12 +327,13 @@ export interface AdminAccount {
   id: string;
   name: string;
   email: string;
-  role: 'CEO' | 'Manager' | 'Ops' | 'Marketing' | 'Support' | 'Finance' | 'IT';
+  role: 'CEO' | 'Manager' | 'Ops' | 'Marketing' | 'Support' | 'Finance' | 'IT' | 'SUPER_ADMIN';
   permissions: string[];
   status: 'active' | 'suspended';
   lastActive: string;
   avatar?: string;
   twoFactorEnabled: boolean;
+  brandId?: string; // Null if Super Admin
 }
 
 export interface Vendor {
@@ -300,6 +351,7 @@ export interface Vendor {
     fulfillmentSpeed: string;
     rating: number;
   };
+  brandId: string;
 }
 
 export interface Affiliate {
@@ -310,6 +362,7 @@ export interface Affiliate {
   salesGenerated: number;
   commissionEarned: number;
   status: 'active' | 'pending';
+  brandId: string;
 }
 
 export interface Campaign {
@@ -326,6 +379,7 @@ export interface Campaign {
   conversions?: number;
   predictedRoi?: number;
   abTestActive: boolean;
+  brandId: string;
 }
 
 export interface CustomerSegment {
@@ -336,6 +390,7 @@ export interface CustomerSegment {
   avgOrderValue: number;
   tags: string[];
   predictedChurn: number;
+  brandId: string;
 }
 
 export interface Appointment {
@@ -347,6 +402,7 @@ export interface Appointment {
   time: string;
   city: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  brandId: string;
 }
 
 export interface ReturnRequest {
@@ -357,6 +413,7 @@ export interface ReturnRequest {
   status: 'pending' | 'received' | 'inspecting' | 'refunded' | 'rejected';
   warehouseId: string;
   requestedAt: string;
+  brandId: string;
 }
 
 export interface Invoice {
@@ -370,6 +427,7 @@ export interface Invoice {
   taxAmount: number;
   taxRate: number;
   complianceCertified: boolean;
+  brandId: string;
 }
 
 export interface AuditLog {
@@ -381,6 +439,7 @@ export interface AuditLog {
   timestamp: string;
   ipAddress: string;
   severity: 'low' | 'medium' | 'high';
+  brandId?: string;
 }
 
 export interface GlobalSettings {
@@ -422,6 +481,7 @@ export interface VipClient {
   lastPurchase?: string;
   isSubscriber: boolean;
   subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
+  brandId: string;
 }
 
 export interface SupportTicket {
@@ -443,6 +503,7 @@ export interface SupportTicket {
     text: string;
     timestamp: string;
   }[];
+  brandId: string;
 }
 
 export interface SupportStats {
@@ -463,6 +524,7 @@ export interface MaisonIntegration {
   latency?: string;
   uptime: number; 
   logo?: string;
+  brandId?: string;
 }
 
 export interface ApiLog {

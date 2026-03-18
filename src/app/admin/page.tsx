@@ -19,7 +19,8 @@ import {
   CreditCard,
   History,
   ActivitySquare,
-  DollarSign
+  DollarSign,
+  Crown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,10 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 export default function SuperAdminPanel() {
-  const { privateInquiries, socialMetrics } = useAppStore();
+  const { privateInquiries, socialMetrics, admins } = useAppStore();
+
+  // Simple mock check for Super Admin
+  const isSuperAdmin = true; 
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -50,6 +54,13 @@ export default function SuperAdminPanel() {
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
           <AdminNavItem icon={<CreditCard />} label="Finance Hub" active={false} href="/admin/finance" />
           <AdminNavItem icon={<Settings />} label="Operations Hub" active={false} href="/admin/operations" />
+
+          {isSuperAdmin && (
+            <>
+              <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-plum">Global Infrastructure</div>
+              <AdminNavItem icon={<Crown />} label="Super Admin" active={false} href="/admin/super" />
+            </>
+          )}
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -103,8 +114,8 @@ export default function SuperAdminPanel() {
                   <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
                   </Link>
-                  <Link href="/admin/seo" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Refresh Sitemap</p>
+                  <Link href="/admin/super" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Global Infrastructure</p>
                   </Link>
                 </div>
               </div>
@@ -139,7 +150,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
       <CardContent className="p-8 space-y-6">
         <div className="flex justify-between items-start">
           <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
-          <div className={cn("text-[10px] font-bold uppercase tracking-widest", positive ? "text-gold" : "text-red-500")}>
+          <div className={cn("text-[10px] font-bold tracking-widest uppercase", positive ? "text-gold" : "text-red-500")}>
             {trend}
           </div>
         </div>

@@ -34,7 +34,10 @@ import {
   CMSSection,
   SEOMetadata,
   SalesScript,
-  AutomationRule
+  AutomationRule,
+  CountryConfig,
+  BrandConfig,
+  CountryCode
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -63,9 +66,13 @@ import {
 } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
+import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 
 interface AppContextType {
-  // --- Dynamic State Modules ---
+  // --- Global Infrastructure ---
+  countryConfigs: CountryConfig[];
+  brandConfigs: BrandConfig[];
+  activeBrandId: string;
   
   // CMS State
   cmsSections: CMSSection[];
@@ -116,6 +123,9 @@ interface AppContextType {
   activeVendor: Vendor | null;
   
   // --- Actions & Methods ---
+  setCountryEnabled: (code: CountryCode, enabled: boolean) => void;
+  updateCountryConfig: (config: CountryConfig) => void;
+  setActiveBrand: (id: string) => void;
   
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
@@ -161,37 +171,44 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  // Global Infrastructure
+  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG);
+  const [brandConfigs, setBrandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
+  const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
+
   // CMS Module
   const [cmsSections, setCmsSections] = useState<CMSSection[]>([
-    { id: 'hero', title: 'The Heritage Registry', subtitle: 'Institutional Acquisition House', visible: true, featured: true },
-    { id: 'editorial-home', title: 'The Standard of the Absolute', visible: true, featured: false },
-    { id: 'departments', title: 'Global Departments', visible: true, featured: false },
-    { id: 'private-salon', title: 'Private Acquisition Salon', visible: true, featured: true }
+    { id: 'hero', title: 'The Heritage Registry', subtitle: 'Institutional Acquisition House', visible: true, featured: true, brandId: activeBrandId },
+    { id: 'editorial-home', title: 'The Standard of the Absolute', visible: true, featured: false, brandId: activeBrandId },
+    { id: 'departments', title: 'Global Departments', visible: true, featured: false, brandId: activeBrandId },
+    { id: 'private-salon', title: 'Private Acquisition Salon', visible: true, featured: true, brandId: activeBrandId }
   ]);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [collections, setCollections] = useState<Collection[]>(INITIAL_COLLECTIONS);
-  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
-  const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS);
+  
+  // Ensure products/collections/etc have brandId and country filters
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, isGlobal: true })));
+  const [collections, setCollections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
+  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
+  const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId })));
   const [cities, setCities] = useState<City[]>(INITIAL_CITIES);
-  const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES);
-  const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
+  const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES.map(g => ({ ...g, brandId: activeBrandId, isGlobal: false })));
+  const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL.map(e => ({ ...e, brandId: activeBrandId, isGlobal: false })));
 
   // CRM Module
-  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES);
-  const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS);
-  const [messagingTemplates, setMessagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS);
+  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
+  const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS.map(c => ({ ...c, brandId: activeBrandId })));
+  const [messagingTemplates, setMessagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
 
   // SEO Module
   const [seoRegistry, setSeoRegistry] = useState<SEOMetadata[]>([
-    { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub for US collectors.', keywords: 'luxury, heritage, acquisition', h1: 'The Heritage Registry' },
-    { id: 'home-uk', path: '/uk', title: 'AMARISÉ | London Heritage Souce', description: 'Traditional craftsmanship for the UK market.', keywords: 'london luxury, bond street', h1: 'The London Archive' }
+    { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub for US collectors.', keywords: 'luxury, heritage, acquisition', h1: 'The Heritage Registry', brandId: activeBrandId, isGlobal: false },
+    { id: 'home-uk', path: '/uk', title: 'AMARISÉ | London Heritage Souce', description: 'Traditional craftsmanship for the UK market.', keywords: 'london luxury, bond street', h1: 'The London Archive', brandId: activeBrandId, isGlobal: false }
   ]);
 
   // Automation Module
   const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
-    { id: 'rule-1', name: 'Auto-Reply: New Inquiry', trigger: 'inquiry_submitted', action: 'send_script', params: { scriptId: 'script-init' }, enabled: true },
-    { id: 'rule-2', name: 'Priority Route: Tier 1', trigger: 'tier_assigned', action: 'notify_admin', params: { priority: 'urgent' }, enabled: true },
-    { id: 'rule-3', name: 'Keyword: Investment Detect', trigger: 'keyword_match', action: 'send_script', params: { scriptId: 'script-investor' }, enabled: true }
+    { id: 'rule-1', name: 'Auto-Reply: New Inquiry', trigger: 'inquiry_submitted', action: 'send_script', params: { scriptId: 'script-init' }, enabled: true, brandId: activeBrandId },
+    { id: 'rule-2', name: 'Priority Route: Tier 1', trigger: 'tier_assigned', action: 'notify_admin', params: { priority: 'urgent' }, enabled: true, brandId: activeBrandId },
+    { id: 'rule-3', name: 'Keyword: Investment Detect', trigger: 'keyword_match', action: 'send_script', params: { scriptId: 'script-investor' }, enabled: true, brandId: activeBrandId }
   ]);
 
   // Global Logistics
@@ -199,16 +216,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
-  const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
-  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
-  const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS);
-  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
+  const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
+  const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS.map(r => ({ ...r, brandId: activeBrandId })));
+  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
-  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS);
-  const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
-  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
-  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
-  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId })));
+  const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
+  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS.map(a => ({ ...a, brandId: activeBrandId })));
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES.map(i => ({ ...i, brandId: activeBrandId })));
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs] = useState<ApiLog[]>(API_LOGS);
@@ -226,7 +243,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
-  const [activeVendor, setActiveVendor] = useState<Vendor | null>(VENDORS[0]);
+  const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
+
+  // --- Infrastructure Actions ---
+  const setCountryEnabled = (code: CountryCode, enabled: boolean) => {
+    setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
+    recordLog(`Market ${code.toUpperCase()} visibility set to ${enabled}`, 'System');
+  };
+
+  const updateCountryConfig = (config: CountryConfig) => {
+    setCountryConfigs(prev => prev.map(c => c.code === config.code ? config : c));
+  };
+
+  const setActiveBrand = (id: string) => setActiveBrandId(id);
 
   // --- CMS Actions ---
   const upsertCMSSection = (s: CMSSection) => setCmsSections(prev => {
@@ -258,7 +287,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
     setPrivateInquiries(prev => [inquiry, ...prev]);
     if (!leadConversations.find(c => c.inquiryId === inquiry.id)) {
-      setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active' }]);
+      setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
     }
     recordLog(`New Acquisition Intent: ${inquiry.customerName}`, 'CRM');
   };
@@ -303,7 +332,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // --- Global State ---
   const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => {
-    setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: 'Maison CEO', action, module, timestamp: new Date().toISOString(), ipAddress: '127.0.0.1', severity }, ...prev]);
+    setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: 'Maison CEO', action, module, timestamp: new Date().toISOString(), ipAddress: '127.0.0.1', severity, brandId: activeBrandId }, ...prev]);
   };
 
   const addToCart = (product: Product) => {
@@ -323,17 +352,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
 
   const value = useMemo(() => ({
+    countryConfigs, brandConfigs, activeBrandId,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
+    setCountryEnabled, updateCountryConfig, setActiveBrand,
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage, updateLeadTier, addInquiryNote,
     upsertSEOMetadata, upsertTemplate, toggleRule, upsertRule,
     addToCart, removeFromCart, updateQuantity, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog
-  }), [cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [countryConfigs, brandConfigs, activeBrandId, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
