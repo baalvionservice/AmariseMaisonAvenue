@@ -28,7 +28,8 @@ import {
   Invoice,
   Affiliate,
   ReturnRequest,
-  PrivateInquiry
+  PrivateInquiry,
+  LeadConversation
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -55,6 +56,7 @@ import {
   AFFILIATES,
   RETURNS
 } from './mock-data';
+import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 
 interface AppContextType {
   // Data State
@@ -82,6 +84,7 @@ interface AppContextType {
   appointments: Appointment[];
   invoices: Invoice[];
   privateInquiries: PrivateInquiry[];
+  leadConversations: LeadConversation[];
   
   // Support Hub State
   supportTickets: SupportTicket[];
@@ -123,6 +126,7 @@ interface AppContextType {
   updateReturnStatus: (id: string, status: ReturnRequest['status']) => void;
   createInvoice: (invoice: Invoice) => void;
   upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
+  updateInquiryStatus: (id: string, status: PrivateInquiry['status']) => void;
   
   // Support Actions
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
@@ -161,7 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   
-  // Admin State
+  // Admin & Sales State
   const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
@@ -172,7 +176,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS);
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
-  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>([]);
+  const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES);
+  const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS);
   
   // Support Hub State
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS);
@@ -228,7 +233,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
-    // Populate metrics for all content types to simulate high-authority resonance
     products.forEach(p => {
       initialMetrics[p.id] = {
         likes: Math.floor(Math.random() * 1000) + 100,
@@ -412,8 +416,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
-    setPrivateInquiries(prev => [inquiry, ...prev]);
-    recordLog(`New Private Inquiry: ${inquiry.id}`, 'Monetization');
+    // Lead Tier Logic: 1 ($50k+), 2 ($10k-$50k), 3 (<$10k)
+    let leadTier: 1 | 2 | 3 = 3;
+    if (inquiry.budgetRange === 'Tier 1') leadTier = 1;
+    else if (inquiry.budgetRange === 'Tier 2') leadTier = 2;
+
+    const enrichedInquiry = { ...inquiry, leadTier };
+    setPrivateInquiries(prev => [enrichedInquiry, ...prev]);
+    
+    // Create initial mock conversation
+    const newConv: LeadConversation = {
+      id: `conv-${enrichedInquiry.id}`,
+      inquiryId: enrichedInquiry.id,
+      status: 'active',
+      messages: [
+        { id: `m-${Date.now()}`, sender: 'client', text: inquiry.message || 'Interested in private acquisition.', timestamp: new Date().toISOString() }
+      ]
+    };
+    setLeadConversations(prev => [newConv, ...prev]);
+    recordLog(`New Acquisition Lead: ${inquiry.customerName}`, 'Sales Desk');
+  };
+
+  const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => {
+    setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   };
 
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
@@ -518,6 +543,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     appointments,
     invoices,
     privateInquiries,
+    leadConversations,
     isShowcaseMode,
     activeVip,
     activeVendor,
@@ -540,6 +566,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateReturnStatus,
     createInvoice,
     upsertPrivateInquiry,
+    updateInquiryStatus,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
@@ -553,7 +580,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode,
     setActiveVip,
     setActiveVendor,
-  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, privateInquiries, isShowcaseMode, activeVip, activeVendor]);
+  }), [cart, wishlist, products, collections, categories, departments, cities, buyingGuides, editorials, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, privateInquiries, leadConversations, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

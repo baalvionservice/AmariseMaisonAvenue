@@ -3,7 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Heart, ShoppingBag, Eye, Share2, Lock } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Share2, Lock, Sparkles } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { formatPrice } from '@/lib/mock-data';
 import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
@@ -17,7 +17,8 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Updated for elite luxury aesthetics and high-ticket monetization.
+ * ProductCard: Optimized for elite high-ticket sales.
+ * Replaces direct "Add to Cart" with Private Acquisition flow.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -28,16 +29,6 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   const isWishlisted = wishlist.some(i => i.id === product.id);
   const metrics = socialMetrics[product.id] || { likes: 0, shares: 0, engagementRate: 0 };
   const monetization = useMemo(() => PRODUCTS_EXTENDED[product.id] || { priceVisible: true }, [product.id]);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(product);
-    toast({
-      title: "Added to Bag",
-      description: `${product.name} has been added to your selection.`,
-    });
-  };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -73,7 +64,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         
         {(product.isVip || monetization.scarcityTag) && (
-          <div className="absolute top-6 left-6 bg-black px-4 py-1.5 text-[8px] font-bold tracking-[0.3em] text-white uppercase shadow-lg z-10 rounded-none">
+          <div className="absolute top-6 left-6 bg-black px-4 py-1.5 text-[8px] font-bold tracking-[0.3em] text-white uppercase shadow-lg z-10 rounded-none border border-white/10">
             {monetization.scarcityTag || 'Private Edition'}
           </div>
         )}
@@ -83,28 +74,20 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
            <span className="text-[9px] font-bold text-gray-900 tracking-tighter">{metrics.likes.toLocaleString()}</span>
         </div>
 
+        {/* Sales Driven Reveal Footer */}
         <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
-          {monetization.priceVisible ? (
-            <Button 
-              className="w-full h-14 rounded-none bg-black text-white hover:bg-gray-900 transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
-              onClick={handleAddToCart}
-            >
-              <ShoppingBag className="w-3.5 h-3.5 mr-2" /> Secure Piece
-            </Button>
-          ) : (
-            <Button 
-              className="w-full h-14 rounded-none bg-plum text-white hover:bg-gold hover:text-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
-            >
-              <Lock className="w-3.5 h-3.5 mr-2" /> Inquire Privately
-            </Button>
-          )}
+          <Button 
+            className="w-full h-14 rounded-none bg-plum text-white hover:bg-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
+          >
+            <Lock className="w-3.5 h-3.5 mr-2" /> Request Acquisition
+          </Button>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
               className={cn("flex-1 h-12 rounded-none border-gray-200 text-gray-900 hover:bg-gray-50 transition-all text-[9px] font-bold tracking-[0.3em] uppercase", isWishlisted && "bg-black text-white hover:bg-black border-black")}
               onClick={handleToggleWishlist}
             >
-              {isWishlisted ? "In Wishlist" : "Save to Registry"}
+              {isWishlisted ? "In Registry" : "Save to Archive"}
             </Button>
             <Button 
               variant="outline" 
@@ -127,15 +110,18 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
         
         <div className="flex flex-col items-center space-y-2">
-          <span className="text-sm font-bold tracking-tight text-gray-900">
-            {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Price"}
-          </span>
+          <div className="flex items-center space-x-2">
+             <Sparkles className="w-3 h-3 text-gold opacity-0 group-hover:opacity-100 transition-opacity" />
+             <span className="text-sm font-bold tracking-tight text-gray-900">
+               {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Acquisition"}
+             </span>
+          </div>
           <div className="w-8 h-px bg-gray-100 group-hover:w-16 transition-all duration-1000" />
         </div>
 
         <div className="pt-4 opacity-0 group-hover:opacity-100 transition-all duration-1000">
           <Link href={`/${countryCode}/product/${product.id}`} className="text-[9px] text-secondary font-bold tracking-[0.5em] uppercase hover:opacity-60 italic">
-            View Archive Details
+            Speak with a Curator
           </Link>
         </div>
       </div>

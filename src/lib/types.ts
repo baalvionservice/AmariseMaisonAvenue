@@ -141,7 +141,7 @@ export interface BuyingGuide {
   provenanceChecklist?: string[];
 }
 
-// --- MONETIZATION & HIGH-TICKET EXTENSIONS ---
+// --- SALES & MONETIZATION EXTENSIONS ---
 
 export interface ProductExtended extends Product {
   collectorValue: string;
@@ -179,12 +179,27 @@ export interface PrivateInquiry {
   customerName: string;
   email: string;
   country: string;
-  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3';
+  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3'; // Tier 1: $50k+, Tier 2: $10k-$50k, Tier 3: <$10k
   intent: 'Collector' | 'Personal' | 'Investment';
   message?: string;
   contactMethod: 'WhatsApp' | 'Email';
   status: 'new' | 'contacted' | 'closed';
+  leadTier: 1 | 2 | 3;
   timestamp: string;
+}
+
+export interface ConciergeMessage {
+  id: string;
+  sender: 'curator' | 'client';
+  text: string;
+  timestamp: string;
+}
+
+export interface LeadConversation {
+  id: string;
+  inquiryId: string;
+  messages: ConciergeMessage[];
+  status: 'active' | 'archived';
 }
 
 export interface SocialMetrics {
