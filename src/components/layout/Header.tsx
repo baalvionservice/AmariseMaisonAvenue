@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
 import { COUNTRIES, DEPARTMENTS, CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
 import { 
@@ -49,13 +49,13 @@ export const Header = () => {
           <Link href={`/${countryCode}/contact`} className="hover:text-gold transition-colors">Contact</Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:text-gold transition-all bg-black px-3 py-1 rounded-sm border border-white/10">
-                <span className="text-sm leading-none">{currentCountry.flag}</span>
-                <span className="font-bold tracking-tighter text-[11px]">{currentCountry.currency}</span>
+              <button className="flex items-center space-x-3 hover:text-gold transition-all bg-black px-3 py-1 rounded-none border border-white/10 group">
+                <span className="text-base leading-none grayscale group-hover:grayscale-0 transition-all">{currentCountry.flag}</span>
+                <span className="font-bold tracking-tighter text-[11px] text-white group-hover:text-gold">{currentCountry.name}</span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2">
-              <DropdownMenuLabel className="text-[8px] uppercase tracking-widest text-muted-foreground mb-2">Select Global Region</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2 rounded-none shadow-luxury">
+              <DropdownMenuLabel className="text-[8px] uppercase tracking-widest text-muted-foreground mb-2 px-3">Select Global Region</DropdownMenuLabel>
               {Object.values(COUNTRIES).map((c) => (
                 <DropdownMenuItem 
                   key={c.code} 
@@ -66,7 +66,7 @@ export const Header = () => {
                   )}
                 >
                   <div className="flex items-center space-x-3">
-                    <span className="text-base">{c.flag}</span>
+                    <span className="text-base leading-none">{c.flag}</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest">{c.name}</span>
                   </div>
                   <span className="text-[9px] font-medium opacity-60">{c.currency}</span>
