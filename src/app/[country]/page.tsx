@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { COLLECTIONS, COUNTRIES, getLocalizedMockText } from '@/lib/mock-data';
+import { COLLECTIONS, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
@@ -40,7 +41,7 @@ export default function HomePage() {
           : `Luxury discovery for a new client in ${currentCountry.name}. Seasonal and iconic pieces.`;
 
         const res = await generateProductRecommendations({ scenario });
-        setRecommendations(res.recommendations.slice(0, 4));
+        setRecommendations(res.recommendations.slice(0, 3));
       } catch (e) {
         console.error("Personalization error:", e);
       } finally {
@@ -51,67 +52,69 @@ export default function HomePage() {
   }, [countryCode, currentCountry.name, activeVip]);
 
   return (
-    <div className="space-y-0 bg-ivory min-h-screen pb-20">
-      {/* Cinematic Hero - Spring Auction Presentation */}
-      <section className="relative h-[85vh] w-full flex items-center justify-center overflow-hidden">
+    <div className="space-y-0 bg-background min-h-screen pb-40 animate-fade-in">
+      {/* Cinematic Hero - Architectural Alignment */}
+      <section className="relative h-[90vh] w-full flex items-end overflow-hidden">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
           alt="Spring Collector's Auction"
           fill
-          className="object-cover"
+          className="object-cover animate-slow-zoom"
           priority
         />
-        <div className="absolute inset-0 bg-black/5" />
-        <div className="relative z-10 text-center space-y-10 max-w-5xl px-6 text-white">
-          <div className="space-y-6 animate-fade-in">
-            <span className="text-[11px] font-bold tracking-[0.5em] uppercase drop-shadow-sm">
-              PLACE YOUR BID
-            </span>
-            <h1 className="text-7xl md:text-[100px] font-headline font-medium leading-[0.9] drop-shadow-lg tracking-tight">
-              Spring Collector's Auction
-            </h1>
-            <p className="text-xl md:text-2xl font-light italic opacity-95 drop-shadow-sm">
-              No Reserve. Zero Buyer's Premiums.
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="container mx-auto px-12 pb-32 relative z-10 text-white max-w-[1600px]">
+          <div className="space-y-8 max-w-3xl">
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold tracking-[0.6em] uppercase opacity-80">
+                Seasonal Event
+              </span>
+              <h1 className="text-7xl md:text-[110px] font-headline font-medium leading-[0.85] tracking-tighter">
+                Spring <br /> Auction
+              </h1>
+            </div>
+            <p className="text-xl md:text-2xl font-light italic opacity-90 max-w-lg leading-relaxed">
+              Zero Buyer's Premiums. Curated artifacts from the 1924 archives.
             </p>
-          </div>
-          <div className="pt-4 animate-fade-in [animation-delay:400ms]">
-            <Link href={`/${countryCode}/buying-guide`}>
-              <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[11px] font-bold tracking-[0.4em] transition-all shadow-2xl">
-                SIGN UP & BID
-              </Button>
-            </Link>
+            <div className="pt-6">
+              <Link href={`/${countryCode}/buying-guide`}>
+                <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all shadow-2xl uppercase">
+                  Join the Registry
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Birkin Collection Bar */}
-      <section className="bg-[#1a1a1a] py-4 text-center border-b border-white/5">
+      {/* Birkin Collection Bar - Minimalist Contrast */}
+      <section className="bg-primary py-5 text-center border-b border-white/5">
         <Link 
           href={`/${countryCode}/category/hermes`} 
-          className="text-white text-[10px] font-bold tracking-[0.3em] uppercase hover:text-gold transition-colors"
+          className="text-white text-[9px] font-bold tracking-[0.4em] uppercase hover:text-secondary transition-colors"
         >
-          SHOP OUR COLLECTION OF NEW HERMÈS BIRKIN BAGS
+          Exclusive Access: The New Hermès Birkin Collection
         </Link>
       </section>
 
-      <div className="space-y-32 pt-32">
-        {/* Featured Departments - Iconographic Grid */}
-        <section className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="space-y-40 pt-40">
+        {/* Featured Departments - Architectural Grid */}
+        <section className="container mx-auto px-12 max-w-[1600px]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
             <DepartmentCard 
-              icon={<Shirt className="w-8 h-8" />} 
+              icon={<Shirt className="w-6 h-6" />} 
               title="Haute Couture" 
               desc="Bespoke tailoring and seasonal runways."
               href={`/${countryCode}/category/apparel`}
             />
             <DepartmentCard 
-              icon={<Gem className="w-8 h-8" />} 
+              icon={<Gem className="w-6 h-6" />} 
               title="Fine Jewelry" 
               desc="Rare stones and hand-sculpted gold."
               href={`/${countryCode}/category/jewelry`}
             />
             <DepartmentCard 
-              icon={<Watch className="w-8 h-8" />} 
+              icon={<Watch className="w-6 h-6" />} 
               title="Heritage Timepieces" 
               desc="Swiss precision and horological secrets."
               href={`/${countryCode}/category/timepieces`}
@@ -119,26 +122,25 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Collections - The Curated Edit */}
-        <section className="container mx-auto px-6 py-12">
-          <div className="flex flex-col items-center text-center space-y-6 mb-20">
-             <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Seasonal Curations</span>
-             <h2 className="text-5xl md:text-6xl font-headline font-bold italic text-gray-900">The Collection Edit</h2>
-             <div className="w-20 h-px bg-gold" />
+        {/* Featured Collections - The Gallery Edit */}
+        <section className="container mx-auto px-12 py-12 max-w-[1600px]">
+          <div className="flex flex-col items-center text-center space-y-6 mb-24">
+             <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Curated Intelligence</span>
+             <h2 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900">The Maison Series</h2>
+             <div className="w-12 h-px bg-secondary" />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {featuredCollections.map((col) => (
-              <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-white shadow-luxury">
-                {/* Collection Card Box Placeholder */}
+              <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
                 <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-105 group-hover:bg-ivory">
                   {col.name} Edit
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                <div className="absolute inset-0 flex flex-col items-center justify-end p-12 text-center space-y-4">
-                  <span className="text-gold text-[10px] font-bold tracking-[0.5em] uppercase">Maison Exclusive</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
+                <div className="absolute inset-0 flex flex-col items-center justify-end p-16 text-center space-y-4">
+                  <span className="text-secondary text-[9px] font-bold tracking-[0.5em] uppercase">Limited</span>
                   <h3 className="text-3xl font-headline font-bold text-white italic">{col.name}</h3>
                   <div className="flex items-center text-white text-[9px] font-bold tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
-                    Reveal Piece <ArrowRight className="ml-2 w-3 h-3" />
+                    Explore <ArrowRight className="ml-2 w-3 h-3" />
                   </div>
                 </div>
               </Link>
@@ -146,39 +148,40 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Editorial Highlight - From The Journal */}
+        {/* Editorial Highlight - Cinematic Context */}
         {latestEditorial && (
-          <section className="bg-lavender/5 py-32 border-y border-border">
-            <div className="container mx-auto px-6">
-              <div className="flex flex-col lg:flex-row items-center gap-24">
-                <div className="lg:w-1/2 relative aspect-[4/5] shadow-2xl bg-muted">
-                  {/* Editorial Card Box Placeholder */}
+          <section className="bg-[#f9f9f9] py-40 border-y border-gray-100">
+            <div className="container mx-auto px-12 max-w-[1600px]">
+              <div className="flex flex-col lg:flex-row items-center gap-32">
+                <div className="lg:w-1/2 relative aspect-[4/5] bg-muted shadow-2xl overflow-hidden">
                   <div className="w-full h-full flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
-                    Editorial Context
+                    Editorial Archive Asset
                   </div>
-                  <div className="absolute -bottom-10 -right-10 w-64 h-80 bg-white p-8 shadow-luxury hidden xl:flex flex-col justify-between border border-border">
-                     <span className="text-[9px] font-bold tracking-widest uppercase text-plum">Featured Extract</span>
-                     <p className="text-sm font-light italic leading-relaxed text-gray-600 line-clamp-4">
+                  <div className="absolute -bottom-12 -right-12 w-72 h-96 bg-white p-10 shadow-luxury hidden xl:flex flex-col justify-between border border-gray-50">
+                     <span className="text-[9px] font-bold tracking-[0.4em] uppercase text-gray-400">Extract 01</span>
+                     <p className="text-sm font-light italic leading-relaxed text-gray-600 line-clamp-5">
                        {latestEditorial.excerpt}
                      </p>
-                     <Link href={`/${countryCode}/journal/${latestEditorial.id}`} className="text-[10px] font-bold uppercase tracking-widest text-gold flex items-center">
-                       Read Full Story <ChevronRight className="w-3 h-3 ml-1" />
+                     <Link href={`/${countryCode}/journal/${latestEditorial.id}`} className="text-[9px] font-bold uppercase tracking-[0.3em] text-secondary flex items-center hover:opacity-60 transition-opacity">
+                       Read Narrative <ChevronRight className="w-3 h-3 ml-1" />
                      </Link>
                   </div>
                 </div>
-                <div className="lg:w-1/2 space-y-10">
-                  <div className="flex items-center space-x-4 text-plum">
-                    <BookOpen className="w-6 h-6" />
-                    <span className="text-[10px] font-bold tracking-[0.4em] uppercase">The Maison Journal</span>
+                <div className="lg:w-1/2 space-y-12">
+                  <div className="flex items-center space-x-4">
+                    <BookOpen className="w-5 h-5 text-secondary" />
+                    <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">The Maison Journal</span>
                   </div>
-                  <h2 className="text-5xl md:text-7xl font-headline font-bold italic leading-tight text-gray-900">{latestEditorial.title}</h2>
-                  <div className="space-y-6 text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l-2 border-gold/30 pl-8">
-                    <p>{latestEditorial.excerpt}</p>
-                  </div>
+                  <h2 className="text-6xl md:text-8xl font-headline font-medium italic leading-[0.9] text-gray-900 tracking-tighter">
+                    {latestEditorial.title}
+                  </h2>
+                  <p className="text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l border-secondary/30 pl-10">
+                    {latestEditorial.excerpt}
+                  </p>
                   <div className="pt-8">
                      <Link href={`/${countryCode}/journal/${latestEditorial.id}`}>
-                        <Button className="bg-plum text-white hover:bg-gold hover:text-gray-900 h-16 px-14 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
-                          ENTER THE NARRATIVE
+                        <Button className="bg-black text-white hover:bg-gray-900 h-16 px-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all uppercase">
+                          Enter the Narrative
                         </Button>
                      </Link>
                   </div>
@@ -188,27 +191,27 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* VIP Preview Salon - Private Access Simulation */}
-        <section className="container mx-auto px-6 py-24">
-          <div className="flex flex-col lg:flex-row items-end justify-between mb-20 gap-8">
+        {/* VIP Preview Salon - Private Selection */}
+        <section className="container mx-auto px-12 py-24 max-w-[1600px]">
+          <div className="flex flex-col lg:flex-row items-end justify-between mb-24 gap-8">
             <div className="space-y-4">
-               <div className="flex items-center space-x-3 text-gold">
-                  <Crown className="w-6 h-6" />
-                  <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">The Private Salon</span>
+               <div className="flex items-center space-x-3">
+                  <Crown className="w-5 h-5 text-secondary" />
+                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">The Private Salon</span>
                </div>
-               <h2 className="text-5xl font-headline font-bold text-gray-900">Curated Intelligence</h2>
-               <p className="text-gray-400 text-xs uppercase tracking-[0.4em] font-bold">Personalized Artifacts for {currentCountry.name}</p>
+               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">Curated Selection</h2>
+               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">Personalized Artifacts for {currentCountry.name}</p>
             </div>
             <Link href={`/${countryCode}/wishlist`}>
-              <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-gold">
-                View Your Private Selection <ArrowRight className="ml-2 w-3 h-3" />
+              <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors">
+                View Private Registry <ArrowRight className="ml-2 w-3 h-3" />
               </Button>
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20">
             {loadingRecs ? (
-              [...Array(4)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted border border-border animate-pulse" />)
+              [...Array(3)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse border border-gray-50" />)
             ) : (
               recommendations.map(rec => (
                 <ProductCard key={rec.id} product={rec} />
@@ -217,30 +220,30 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Newsletter Signup - The Archive */}
-        <section className="bg-white py-40 text-center border-t border-border">
-          <div className="max-w-3xl mx-auto space-y-12 px-6">
-             <div className="inline-flex items-center justify-center p-4 bg-plum/5 rounded-full mb-4">
-                <span className="text-2xl">✨</span>
+        {/* Newsletter Signup - The Global Archive */}
+        <section className="bg-white py-48 text-center border-t border-gray-100">
+          <div className="max-w-3xl mx-auto space-y-16 px-12">
+             <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
+                <Sparkles className="w-6 h-6 text-secondary" />
              </div>
-             <div className="space-y-4">
-                <h3 className="text-4xl md:text-5xl font-headline font-bold italic text-gray-900">Join The Archive</h3>
+             <div className="space-y-6">
+                <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">Join The Archive</h3>
                 <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
-                  Receive private invitations to seasonal launches, artisanal showcases, and digital premieres from the Maison Amarisé.
+                  Receive private invitations to seasonal launches and digital premieres from the Maison Amarisé.
                 </p>
              </div>
-             <div className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-gold transition-colors">
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors">
                 <input 
                   type="email" 
                   placeholder="YOUR EMAIL ADDRESS" 
-                  className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-300"
+                  className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
                 />
-                <button className="text-[10px] font-bold tracking-[0.3em] uppercase text-plum hover:text-gold transition-colors py-4">
+                <button className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4">
                   SUBSCRIBE
                 </button>
              </div>
-             <p className="text-[8px] text-gray-400 uppercase tracking-widest">
-               By subscribing, you agree to our Privacy Policy and Terms of Heritage.
+             <p className="text-[8px] text-gray-300 uppercase tracking-[0.4em] font-medium">
+               By subscribing, you agree to our Terms of Heritage.
              </p>
           </div>
         </section>
@@ -251,15 +254,15 @@ export default function HomePage() {
 
 function DepartmentCard({ icon, title, desc, href }: { icon: React.ReactNode, title: string, desc: string, href: string }) {
   return (
-    <Link href={href} className="group p-10 bg-white border border-border shadow-sm hover:shadow-luxury transition-all duration-500 text-center space-y-6">
-      <div className="inline-flex items-center justify-center w-16 h-16 bg-ivory rounded-full text-plum group-hover:bg-gold group-hover:text-white transition-colors duration-500">
+    <Link href={href} className="group p-12 bg-white border border-gray-50 hover:border-gray-200 hover:shadow-luxury transition-all duration-700 text-center space-y-8">
+      <div className="inline-flex items-center justify-center w-14 h-14 bg-[#fcfcfc] border border-gray-100 rounded-full text-gray-400 group-hover:bg-secondary group-hover:text-white group-hover:border-secondary transition-all duration-500">
         {icon}
       </div>
-      <div className="space-y-2">
-        <h4 className="text-xl font-headline font-bold text-gray-900 group-hover:text-gold transition-colors">{title}</h4>
-        <p className="text-xs text-gray-400 font-light leading-relaxed px-4">{desc}</p>
+      <div className="space-y-3">
+        <h4 className="text-xl font-headline font-bold text-gray-900 group-hover:text-secondary transition-colors duration-500 tracking-tight">{title}</h4>
+        <p className="text-[11px] text-gray-400 font-light leading-relaxed px-6 uppercase tracking-wider">{desc}</p>
       </div>
-      <div className="pt-4 flex items-center justify-center text-[9px] font-bold tracking-widest uppercase text-plum opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="pt-4 flex items-center justify-center text-[9px] font-bold tracking-[0.4em] uppercase text-gray-300 group-hover:text-black opacity-0 group-hover:opacity-100 transition-all">
         Enter Gallery <ChevronRight className="w-3 h-3 ml-1" />
       </div>
     </Link>
