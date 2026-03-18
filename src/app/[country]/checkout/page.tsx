@@ -12,16 +12,33 @@ import { Check, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useAppStore();
+  const { cart, clearCart, createInvoice } = useAppStore();
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
   
   const [step, setStep] = useState(1);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  
   const subtotal = cart.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
 
   const handlePlaceOrder = () => {
+    const orderId = `AM-${(Math.random() * 10000).toFixed(0)}`;
+    
+    // Simulate generation of invoice in the mock system
+    createInvoice({
+      id: `inv-${Date.now()}`,
+      orderId,
+      customerName: `${firstName} ${lastName}`,
+      amount: subtotal,
+      currency: countryCode.toUpperCase(),
+      status: 'paid',
+      date: new Date().toISOString(),
+      taxAmount: subtotal * 0.08
+    });
+
     setStep(3);
     clearCart();
     toast({
@@ -57,11 +74,21 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">First Name</Label>
-                      <Input className="rounded-none bg-muted/30 border-border" placeholder="Julian" />
+                      <Input 
+                        className="rounded-none bg-muted/30 border-border" 
+                        placeholder="Julian" 
+                        value={firstName} 
+                        onChange={(e) => setFirstName(e.target.value)} 
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Last Name</Label>
-                      <Input className="rounded-none bg-muted/30 border-border" placeholder="Vandervilt" />
+                      <Input 
+                        className="rounded-none bg-muted/30 border-border" 
+                        placeholder="Vandervilt" 
+                        value={lastName} 
+                        onChange={(e) => setLastName(e.target.value)} 
+                      />
                     </div>
                     <div className="col-span-2 space-y-2">
                       <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Address</Label>
@@ -79,6 +106,7 @@ export default function CheckoutPage() {
                   <Button 
                     className="w-full h-16 bg-primary hover:bg-secondary rounded-none text-xs tracking-widest font-bold"
                     onClick={() => setStep(2)}
+                    disabled={!firstName || !lastName}
                   >
                     CONTINUE TO PAYMENT
                   </Button>

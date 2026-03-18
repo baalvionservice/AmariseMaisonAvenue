@@ -50,22 +50,33 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+import { Product } from '@/lib/types';
 
 type OpsTab = 'dashboard' | 'catalog' | 'curations' | 'orders' | 'cms' | 'customers' | 'reports' | 'logistics';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { products, editorials, vipClients, deleteProduct } = useAppStore();
+  const { products, editorials, vipClients, deleteProduct, upsertProduct } = useAppStore();
   const { toast } = useToast();
 
-  const handleAction = (msg: string) => {
-    toast({ title: "Operation Initiated", description: msg });
+  const handleAddMockProduct = () => {
+    const newProduct: Product = {
+      id: `prod-${Date.now()}`,
+      name: 'New Artisanal Creation',
+      departmentId: 'women',
+      categoryId: 'w-couture',
+      subcategoryId: 'evening-gowns',
+      collectionId: 'spring-24',
+      basePrice: 4500,
+      imageUrl: 'https://picsum.photos/seed/new-artisan/1200/1600',
+      isVip: false,
+      rating: 5.0,
+      reviewsCount: 0,
+      stock: 5,
+      vendorId: 'vend-1'
+    };
+    upsertProduct(newProduct);
+    toast({ title: "Maison Entry Created", description: "The new artifact has been added to the catalog." });
   };
 
   return (
@@ -90,25 +101,9 @@ export default function OperationsAdminPanel() {
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
-          <div className="px-4 py-2 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
             <Link href="/admin">
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/admin/marketing">
-              <PieChart className="w-4 h-4 mr-3" /> Marketing Hub
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/admin/support">
-              <LifeBuoy className="w-4 h-4 mr-3" /> Support Hub
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/admin/integrations">
-              <Cpu className="w-4 h-4 mr-3" /> Sync Hub
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
@@ -207,7 +202,7 @@ export default function OperationsAdminPanel() {
                   <h2 className="text-2xl font-headline font-bold italic">Artifact Management</h2>
                   <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the Maison's creations</p>
                 </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={() => handleAction("Catalog creation interface opened.")}>
+                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={handleAddMockProduct}>
                   <Plus className="w-4 h-4 mr-2" /> Add New Artifact
                 </Button>
               </div>
@@ -255,47 +250,6 @@ export default function OperationsAdminPanel() {
                   </TableBody>
                 </Table>
               </Card>
-            </div>
-          )}
-
-          {activeTab === 'cms' && (
-            <div className="space-y-12">
-              <div className="flex justify-between items-end">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Editorial & Narratives</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Manage the Maison Journal and trend highlights</p>
-                </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
-                  <Plus className="w-4 h-4 mr-2" /> Draft Narrative
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {editorials.map(ed => (
-                  <Card key={ed.id} className="bg-white border-border shadow-luxury overflow-hidden group">
-                    <div className="aspect-video relative overflow-hidden">
-                      <img src={ed.imageUrl} alt={ed.title} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" />
-                      <div className="absolute top-4 left-4 bg-plum/90 text-white px-3 py-1 text-[8px] font-bold uppercase tracking-widest">
-                        {ed.category}
-                      </div>
-                    </div>
-                    <CardContent className="p-8 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <h4 className="text-xl font-headline font-bold italic">{ed.title}</h4>
-                        <Badge className="bg-green-50 text-green-600 text-[8px] uppercase tracking-widest">Published</Badge>
-                      </div>
-                      <p className="text-xs text-gray-500 font-light italic line-clamp-2">{ed.excerpt}</p>
-                      <div className="pt-4 flex justify-between items-center border-t border-border">
-                        <span className="text-[9px] text-gray-400 uppercase tracking-widest">By {ed.author} • {ed.date}</span>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Eye className="w-4 h-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Edit3 className="w-4 h-4" /></Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
             </div>
           )}
         </div>

@@ -112,6 +112,7 @@ interface AppContextType {
   upsertSegment: (segment: CustomerSegment) => void;
   upsertAppointment: (apt: Appointment) => void;
   updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
+  createInvoice: (invoice: Invoice) => void;
   
   // Support Actions
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
@@ -138,6 +139,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  // Persistence Simulation: Load from localStorage if available
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -149,7 +151,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   
-  // Admin Extensions
+  // Admin State
   const [admins, setAdmins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
@@ -183,6 +185,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(VENDORS[0]);
 
+  // Utility: Record an audit log
+  const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => {
+    const newLog: AuditLog = {
+      id: `log-${Date.now()}`,
+      adminId: 'adm-current',
+      adminName: 'Maison CEO',
+      action,
+      module,
+      timestamp: new Date().toISOString(),
+      ipAddress: '127.0.0.1',
+      severity
+    };
+    setAuditLogs(prev => [newLog, ...prev]);
+  };
+
+  // Utility: Simulate API Traffic
+  const simulateApiCall = (endpoint: string, method: ApiLog['method'], status: number = 200) => {
+    const newLog: ApiLog = {
+      id: `apilog-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      endpoint,
+      method,
+      status,
+      latency: `${Math.floor(Math.random() * 200) + 20}ms`,
+      integrationId: 'int-dynamic'
+    };
+    setApiLogs(prev => [newLog, ...prev.slice(0, 9)]);
+  };
+
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
     products.forEach(p => {
@@ -195,6 +226,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSocialMetrics(initialMetrics);
   }, [products]);
 
+  // Auto-Indexing Simulator
+  useEffect(() => {
+    if (indexingStatus.autoSyncEnabled) {
+      const interval = setInterval(() => {
+        setIndexingStatus(prev => ({
+          ...prev,
+          indexedItems: prev.catalogItems,
+          lastFullScan: new Date().toISOString()
+        }));
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [indexingStatus.autoSyncEnabled]);
+
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -205,10 +250,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
+    simulateApiCall('/cart/add', 'POST');
   };
 
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== productId));
+    simulateApiCall('/cart/remove', 'DELETE');
   };
 
   const updateQuantity = (productId: string, delta: number) => {
@@ -227,6 +274,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (exists) return prev.filter((item) => item.id !== product.id);
       return [...prev, product];
     });
+    simulateApiCall('/wishlist/toggle', 'POST');
   };
 
   const clearCart = () => setCart([]);
@@ -241,10 +289,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [p, ...prev];
     });
+    recordLog(`Upserted Artifact: ${p.name}`, 'Catalog Atelier');
+    setIndexingStatus(prev => ({ ...prev, catalogItems: prev.catalogItems + 1 }));
   };
 
   const deleteProduct = (id: string) => {
     setProducts(prev => prev.filter(p => p.id !== id));
+    recordLog(`Deleted Artifact: ${id}`, 'Catalog Atelier', 'medium');
+    setIndexingStatus(prev => ({ ...prev, catalogItems: prev.catalogItems - 1 }));
   };
 
   const upsertCollection = (c: Collection) => {
@@ -257,6 +309,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [c, ...prev];
     });
+    recordLog(`Updated Collection: ${c.name}`, 'Curations');
   };
 
   const upsertEditorial = (ed: Editorial) => {
@@ -269,6 +322,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [ed, ...prev];
     });
+    recordLog(`Published Journal Story: ${ed.title}`, 'Storytelling CMS');
   };
 
   const upsertAdmin = (admin: AdminAccount) => {
@@ -281,6 +335,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [admin, ...prev];
     });
+    recordLog(`Governance Update: Admin ${admin.name}`, 'Governance', 'high');
   };
 
   const upsertVendor = (vendor: Vendor) => {
@@ -293,6 +348,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [vendor, ...prev];
     });
+    recordLog(`Vendor Performance Updated: ${vendor.name}`, 'Ecosystem');
   };
 
   const upsertCampaign = (campaign: Campaign) => {
@@ -305,6 +361,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [campaign, ...prev];
     });
+    recordLog(`Campaign State Changed: ${campaign.title}`, 'Marketing Engage');
   };
 
   const upsertSegment = (seg: CustomerSegment) => {
@@ -317,19 +374,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return [seg, ...prev];
     });
+    recordLog(`Customer Segment Re-defined: ${seg.name}`, 'Marketing Engage');
   };
 
   const upsertAppointment = (apt: Appointment) => {
     setAppointments(prev => [...prev, apt]);
+    simulateApiCall('/appointments/create', 'POST');
   };
 
   const updateAppointmentStatus = (id: string, status: Appointment['status']) => {
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    recordLog(`Appointment ${id} status: ${status}`, 'Concierge');
+  };
+
+  const createInvoice = (inv: Invoice) => {
+    setInvoices(prev => [inv, ...prev]);
+    simulateApiCall('/billing/invoice/generate', 'POST');
   };
 
   // Support Actions
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
     setSupportTickets(prev => prev.map(t => t.id === id ? { ...t, status, updatedAt: new Date().toISOString() } : t));
+    recordLog(`Ticket ${id} marked as ${status}`, 'Support Care');
   };
 
   const assignTicket = (ticketId: string, adminId: string) => {
@@ -349,12 +415,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       return t;
     }));
+    simulateApiCall('/support/message/send', 'POST');
   };
 
   const toggleIntegration = (id: string) => {
     setIntegrations(prev => prev.map(i => {
       if (i.id === id) {
-        return { ...i, status: i.status === 'Connected' ? 'Disconnected' : 'Connected' };
+        const newStatus = i.status === 'Connected' ? 'Disconnected' : 'Connected';
+        recordLog(`Integration ${i.name} set to ${newStatus}`, 'Architecture', 'medium');
+        return { ...i, status: newStatus as any };
       }
       return i;
     }));
@@ -372,13 +441,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setIndexingLogs(prev => [newLog, ...prev]);
     setIndexingStatus(prev => ({ ...prev, lastFullScan: new Date().toISOString() }));
+    recordLog(`Manual Re-indexing Triggered: ${type}`, 'Architecture');
   };
 
   const toggleAutoSync = () => {
     setIndexingStatus(prev => ({ ...prev, autoSyncEnabled: !prev.autoSyncEnabled }));
   };
 
-  const updateGlobalSettings = (settings: GlobalSettings) => setGlobalSettings(settings);
+  const updateGlobalSettings = (settings: GlobalSettings) => {
+    setGlobalSettings(settings);
+    recordLog('Global Platform Settings Updated', 'Architecture', 'high');
+  };
 
   const toggleLike = (contentId: string, country: string) => {
     setSocialMetrics(prev => {
@@ -438,6 +511,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertSegment,
     upsertAppointment,
     updateAppointmentStatus,
+    createInvoice,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
