@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 import Link from 'next/link';
-import { Smartphone } from 'lucide-react';
+import { Smartphone, Phone, Mail, MessageCircle, Facebook, Twitter, Instagram, Youtube, Music2 } from 'lucide-react';
 
 export default function CountryLayout({
   children,
@@ -45,7 +45,114 @@ export default function CountryLayout({
         </div>
       </section>
 
-      {/* Floating App Badge - Persists on all pages */}
+      {/* Main Luxury Footer */}
+      <footer className="bg-white border-t border-gray-100 pt-20 pb-12">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            {/* Column 1: Customer Care */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="w-full h-px bg-black/10" />
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-black">Customer Care</h4>
+                <ul className="space-y-3">
+                  <FooterLink href={`/${countryCode}/contact`}>Contact Us</FooterLink>
+                  <FooterLink href="#">My Account</FooterLink>
+                  <FooterLink href={`/${countryCode}/customer-service`}>Shipping</FooterLink>
+                  <FooterLink href={`/${countryCode}/customer-service`}>Returns</FooterLink>
+                  <FooterLink href={`/${countryCode}/customer-service`}>FAQ</FooterLink>
+                </ul>
+              </div>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center space-x-3 text-black">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Phone: <span className="font-normal normal-case ml-2 text-gray-600">+1 (888) 623-2832</span></span>
+                </div>
+                <div className="flex items-center space-x-3 text-black">
+                  <Mail className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Email: <span className="font-normal normal-case ml-2 text-gray-600">info@amarise-maison.com</span></span>
+                </div>
+                <div className="flex items-center space-x-3 text-black">
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">WhatsApp: <span className="font-normal normal-case ml-2 text-gray-600">+1 (917) 831-6040</span></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 2: About */}
+            <div className="space-y-6">
+              <div className="w-full h-px bg-black/10" />
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-black">About</h4>
+              <ul className="space-y-3">
+                <FooterLink href={`/${countryCode}/about`}>About Us</FooterLink>
+                <FooterLink href={`/${countryCode}/contact`}>Visit Us</FooterLink>
+                <FooterLink href="#">Message From Our Founder</FooterLink>
+                <FooterLink href="#">Affiliates</FooterLink>
+                <FooterLink href={`/${countryCode}/journal`}>Blog</FooterLink>
+                <FooterLink href="#">Press</FooterLink>
+              </ul>
+            </div>
+
+            {/* Column 3: Shop With Us */}
+            <div className="space-y-6">
+              <div className="w-full h-px bg-black/10" />
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-black">Shop With Us</h4>
+              <ul className="space-y-3">
+                <FooterLink href="#">Authenticity Guarantee</FooterLink>
+                <FooterLink href="#">Condition Descriptions</FooterLink>
+                <FooterLink href="#">In-Home Services</FooterLink>
+                <FooterLink href={`/${countryCode}/appointments`}>Concierge Services</FooterLink>
+                <FooterLink href={`/${countryCode}/collections`}>Catalog</FooterLink>
+                <FooterLink href={`/${countryCode}/buying-guide`}>MadAve Live</FooterLink>
+              </ul>
+            </div>
+
+            {/* Column 4: Sell With Us & Socials */}
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <div className="w-full h-px bg-black/10" />
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-black">Sell With Us</h4>
+                <ul className="space-y-3">
+                  <FooterLink href="#">How to Sell or Consign</FooterLink>
+                  <FooterLink href="#">Submit an Item</FooterLink>
+                </ul>
+              </div>
+              
+              <div className="flex space-x-5 text-black items-center">
+                <Link href="#" className="hover:opacity-60 transition-opacity"><Facebook className="w-4 h-4 fill-current" /></Link>
+                <Link href="#" className="hover:opacity-60 transition-opacity"><Twitter className="w-4 h-4 fill-current" /></Link>
+                <Link href="#" className="hover:opacity-60 transition-opacity"><Instagram className="w-4 h-4" /></Link>
+                <Link href="#" className="hover:opacity-60 transition-opacity"><Youtube className="w-4 h-4" /></Link>
+                <Link href="#" className="hover:opacity-60 transition-opacity"><Music2 className="w-4 h-4" /></Link>
+              </div>
+
+              {/* Authenticity Box */}
+              <div className="bg-[#f8f8f8] p-8 text-center space-y-3 border border-gray-100">
+                <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">100% Authentic</h5>
+                <div className="flex justify-center">
+                  <div className="w-8 h-10 border border-black/20 flex items-center justify-center">
+                    <span className="text-[8px] font-bold">A/G</span>
+                  </div>
+                </div>
+                <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black">Guaranteed</h5>
+                <p className="text-[9px] text-gray-400 font-light leading-tight italic px-4">
+                  The #1 Trusted Seller Of New & Pre-Owned Hermès Bags
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-[9px] text-gray-400 tracking-[0.3em] uppercase font-bold">
+            <p>© 2024 Amarisé Maison Avenue. All rights reserved.</p>
+            <div className="flex space-x-8 mt-6 md:mt-0">
+              <Link href="#" className="hover:text-black transition-colors">Privacy Policy</Link>
+              <Link href="#" className="hover:text-black transition-colors">Terms of Use</Link>
+              <Link href="#" className="hover:text-black transition-colors">Accessibility</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Floating App Badge */}
       <div className="fixed bottom-6 left-6 z-[60]">
         <button className="flex items-center space-x-3 bg-gradient-to-r from-[#e8def8] to-[#f3e8f5] px-4 py-2.5 rounded-full shadow-lg border border-white/50 hover:shadow-xl transition-all group">
           <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center shadow-sm">
@@ -58,60 +165,16 @@ export default function CountryLayout({
       </div>
 
       <ShowcaseControls />
-      
-      <footer className="bg-black text-white py-32 mt-0 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-20 relative z-10">
-          <div className="col-span-1 md:col-span-1 space-y-8">
-            <div className="font-headline text-3xl font-bold tracking-tighter">
-              AMARISÉ <span className="font-light italic text-xl ml-1 text-gold">MAISON AVENUE</span>
-            </div>
-            <p className="text-sm text-gray-400 leading-relaxed font-light italic">
-              "Curating the world's most exquisite treasures since 1924. A testament to human excellence, craft, and the pursuit of timeless beauty."
-            </p>
-            <div className="flex space-x-6">
-              {['Instagram', 'Twitter', 'Facebook', 'LinkedIn'].map(social => (
-                <a key={social} href="#" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-gold transition-colors">{social}</a>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-gold">Departments</h4>
-            <ul className="space-y-4 text-sm font-light text-gray-400">
-              <li><Link href={`/${countryCode}/category/jewelry`} className="hover:text-white transition-colors">Fine Jewelry</Link></li>
-              <li><Link href={`/${countryCode}/category/apparel`} className="hover:text-white transition-colors">Haute Couture</Link></li>
-              <li><Link href={`/${countryCode}/category/timepieces`} className="hover:text-white transition-colors">Heritage Watches</Link></li>
-              <li><Link href={`/${countryCode}/category/accessories`} className="hover:text-white transition-colors">Bespoke Accessories</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-gold">Client Services</h4>
-            <ul className="space-y-4 text-sm font-light text-gray-400">
-              <li><Link href={`/${countryCode}/wishlist`} className="hover:text-white transition-colors">VIP Salon</Link></li>
-              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-white transition-colors">Track Your Order</Link></li>
-              <li><Link href={`/${countryCode}/buying-guide`} className="hover:text-white transition-colors font-bold text-gold">Buying Guides</Link></li>
-              <li><Link href={`/${countryCode}/customer-service`} className="hover:text-white transition-colors">Return Policy</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-[11px] uppercase tracking-[0.4em] mb-8 text-gold">Maison Amarisé</h4>
-            <ul className="space-y-4 text-sm font-light text-gray-400">
-              <li><Link href={`/${countryCode}/about`} className="hover:text-white transition-colors">Our Story</Link></li>
-              <li><Link href={`/${countryCode}/contact`} className="hover:text-white transition-colors">Ateliers</Link></li>
-              <li><Link href={`/${countryCode}/journal`} className="hover:text-white transition-colors">Sustainability</Link></li>
-              <li><Link href="/admin" className="hover:text-white transition-colors">Careers</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="container mx-auto px-6 mt-32 pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-500 tracking-[0.4em] uppercase font-bold">
-          <p>© 2024 Amarisé Maison Avenue. All rights reserved.</p>
-          <div className="flex space-x-10 mt-8 md:mt-0">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Accessibility</a>
-          </div>
-        </div>
-      </footer>
     </>
+  );
+}
+
+function FooterLink({ href, children }: { href: string, children: React.ReactNode }) {
+  return (
+    <li>
+      <Link href={href} className="text-[11px] font-light text-gray-600 hover:text-black transition-colors block">
+        {children}
+      </Link>
+    </li>
   );
 }
