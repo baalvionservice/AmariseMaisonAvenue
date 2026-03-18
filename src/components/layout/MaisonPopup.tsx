@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -10,9 +9,9 @@ import { cn } from '@/lib/utils';
 
 /**
  * MaisonPopup: A high-fidelity acquisition popup.
- * Appears every 153 minutes as requested.
+ * Appears every 2 minutes as requested.
  */
-const POPUP_INTERVAL = 153 * 60 * 1000; // 153 minutes in milliseconds
+const POPUP_INTERVAL = 2 * 60 * 1000; // 2 minutes in milliseconds
 const POPUP_KEY = 'maison_popup_last_shown';
 
 export function MaisonPopup() {
@@ -34,7 +33,7 @@ export function MaisonPopup() {
 
   const handleClose = () => {
     setIsOpen(false);
-    // Update the timestamp so it doesn't show again for another 153 minutes
+    // Update the timestamp so it doesn't show again for another 2 minutes
     localStorage.setItem(POPUP_KEY, Date.now().toString());
   };
 
@@ -48,7 +47,7 @@ export function MaisonPopup() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-700">
-      <div className="relative w-full max-w-[940px] bg-white overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col md:flex-row animate-in zoom-in-95 duration-500 rounded-sm">
+      <div className="relative w-full max-w-[940px] bg-white overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col md:row animate-in zoom-in-95 duration-500 rounded-sm">
         {/* Close Interaction */}
         <button 
           onClick={handleClose}
