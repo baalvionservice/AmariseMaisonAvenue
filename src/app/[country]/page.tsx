@@ -18,6 +18,7 @@ import {
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
 import { ProductCard } from '@/components/product/ProductCard';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { country } = useParams();
@@ -51,41 +52,34 @@ export default function HomePage() {
 
   return (
     <div className="space-y-32 bg-ivory min-h-screen pb-20">
-      {/* Cinematic Hero - Maison Avenue Presentation */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-muted">
-        {/* Hero Card Box Placeholder */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10">
-           <div className="w-full h-full border-8 border-gold/20 flex items-center justify-center">
-              <span className="text-[15vw] font-headline font-bold text-gold tracking-tighter italic">A</span>
-           </div>
-        </div>
-        <div className="absolute inset-0 cinematic-gradient" />
-        <div className="relative z-10 text-center space-y-10 max-w-5xl px-6 py-16 luxury-blur border border-white/20 shadow-luxury">
+      {/* Cinematic Hero - Spring Auction Presentation */}
+      <section className="relative h-[85vh] w-full flex items-center justify-center overflow-hidden">
+        <Image 
+          src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
+          alt="Spring Collector's Auction"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/5" />
+        <div className="relative z-10 text-center space-y-10 max-w-5xl px-6 text-white">
           <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-center space-x-4">
-              <div className="w-12 h-px bg-gold/50" />
-              <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-plum">
-                Maison Avenue | {currentCountry.name}
-              </span>
-              <div className="w-12 h-px bg-gold/50" />
-            </div>
-            <h1 className="text-7xl md:text-9xl font-headline font-bold text-gray-900 leading-none">
-              {getLocalizedMockText('The Art of', countryCode)} <br /> 
-              <span className="italic font-normal serif text-gold">{getLocalizedMockText('Excellence', countryCode)}</span>
+            <span className="text-[11px] font-bold tracking-[0.5em] uppercase drop-shadow-sm">
+              PLACE YOUR BID
+            </span>
+            <h1 className="text-7xl md:text-[100px] font-headline font-medium leading-[0.9] drop-shadow-lg tracking-tight">
+              Spring Collector's Auction
             </h1>
+            <p className="text-xl md:text-2xl font-light italic opacity-95 drop-shadow-sm">
+              No Reserve. Zero Buyer's Premiums.
+            </p>
           </div>
-          <p className="text-lg md:text-xl text-gray-600 font-light max-w-2xl mx-auto leading-relaxed italic animate-fade-in [animation-delay:200ms]">
-            "Curating the world's most exquisite treasures since 1924. A testament to human brilliance, craft, and the pursuit of timeless beauty."
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 animate-fade-in [animation-delay:400ms]">
-            <Link href={`/${countryCode}/category/apparel`}>
-              <Button className="bg-plum text-white hover:bg-gold hover:text-gray-900 px-16 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all shadow-xl shadow-plum/10">
-                {getLocalizedMockText('EXPLORE THE ATELIER', countryCode)}
+          <div className="pt-4 animate-fade-in [animation-delay:400ms]">
+            <Link href={`/${countryCode}/buying-guide`}>
+              <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[11px] font-bold tracking-[0.4em] transition-all shadow-2xl">
+                SIGN UP & BID
               </Button>
             </Link>
-            <Button variant="outline" className="border-gold text-gold hover:bg-gold/5 px-16 h-16 rounded-none text-[10px] tracking-[0.4em] font-bold transition-all">
-              {getLocalizedMockText('OUR HERITAGE', countryCode)}
-            </Button>
           </div>
         </div>
       </section>
