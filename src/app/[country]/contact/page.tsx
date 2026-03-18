@@ -1,9 +1,7 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,14 +57,11 @@ export default function ContactPage() {
   return (
     <div className="animate-fade-in bg-ivory pb-32">
       {/* Hero Header */}
-      <section className="relative h-[40vh] w-full flex items-center justify-center overflow-hidden border-b border-border">
-        <Image 
-          src="https://picsum.photos/seed/amarise-concierge/2560/1440" 
-          alt="Maison Amarisé Global Concierge"
-          fill
-          className="object-cover opacity-60 grayscale-[50%]"
-          priority
-        />
+      <section className="relative h-[40vh] w-full flex items-center justify-center overflow-hidden border-b border-border bg-muted">
+        {/* Concierge Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+           <span className="text-[10vw] font-headline font-bold text-gray-900 uppercase tracking-widest">CONCIERGE</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ivory/20 to-ivory" />
         <div className="relative z-10 text-center space-y-4 px-6">
           <nav className="flex items-center justify-center space-x-2 text-[10px] tracking-widest uppercase text-muted-foreground mb-8">
@@ -182,14 +177,12 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Map Simulation */}
-            <div className="relative aspect-[4/5] w-full border border-border shadow-luxury group overflow-hidden" key={`map-${countryCode}`}>
-              <Image 
-                src={currentCountry.office?.image || ''} 
-                alt={`${currentCountry.office?.city} Office`}
-                fill
-                className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-              />
+            {/* Map Simulation Card Box */}
+            <div className="relative aspect-[4/5] w-full border border-border shadow-luxury group overflow-hidden bg-muted flex items-center justify-center" key={`map-${countryCode}`}>
+              {/* HQ Card Box Placeholder */}
+              <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105">
+                Atelier Location
+              </div>
               <div className="absolute inset-0 bg-plum/10 group-hover:bg-transparent transition-colors" />
               <div className="absolute bottom-0 inset-x-0 p-8 luxury-blur bg-opacity-90 border-t border-border">
                  <div className="flex items-center space-x-2 text-[10px] font-bold tracking-widest text-plum uppercase">

@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import { COLLECTIONS, PRODUCTS, formatPrice } from '@/lib/mock-data';
+import { COLLECTIONS, PRODUCTS } from '@/lib/mock-data';
 import { ProductCard } from '@/components/product/ProductCard';
 import { generateCollectionNarrative } from '@/ai/flows/generate-collection-narrative';
 import { ChevronRight, Filter, Sparkles } from 'lucide-react';
@@ -46,15 +45,11 @@ export default function CollectionPage() {
   return (
     <div className="space-y-20">
       {/* Collection Hero */}
-      <section className="relative h-[70vh] w-full flex items-end overflow-hidden">
-        <Image 
-          src={collection.imageUrl} 
-          alt={collection.name}
-          fill
-          className="object-cover"
-          priority
-          data-ai-hint="luxury fashion"
-        />
+      <section className="relative h-[70vh] w-full flex items-end overflow-hidden bg-muted">
+        {/* Collection Hero Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+           <span className="text-[15vw] font-headline font-bold text-gray-900 uppercase tracking-tighter">{collection.name}</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         <div className="container mx-auto px-6 pb-20 relative z-10 space-y-4">
           <nav className="flex items-center space-x-2 text-[10px] tracking-widest uppercase text-muted-foreground mb-4">
@@ -84,7 +79,7 @@ export default function CollectionPage() {
                 <div className="h-4 bg-muted w-4/6 mx-auto" />
               </div>
             ) : (
-              <div className="prose prose-invert max-w-none text-xl font-light leading-relaxed text-muted-foreground italic">
+              <div className="prose prose-xl max-w-none font-light leading-relaxed text-gray-600 italic">
                 {narrative}
               </div>
             )}

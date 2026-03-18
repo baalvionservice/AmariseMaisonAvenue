@@ -1,12 +1,10 @@
-
 'use client';
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { ChevronLeft, Share2, Bookmark, Sparkles, Heart, Facebook, Twitter, Linkedin, Copy } from 'lucide-react';
+import { ChevronLeft, Share2, Bookmark, Heart, Facebook, Twitter, Linkedin, Copy, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 import { useToast } from '@/hooks/use-toast';
@@ -34,8 +32,6 @@ export default function JournalArticlePage() {
   }
 
   const handleToggleLike = () => {
-    // We use contentId for toggleLike. In a real app we'd have a separate 'likedJournal' state.
-    // For this demo we'll just track it in the interaction log.
     toggleLike(article.id, countryCode);
     toast({
       title: isLiked ? "Reaction Removed" : "Article Appreciated",
@@ -54,26 +50,23 @@ export default function JournalArticlePage() {
   return (
     <div className="animate-fade-in">
       {/* Hero Header */}
-      <section className="relative h-[80vh] w-full flex items-end overflow-hidden">
-        <Image 
-          src={article.imageUrl} 
-          alt={article.title}
-          fill
-          className="object-cover animate-slow-zoom"
-          priority
-        />
+      <section className="relative h-[80vh] w-full flex items-end overflow-hidden bg-muted">
+        {/* Article Hero Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+           <span className="text-[15vw] font-headline font-bold text-gray-900 tracking-widest uppercase">{article.category}</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         <div className="container mx-auto px-6 pb-20 relative z-10">
-          <Link href={`/${countryCode}/journal`} className="inline-flex items-center text-[10px] tracking-[0.4em] uppercase text-white hover:text-primary transition-colors mb-8">
+          <Link href={`/${countryCode}/journal`} className="inline-flex items-center text-[10px] tracking-[0.4em] uppercase text-gray-900 hover:text-primary transition-colors mb-8">
             <ChevronLeft className="w-3 h-3 mr-2" /> Back to Journal
           </Link>
           <div className="space-y-6 max-w-5xl">
             <div className="flex items-center space-x-6">
-              <span className="text-primary text-xs font-bold tracking-[0.4em] uppercase">{article.category}</span>
-              <span className="text-white/60 text-[10px] uppercase tracking-widest">{article.date}</span>
+              <span className="text-plum text-xs font-bold tracking-[0.4em] uppercase">{article.category}</span>
+              <span className="text-gray-400 text-[10px] uppercase tracking-widest">{article.date}</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-headline font-bold text-white leading-tight">{article.title}</h1>
-            <p className="text-xl md:text-2xl text-white/80 font-light italic max-w-3xl leading-relaxed">
+            <h1 className="text-6xl md:text-8xl font-headline font-bold text-gray-900 leading-tight">{article.title}</h1>
+            <p className="text-xl md:text-2xl text-gray-600 font-light italic max-w-3xl leading-relaxed">
               {article.excerpt}
             </p>
           </div>
@@ -136,7 +129,7 @@ export default function JournalArticlePage() {
             </div>
           </div>
 
-          <div className="prose prose-invert prose-xl font-light leading-relaxed text-muted-foreground whitespace-pre-wrap selection:bg-primary selection:text-white first-letter:text-8xl first-letter:font-headline first-letter:text-primary first-letter:float-left first-letter:mr-4 first-letter:mt-2">
+          <div className="prose prose-xl font-light leading-relaxed text-gray-700 whitespace-pre-wrap selection:bg-primary selection:text-white first-letter:text-8xl first-letter:font-headline first-letter:text-primary first-letter:float-left first-letter:mr-4 first-letter:mt-2">
             {article.content}
           </div>
 

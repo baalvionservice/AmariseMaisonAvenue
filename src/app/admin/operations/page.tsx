@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -6,39 +5,23 @@ import Link from 'next/link';
 import { 
   LayoutDashboard, 
   Package, 
-  Tags, 
   Truck, 
   FileText, 
   Users, 
-  BarChart3, 
   Settings,
   LogOut,
   ChevronRight,
   Search,
   Plus,
-  Filter,
-  MoreVertical,
   Edit3,
   Trash2,
-  CheckCircle2,
   Clock,
-  AlertTriangle,
-  RefreshCcw,
-  ArrowUpRight,
-  ArrowDownRight,
-  Eye,
-  Star,
-  MapPin,
-  PieChart,
-  LayoutTemplate,
-  LifeBuoy,
-  Cpu,
+  RotateCcw,
   Boxes,
-  RotateCcw
+  Star
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
@@ -58,7 +41,7 @@ type OpsTab = 'dashboard' | 'catalog' | 'inventory' | 'orders' | 'returns' | 'cm
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { products, editorials, returns, updateReturnStatus, deleteProduct, upsertProduct } = useAppStore();
+  const { products, returns, updateReturnStatus, deleteProduct, upsertProduct } = useAppStore();
   const { toast } = useToast();
 
   const handleAddMockProduct = () => {
@@ -70,7 +53,7 @@ export default function OperationsAdminPanel() {
       subcategoryId: 'evening-gowns',
       collectionId: 'spring-24',
       basePrice: 4500,
-      imageUrl: 'https://picsum.photos/seed/new-artisan/1200/1600',
+      imageUrl: '', // Asset placeholder
       isVip: false,
       rating: 5.0,
       reviewsCount: 0,
@@ -105,7 +88,7 @@ export default function OperationsAdminPanel() {
         <div className="pt-8 border-t border-border space-y-4">
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
             <Link href="/admin">
-              <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
+              <RotateCcw className="w-4 h-4 mr-3" /> Master Control
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
@@ -194,70 +177,6 @@ export default function OperationsAdminPanel() {
             </div>
           )}
 
-          {activeTab === 'inventory' && (
-            <div className="space-y-12">
-              <h2 className="text-2xl font-headline font-bold italic text-gray-900">Multi-Warehouse Inventory</h2>
-              <Card className="bg-white border-border shadow-luxury overflow-hidden">
-                <Table>
-                  <TableHeader className="bg-ivory/50">
-                    <TableRow>
-                      <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Atelier NY</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Atelier London</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Atelier Dubai</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Global Agg.</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.slice(0, 10).map(p => (
-                      <TableRow key={p.id}>
-                        <TableCell className="pl-8 text-xs font-bold">{p.name}</TableCell>
-                        <TableCell className="text-xs">{p.regionalStock?.[0]?.stockCount || 0}</TableCell>
-                        <TableCell className="text-xs">{p.regionalStock?.[1]?.stockCount || 0}</TableCell>
-                        <TableCell className="text-xs">0</TableCell>
-                        <TableCell className="text-right pr-8 text-xs font-bold text-plum">{p.stock}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-            </div>
-          )}
-
-          {activeTab === 'returns' && (
-            <div className="space-y-12">
-              <h2 className="text-2xl font-headline font-bold italic text-gray-900">Reverse Logistics & Returns</h2>
-              <Card className="bg-white border-border shadow-luxury overflow-hidden">
-                <Table>
-                  <TableHeader className="bg-ivory/50">
-                    <TableRow>
-                      <TableHead className="text-[9px] uppercase font-bold pl-8">Return ID</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Order</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Reason</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {returns.map(r => (
-                      <TableRow key={r.id}>
-                        <TableCell className="pl-8 text-xs font-mono font-bold">{r.id}</TableCell>
-                        <TableCell className="text-xs font-bold text-plum">{r.orderId}</TableCell>
-                        <TableCell className="text-xs italic text-gray-500">{r.reason}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge className="bg-gold/10 text-gold text-[8px] uppercase">{r.status}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right pr-8">
-                          <Button variant="outline" size="sm" className="h-8 border-border text-[8px] uppercase font-bold" onClick={() => updateReturnStatus(r.id, 'inspecting')}>Inspect</Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-            </div>
-          )}
-
           {activeTab === 'catalog' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -286,8 +205,8 @@ export default function OperationsAdminPanel() {
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
-                            <div className="w-10 h-12 bg-ivory rounded-sm overflow-hidden flex-shrink-0">
-                              <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                            <div className="w-10 h-12 bg-muted rounded-sm flex-shrink-0 flex items-center justify-center text-[6px] font-bold uppercase text-gray-400">
+                              Piece
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-bold leading-tight">{product.name}</span>
@@ -355,7 +274,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
             "flex items-center text-[10px] font-bold tracking-widest uppercase",
             positive ? "text-gold" : "text-gray-400"
           )}>
-            {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : null}
+            {trend}
           </div>
         </div>
         <div>

@@ -1,8 +1,6 @@
-
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { MAISON_STORY, COUNTRIES } from '@/lib/mock-data';
 import { Sparkles, History, Gem, ShieldCheck, ChevronRight } from 'lucide-react';
@@ -15,33 +13,12 @@ export default function AboutPage() {
 
   return (
     <div className="animate-fade-in bg-ivory">
-      {/* JSON-LD Structured Data for the Maison Heritage */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "AboutPage",
-            "mainEntity": {
-              "@type": "Organization",
-              "name": "AMARISÉ Luxe",
-              "foundingDate": "1924",
-              "description": MAISON_STORY.philosophy,
-              "areaServed": currentCountry.name
-            }
-          })
-        }}
-      />
-
       {/* Hero Header */}
-      <section className="relative h-[60vh] w-full flex items-center justify-center overflow-hidden border-b border-border">
-        <Image 
-          src="https://picsum.photos/seed/amarise-heritage/2560/1440" 
-          alt="Maison Amarisé Heritage"
-          fill
-          className="object-cover opacity-80 animate-slow-zoom"
-          priority
-        />
+      <section className="relative h-[60vh] w-full flex items-center justify-center overflow-hidden border-b border-border bg-muted">
+        {/* Heritage Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+           <span className="text-[15vw] font-headline font-bold text-gray-900 italic">1924</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
         <div className="relative z-10 text-center space-y-6 max-w-4xl px-6">
           <nav className="flex items-center justify-center space-x-2 text-[10px] tracking-widest uppercase text-muted-foreground mb-8">
@@ -105,14 +82,11 @@ export default function AboutPage() {
         <div className="space-y-40">
           {MAISON_STORY.craftsmanship.map((craft, idx) => (
             <div key={idx} className={`flex flex-col lg:flex-row items-center gap-24 ${idx % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
-              <div className="lg:w-1/2 relative aspect-[4/5] w-full shadow-luxury overflow-hidden group">
-                <Image 
-                  src={craft.imageUrl} 
-                  alt={craft.title} 
-                  fill 
-                  className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
+              <div className="lg:w-1/2 relative aspect-[4/5] w-full shadow-luxury overflow-hidden group bg-muted flex items-center justify-center">
+                {/* Craft Card Box Placeholder */}
+                <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-110">
+                  {craft.title} Archive
+                </div>
                 <div className="absolute inset-0 bg-plum/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="lg:w-1/2 space-y-8 text-center lg:text-left px-6">

@@ -2,7 +2,6 @@
 
 import React, { memo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { Heart, ShoppingBag, Star, Eye, Share2 } from 'lucide-react';
 import { Product } from '@/lib/types';
@@ -19,6 +18,7 @@ interface ProductCardProps {
 /**
  * ProductCard: Optimized for high-volume enterprise rendering.
  * Redesigned with a minimalist light aesthetic, soft shadows, and gold accents.
+ * Images removed and replaced with Artisanal Asset Frames.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -66,14 +66,11 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   return (
     <article className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-500 hover:shadow-luxury border border-border animate-fade-in h-full">
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-ivory">
-        <Image 
-          src={product.imageUrl} 
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-1000 group-hover:scale-103"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          loading="lazy"
-        />
+        {/* Card Box Placeholder */}
+        <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.4em] text-gray-300 uppercase transition-colors group-hover:bg-ivory group-hover:text-gold">
+          Maison Piece
+        </div>
+        
         <div className="absolute inset-0 bg-gradient-to-t from-lavender/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
         
         {product.isVip && (

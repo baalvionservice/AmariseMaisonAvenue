@@ -1,66 +1,37 @@
-
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   BarChart3, 
   Settings, 
   DollarSign, 
-  Package,
   LogOut,
   ChevronRight,
   ArrowUpRight,
   ArrowDownRight,
-  Mail,
-  Zap,
-  Target,
-  Briefcase,
   Globe,
-  Database,
-  Sparkles,
-  RefreshCcw,
-  LayoutDashboard,
-  Crown,
-  Share2,
-  BookOpen,
-  Activity,
-  UserCheck,
-  Languages,
-  Plus,
-  Trash2,
-  Image as ImageIcon,
-  Edit3,
-  CheckCircle2,
-  FileText,
-  MapPin,
-  Eye,
-  ShieldAlert,
-  Users,
-  CreditCard,
-  Truck,
   Building2,
   History,
-  Lock,
-  Smartphone,
+  Users,
+  CreditCard,
   LayoutTemplate,
-  BriefcaseBusiness,
   PieChart,
   LifeBuoy,
   Cpu,
   ShieldCheck,
-  ActivitySquare
+  ShieldAlert,
+  Plus,
+  ActivitySquare,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  COUNTRIES, 
-} from '@/lib/mock-data';
+import { COUNTRIES } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
-import { useToast } from '@/hooks/use-toast';
 import { 
   Table, 
   TableBody, 
@@ -79,9 +50,7 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Pie,
-  Cell,
-  BarChart,
-  Bar
+  Cell
 } from 'recharts';
 
 type AdminTab = 'intelligence' | 'governance' | 'ecosystem' | 'architecture' | 'strategy' | 'archives' | 'compliance';
@@ -104,14 +73,11 @@ const DEMO_DATA = [
 export default function SuperAdminPanel() {
   const [activeTab, setActiveTab] = useState<AdminTab>('intelligence');
   const { 
-    products, 
     admins,
     vendors,
-    activeCampaigns,
     auditLogs,
     globalSettings
   } = useAppStore();
-  const { toast } = useToast();
 
   const [selectedCountry, setSelectedCountry] = useState('us');
   const currentCountry = COUNTRIES[selectedCountry] || COUNTRIES.us;
@@ -132,7 +98,6 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<Users />} label="Governance" active={activeTab === 'governance'} onClick={() => setActiveTab('governance')} />
           <AdminNavItem icon={<Building2 />} label="Ecosystem" active={activeTab === 'ecosystem'} onClick={() => setActiveTab('ecosystem')} />
           <AdminNavItem icon={<Settings />} label="Architecture" active={activeTab === 'architecture'} onClick={() => setActiveTab('architecture')} />
-          <AdminNavItem icon={<Target />} label="Strategy" active={activeTab === 'strategy'} onClick={() => setActiveTab('strategy')} />
           <AdminNavItem icon={<History />} label="Archives" active={activeTab === 'archives'} onClick={() => setActiveTab('archives')} />
           
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
@@ -220,9 +185,9 @@ export default function SuperAdminPanel() {
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard icon={<DollarSign />} label="Global Revenue" value="$4.2M" trend="+12.5%" positive />
-                <StatCard icon={<Briefcase />} label="Avg. Order Value" value="$8,450" trend="+4.2%" positive />
-                <StatCard icon={<Crown />} label="VIP Retention" value="94%" trend="Live" positive />
-                <StatCard icon={<Target />} label="Predicted Growth" value="18.2%" trend="AI Forecast" positive />
+                <StatCard icon={<Building2 />} label="Avg. Order Value" value="$8,450" trend="+4.2%" positive />
+                <StatCard icon={<ActivitySquare />} label="VIP Retention" value="94%" trend="Live" positive />
+                <StatCard icon={<BarChart3 />} label="Predicted Growth" value="18.2%" trend="AI Forecast" positive />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -255,8 +220,8 @@ export default function SuperAdminPanel() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Lifetime Value</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by tier resonance</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Client Segmentation</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Market distribution by loyalty tier</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 flex flex-col items-center">
                     <div className="h-48 w-full">
@@ -296,30 +261,6 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
-          {activeTab === 'compliance' && (
-            <div className="space-y-12">
-              <h2 className="text-2xl font-headline font-bold italic">Security & Regulatory Compliance</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <ComplianceCard icon={<ShieldCheck />} label="GDPR / CCPA Status" value={globalSettings.compliance.gdprEnabled ? "Active" : "Disabled"} status="Optimal" />
-                <ComplianceCard icon={<Lock />} label="PCI-DSS v4.0" value={globalSettings.compliance.pciStatus} status="Verified" />
-                <ComplianceCard icon={<ActivitySquare />} label="Fraud Shield" value="99.9% Protection" status="Active" />
-              </div>
-              
-              <Card className="bg-white border-border shadow-luxury">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Platform Security Policies</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Enterprise-level safety protocols</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <SecuritySettingRow label="Mandatory Two-Factor Authentication (2FA)" active={true} />
-                  <SecuritySettingRow label="IP Whitelisting for Admin Operations" active={true} />
-                  <SecuritySettingRow label="Automated PII Masking in Logs" active={true} />
-                  <SecuritySettingRow label="Real-time Intrusion Detection (IDS)" active={true} />
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
           {activeTab === 'governance' && (
             <div className="space-y-12">
               <div className="flex justify-between items-end">
@@ -337,8 +278,9 @@ export default function SuperAdminPanel() {
                   <Card key={admin.id} className="bg-white border-border shadow-luxury hover:border-plum transition-all group overflow-hidden">
                     <CardContent className="p-8 space-y-6">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-ivory rounded-sm flex items-center justify-center border border-border group-hover:border-plum transition-colors overflow-hidden">
-                          {admin.avatar ? <img src={admin.avatar} alt={admin.name} className="w-full h-full object-cover" /> : <Users className="w-8 h-8 text-plum" />}
+                        <div className="w-16 h-16 bg-muted rounded-sm flex items-center justify-center border border-border group-hover:border-plum transition-colors overflow-hidden">
+                          {/* Admin Avatar Placeholder */}
+                          <Users className="w-8 h-8 text-plum opacity-20" />
                         </div>
                         <div className="flex-1">
                           <h4 className="text-xl font-headline font-bold leading-tight">{admin.name}</h4>
@@ -365,43 +307,26 @@ export default function SuperAdminPanel() {
             </div>
           )}
 
-          {activeTab === 'ecosystem' && (
+          {activeTab === 'compliance' && (
             <div className="space-y-12">
-              <div className="flex justify-between items-end">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-headline font-bold italic">Artisanal Partners</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Manage vendor applications and sales performance</p>
-                </div>
+              <h2 className="text-2xl font-headline font-bold italic">Security & Regulatory Compliance</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <ComplianceCard icon={<ShieldCheck />} label="GDPR / CCPA Status" value={globalSettings.compliance.gdprEnabled ? "Active" : "Disabled"} status="Optimal" />
+                <ComplianceCard icon={<Lock />} label="PCI-DSS v4.0" value={globalSettings.compliance.pciStatus} status="Verified" />
+                <ComplianceCard icon={<ActivitySquare />} label="Fraud Shield" value="99.9% Protection" status="Active" />
               </div>
-
-              <Card className="bg-white border-border shadow-luxury overflow-hidden">
-                <Table>
-                  <TableHeader className="bg-ivory/50">
-                    <TableRow>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold">Partner Name</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold">Category</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Fulfillment</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-center">Entities</TableHead>
-                      <TableHead className="text-[9px] uppercase tracking-widest font-bold text-right">Revenue Share</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {vendors.map(vendor => (
-                      <TableRow key={vendor.id} className="hover:bg-ivory/30 transition-colors">
-                        <TableCell className="text-xs font-bold uppercase">{vendor.name}</TableCell>
-                        <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{vendor.category}</Badge></TableCell>
-                        <TableCell>
-                          <div className="flex flex-col items-center space-y-1">
-                            <span className="text-[10px] font-bold text-gold">{vendor.kpis.fulfillmentSpeed}</span>
-                            <Progress value={vendor.performance} className="h-1 w-16 bg-gray-100" />
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs text-center font-bold text-plum">{vendor.productCount}</TableCell>
-                        <TableCell className="text-xs text-right font-light">${vendor.salesTotal.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              
+              <Card className="bg-white border-border shadow-luxury">
+                <CardHeader>
+                  <CardTitle className="font-headline text-2xl">Platform Security Policies</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Enterprise-level safety protocols</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <SecuritySettingRow label="Mandatory Two-Factor Authentication (2FA)" active={true} />
+                  <SecuritySettingRow label="IP Whitelisting for Admin Operations" active={true} />
+                  <SecuritySettingRow label="Automated PII Masking in Logs" active={true} />
+                  <SecuritySettingRow label="Real-time Intrusion Detection (IDS)" active={true} />
+                </CardContent>
               </Card>
             </div>
           )}

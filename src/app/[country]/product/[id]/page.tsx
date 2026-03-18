@@ -1,30 +1,18 @@
-
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { PRODUCTS, formatPrice, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
-  Share2, 
-  ShieldCheck, 
-  Truck, 
-  Star,
   ChevronRight,
-  Sparkles,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Copy,
-  Info,
-  Calendar,
-  Gift,
-  Eye,
+  Star,
   RotateCcw,
   Zap,
-  Gavel
+  Gavel,
+  Calendar,
+  Gift
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -34,24 +22,17 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from '@/components/product/ProductCard';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
-  const { addToCart, toggleWishlist, wishlist, socialMetrics, toggleLike, trackShare } = useAppStore();
+  const { addToCart, toggleWishlist, wishlist, socialMetrics } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   
-  const metrics = socialMetrics[id as string] || { likes: 0, shares: 0, engagementRate: 0 };
   const [aiDescription, setAiDescription] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -121,13 +102,9 @@ export default function ProductPage() {
                    <Button variant="ghost" className="text-[9px] uppercase font-bold" onClick={() => setIs360Active(false)}>Return to Still</Button>
                 </div>
               ) : (
-                <Image 
-                  src={product.mediaGallery?.[activeMediaIndex]?.url || product.imageUrl} 
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-[2.5s] group-hover:scale-105"
-                  priority
-                />
+                <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
+                  Artisanal Perspective {activeMediaIndex + 1}
+                </div>
               )}
               
               <div className="absolute bottom-8 left-8 flex space-x-2">
@@ -139,13 +116,11 @@ export default function ProductPage() {
                       setIs360Active(m.type === '360');
                     }}
                     className={cn(
-                      "w-12 h-16 border bg-white transition-all overflow-hidden relative",
-                      activeMediaIndex === idx ? "border-plum scale-110 shadow-lg" : "border-border opacity-60"
+                      "w-12 h-16 border bg-muted transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter text-gray-400",
+                      activeMediaIndex === idx ? "border-plum scale-110 shadow-lg bg-ivory text-plum" : "border-border opacity-60"
                     )}
                    >
-                     <Image src={m.url} alt={m.alt} fill className="object-cover" />
-                     {m.type === 'video' && <Zap className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-md" />}
-                     {m.type === '360' && <RotateCcw className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-md" />}
+                     {m.type === 'video' ? 'VIDEO' : m.type === '360' ? '360°' : `P-${idx+1}`}
                    </button>
                  ))}
               </div>
@@ -285,7 +260,7 @@ export default function ProductPage() {
           <div className="flex items-end justify-between mb-20">
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-plum">
-                 <Sparkles className="w-5 h-5 text-gold" />
+                 <Zap className="w-5 h-5 text-gold" />
                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Intelligence Curation</span>
               </div>
               <h2 className="text-5xl font-headline font-bold italic text-gray-900">Complementary Artifacts</h2>
@@ -294,7 +269,7 @@ export default function ProductPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {loadingRecs ? (
-              [...Array(4)].map((_, i) => <div key={i} className="aspect-[4/5] bg-white border border-border animate-pulse" />)
+              [...Array(4)].map((_, i) => <div key={i} className="aspect-[4/5] bg-muted border border-border animate-pulse" />)
             ) : (
               recommendations.map(p => (
                 <ProductCard key={p.id} product={p} />

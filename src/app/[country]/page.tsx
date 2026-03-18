@@ -2,30 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { PRODUCTS, COLLECTIONS, COUNTRIES, CATEGORIES, getLocalizedMockText } from '@/lib/mock-data';
+import { COLLECTIONS, COUNTRIES, getLocalizedMockText } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
-  Sparkles, 
-  Crown, 
-  ShieldCheck, 
   BookOpen, 
   Gem, 
   Watch, 
   Shirt, 
-  ChevronRight 
+  ChevronRight,
+  Sparkles,
+  Crown
 } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
-import { cn } from '@/lib/utils';
 import { ProductCard } from '@/components/product/ProductCard';
 
-/**
- * HomePage: AMARISÉ MAISON AVENUE
- * A light, airy, editorial luxury experience.
- */
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -59,14 +52,13 @@ export default function HomePage() {
   return (
     <div className="space-y-32 bg-ivory min-h-screen pb-20">
       {/* Cinematic Hero - Maison Avenue Presentation */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <Image 
-          src="https://picsum.photos/seed/amarise-avenue-hero/2560/1440" 
-          alt="Amarisé Maison Avenue Global Flagship"
-          fill
-          className="object-cover opacity-90 animate-slow-zoom"
-          priority
-        />
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-muted">
+        {/* Hero Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+           <div className="w-full h-full border-8 border-gold/20 flex items-center justify-center">
+              <span className="text-[15vw] font-headline font-bold text-gold tracking-tighter italic">A</span>
+           </div>
+        </div>
         <div className="absolute inset-0 cinematic-gradient" />
         <div className="relative z-10 text-center space-y-10 max-w-5xl px-6 py-16 luxury-blur border border-white/20 shadow-luxury">
           <div className="space-y-6 animate-fade-in">
@@ -130,15 +122,12 @@ export default function HomePage() {
            <div className="w-20 h-px bg-gold" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {featuredCollections.map((col, idx) => (
+          {featuredCollections.map((col) => (
             <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-white shadow-luxury">
-              <Image 
-                src={col.imageUrl} 
-                alt={col.name} 
-                fill 
-                className="object-cover transition-transform duration-[2s] group-hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 33vw"
-              />
+              {/* Collection Card Box Placeholder */}
+              <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-105 group-hover:bg-ivory">
+                {col.name} Edit
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
               <div className="absolute inset-0 flex flex-col items-center justify-end p-12 text-center space-y-4">
                 <span className="text-gold text-[10px] font-bold tracking-[0.5em] uppercase">Maison Exclusive</span>
@@ -157,14 +146,11 @@ export default function HomePage() {
         <section className="bg-lavender/5 py-32 border-y border-border">
           <div className="container mx-auto px-6">
             <div className="flex flex-col lg:flex-row items-center gap-24">
-              <div className="lg:w-1/2 relative aspect-[4/5] shadow-2xl">
-                <Image 
-                  src={latestEditorial.imageUrl} 
-                  alt={latestEditorial.title} 
-                  fill 
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
+              <div className="lg:w-1/2 relative aspect-[4/5] shadow-2xl bg-muted">
+                {/* Editorial Card Box Placeholder */}
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
+                  Editorial Context
+                </div>
                 <div className="absolute -bottom-10 -right-10 w-64 h-80 bg-white p-8 shadow-luxury hidden xl:flex flex-col justify-between border border-border">
                    <span className="text-[9px] font-bold tracking-widest uppercase text-plum">Featured Extract</span>
                    <p className="text-sm font-light italic leading-relaxed text-gray-600 line-clamp-4">
@@ -217,7 +203,7 @@ export default function HomePage() {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {loadingRecs ? (
-            [...Array(4)].map((_, i) => <div key={i} className="aspect-[3/4] bg-white border border-border animate-pulse" />)
+            [...Array(4)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted border border-border animate-pulse" />)
           ) : (
             recommendations.map(rec => (
               <ProductCard key={rec.id} product={rec} />

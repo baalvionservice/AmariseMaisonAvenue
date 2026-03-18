@@ -40,8 +40,8 @@ export default function CartPage() {
         <div className="lg:w-2/3 space-y-8">
           {cart.map((item) => (
             <div key={item.id} className="flex gap-8 pb-8 border-b border-border group">
-              <div className="relative w-32 h-40 bg-card bg-muted overflow-hidden">
-                {/* Image removed */}
+              <div className="relative w-32 h-40 bg-muted flex-shrink-0 flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-gray-300">
+                Piece
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">

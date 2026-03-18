@@ -1,9 +1,7 @@
-
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
@@ -41,14 +39,11 @@ export default function JournalPage() {
             href={`/${countryCode}/journal/${ed.id}`}
             className={`group space-y-8 block ${idx % 2 === 1 ? 'md:translate-y-20' : ''}`}
           >
-            <div className="relative aspect-[16/9] overflow-hidden bg-muted border border-border/40">
-              <Image 
-                src={ed.imageUrl} 
-                alt={ed.title}
-                fill
-                className="object-cover transition-transform duration-[2s] group-hover:scale-110"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+            <div className="relative aspect-[16/9] overflow-hidden bg-muted border border-border/40 flex items-center justify-center">
+              {/* Journal Card Box Placeholder */}
+              <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-transform duration-[2s] group-hover:scale-110">
+                Editorial Asset
+              </div>
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
               {ed.isVip && (
                 <div className="absolute top-6 left-6 bg-primary px-4 py-2 text-[10px] font-bold tracking-[0.2em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80">

@@ -1,11 +1,9 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { CITIES, COUNTRIES, PRODUCTS, COLLECTIONS, formatPrice } from '@/lib/mock-data';
+import { CITIES, COUNTRIES, PRODUCTS, COLLECTIONS } from '@/lib/mock-data';
 import { generateCityNarrative } from '@/ai/flows/generate-city-narrative';
 import { ProductCard } from '@/components/product/ProductCard';
 import { 
@@ -16,16 +14,10 @@ import {
   Sparkles, 
   Globe, 
   ArrowRight,
-  History,
   Store
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
-/**
- * CityPage: Cinematic Editorial Destination for Maison Amarisé.
- * Features GenAI narratives, localized trends, and flagship showcases.
- */
 export default function CityPage() {
   const { country, cityId } = useParams();
   const countryCode = (country as string) || 'us';
@@ -61,34 +53,12 @@ export default function CityPage() {
 
   return (
     <div className="animate-fade-in bg-ivory pb-40">
-      {/* SEO: JSON-LD Guide & LocalBusiness */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Guide",
-            "name": `Maison Amarisé Guide to ${city.name}`,
-            "description": city.description,
-            "about": {
-              "@type": "LocalBusiness",
-              "name": `Amarisé Luxe ${city.name}`,
-              "address": city.office.address,
-              "telephone": city.office.phone
-            }
-          })
-        }}
-      />
-
       {/* Hero Header */}
-      <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
-        <Image 
-          src={city.heroImage} 
-          alt={`${city.name} Cityscape`}
-          fill
-          className="object-cover opacity-80 animate-slow-zoom"
-          priority
-        />
+      <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden bg-muted">
+        {/* City Card Box Placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+           <span className="text-[15vw] font-headline font-bold text-gray-900 italic tracking-tighter">{city.name}</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-ivory" />
         <div className="relative z-10 text-center space-y-8 max-w-5xl px-6">
           <nav className="flex items-center justify-center space-x-2 text-[10px] tracking-widest uppercase text-muted-foreground mb-8">
@@ -174,8 +144,11 @@ export default function CityPage() {
            </div>
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {featuredCollections.map(col => (
-                <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden shadow-luxury">
-                  <Image src={col.imageUrl} alt={col.name} fill className="object-cover transition-transform duration-[2s] group-hover:scale-105" />
+                <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden shadow-luxury bg-muted flex items-center justify-center">
+                  {/* Collection City Card Box Placeholder */}
+                  <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105 group-hover:text-plum">
+                    {col.name} Edit
+                  </div>
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
                   <div className="absolute inset-0 flex flex-col items-center justify-end p-12 text-center text-white">
                     <span className="text-gold text-[10px] font-bold tracking-[0.4em] uppercase mb-4">Maison Edit</span>
@@ -188,8 +161,11 @@ export default function CityPage() {
 
         {/* Flagship Section */}
         <div className="flex flex-col lg:flex-row items-center gap-24 py-20 bg-white p-16 border border-border shadow-luxury">
-           <div className="lg:w-1/2 relative aspect-square shadow-2xl overflow-hidden group">
-              <Image src={city.office.image} alt={`${city.name} Flagship`} fill className="object-cover transition-transform duration-[2s] group-hover:scale-105" />
+           <div className="lg:w-1/2 relative aspect-square shadow-2xl overflow-hidden group bg-muted flex items-center justify-center">
+              {/* Flagship Card Box Placeholder */}
+              <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105">
+                Flagship View
+              </div>
               <div className="absolute inset-0 bg-plum/5" />
            </div>
            <div className="lg:w-1/2 space-y-10">
