@@ -114,6 +114,11 @@ export interface Editorial {
   date: string;
   isVip: boolean;
   featuredProducts: string[];
+  // SEO Authority Fields
+  targetKeyword?: string;
+  metaDescription?: string;
+  contentOutline?: string[];
+  relatedArticles?: string[];
 }
 
 export interface BuyingGuide {
@@ -129,6 +134,11 @@ export interface BuyingGuide {
   country: string;
   date: string;
   author: string;
+  // SEO Authority Fields
+  targetKeyword?: string;
+  metaDescription?: string;
+  investmentOutlook?: string;
+  provenanceChecklist?: string[];
 }
 
 export interface SocialMetrics {

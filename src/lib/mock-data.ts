@@ -63,7 +63,7 @@ const generateProducts = (): Product[] => {
       subcategoryId: sub.toLowerCase().replace(/ /g, '-'),
       collectionId: COLLECTIONS[i % COLLECTIONS.length].id,
       basePrice: 1500 + (i * 123) % 45000,
-      imageUrl: ``,
+      imageUrl: `https://picsum.photos/seed/amarise-prod-${i}/800/1000`,
       isVip: i % 10 === 0,
       rating: 4.5 + (i % 5) / 10,
       reviewsCount: 12 + (i % 200),
@@ -76,7 +76,7 @@ const generateProducts = (): Product[] => {
         { warehouseId: 'wh-ldn', warehouseName: 'London Hub', stockCount: 5, region: 'uk' }
       ],
       mediaGallery: [
-        { type: 'image', url: ``, alt: 'Main View' },
+        { type: 'image', url: `https://picsum.photos/seed/amarise-prod-${i}-1/800/1000`, alt: 'Main View' },
         { type: 'video', url: '', alt: 'Artisanal Craft' },
         { type: '360', url: ``, alt: '360 Degree View' }
       ],
@@ -91,23 +91,85 @@ const generateProducts = (): Product[] => {
 export const PRODUCTS = generateProducts();
 
 export const CITIES: City[] = [
-  { id: 'new-york', name: 'New York', countryCode: 'us', description: 'The global pulse.', heroImage: '', featuredCollections: ['heritage'], featuredProducts: ['prod-1', 'prod-2'], office: COUNTRIES.us.office!, trends: [{ title: 'Fifth Ave Minimalism', description: 'Monochrome tailoring.' }] },
+  { id: 'new-york', name: 'New York', countryCode: 'us', description: 'The global pulse.', heroImage: 'https://picsum.photos/seed/ny-luxe/1920/1080', featuredCollections: ['heritage'], featuredProducts: ['prod-1', 'prod-2'], office: COUNTRIES.us.office!, trends: [{ title: 'Fifth Ave Minimalism', description: 'Monochrome tailoring.' }] },
+  { id: 'london', name: 'London', countryCode: 'uk', description: 'The heritage soul.', heroImage: 'https://picsum.photos/seed/ldn-luxe/1920/1080', featuredCollections: ['spring-24'], featuredProducts: ['prod-3', 'prod-4'], office: COUNTRIES.uk.office!, trends: [{ title: 'Bond Street Classic', description: 'Traditional Bespoke.' }] },
+  { id: 'dubai', name: 'Dubai', countryCode: 'ae', description: 'The desert oasis of gold.', heroImage: 'https://picsum.photos/seed/dxb-luxe/1920/1080', featuredCollections: ['prive'], featuredProducts: ['prod-5', 'prod-6'], office: COUNTRIES.ae.office!, trends: [{ title: 'Desert Opulence', description: 'High Jewelry Focus.' }] },
 ];
 
-export const EDITOR_INITIAL: Editorial[] = [
-  { id: 'ed-1', title: 'The Architecture of Time', excerpt: 'Swiss heritage.', content: 'Long form content...', imageUrl: '', category: 'Artisanal', country: 'us', author: 'Elena Vance', date: '2024-03-01', isVip: false, featuredProducts: ['prod-1'] },
-];
+/**
+ * HIGH-AUTHORITY CONTENT ENGINE GENERATOR
+ * Programmatically generates 100+ SEO entries.
+ */
+const generateSEOContent = () => {
+  const editorials: Editorial[] = [];
+  const guides: BuyingGuide[] = [];
 
-export const BUYING_GUIDES: BuyingGuide[] = [
-  { id: 'bg-1', title: 'Horological Investment', excerpt: 'Mastering selection.', content: 'Guide content...', tips: ['Check movement', 'Check provenance'], featuredProducts: ['prod-1'], featuredCollections: ['heritage'], imageUrl: '', category: 'Watches', country: 'us', date: '2024-03-10', author: 'Elena Vance' },
-];
+  const topics = [
+    { title: 'The Architecture of Time', category: 'Artisanal', keyword: 'luxury watch investment' },
+    { title: 'Haute Couture: A Human Dialogue', category: 'Seasonal', keyword: 'bespoke couture trends' },
+    { title: 'The Soul of Silk', category: 'Artisanal', keyword: 'heritage silk craft' },
+    { title: 'Opaque Brilliance: Diamonds of the Future', category: 'Artisanal', keyword: 'rare diamond collecting' },
+    { title: 'Atelier Secrets: Bond Street', category: 'City Edit', keyword: 'London luxury shopping guide' },
+    { title: 'The Midnight Collection Narrative', category: 'VIP Exclusive', keyword: 'limited edition luxury apparel' }
+  ];
+
+  const countryCodes: CountryCode[] = ['us', 'uk', 'ae', 'in', 'sg'];
+
+  for (let i = 1; i <= 100; i++) {
+    const country = countryCodes[i % countryCodes.length];
+    const topic = topics[i % topics.length];
+    
+    editorials.push({
+      id: `seo-ed-${i}`,
+      title: `${topic.title} in ${COUNTRIES[country].name}`,
+      excerpt: `An exploration of ${topic.keyword} within the global Maison context.`,
+      content: `In the heart of our global ateliers, the pursuit of ${topic.keyword} remains a dialogue between human brilliance and timeless heritage. Whether observing the craftsmanship in ${COUNTRIES[country].office?.city} or our Parisian headquarters, the standard of the absolute is never compromised.`,
+      imageUrl: `https://picsum.photos/seed/amarise-seo-${i}/1200/800`,
+      category: topic.category as any,
+      country: country,
+      author: 'Elena Vance',
+      date: '2024-03-01',
+      isVip: i % 10 === 0,
+      featuredProducts: [`prod-${i}`, `prod-${i+1}`],
+      targetKeyword: topic.keyword,
+      metaDescription: `Discover the expert perspective on ${topic.keyword} at Maison Amarisé. Local context for ${COUNTRIES[country].name}.`,
+      contentOutline: ['The Heritage of Craft', 'Modern Market Dynamics', 'The Collector Perspective']
+    });
+
+    if (i <= 25) {
+      guides.push({
+        id: `seo-bg-${i}`,
+        title: `The ${COUNTRIES[country].name} Guide to ${topic.keyword}`,
+        excerpt: `A masterclass in identifying and acquiring the pinnacle of ${topic.category}.`,
+        content: `Acquiring an artifact of this magnitude requires more than wealth; it requires intelligence. This guide explores the provenance, materiality, and emotional resonance of ${topic.keyword}.`,
+        tips: [`Verify the hallmark of the master artisan.`, `Understand the heritage significance of materials.`, `Analyze the global investment trajectory.`],
+        featuredProducts: [`prod-${i}`, `prod-${i+5}`],
+        featuredCollections: ['heritage', 'prive'],
+        imageUrl: `https://picsum.photos/seed/amarise-guide-${i}/1200/800`,
+        category: topic.category,
+        country: country,
+        date: '2024-03-10',
+        author: 'Elena Vance',
+        targetKeyword: `${topic.keyword} buying guide`,
+        metaDescription: `Expert advice on ${topic.keyword} acquisition from the senior curators at Maison Amarisé.`,
+        investmentOutlook: `Steady 12-15% annual appreciation observed in this category over the last decade.`
+      });
+    }
+  }
+
+  return { editorials, guides };
+};
+
+const seoContent = generateSEOContent();
+export const EDITOR_INITIAL = seoContent.editorials;
+export const BUYING_GUIDES = seoContent.guides;
 
 export const MAISON_STORY: MaisonStory = {
   title: 'A Legacy of Radiance',
   subtitle: 'Since 1924.',
   history: [{ year: '1924', milestone: 'The First Atelier', description: 'Founded in Paris.' }],
   philosophy: 'Luxury is human brilliance.',
-  craftsmanship: [{ title: 'Haute Couture', description: 'Hand-sewn.', imageUrl: '' }],
+  craftsmanship: [{ title: 'Haute Couture', description: 'Hand-sewn.', imageUrl: 'https://picsum.photos/seed/craft-1/800/1000' }],
   sustainability: 'Preserving the earth.'
 };
 

@@ -14,10 +14,17 @@ import {
   Sparkles, 
   Globe, 
   ArrowRight,
-  Store
+  Store,
+  Compass,
+  History,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+/**
+ * CityPage: Programmatic SEO Authority Page.
+ * Focuses on high-authority city-specific luxury content.
+ */
 export default function CityPage() {
   const { country, cityId } = useParams();
   const countryCode = (country as string) || 'us';
@@ -53,136 +60,166 @@ export default function CityPage() {
 
   return (
     <div className="animate-fade-in bg-ivory pb-40">
+      {/* SEO Schema: City Authority */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Guide",
+            "name": `Luxury Shopping in ${city.name}`,
+            "description": city.description,
+            "abstract": narrative,
+            "hasPart": featuredProducts.map(p => ({
+              "@type": "Product",
+              "name": p.name
+            }))
+          })
+        }}
+      />
+
       {/* Hero Header */}
-      <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden bg-muted">
-        {/* City Card Box Placeholder */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-5">
-           <span className="text-[15vw] font-headline font-bold text-gray-900 italic tracking-tighter">{city.name}</span>
+      <section className="relative h-[80vh] w-full flex items-center justify-center overflow-hidden bg-muted">
+        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+           <span className="text-[25vw] font-headline font-bold text-gray-900 italic tracking-tighter leading-none">{city.name.charAt(0)}</span>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-ivory" />
-        <div className="relative z-10 text-center space-y-8 max-w-5xl px-6">
-          <nav className="flex items-center justify-center space-x-2 text-[10px] tracking-widest uppercase text-muted-foreground mb-8">
-            <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Home</Link>
+        <div className="relative z-10 text-center space-y-12 max-w-6xl px-12">
+          <nav className="flex items-center justify-center space-x-2 text-[10px] tracking-[0.5em] uppercase text-muted-foreground mb-12 font-bold">
+            <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Maison</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-foreground">Destinations</span>
+            <span className="text-foreground">Global Destinations</span>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-plum font-bold">{city.name}</span>
+            <span className="text-secondary font-black">{city.name}</span>
           </nav>
-          <span className="text-primary text-[10px] font-bold tracking-[0.5em] uppercase">The Global Ateliers</span>
-          <h1 className="text-7xl md:text-9xl font-headline font-bold text-gray-900 leading-tight italic">
-            {city.name}
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 font-light italic max-w-3xl mx-auto leading-relaxed">
+          <div className="space-y-6">
+            <span className="text-secondary text-xs font-bold tracking-[0.6em] uppercase">The Global Ateliers</span>
+            <h1 className="text-8xl md:text-[160px] font-headline font-bold text-gray-900 leading-[0.8] italic tracking-tighter">
+              {city.name}
+            </h1>
+          </div>
+          <p className="text-2xl md:text-3xl text-gray-600 font-light italic max-w-4xl mx-auto leading-relaxed">
             {city.description}
           </p>
         </div>
       </section>
 
-      {/* Editorial Narrative */}
-      <section className="container mx-auto px-6 py-32">
-        <div className="max-w-4xl mx-auto space-y-16">
-          <div className="flex items-center space-x-4">
-            <div className="h-px flex-1 bg-gold/30" />
-            <Sparkles className="w-6 h-6 text-gold" />
-            <div className="h-px flex-1 bg-gold/30" />
+      {/* Editorial Authority Pillar */}
+      <section className="container mx-auto px-12 py-40 max-w-[1600px]">
+        <div className="max-w-5xl mx-auto space-y-24">
+          <div className="flex items-center space-x-8 text-secondary/30">
+            <div className="h-px flex-1 bg-current" />
+            <Compass className="w-8 h-8" />
+            <div className="h-px flex-1 bg-current" />
           </div>
           
-          <div className="bg-white p-16 border border-border shadow-luxury relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-12 opacity-5">
-                <Globe className="w-64 h-64" />
+          <div className="bg-white p-24 border border-border shadow-luxury relative overflow-hidden group">
+             <div className="absolute -top-20 -right-20 p-24 opacity-5 pointer-events-none">
+                <Globe className="w-96 h-96 text-black" />
              </div>
              {loadingNarrative ? (
-                <div className="space-y-4 animate-pulse">
-                  <div className="h-4 bg-muted w-full" />
-                  <div className="h-4 bg-muted w-5/6 mx-auto" />
+                <div className="space-y-8 animate-pulse">
+                  <div className="h-8 bg-muted w-full" />
+                  <div className="h-8 bg-muted w-5/6 mx-auto" />
+                  <div className="h-8 bg-muted w-4/6 mx-auto" />
                 </div>
               ) : (
-                <div className="space-y-8 relative z-10 text-center">
-                  <h2 className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Maison Intelligence</h2>
-                  <p className="text-3xl text-gray-800 font-light italic font-headline leading-relaxed max-w-3xl mx-auto">
+                <div className="space-y-12 relative z-10 text-center">
+                  <div className="space-y-2">
+                    <h2 className="text-[10px] font-bold tracking-[0.6em] uppercase text-secondary">Maison Intelligence</h2>
+                    <h3 className="text-4xl font-headline font-bold italic tracking-tight">The {city.name} Perspective</h3>
+                  </div>
+                  <p className="text-4xl text-gray-800 font-light italic font-headline leading-snug max-w-4xl mx-auto">
                     {narrative}
                   </p>
-                  <div className="h-px w-20 bg-gold mx-auto" />
+                  <div className="h-px w-32 bg-secondary mx-auto" />
                 </div>
               )}
           </div>
         </div>
       </section>
 
-      {/* City Trends & Collections */}
-      <section className="container mx-auto px-6 py-12 space-y-32">
-        {/* Trends Grid */}
-        {city.trends.length > 0 && (
-          <div className="space-y-20">
-            <div className="text-center space-y-4">
-              <h3 className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Local Resonance</h3>
-              <h2 className="text-5xl font-headline font-bold italic text-gray-900">Atelier Trends: {city.name}</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {city.trends.map((trend, idx) => (
-                <div key={idx} className="bg-white p-12 border border-border shadow-sm group hover:border-gold transition-all">
-                  <h4 className="text-2xl font-headline font-bold italic text-gray-900 mb-4 group-hover:text-plum transition-colors">{trend.title}</h4>
-                  <p className="text-gray-500 font-light leading-relaxed italic border-l-2 border-gold/30 pl-6">
-                    {trend.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+      {/* Local Trends & Curated Edits */}
+      <section className="container mx-auto px-12 py-24 space-y-48 max-w-[1600px]">
+        {/* Local Resonace Grid */}
+        <div className="space-y-24">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <History className="w-10 h-10 text-secondary" />
+            <h2 className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Local Resonance</h2>
+            <p className="text-gray-400 text-[10px] uppercase tracking-[0.5em] font-bold">Atelier Trends: {city.name}</p>
           </div>
-        )}
-
-        {/* Featured Collections */}
-        <div className="space-y-20">
-           <div className="flex items-end justify-between border-b border-border pb-8">
-              <div className="space-y-2">
-                <h3 className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Curated Edits</h3>
-                <h2 className="text-4xl font-headline font-bold italic text-gray-900">City-Specific Selection</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {city.trends.map((trend, idx) => (
+              <div key={idx} className="bg-white p-16 border border-border shadow-sm group hover:border-secondary hover:shadow-luxury transition-all duration-700">
+                <h4 className="text-3xl font-headline font-bold italic text-gray-900 mb-6 group-hover:text-secondary transition-colors tracking-tight">{trend.title}</h4>
+                <p className="text-xl text-gray-500 font-light leading-relaxed italic border-l-2 border-secondary/20 pl-8">
+                  {trend.description}
+                </p>
               </div>
-              <Link href={`/${countryCode}/category/apparel`} className="text-[10px] font-bold tracking-[0.3em] uppercase text-gold hover:text-plum transition-colors flex items-center">
-                Explore Full Catalog <ArrowRight className="w-3 h-3 ml-2" />
+            ))}
+          </div>
+        </div>
+
+        {/* Featured Local Availability */}
+        <div className="space-y-24">
+           <div className="flex items-end justify-between border-b border-gray-100 pb-12">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3 text-secondary">
+                   <Sparkles className="w-6 h-6" />
+                   <span className="text-[10px] font-bold uppercase tracking-[0.5em]">Curated Edits</span>
+                </div>
+                <h2 className="text-5xl font-headline font-bold italic text-gray-900 leading-none">City-Specific Selection</h2>
+              </div>
+              <Link href={`/${countryCode}/category/apparel`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2 flex items-center">
+                Explore Full Archive <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Link>
            </div>
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {featuredCollections.map(col => (
-                <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden shadow-luxury bg-muted flex items-center justify-center">
-                  {/* Collection City Card Box Placeholder */}
-                  <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105 group-hover:text-plum">
-                    {col.name} Edit
-                  </div>
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-end p-12 text-center text-white">
-                    <span className="text-gold text-[10px] font-bold tracking-[0.4em] uppercase mb-4">Maison Edit</span>
-                    <h3 className="text-3xl font-headline font-bold italic">{col.name}</h3>
-                  </div>
-                </Link>
+           
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16">
+              {featuredProducts.map(p => (
+                <ProductCard key={p.id} product={p} />
               ))}
            </div>
         </div>
 
-        {/* Flagship Section */}
-        <div className="flex flex-col lg:flex-row items-center gap-24 py-20 bg-white p-16 border border-border shadow-luxury">
-           <div className="lg:w-1/2 relative aspect-square shadow-2xl overflow-hidden group bg-muted flex items-center justify-center">
-              {/* Flagship Card Box Placeholder */}
-              <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105">
-                Flagship View
+        {/* Flagship Experience Authority Section */}
+        <div className="flex flex-col lg:flex-row items-stretch gap-0 bg-white shadow-2xl border border-gray-100 overflow-hidden">
+           <div className="lg:w-1/2 relative min-h-[600px] overflow-hidden group bg-muted">
+              <Image 
+                src="https://picsum.photos/seed/amarise-flagship/1200/1200" 
+                alt={`${city.name} Flagship`}
+                fill
+                className="object-cover transition-transform duration-[3s] group-hover:scale-105 opacity-80 grayscale-[20%]"
+              />
+              <div className="absolute inset-0 bg-black/10" />
+              <div className="absolute inset-0 flex items-center justify-center p-12">
+                 <div className="luxury-blur bg-white/10 border border-white/20 p-12 text-center text-white space-y-4 w-full">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.6em] text-secondary">Atelier Perspective</span>
+                    <h4 className="text-4xl font-headline font-bold italic">The Archive View</h4>
+                 </div>
               </div>
-              <div className="absolute inset-0 bg-plum/5" />
            </div>
-           <div className="lg:w-1/2 space-y-10">
-              <div className="flex items-center space-x-4 text-plum">
-                 <Store className="w-8 h-8" />
-                 <h3 className="text-[10px] font-bold tracking-[0.4em] uppercase">The Flagship Experience</h3>
+           
+           <div className="lg:w-1/2 p-24 lg:p-32 flex flex-col justify-center space-y-12">
+              <div className="flex items-center space-x-4 text-secondary">
+                 <Store className="w-10 h-10" />
+                 <h3 className="text-[10px] font-bold tracking-[0.6em] uppercase">The Flagship Sanctuary</h3>
               </div>
-              <h2 className="text-5xl font-headline font-bold italic leading-tight text-gray-900">Amarisé Luxe {city.office.city}</h2>
-              <div className="space-y-6">
-                <ContactRow icon={<MapPin className="w-4 h-4 text-gold" />} label="Address" value={city.office.address} />
-                <ContactRow icon={<Phone className="w-4 h-4 text-gold" />} label="Concierge" value={city.office.phone} />
-                <ContactRow icon={<Mail className="w-4 h-4 text-gold" />} label="Inquiry" value={city.office.email} />
+              <h2 className="text-6xl font-headline font-bold italic leading-[0.9] text-gray-900 tracking-tighter">Amarisé Luxe <br /> {city.office.city}</h2>
+              <div className="space-y-8 pt-8">
+                <ContactRow icon={<MapPin className="w-5 h-5 text-secondary" />} label="Address" value={city.office.address} />
+                <ContactRow icon={<Phone className="w-5 h-5 text-secondary" />} label="Concierge" value={city.office.phone} />
+                <ContactRow icon={<Mail className="w-5 h-5 text-secondary" />} label="Inquiry" value={city.office.email} />
               </div>
-              <div className="pt-8">
-                 <Link href={city.office.mapUrl} target="_blank">
-                    <Button className="h-16 px-14 rounded-none bg-plum text-white hover:bg-gold hover:text-gray-900 text-[10px] tracking-[0.4em] font-bold transition-all">
-                      REQUEST DIRECTIONS
+              <div className="pt-12 flex flex-col sm:flex-row gap-8">
+                 <Link href={city.office.mapUrl} target="_blank" className="flex-1">
+                    <Button className="w-full h-20 rounded-none bg-black text-white hover:bg-secondary transition-all text-[10px] font-bold tracking-[0.5em] uppercase shadow-xl">
+                      Request Directions
+                    </Button>
+                 </Link>
+                 <Link href={`/${countryCode}/appointments`} className="flex-1">
+                    <Button variant="outline" className="w-full h-20 rounded-none border-black text-[10px] font-bold tracking-[0.5em] uppercase hover:bg-black hover:text-white transition-all">
+                      Book Private Salon
                     </Button>
                  </Link>
               </div>
@@ -190,16 +227,17 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* Artifact Gallery */}
-      <section className="container mx-auto px-6 py-24 space-y-20">
-         <div className="text-center space-y-4">
-            <h3 className="text-[10px] font-bold tracking-[0.4em] uppercase text-plum">Local Availability</h3>
-            <h2 className="text-5xl font-headline font-bold italic text-gray-900">Artisanal Artifacts in {city.name}</h2>
-         </div>
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-            {featuredProducts.map(p => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+      {/* SEO Compliance & Trust Footer */}
+      <section className="container mx-auto px-12 mt-48 pt-48 border-t border-gray-100 text-center max-w-4xl">
+         <div className="space-y-12">
+            <ShieldCheck className="w-12 h-12 text-secondary mx-auto" />
+            <h3 className="text-5xl font-headline font-bold italic tracking-tight">Artisanal Responsibility</h3>
+            <p className="text-2xl text-gray-500 font-light italic leading-relaxed">
+              "Every artifact available in our {city.name} atelier is certified for global provenance and authentic heritage compliance."
+            </p>
+            <div className="pt-12">
+               <span className="text-[9px] font-bold uppercase tracking-[0.8em] text-gray-300">Maison Amarisé Global Destinations Registry</span>
+            </div>
          </div>
       </section>
     </div>
@@ -208,11 +246,11 @@ export default function CityPage() {
 
 function ContactRow({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
   return (
-    <div className="flex items-start space-x-6 group">
-      <div className="mt-1">{icon}</div>
-      <div className="space-y-1">
-        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
-        <p className="text-sm font-light text-gray-900 italic leading-relaxed">{value}</p>
+    <div className="flex items-start space-x-8 group">
+      <div className="mt-1 transition-transform group-hover:scale-110 duration-500">{icon}</div>
+      <div className="space-y-2">
+        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">{label}</span>
+        <p className="text-xl font-light text-gray-900 italic leading-none">{value}</p>
       </div>
     </div>
   );
