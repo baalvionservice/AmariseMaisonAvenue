@@ -225,6 +225,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initialMetrics: Record<string, SocialMetrics> = {};
+    // Populate metrics for all content types to simulate high-authority resonance
     products.forEach(p => {
       initialMetrics[p.id] = {
         likes: Math.floor(Math.random() * 1000) + 100,
@@ -232,8 +233,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         engagementRate: Math.random() * 5 + 2
       };
     });
+    editorials.forEach(ed => {
+      initialMetrics[ed.id] = {
+        likes: Math.floor(Math.random() * 5000) + 500,
+        shares: Math.floor(Math.random() * 1000) + 100,
+        engagementRate: Math.random() * 8 + 4
+      };
+    });
+    buyingGuides.forEach(bg => {
+      initialMetrics[bg.id] = {
+        likes: Math.floor(Math.random() * 3000) + 300,
+        shares: Math.floor(Math.random() * 800) + 50,
+        engagementRate: Math.random() * 6 + 3
+      };
+    });
     setSocialMetrics(initialMetrics);
-  }, [products]);
+  }, [products, editorials, buyingGuides]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -389,8 +404,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     recordLog(`Return ${id} set to ${status}`, 'Operations');
   };
 
-  const createInvoice = (inv: Invoice) => {
-    setInvoices(prev => [inv, ...prev]);
+  const createInvoice = (invoice: Invoice) => {
+    setInvoices(prev => [invoice, ...prev]);
   };
 
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
