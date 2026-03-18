@@ -31,27 +31,26 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
-      {/* Announcement Bar */}
-      <div className="bg-black text-white h-10 flex items-center justify-between px-6 text-[10px] tracking-widest font-medium uppercase">
+      {/* Announcement Bar - Updated to Light Lavender Style */}
+      <div className="bg-[#f3ebf7] text-gray-800 h-10 flex items-center justify-between px-6 text-[10px] tracking-widest font-bold uppercase border-b border-black/5">
         <div className="flex items-center space-x-2">
-          <span className="opacity-80">100% Authentic Guaranteed</span>
+          <span className="opacity-70">100% Authentic Guaranteed</span>
         </div>
         <div className="flex-1 flex justify-center items-center overflow-hidden">
-          <div className="flex items-center space-x-4">
-            <ChevronLeft className="w-3 h-3 cursor-pointer hover:text-gold transition-colors" />
-            <span className="animate-pulse">Spring Collector's Auction</span>
-            <ChevronRight className="w-3 h-3 cursor-pointer hover:text-gold transition-colors" />
+          <div className="flex items-center space-x-6">
+            <ChevronLeft className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors" />
+            <span className="tracking-[0.2em]">Spring Collector's Auction</span>
+            <ChevronRight className="w-3.5 h-3.5 cursor-pointer hover:text-plum transition-colors" />
           </div>
         </div>
         <div className="flex items-center space-x-6">
-          <Link href="#" className="hover:text-gold transition-colors">Sell</Link>
-          <Link href={`/${countryCode}/appointments`} className="hover:text-gold transition-colors">Appointments</Link>
-          <Link href={`/${countryCode}/contact`} className="hover:text-gold transition-colors">Contact</Link>
+          <Link href={`/${countryCode}/appointments`} className="hover:text-plum transition-colors">Appointments</Link>
+          <Link href={`/${countryCode}/contact`} className="hover:text-plum transition-colors">Contact</Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:text-gold transition-all bg-black px-3 py-1 rounded-none border border-white/10 group">
+              <button className="flex items-center space-x-3 hover:bg-white/50 transition-all px-3 py-1 border border-black/10 group">
                 <span className="text-base leading-none grayscale group-hover:grayscale-0 transition-all">{currentCountry.flag}</span>
-                <span className="font-bold tracking-tighter text-[11px] text-white group-hover:text-gold">{currentCountry.name}</span>
+                <span className="font-bold tracking-tighter text-[11px] text-gray-800">{currentCountry.name}</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2 rounded-none shadow-luxury">
