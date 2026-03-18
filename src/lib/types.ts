@@ -1,4 +1,3 @@
-
 export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
 
 export interface Office {
@@ -31,6 +30,7 @@ export interface Country {
   currency: string;
   symbol: string;
   locale: string;
+  flag: string;
   office?: Office;
 }
 

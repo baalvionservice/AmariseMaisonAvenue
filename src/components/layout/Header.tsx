@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Globe, MapPin, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { COUNTRIES, DEPARTMENTS, CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
 import { 
@@ -12,8 +11,7 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
+  DropdownMenuLabel
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
@@ -51,15 +49,27 @@ export const Header = () => {
           <Link href={`/${countryCode}/contact`} className="hover:text-gold transition-colors">Contact</Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-2 hover:text-gold transition-colors">
-                <span className="font-bold">{countryCode.toUpperCase()}</span>
-                <span className="opacity-60">{currentCountry.currency}</span>
+              <button className="flex items-center space-x-3 hover:text-gold transition-all bg-black px-3 py-1 rounded-sm border border-white/10">
+                <span className="text-sm leading-none">{currentCountry.flag}</span>
+                <span className="font-bold tracking-tighter text-[11px]">{currentCountry.currency}</span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border-border w-48">
+            <DropdownMenuContent align="end" className="bg-white border-border w-56 p-2">
+              <DropdownMenuLabel className="text-[8px] uppercase tracking-widest text-muted-foreground mb-2">Select Global Region</DropdownMenuLabel>
               {Object.values(COUNTRIES).map((c) => (
-                <DropdownMenuItem key={c.code} onClick={() => handleCountryChange(c.code)} className="cursor-pointer text-[10px] font-bold uppercase tracking-widest p-3">
-                  {c.name} ({c.currency})
+                <DropdownMenuItem 
+                  key={c.code} 
+                  onClick={() => handleCountryChange(c.code)} 
+                  className={cn(
+                    "cursor-pointer flex items-center justify-between p-3 rounded-none transition-colors",
+                    countryCode === c.code ? "bg-black text-white" : "hover:bg-ivory"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-base">{c.flag}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">{c.name}</span>
+                  </div>
+                  <span className="text-[9px] font-medium opacity-60">{c.currency}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
