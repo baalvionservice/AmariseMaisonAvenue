@@ -3,7 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Heart, ShoppingBag, Eye, Share2, Lock, Sparkles } from 'lucide-react';
+import { Heart, Share2, Lock, Sparkles, ShieldCheck } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { formatPrice } from '@/lib/mock-data';
 import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
@@ -17,13 +17,13 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Optimized for elite high-ticket sales.
- * Implements Price-on-Request gating for luxury artifacts.
+ * ProductCard: Optimized for institutional trust and private acquisition.
+ * Features Gated Pricing logic for Tier 1 artifacts.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
-  const { addToCart, toggleWishlist, wishlist, socialMetrics, toggleLike, trackShare } = useAppStore();
+  const { toggleWishlist, wishlist, socialMetrics, toggleLike, trackShare } = useAppStore();
   const { toast } = useToast();
   
   const isWishlisted = wishlist.some(i => i.id === product.id);
@@ -119,9 +119,10 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
 
         <div className="pt-4 opacity-0 group-hover:opacity-100 transition-all duration-1000">
-          <Link href={`/${countryCode}/product/${product.id}`} className="text-[9px] text-secondary font-bold tracking-[0.5em] uppercase hover:opacity-60 italic">
-            Speak with a Curator
-          </Link>
+          <div className="flex items-center justify-center space-x-2 text-[9px] text-gray-400 font-bold uppercase tracking-[0.3em]">
+            <ShieldCheck className="w-3 h-3 text-secondary" />
+            <span>Maison Registry Verified</span>
+          </div>
         </div>
       </div>
     </article>

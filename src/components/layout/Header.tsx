@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Diamond } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Crown } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -31,8 +31,8 @@ export const Header = () => {
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
 
   const slides = [
-    "PRIVATE SHOWROOM APPOINTMENTS AVAILABLE IN NYC & LONDON",
-    "THE SPRING 1924 ARCHIVE AUCTION IS NOW LIVE"
+    "PRIVATE CURATORIAL SESSIONS AVAILABLE IN NYC & LONDON",
+    "THE SPRING 1924 ARCHIVE REGISTRY IS NOW ACTIVE"
   ];
 
   const handlePrevSlide = () => {
@@ -54,13 +54,13 @@ export const Header = () => {
     { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
     { name: 'ACCESSORIES', href: `/${countryCode}/category/accessories` },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
-    { name: 'MAISON SERVICES', href: '#', services: true },
+    { name: 'PRIVATE ADVISORY', href: '#', services: true },
     { name: 'THE JOURNAL', href: `/${countryCode}/journal` },
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
-      {/* Top Ticker Bar - Minimalist Ivory */}
+      {/* Institutional Ticker */}
       <div className="bg-[#fcfcfc] text-gray-500 h-10 flex items-center justify-center px-6 text-[9px] tracking-[0.4em] font-bold uppercase border-b border-gray-100">
         <div className="flex items-center space-x-10">
           <ChevronLeft 
@@ -79,16 +79,16 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Black Utility Bar */}
+      {/* Authority Utility Bar */}
       <div className="bg-black text-white h-11 flex items-center justify-between px-12 text-[10px] tracking-[0.3em] font-bold uppercase">
         <div className="flex items-center space-x-3">
           <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
-          <span className="opacity-90">Authenticity Registry Verified</span>
+          <span className="opacity-90">Maison Registry Verified</span>
         </div>
         
         <div className="flex items-center space-x-8">
           <Link href="#" className="hover:text-secondary transition-colors">Consignment</Link>
-          <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors">Private Viewings</Link>
+          <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors">Atelier Viewings</Link>
           <Link href={`/${countryCode}/contact`} className="hover:text-secondary transition-colors">Specialist Inquiry</Link>
           
           <DropdownMenu>
@@ -121,7 +121,7 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Main Brand Header */}
+      {/* Maison Brand Header */}
       <div className="h-28 border-b border-gray-100 px-12 flex items-center justify-between relative bg-white">
         <div className="flex items-center space-x-6 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
           <Link href="#" className="hover:text-black border-r border-gray-100 pr-6">Client Portal</Link>
@@ -139,7 +139,7 @@ export const Header = () => {
         <div className="flex items-center space-x-10">
           <button className="text-gray-400 hover:text-black transition-colors group relative flex items-center">
             <Search className="w-5 h-5 stroke-[1.5px]" />
-            <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Search</span>
+            <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Intelligence</span>
           </button>
           
           <Link href={`/${countryCode}/wishlist`} className="relative text-gray-400 hover:text-black transition-colors group">
@@ -162,7 +162,7 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Primary Navigation */}
+      {/* Curatorial Navigation */}
       <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-12">
         {navLinks.map((link) => (
           <div key={link.name} className="group h-full flex items-center">
@@ -172,7 +172,7 @@ export const Header = () => {
                   {link.name}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" className="bg-white border-border w-72 p-2 rounded-none shadow-2xl">
-                  <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.5em] text-gray-400 p-4">Elite Services</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.5em] text-gray-400 p-4">Acquisition Services</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {MAISON_SERVICES.map(s => (
                     <DropdownMenuItem key={s.id} asChild className="p-4 rounded-none cursor-pointer hover:bg-ivory group/item">
@@ -199,7 +199,7 @@ export const Header = () => {
               <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50">
                 <div className="container mx-auto px-20 flex gap-40 max-w-[1600px]">
                   <div className="w-72 space-y-10">
-                    <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">New Arrivals</h3>
+                    <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">Atelier Edits</h3>
                     <div className="flex flex-col space-y-6">
                       {['Hermès Heritage', 'Chanel Seasonal', 'Maison Accessories', 'Artisanal Jewelry'].map((sub) => (
                         <Link 

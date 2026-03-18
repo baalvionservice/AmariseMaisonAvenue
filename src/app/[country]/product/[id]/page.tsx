@@ -16,7 +16,8 @@ import {
   Award,
   Lock,
   Sparkles,
-  Info
+  Info,
+  Crown
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -33,7 +34,7 @@ export default function ProductPage() {
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
-  const { addToCart, toggleWishlist, wishlist } = useAppStore();
+  const { toggleWishlist, wishlist } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
   const monetization = useMemo(() => PRODUCTS_EXTENDED[id as string] || { priceVisible: true }, [id]);
@@ -58,7 +59,7 @@ export default function ProductPage() {
             category: product.category,
           }),
           generateProductRecommendations({
-            scenario: `Private acquisition recommendations for elite client viewing ${product.name}. Focus on collector synergy.`,
+            scenario: `Private acquisition recommendations for elite client viewing ${product.name}. Focus on collector synergy and institutional value.`,
             currentProductId: product.id
           })
         ]);
@@ -84,6 +85,31 @@ export default function ProductPage() {
         isOpen={isInquiryOpen} 
         onClose={() => setIsInquiryOpen(false)} 
         product={product} 
+      />
+
+      {/* SEO Schema Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "description": aiDescription || product.name,
+            "image": product.imageUrl,
+            "offers": {
+              "@type": "Offer",
+              "priceCurrency": countryCode.toUpperCase(),
+              "price": product.basePrice,
+              "availability": "https://schema.org/InStock",
+              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`
+            },
+            "brand": {
+              "@type": "Brand",
+              "name": "AMARISÉ MAISON AVENUE"
+            }
+          })
+        }}
       />
 
       <div className="container mx-auto px-6 py-12 max-w-[1600px]">
@@ -129,7 +155,7 @@ export default function ProductPage() {
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 text-secondary">
-                   <CrownIcon className="w-5 h-5" />
+                   <Crown className="w-5 h-5" />
                    <span className="text-[10px] font-bold tracking-[0.5em] uppercase border-b border-gold/40 pb-1">
                      Private Acquisition Flow
                    </span>
@@ -150,13 +176,13 @@ export default function ProductPage() {
               </div>
 
               <div className="text-7xl font-light tracking-tighter text-gray-900">
-                {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Price"}
+                {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Private Price"}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-               <IntelligenceTile icon={<Award className="w-5 h-5" />} label="Collector Value" value={monetization.collectorValue || 'Signature Artifact'} />
-               <IntelligenceTile icon={<TrendingUp className="w-5 h-5" />} label="Market Status" value={monetization.marketRange || 'Highly Resilient'} />
+               <IntelligenceTile icon={<Award className="w-5 h-5" />} label="Collector Status" value={monetization.collectorValue || 'Signature Artifact'} />
+               <IntelligenceTile icon={<TrendingUp className="w-5 h-5" />} label="Market Resiliency" value={monetization.marketRange || 'Optimal'} />
             </div>
 
             <div className="space-y-6 pt-4">
@@ -174,7 +200,7 @@ export default function ProductPage() {
                   className="h-16 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 hover:text-white transition-all"
                   onClick={() => setIsInquiryOpen(true)}
                 >
-                  <Sparkles className="w-4 h-4 mr-3" /> SPEAK WITH A CURATOR
+                  <Sparkles className="w-4 h-4 mr-3" /> CURATORIAL DIALOGUE
                 </Button>
                 <Button 
                   variant="outline" 
@@ -188,7 +214,7 @@ export default function ProductPage() {
 
             <Tabs defaultValue="intelligence" className="w-full pt-16">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12">
-                <TabsTrigger value="intelligence" className="tab-trigger">Collector Insight</TabsTrigger>
+                <TabsTrigger value="intelligence" className="tab-trigger">Collector Analysis</TabsTrigger>
                 <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
                 <TabsTrigger value="provenance" className="tab-trigger">Provenance</TabsTrigger>
               </TabsList>
@@ -201,16 +227,16 @@ export default function ProductPage() {
                     <div className="relative z-10 space-y-8">
                        <div className="flex items-center space-x-4 text-plum">
                           <TrendingUp className="w-6 h-6" />
-                          <h3 className="text-[11px] font-bold uppercase tracking-[0.5em]">Investment Analysis</h3>
+                          <h3 className="text-[11px] font-bold uppercase tracking-[0.5em]">Investment Trajectory</h3>
                        </div>
                        <p className="text-xl text-gray-600 font-light leading-relaxed italic border-l-2 border-plum/20 pl-10">
-                         {monetization.investmentInsight || "This artifact represents a stable position within the Maison archives, historically outperforming standard market benchmarks for its category by 12% annually."}
+                         {monetization.investmentInsight || "This artifact represents a stable position within the Maison archives, showing consistent performance in global collector secondary markets."}
                        </p>
                     </div>
                  </div>
                  <div className="flex items-center space-x-4 text-gray-400">
                     <ShieldCheck className="w-5 h-5 text-secondary" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Maison Registry Verified</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Maison Registry Verification: COMPLETE</span>
                  </div>
               </TabsContent>
 
@@ -230,10 +256,10 @@ export default function ProductPage() {
 
               <TabsContent value="provenance" className="pt-12">
                 <ul className="space-y-10">
-                  <DetailRow label="Atelier Origin" value={`Maison Amarisé Ateliers, Paris Flagship`} />
-                  <DetailRow label="Heritage Series" value="Hand-curated Founding Archives" />
-                  <DetailRow label="Certification" value="NFC-enabled global authenticity registry" />
-                  <DetailRow label="Material Purity" value="Audited for artisanal responsibility" />
+                  <DetailRow label="Atelier Origin" value={`Maison Amarisé Ateliers, Paris Central`} />
+                  <DetailRow label="Heritage Registry" value="Archive No. 1924-EXP-001" />
+                  <DetailRow label="Certification" value="ISO-Certified Global Provenance Documentation" />
+                  <DetailRow label="Material Purity" value="Audited for Institutional Responsibility" />
                 </ul>
               </TabsContent>
             </Tabs>
@@ -247,7 +273,7 @@ export default function ProductPage() {
                  <Award className="w-8 h-8 text-gold" />
                  <span className="text-[11px] font-bold tracking-[0.6em] uppercase">Private Selection</span>
               </div>
-              <h2 className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Resonant Artifacts</h2>
+              <h2 className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Synergistic Artifacts</h2>
             </div>
             <Link href={`/${countryCode}/category/all`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-plum transition-colors border-b border-black pb-2 flex items-center">
                Explore Full Archive <ChevronRight className="w-3 h-3 ml-2" />
@@ -287,22 +313,5 @@ function DetailRow({ label, value }: { label: string, value: string }) {
       <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-plum group-hover:text-gold transition-colors">{label}</span>
       <span className="col-span-2 text-lg text-gray-500 font-light italic leading-snug">{value}</span>
     </div>
-  );
-}
-
-function CrownIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M5 15l-2-7 5 2 4-7 4 7 5-2-2 7H5z" />
-      <path d="M5 15v4h14v-4" />
-    </svg>
   );
 }

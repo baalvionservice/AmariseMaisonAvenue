@@ -149,6 +149,7 @@ export interface ProductExtended extends Product {
   investmentInsight: string;
   scarcityTag: string;
   priceVisible: boolean;
+  institutionalVerification?: boolean;
 }
 
 export interface MaisonService {
@@ -223,6 +224,7 @@ export interface MaisonStory {
     imageUrl: string;
   }[];
   sustainability: string;
+  institutionalCharter?: string;
 }
 
 export interface CustomerServiceInfo {

@@ -3,7 +3,7 @@ import {
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
   Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats,
   MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice,
-  Affiliate, ReturnRequest
+  Affiliate, ReturnRequest, CountryCode
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -96,10 +96,6 @@ export const CITIES: City[] = [
   { id: 'dubai', name: 'Dubai', countryCode: 'ae', description: 'The desert oasis of gold.', heroImage: 'https://picsum.photos/seed/dxb-luxe/1920/1080', featuredCollections: ['prive'], featuredProducts: ['prod-5', 'prod-6'], office: COUNTRIES.ae.office!, trends: [{ title: 'Desert Opulence', description: 'High Jewelry Focus.' }] },
 ];
 
-/**
- * HIGH-AUTHORITY CONTENT ENGINE GENERATOR
- * Programmatically generates 100+ SEO entries.
- */
 const generateSEOContent = () => {
   const editorials: Editorial[] = [];
   const guides: BuyingGuide[] = [];
@@ -170,7 +166,8 @@ export const MAISON_STORY: MaisonStory = {
   history: [{ year: '1924', milestone: 'The First Atelier', description: 'Founded in Paris.' }],
   philosophy: 'Luxury is human brilliance.',
   craftsmanship: [{ title: 'Haute Couture', description: 'Hand-sewn.', imageUrl: 'https://picsum.photos/seed/craft-1/800/1000' }],
-  sustainability: 'Preserving the earth.'
+  sustainability: 'Preserving the earth.',
+  institutionalCharter: 'Our mission is to maintain the standard of the absolute in every artifact we curate.'
 };
 
 export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {

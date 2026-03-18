@@ -7,13 +7,13 @@ import { COLLECTIONS, COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
-  BookOpen, 
-  Gem, 
-  Watch, 
-  Shirt, 
   ChevronRight,
   Sparkles,
-  Crown
+  Crown,
+  Shirt,
+  Gem,
+  Watch,
+  Award
 } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
@@ -29,15 +29,12 @@ export default function HomePage() {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
 
-  const latestEditorial = editorials.find(ed => ed.country === countryCode) || editorials[0];
-  const featuredCollections = COLLECTIONS.slice(0, 3);
-
   useEffect(() => {
     async function loadRecs() {
       try {
         const scenario = activeVip 
-          ? `VIP curation for ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on heritage and high-value artifacts.`
-          : `Luxury discovery for a new client in ${currentCountry.name}. Seasonal and iconic pieces.`;
+          ? `Private curation for elite client ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on high-value institutional artifacts.`
+          : `Luxury discovery for a new connoisseur in ${currentCountry.name}. Seasonal heritage pieces.`;
 
         const res = await generateProductRecommendations({ scenario });
         setRecommendations(res.recommendations.slice(0, 3));
@@ -52,10 +49,11 @@ export default function HomePage() {
 
   return (
     <div className="space-y-0 bg-background min-h-screen pb-40 animate-fade-in">
+      {/* Hero: Institutional Authority */}
       <section className="relative h-[90vh] w-full flex items-end overflow-hidden">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
-          alt="Spring Collector's Auction"
+          alt="Maison Amarisé Heritage Auction"
           fill
           className="object-cover animate-slow-zoom"
           priority
@@ -65,14 +63,14 @@ export default function HomePage() {
           <div className="space-y-8 max-w-3xl">
             <div className="space-y-2">
               <span className="text-[10px] font-bold tracking-[0.6em] uppercase opacity-80">
-                Institutional Event
+                Institutional Acquisition House
               </span>
               <h1 className="text-7xl md:text-[110px] font-headline font-medium leading-[0.85] tracking-tighter">
-                The Archive <br /> Registry
+                The Heritage <br /> Registry
               </h1>
             </div>
             <p className="text-xl md:text-2xl font-light italic opacity-90 max-w-lg leading-relaxed">
-              Curating high-value artifacts from the founding 1924 collections. Available for private acquisition only.
+              Managing the private transfer of high-value artifacts since 1924. Available via curatorial verification only.
             </p>
             <div className="pt-6">
               <Link href={`/${countryCode}/buying-guide`}>
@@ -90,11 +88,12 @@ export default function HomePage() {
           href={`/${countryCode}/category/hermes`} 
           className="text-white text-[9px] font-bold tracking-[0.4em] uppercase hover:text-secondary transition-colors"
         >
-          Specialist Access: Private Hermès Birkin Acquisition Flow Now Active
+          Specialist Access: Private Acquisition Flow for the 1924 Heritage Series Now Active
         </Link>
       </section>
 
-      <section className="container mx-auto px-12 py-40 max-w-[1600px]">
+      {/* Narrative: Institutional Voice */}
+      <section className="container mx-auto px-12 py-48 max-w-[1600px]">
         <div className="flex flex-col lg:flex-row items-center gap-24 lg:gap-40">
           <div className="lg:w-1/2 relative aspect-[4/5] w-full overflow-hidden shadow-luxury group">
             <Image 
@@ -102,18 +101,17 @@ export default function HomePage() {
               alt="Maison Mastery" 
               fill 
               className="object-cover transition-transform duration-[3s] group-hover:scale-105"
-              data-ai-hint="fashion atelier"
             />
           </div>
           <div className="lg:w-1/2 space-y-10 text-center lg:text-left">
             <div className="space-y-4">
-              <span className="text-secondary text-[10px] font-bold tracking-[0.5em] uppercase">The Maison Voice</span>
+              <span className="text-secondary text-[10px] font-bold tracking-[0.5em] uppercase">The Maison Intelligence</span>
               <h2 className="text-5xl md:text-7xl font-headline font-medium italic text-gray-900 tracking-tight leading-tight">
-                The Pulse <br /> of Mastery
+                The Standard <br /> of the Absolute
               </h2>
             </div>
             <p className="text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l-2 border-secondary/20 pl-10">
-              "Beyond the object lies the provenance. As a private acquisition house since 1924, we believe in the dialogue between the master's hand and the collector's soul."
+              "Beyond the artifact lies the provenance. As an institutional acquisition house, our dialogue is between the master's legacy and the discerning collector's soul."
             </p>
             <div className="pt-6">
               <Link href={`/${countryCode}/about`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2">
@@ -124,30 +122,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="space-y-40">
+      <div className="space-y-48">
+        {/* Departments: Professional Categorization */}
         <section className="container mx-auto px-12 max-w-[1600px]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
             <DepartmentCard 
               icon={<Shirt className="w-6 h-6" />} 
               title="Haute Couture" 
-              desc="Bespoke tailoring and archival runway assets."
+              desc="Archival runway assets and bespoke tailoring."
               href={`/${countryCode}/category/apparel`}
             />
             <DepartmentCard 
               icon={<Gem className="w-6 h-6" />} 
               title="High Jewelry" 
-              desc="Museum-grade stones and hand-sculpted gold."
+              desc="Ethically audited rare gems and hand-sculpted gold."
               href={`/${countryCode}/category/jewelry`}
             />
             <DepartmentCard 
               icon={<Watch className="w-6 h-6" />} 
               title="Heritage Complications" 
-              desc="Swiss horological secrets and investment pieces."
-              href={`/${countryCode}/category/timepieces`}
+              desc="Swiss-certified horological artifacts for collectors."
+              href={`/${countryCode}/category/watches`}
             />
           </div>
         </section>
 
+        {/* Pause Moment: Architecture */}
         <section className="relative h-[60vh] w-full flex items-center overflow-hidden bg-ivory">
           <div className="absolute right-0 top-0 w-2/3 h-full overflow-hidden">
             <Image 
@@ -155,34 +155,34 @@ export default function HomePage() {
               alt="Atelier Silence" 
               fill 
               className="object-cover opacity-40 grayscale"
-              data-ai-hint="minimal architecture"
             />
           </div>
           <div className="container mx-auto px-12 relative z-10 max-w-[1600px]">
             <div className="max-w-2xl space-y-8">
-              <h2 className="text-6xl md:text-8xl font-headline font-medium italic text-black leading-none">Architecture <br /> of Rarity</h2>
+              <h2 className="text-6xl md:text-8xl font-headline font-medium italic text-black leading-none">The Luxury <br /> of Silence</h2>
               <p className="text-lg text-gray-600 font-light italic max-w-md">
-                Exploring the intervals where craftsmanship transforms into institutional legacy.
+                Refining the intervals where craftsmanship transforms into a global institutional legacy.
               </p>
             </div>
           </div>
         </section>
 
+        {/* Curation: Series Edit */}
         <section className="container mx-auto px-12 py-12 max-w-[1600px]">
           <div className="flex flex-col items-center text-center space-y-6 mb-24">
-             <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Market Intelligence</span>
-             <h2 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900">The Series Edit</h2>
+             <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Market Curation</span>
+             <h2 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900">Institutional Edits</h2>
              <div className="w-12 h-px bg-secondary" />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {featuredCollections.map((col) => (
+            {COLLECTIONS.slice(0, 3).map((col) => (
               <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
                 <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-105 group-hover:bg-ivory">
                   {col.name} Archive
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
                 <div className="absolute inset-0 flex flex-col items-center justify-end p-16 text-center space-y-4">
-                  <span className="text-secondary text-[9px] font-bold tracking-[0.5em] uppercase">Archive Only</span>
+                  <span className="text-secondary text-[9px] font-bold tracking-[0.5em] uppercase">Archive Registry Only</span>
                   <h3 className="text-3xl font-headline font-bold text-white italic">{col.name}</h3>
                   <div className="flex items-center text-white text-[9px] font-bold tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
                     Explore Series <ArrowRight className="ml-2 w-3 h-3" />
@@ -193,19 +193,20 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Private Salon: High Intent Recs */}
         <section className="container mx-auto px-12 py-24 max-w-[1600px]">
           <div className="flex flex-col lg:flex-row items-end justify-between mb-24 gap-8">
             <div className="space-y-4">
                <div className="flex items-center space-x-3">
                   <Crown className="w-5 h-5 text-secondary" />
-                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">The Private Salon</span>
+                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">The Private Acquisition Salon</span>
                </div>
-               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">Private Acquisition Only</h2>
-               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">Collector Verification Required for {currentCountry.name}</p>
+               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">Discreet Allocation Only</h2>
+               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">Curatorial Verification Required for {currentCountry.name} Market</p>
             </div>
             <Link href={`/${countryCode}/wishlist`}>
               <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors">
-                View Private Selection <ArrowRight className="ml-2 w-3 h-3" />
+                View Personal Registry <ArrowRight className="ml-2 w-3 h-3" />
               </Button>
             </Link>
           </div>
@@ -221,10 +222,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="py-40 text-center bg-ivory">
+        {/* Heritage Trust Section */}
+        <section className="py-48 text-center bg-ivory">
           <div className="container mx-auto px-12 max-w-[1600px] flex flex-col items-center space-y-12">
+            <Award className="w-12 h-12 text-secondary mb-4" />
             <h3 className="text-4xl md:text-5xl font-headline font-medium italic text-black tracking-widest leading-relaxed max-w-4xl mx-auto">
-              "A curated world of rare expressions, <br /> defined by the absolute."
+              "A global network of rare artifacts, <br /> audited for provenance and permanence."
             </h3>
             <div className="w-16 h-px bg-secondary" />
             <Link href={`/${countryCode}/appointments`}>
@@ -235,21 +238,22 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Final Registry Invitation */}
         <section className="bg-white py-48 text-center border-t border-gray-100">
           <div className="max-w-3xl mx-auto space-y-16 px-12">
              <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
                 <Sparkles className="w-6 h-6 text-secondary" />
              </div>
              <div className="space-y-6">
-                <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Collector Registry</h3>
+                <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Institutional Registry</h3>
                 <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
-                  Receive private invitations to seasonal launches and digital premieres from the Maison Amarisé archives.
+                  Join our verified collector network for private acquisition invitations and digital previews of the Maison archives.
                 </p>
              </div>
              <div className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors">
                 <input 
                   type="email" 
-                  placeholder="YOUR EMAIL ADDRESS" 
+                  placeholder="ACQUISITION EMAIL" 
                   className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
                 />
                 <button className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4">
@@ -257,7 +261,7 @@ export default function HomePage() {
                 </button>
              </div>
              <p className="text-[8px] text-gray-300 uppercase tracking-[0.4em] font-medium">
-               By submitting, you agree to our Private Heritage Charter.
+               Audited compliance with the Global Heritage Responsibility Charter.
              </p>
           </div>
         </section>
@@ -277,7 +281,7 @@ function DepartmentCard({ icon, title, desc, href }: { icon: React.ReactNode, ti
         <p className="text-[11px] text-gray-400 font-light leading-relaxed px-6 uppercase tracking-wider">{desc}</p>
       </div>
       <div className="pt-4 flex items-center justify-center text-[9px] font-bold tracking-[0.4em] uppercase text-gray-300 group-hover:text-black opacity-0 group-hover:opacity-100 transition-all">
-        Consult Specialist <ChevronRight className="w-3 h-3 ml-1" />
+        Speak with a Specialist <ChevronRight className="w-3 h-3 ml-1" />
       </div>
     </Link>
   );

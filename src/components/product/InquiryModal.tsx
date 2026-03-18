@@ -48,7 +48,7 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
       serviceId: service?.id,
       customerName: formData.name,
       email: formData.email,
-      country: 'Market Registry Verified',
+      country: 'Market Verified',
       budgetRange: formData.budget as any,
       intent: formData.intent as any,
       message: formData.message,
@@ -60,8 +60,8 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
 
     setIsSubmitted(true);
     toast({
-      title: "Acquisition Request Transmitted",
-      description: "A specialist curator has been assigned to your inquiry.",
+      title: "Acquisition Intent Received",
+      description: "A specialist curator has been assigned to your profile.",
     });
   };
 
@@ -74,25 +74,25 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
           </div>
           
           <div className="space-y-8">
-            <h2 className="text-5xl font-headline font-bold italic tracking-tight text-gray-900 leading-tight">Request Received</h2>
+            <h2 className="text-5xl font-headline font-bold italic tracking-tight text-gray-900 leading-tight">Registry Verified</h2>
             <div className="prose prose-lg text-gray-600 font-light italic leading-relaxed text-left border-l-2 border-plum/20 pl-8 bg-ivory/50 p-8">
               <p className="mb-4">"Thank you for your inquiry.</p>
-              <p className="mb-4">Your request has been personally reviewed by our acquisition desk.</p>
-              <p className="mb-4 font-normal">Before we proceed, I would like to understand your intent more precisely — are you looking for:</p>
+              <p className="mb-4">Your request has been personally reviewed by our curatorial desk.</p>
+              <p className="mb-4 font-normal">Before we proceed, a specialist will review your profile to align with the appropriate acquisition series — are you focusing on:</p>
               <ul className="list-disc pl-5 space-y-2 mb-4">
-                <li>A collectible investment piece</li>
-                <li>A personal statement acquisition</li>
-                <li>Or a rare archival find</li>
+                <li>Institutional portfolio growth</li>
+                <li>Personal heritage acquisition</li>
+                <li>Exclusive archival sourcing</li>
               </ul>
-              <p className="mb-4">We curate differently based on purpose.</p>
+              <p className="mb-4">We curate differently based on purpose and provenance.</p>
               <p className="font-bold uppercase tracking-widest text-[10px] text-plum">— AMARISÉ Curatorial Desk"</p>
             </div>
           </div>
 
           <div className="pt-4 flex flex-col items-center space-y-6">
-            <p className="text-xs text-gray-400 italic">A specialist curator will contact you via {formData.contactMethod} shortly.</p>
+            <p className="text-xs text-gray-400 italic">Expect a discreet response via {formData.contactMethod} within 24 business hours.</p>
             <Button onClick={onClose} className="w-full h-16 bg-black text-white hover:bg-plum rounded-none text-[10px] font-bold tracking-[0.4em] uppercase transition-all shadow-xl">
-              CONTINUE DISCOVERY
+              CONTINUE ARCHIVE DISCOVERY
             </Button>
           </div>
         </DialogContent>
@@ -112,19 +112,19 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
                <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Acquisition Desk</span>
             </div>
             <h2 className="text-5xl font-headline font-bold italic leading-[0.9] text-gray-900 tracking-tighter">
-              Private <br /> Acquisition
+              Private <br /> Curation
             </h2>
             <div className="h-px w-16 bg-plum" />
           </div>
 
           <p className="text-lg text-gray-500 font-light leading-relaxed italic">
-            "We believe the acquisition of an artifact is a dialogue. Our curators provide a discreet, personalized experience for the world's most discerning collectors."
+            "Acquisition is a dialogue. Our curatorial specialists maintain the highest standard of discretion for the world's most serious collectors."
           </p>
 
           <div className="space-y-8 pt-4">
-            <FeatureItem icon={<Globe className="w-5 h-5 text-gold" />} label="Global Sourcing Network" />
-            <FeatureItem icon={<ShieldCheck className="w-5 h-5 text-gold" />} label="Institutional Responsibility" />
-            <FeatureItem icon={<MessageSquare className="w-5 h-5 text-gold" />} label="Bespoke Curatorial Guidance" />
+            <FeatureItem icon={<Globe className="w-5 h-5 text-gold" />} label="Global Sourcing Matrix" />
+            <FeatureItem icon={<ShieldCheck className="w-5 h-5 text-gold" />} label="Institutional Trust" />
+            <FeatureItem icon={<MessageSquare className="w-5 h-5 text-gold" />} label="Bespoke Private Dialogue" />
           </div>
 
           {product && (
@@ -137,67 +137,67 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
 
         <div className="w-full md:w-[60%] p-16 space-y-10 bg-white">
           <div className="space-y-2">
-             <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Collector Registration</h3>
-             <p className="text-sm font-light italic">Please provide your details for private verification.</p>
+             <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Registry Entry</h3>
+             <p className="text-sm font-light italic">Please provide verified credentials for specialist review.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-3">
-                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Full Name</Label>
+                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Legal Name</Label>
                 <Input required className="h-12 rounded-none bg-ivory/30 border-border focus:border-plum transition-colors px-4" placeholder="Julian Vandervilt" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
               <div className="space-y-3">
-                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Email Address</Label>
+                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Verified Email</Label>
                 <Input required type="email" className="h-12 rounded-none bg-ivory/30 border-border focus:border-plum transition-colors px-4" placeholder="j.vandervilt@lux.net" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-3">
-                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Acquisition Intent</Label>
+                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Strategic Intent</Label>
                 <Select value={formData.intent} onValueChange={v => setFormData({...formData, intent: v as any})}>
                   <SelectTrigger className="rounded-none bg-ivory/30 border-border h-12 px-4 focus:ring-plum">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-border shadow-luxury">
-                    <SelectItem value="Personal" className="text-[10px] uppercase font-bold">Personal Acquisition</SelectItem>
-                    <SelectItem value="Investment" className="text-[10px] uppercase font-bold">Strategic Investment</SelectItem>
-                    <SelectItem value="Collector" className="text-[10px] uppercase font-bold">Private Curation</SelectItem>
+                    <SelectItem value="Personal" className="text-[10px] uppercase font-bold">Heritage Acquisition</SelectItem>
+                    <SelectItem value="Investment" className="text-[10px] uppercase font-bold">Portfolio Curation</SelectItem>
+                    <SelectItem value="Collector" className="text-[10px] uppercase font-bold">Archival Research</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Market Bracket</Label>
+                <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Allocation Bracket</Label>
                 <Select value={formData.budget} onValueChange={v => setFormData({...formData, budget: v as any})}>
                   <SelectTrigger className="rounded-none bg-ivory/30 border-border h-12 px-4 focus:ring-plum">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-border shadow-luxury">
-                    <SelectItem value="Tier 3" className="text-[10px] uppercase font-bold">Below $10,000</SelectItem>
-                    <SelectItem value="Tier 2" className="text-[10px] uppercase font-bold">$10,000 - $50,000</SelectItem>
-                    <SelectItem value="Tier 1" className="text-[10px] uppercase font-bold">$50,000+</SelectItem>
+                    <SelectItem value="Tier 3" className="text-[10px] uppercase font-bold">Initial Discovery</SelectItem>
+                    <SelectItem value="Tier 2" className="text-[10px] uppercase font-bold">Strategic Allocation</SelectItem>
+                    <SelectItem value="Tier 1" className="text-[10px] uppercase font-bold">Institutional Level</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-3">
-              <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Discreet Message (Optional)</Label>
-              <Textarea className="rounded-none bg-ivory/30 border-border min-h-[120px] text-xs px-4 py-4 italic font-light focus:border-plum" placeholder="Specify requirements, heritage preferences, or provenance inquiries..." value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
+              <Label className="text-[10px] uppercase tracking-widest font-bold text-gray-900">Discreet Brief</Label>
+              <Textarea className="rounded-none bg-ivory/30 border-border min-h-[120px] text-xs px-4 py-4 italic font-light focus:border-plum" placeholder="Detail your requirements, heritage preferences, or provenance inquiries..." value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
             </div>
 
             <div className="space-y-4 pt-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">PREFERRED DIALOGUE CHANNEL</p>
               <div className="flex space-x-6">
-                <ContactMethodBtn icon={<MessageSquare className="w-4 h-4" />} label="WhatsApp" active={formData.contactMethod === 'WhatsApp'} onClick={() => setFormData({...formData, contactMethod: 'WhatsApp'})} />
-                <ContactMethodBtn icon={<Mail className="w-4 h-4" />} label="Secure Email" active={formData.contactMethod === 'Email'} onClick={() => setFormData({...formData, contactMethod: 'Email'})} />
+                <ContactMethodBtn icon={<MessageSquare className="w-4 h-4" />} label="WhatsApp Concierge" active={formData.contactMethod === 'WhatsApp'} onClick={() => setFormData({...formData, contactMethod: 'WhatsApp'})} />
+                <ContactMethodBtn icon={<Mail className="w-4 h-4" />} label="Secure Portal" active={formData.contactMethod === 'Email'} onClick={() => setFormData({...formData, contactMethod: 'Email'})} />
               </div>
             </div>
 
             <div className="pt-6">
               <Button type="submit" className="w-full h-20 bg-plum text-white hover:bg-black rounded-none text-[11px] font-bold tracking-[0.5em] uppercase transition-all shadow-2xl shadow-plum/20">
-                <Lock className="w-4 h-4 mr-4" /> TRANSMIT ACQUISITION REQUEST <ArrowRight className="ml-4 w-4 h-4" />
+                <Lock className="w-4 h-4 mr-4" /> TRANSMIT ACQUISITION BRIEF <ArrowRight className="ml-4 w-4 h-4" />
               </Button>
             </div>
           </form>
