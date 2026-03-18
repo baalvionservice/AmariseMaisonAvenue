@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -80,7 +79,7 @@ export default function BuyingGuideDetailPage() {
             },
             "publisher": {
               "@type": "Organization",
-              "name": "AMARISÉ Luxe"
+              "name": "AMARISÉ MAISON AVENUE"
             },
             "datePublished": guide.date
           })
