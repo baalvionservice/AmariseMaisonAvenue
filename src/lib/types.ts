@@ -290,6 +290,39 @@ export interface BrandConfig {
   enabled: boolean;
 }
 
+// --- AI AUTOPILOT SYSTEM ---
+
+export type AIAutomationLevel = 'manual' | 'assisted' | 'auto';
+
+export interface AIModuleStatus {
+  id: string;
+  name: string;
+  enabled: boolean;
+  level: AIAutomationLevel;
+  lastActionAt?: string;
+}
+
+export interface AIActionLog {
+  id: string;
+  moduleId: string;
+  action: string;
+  status: 'executed' | 'suggested' | 'failed';
+  timestamp: string;
+  details: string;
+  outcome?: string;
+}
+
+export interface AISuggestion {
+  id: string;
+  moduleId: string;
+  type: 'content' | 'sales' | 'seo' | 'strategy';
+  title: string;
+  description: string;
+  data: any;
+  status: 'pending' | 'approved' | 'rejected';
+  timestamp: string;
+}
+
 // --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {

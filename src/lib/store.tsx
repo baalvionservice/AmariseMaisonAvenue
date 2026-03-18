@@ -37,7 +37,11 @@ import {
   AutomationRule,
   CountryConfig,
   BrandConfig,
-  CountryCode
+  CountryCode,
+  AIModuleStatus,
+  AIActionLog,
+  AISuggestion,
+  AIAutomationLevel
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -92,8 +96,11 @@ interface AppContextType {
   // SEO State
   seoRegistry: SEOMetadata[];
   
-  // Automation State
+  // Automation & AI State
   automationRules: AutomationRule[];
+  aiModules: AIModuleStatus[];
+  aiLogs: AIActionLog[];
+  aiSuggestions: AISuggestion[];
   
   // Logistics & Admin State
   cart: CartItem[];
@@ -151,6 +158,12 @@ interface AppContextType {
   toggleRule: (id: string) => void;
   upsertRule: (rule: AutomationRule) => void;
 
+  // AI Actions
+  updateAIModule: (id: string, enabled: boolean, level: AIAutomationLevel) => void;
+  addAILog: (log: AIActionLog) => void;
+  upsertAISuggestion: (suggestion: AISuggestion) => void;
+  updateSuggestionStatus: (id: string, status: AISuggestion['status']) => void;
+
   // Global Actions
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -184,7 +197,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'private-salon', title: 'Private Acquisition Salon', visible: true, featured: true, brandId: activeBrandId }
   ]);
   
-  // Ensure products/collections/etc have brandId and country filters
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, isGlobal: true })));
   const [collections, setCollections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
@@ -203,6 +215,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub for US collectors.', keywords: 'luxury, heritage, acquisition', h1: 'The Heritage Registry', brandId: activeBrandId, isGlobal: false },
     { id: 'home-uk', path: '/uk', title: 'AMARISÉ | London Heritage Souce', description: 'Traditional craftsmanship for the UK market.', keywords: 'london luxury, bond street', h1: 'The London Archive', brandId: activeBrandId, isGlobal: false }
   ]);
+
+  // AI Autopilot State
+  const [aiModules, setAiModules] = useState<AIModuleStatus[]>([
+    { id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' },
+    { id: 'ai-content', name: 'AI Content Engine', enabled: true, level: 'manual' },
+    { id: 'ai-seo', name: 'AI SEO Optimizer', enabled: false, level: 'manual' },
+    { id: 'ai-outreach', name: 'AI Outreach Agent', enabled: true, level: 'manual' },
+    { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' }
+  ]);
+  const [aiLogs, setAiLogs] = useState<AIActionLog[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
 
   // Automation Module
   const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
@@ -323,6 +346,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return idx > -1 ? prev.map(item => item.id === t.id ? t : item) : [...prev, t];
   });
 
+  // --- AI Actions ---
+  const updateAIModule = (id: string, enabled: boolean, level: AIAutomationLevel) => {
+    setAiModules(prev => prev.map(m => m.id === id ? { ...m, enabled, level } : m));
+    recordLog(`AI Module ${id} updated to ${level}`, 'AI Autopilot');
+  };
+
+  const addAILog = (log: AIActionLog) => setAiLogs(prev => [log, ...prev].slice(0, 50));
+
+  const upsertAISuggestion = (s: AISuggestion) => setAiSuggestions(prev => {
+    const idx = prev.findIndex(item => item.id === s.id);
+    return idx > -1 ? prev.map(item => item.id === s.id ? s : item) : [s, ...prev];
+  });
+
+  const updateSuggestionStatus = (id: string, status: AISuggestion['status']) => 
+    setAiSuggestions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
+
   // --- Automation Actions ---
   const toggleRule = (id: string) => setAutomationRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
   const upsertRule = (r: AutomationRule) => setAutomationRules(prev => {
@@ -355,6 +394,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     countryConfigs, brandConfigs, activeBrandId,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
+    aiModules, aiLogs, aiSuggestions,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
@@ -362,9 +402,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage, updateLeadTier, addInquiryNote,
     upsertSEOMetadata, upsertTemplate, toggleRule, upsertRule,
+    updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, updateQuantity, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog
-  }), [countryConfigs, brandConfigs, activeBrandId, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [countryConfigs, brandConfigs, activeBrandId, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

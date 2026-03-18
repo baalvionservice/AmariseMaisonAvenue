@@ -20,7 +20,8 @@ import {
   History,
   ActivitySquare,
   DollarSign,
-  Crown
+  Crown,
+  BrainCircuit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export default function SuperAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <AdminNavItem icon={<LayoutDashboard />} label="Intelligence" active={true} href="/admin" />
+          <AdminNavItem icon={<BrainCircuit />} label="AI Autopilot" active={false} href="/admin/ai-dashboard" />
           <AdminNavItem icon={<LayoutTemplate />} label="Content (CMS)" active={false} href="/admin/content" />
           <AdminNavItem icon={<Target />} label="Sales (CRM)" active={false} href="/admin/sales" />
           <AdminNavItem icon={<Globe />} label="SEO Authority" active={false} href="/admin/seo" />
@@ -96,10 +98,10 @@ export default function SuperAdminPanel() {
                 <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of business modules</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-6">
+                <ModuleStatus label="AI Autopilot" status="Active" progress={88} />
                 <ModuleStatus label="Atelier CMS" status="Synchronized" progress={100} />
                 <ModuleStatus label="Acquisition CRM" status="Live" progress={100} />
                 <ModuleStatus label="SEO Authority Matrix" status="Indexing" progress={92} />
-                <ModuleStatus label="Logic Automation" status="Active" progress={100} />
               </CardContent>
             </Card>
 
@@ -108,8 +110,8 @@ export default function SuperAdminPanel() {
               <div className="relative z-10 space-y-6">
                 <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
                 <div className="space-y-4">
-                  <Link href="/admin/content" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Update Catalog</p>
+                  <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
                   </Link>
                   <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
