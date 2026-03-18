@@ -184,12 +184,12 @@ export interface PrivateInquiry {
   intent: 'Collector' | 'Personal' | 'Investment';
   message?: string;
   contactMethod: 'WhatsApp' | 'Email';
-  status: 'new' | 'contacted' | 'closed';
+  status: 'new' | 'contacted' | 'qualifying' | 'presenting' | 'closing' | 'won' | 'lost';
   leadTier: 1 | 2 | 3;
   timestamp: string;
 }
 
-export interface ConciergeMessage {
+export interface CuratorMessage {
   id: string;
   sender: 'curator' | 'client';
   text: string;
@@ -199,8 +199,15 @@ export interface ConciergeMessage {
 export interface LeadConversation {
   id: string;
   inquiryId: string;
-  messages: ConciergeMessage[];
+  messages: CuratorMessage[];
   status: 'active' | 'archived';
+}
+
+export interface SalesScript {
+  id: string;
+  stage: PrivateInquiry['status'];
+  triggerKeywords?: string[];
+  template: string;
 }
 
 export interface SocialMetrics {

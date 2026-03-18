@@ -14,9 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useAppStore } from '@/lib/store';
+import { useSalesSystem } from '@/hooks/use-sales-system';
 import { useToast } from '@/hooks/use-toast';
 import { Product, MaisonService } from '@/lib/types';
+import { useParams, useRouter } from 'next/navigation';
 
 interface InquiryModalProps {
   isOpen: boolean;
@@ -26,10 +27,11 @@ interface InquiryModalProps {
 }
 
 export function InquiryModal({ isOpen, onClose, product, service }: InquiryModalProps) {
-  const { upsertPrivateInquiry } = useAppStore();
+  const { createInitialInquiry } = useSalesSystem();
   const { toast } = useToast();
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const { country } = useParams();
+  const router = useRouter();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,63 +44,29 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    upsertPrivateInquiry({
-      id: `inq-${Date.now()}`,
+    const inquiryId = createInitialInquiry({
       productId: product?.id,
       serviceId: service?.id,
       customerName: formData.name,
       email: formData.email,
-      country: 'Market Verified',
+      country: (country as string) || 'Global',
       budgetRange: formData.budget as any,
       intent: formData.intent as any,
       message: formData.message,
-      contactMethod: formData.contactMethod as any,
-      status: 'new',
-      leadTier: 3, 
-      timestamp: new Date().toISOString()
+      contactMethod: formData.contactMethod as any
     });
 
-    setIsSubmitted(true);
     toast({
       title: "Acquisition Intent Received",
-      description: "A specialist curator has been assigned to your profile.",
+      description: "A specialist curator has been assigned. Redirecting to secure dialogue...",
     });
+
+    // Close and redirect to chat
+    setTimeout(() => {
+      onClose();
+      router.push(`/${country || 'us'}/inquiry/${inquiryId}`);
+    }, 1500);
   };
-
-  if (isSubmitted) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl bg-white p-16 text-center space-y-12 rounded-none border-none shadow-2xl animate-fade-in">
-          <div className="w-24 h-24 bg-plum/5 rounded-full flex items-center justify-center mx-auto border border-plum/10">
-            <ShieldCheck className="w-12 h-12 text-plum" />
-          </div>
-          
-          <div className="space-y-8">
-            <h2 className="text-5xl font-headline font-bold italic tracking-tight text-gray-900 leading-tight">Registry Verified</h2>
-            <div className="prose prose-lg text-gray-600 font-light italic leading-relaxed text-left border-l-2 border-plum/20 pl-8 bg-ivory/50 p-8">
-              <p className="mb-4">"Thank you for your inquiry.</p>
-              <p className="mb-4">Your request has been personally reviewed by our curatorial desk.</p>
-              <p className="mb-4 font-normal">Before we proceed, a specialist will review your profile to align with the appropriate acquisition series — are you focusing on:</p>
-              <ul className="list-disc pl-5 space-y-2 mb-4">
-                <li>Institutional portfolio growth</li>
-                <li>Personal heritage acquisition</li>
-                <li>Exclusive archival sourcing</li>
-              </ul>
-              <p className="mb-4">We curate differently based on purpose and provenance.</p>
-              <p className="font-bold uppercase tracking-widest text-[10px] text-plum">— AMARISÉ Curatorial Desk"</p>
-            </div>
-          </div>
-
-          <div className="pt-4 flex flex-col items-center space-y-6">
-            <p className="text-xs text-gray-400 italic">Expect a discreet response via {formData.contactMethod} within 24 business hours.</p>
-            <Button onClick={onClose} className="w-full h-16 bg-black text-white hover:bg-plum rounded-none text-[10px] font-bold tracking-[0.4em] uppercase transition-all shadow-xl">
-              CONTINUE ARCHIVE DISCOVERY
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

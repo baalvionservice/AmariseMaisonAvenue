@@ -17,7 +17,8 @@ import {
   Lock,
   Sparkles,
   Info,
-  Crown
+  Crown,
+  MessageSquare
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -200,7 +201,7 @@ export default function ProductPage() {
                   className="h-16 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 hover:text-white transition-all"
                   onClick={() => setIsInquiryOpen(true)}
                 >
-                  <Sparkles className="w-4 h-4 mr-3" /> CURATORIAL DIALOGUE
+                  <MessageSquare className="w-4 h-4 mr-3" /> SPEAK WITH A CURATOR
                 </Button>
                 <Button 
                   variant="outline" 

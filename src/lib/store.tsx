@@ -29,7 +29,8 @@ import {
   Affiliate,
   ReturnRequest,
   PrivateInquiry,
-  LeadConversation
+  LeadConversation,
+  CuratorMessage
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -127,6 +128,7 @@ interface AppContextType {
   createInvoice: (invoice: Invoice) => void;
   upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
   updateInquiryStatus: (id: string, status: PrivateInquiry['status']) => void;
+  addLeadMessage: (inquiryId: string, text: string, sender: 'curator' | 'client') => void;
   
   // Support Actions
   updateTicketStatus: (ticketId: string, status: SupportTicket['status']) => void;
@@ -429,9 +431,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       id: `conv-${enrichedInquiry.id}`,
       inquiryId: enrichedInquiry.id,
       status: 'active',
-      messages: [
-        { id: `m-${Date.now()}`, sender: 'client', text: inquiry.message || 'Interested in private acquisition.', timestamp: new Date().toISOString() }
-      ]
+      messages: []
     };
     setLeadConversations(prev => [newConv, ...prev]);
     recordLog(`New Acquisition Lead: ${inquiry.customerName}`, 'Sales Desk');
@@ -439,6 +439,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => {
     setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
+  };
+
+  const addLeadMessage = (inquiryId: string, text: string, sender: 'curator' | 'client') => {
+    setLeadConversations(prev => prev.map(c => {
+      if (c.inquiryId === inquiryId) {
+        const newMessage: CuratorMessage = {
+          id: `msg-${Date.now()}`,
+          sender,
+          text,
+          timestamp: new Date().toISOString()
+        };
+        return { ...c, messages: [...c.messages, newMessage] };
+      }
+      return c;
+    }));
   };
 
   const updateTicketStatus = (id: string, status: SupportTicket['status']) => {
@@ -567,6 +582,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     createInvoice,
     upsertPrivateInquiry,
     updateInquiryStatus,
+    addLeadMessage,
     updateGlobalSettings,
     updateTicketStatus,
     assignTicket,
