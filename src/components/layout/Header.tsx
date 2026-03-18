@@ -47,6 +47,7 @@ export const Header = () => {
 
   const navLinks = [
     { name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals`, mega: true },
+    { name: 'COLLECTIONS', href: `/${countryCode}/collections` },
     { name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
     { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
     { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
