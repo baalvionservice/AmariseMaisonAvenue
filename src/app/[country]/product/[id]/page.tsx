@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -88,6 +87,36 @@ export default function ProductPage() {
 
   return (
     <div className="bg-ivory min-h-screen">
+      {/* Structured Data: SEO Schema.org Product */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.imageUrl,
+            "description": aiDescription || "Luxury artisanal artifact from Maison Amarisé.",
+            "brand": {
+              "@type": "Brand",
+              "name": "AMARISÉ MAISON AVENUE"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`,
+              "priceCurrency": currentCountry.currency,
+              "price": product.basePrice,
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating,
+              "reviewCount": product.reviewsCount
+            }
+          })
+        }}
+      />
+
       <div className="container mx-auto px-6 py-12">
         <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground font-bold">
           <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Maison</Link>
