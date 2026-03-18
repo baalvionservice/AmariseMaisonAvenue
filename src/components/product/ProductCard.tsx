@@ -18,7 +18,7 @@ interface ProductCardProps {
 
 /**
  * ProductCard: Optimized for elite high-ticket sales.
- * Replaces direct "Add to Cart" with Private Acquisition flow.
+ * Implements Price-on-Request gating for luxury artifacts.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -74,7 +74,6 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
            <span className="text-[9px] font-bold text-gray-900 tracking-tighter">{metrics.likes.toLocaleString()}</span>
         </div>
 
-        {/* Sales Driven Reveal Footer */}
         <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
           <Button 
             className="w-full h-14 rounded-none bg-plum text-white hover:bg-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"

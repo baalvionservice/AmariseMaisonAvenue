@@ -4,9 +4,7 @@
 
 @layer base {
   :root {
-    /* Pure White Background */
     --background: 0 0% 100%;
-    /* Deep Black Text */
     --foreground: 0 0% 0%;
     
     --card: 0 0% 100%;
@@ -15,26 +13,21 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
     
-    /* Solid Black Primary */
     --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
     
-    /* Gold Accent/Secondary */
     --secondary: 45 64% 52%;
     --secondary-foreground: 0 0% 100%;
     
-    /* Very Light Grey Muted */
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
     
-    /* Subtle Gold Accent */
     --accent: 45 64% 95%;
     --accent-foreground: 0 0% 0%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     
-    /* Clean Borders */
     --border: 0 0% 90%;
     --input: 0 0% 90%;
     --ring: 45 64% 52%;
@@ -82,7 +75,6 @@
   animation: slowZoom 20s ease-in-out infinite alternate;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -115,4 +107,8 @@
 
 .tab-trigger {
   @apply text-[10px] font-bold uppercase tracking-[0.3em] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary transition-all pb-4 rounded-none h-auto bg-transparent;
+}
+
+button, .button {
+  @apply rounded-none transition-all duration-500;
 }

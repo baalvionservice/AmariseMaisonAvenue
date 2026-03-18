@@ -96,7 +96,6 @@ export default function ProductPage() {
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-24">
-          {/* Main Visuals */}
           <div className="w-full lg:w-[55%] space-y-8">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
               <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
@@ -126,7 +125,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Acquisition Details */}
           <div className="w-full lg:w-[45%] space-y-12">
             <div className="space-y-8">
               <div className="flex items-center justify-between">
@@ -156,13 +154,11 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* High-Ticket Intelligence Block */}
             <div className="grid grid-cols-2 gap-6">
                <IntelligenceTile icon={<Award className="w-5 h-5" />} label="Collector Value" value={monetization.collectorValue || 'Signature Artifact'} />
                <IntelligenceTile icon={<TrendingUp className="w-5 h-5" />} label="Market Status" value={monetization.marketRange || 'Highly Resilient'} />
             </div>
 
-            {/* Primary Acquisition Actions */}
             <div className="space-y-6 pt-4">
               <Button 
                 size="lg" 
@@ -244,7 +240,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Resonance Section */}
         <section className="mt-60 border-t border-border pt-32">
           <div className="flex items-end justify-between mb-24">
             <div className="space-y-6">

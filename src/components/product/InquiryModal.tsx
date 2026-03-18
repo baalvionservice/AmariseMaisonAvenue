@@ -54,7 +54,7 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
       message: formData.message,
       contactMethod: formData.contactMethod as any,
       status: 'new',
-      leadTier: 3, // Calculated in store
+      leadTier: 3, 
       timestamp: new Date().toISOString()
     });
 
@@ -103,7 +103,6 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl bg-white p-0 overflow-hidden flex flex-col md:flex-row rounded-none border-none shadow-2xl animate-fade-in">
-        {/* Left: Branding & High-Ticket Context */}
         <div className="w-full md:w-[40%] bg-ivory p-12 space-y-12 flex flex-col justify-center border-r border-border relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-plum via-gold to-plum opacity-50" />
           
@@ -136,7 +135,6 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
           )}
         </div>
 
-        {/* Right: Lead Capture Form */}
         <div className="w-full md:w-[60%] p-16 space-y-10 bg-white">
           <div className="space-y-2">
              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Collector Registration</h3>

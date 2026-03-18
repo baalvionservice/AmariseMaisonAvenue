@@ -2,7 +2,7 @@ import { ProductExtended, MaisonService, MaisonReport, PrivateInquiry } from './
 
 /**
  * HIGH-TICKET MONETIZATION MOCK DATA
- * Isolated registry for high-value artifacts and premium services.
+ * Assigning Elite status to selected artifacts for ₹10L+ trust simulation.
  */
 
 export const PRODUCTS_EXTENDED: Record<string, Partial<ProductExtended>> = {
@@ -10,7 +10,7 @@ export const PRODUCTS_EXTENDED: Record<string, Partial<ProductExtended>> = {
     collectorValue: 'Exceptional',
     marketRange: '$12,000 - $15,000',
     investmentInsight: 'Artifacts from the 1924 founding series show a consistent 12% annual appreciation in the secondary market.',
-    scarcityTag: 'Only 1 available globally',
+    scarcityTag: 'Final Archive Piece',
     priceVisible: false
   },
   'prod-10': {
@@ -21,10 +21,10 @@ export const PRODUCTS_EXTENDED: Record<string, Partial<ProductExtended>> = {
     priceVisible: false
   },
   'prod-50': {
-    collectorValue: 'High',
+    collectorValue: 'Strategic',
     marketRange: '$8,000 - $10,000',
-    investmentInsight: 'Exotic leathers within the Heritage line maintain higher resale liquidity than seasonal counterparts.',
-    scarcityTag: 'Final Archive Piece',
+    investmentInsight: 'Exotic series within the Heritage line maintain higher resale liquidity than seasonal counterparts.',
+    scarcityTag: 'Only 1 available globally',
     priceVisible: true
   }
 };
