@@ -38,6 +38,13 @@ export const CATEGORIES: Category[] = [
 export const COLLECTIONS: Collection[] = [
   { id: 'heritage', name: 'The Heritage Line', description: 'Founding Year 1924.', imageUrl: '' },
   { id: 'spring-24', name: 'Spring Summer 2024', description: 'Mediterranean Dawn.', imageUrl: '' },
+  { id: 'prive', name: 'Maison Privé', description: 'VIP Exclusive artifacts.', imageUrl: '' },
+  { id: 'resort-24', name: 'Resort 2024', description: 'Coastal elegance.', imageUrl: '' },
+  { id: 'bridal', name: 'Couture Bridal', description: 'Forever heritage.', imageUrl: '' },
+  { id: 'mens-bespoke', name: 'Bespoke Tailoring', description: 'Architectural cuts.', imageUrl: '' },
+  { id: 'high-jewelry', name: 'Atelier Diamonds', description: 'Celestial light.', imageUrl: '' },
+  { id: 'accessories-24', name: 'The Silk Edit', description: 'Hand-painted archives.', imageUrl: '' },
+  { id: 'watches-collection', name: 'Horological Secrets', description: 'Eternal precision.', imageUrl: '' },
 ];
 
 export const COLORS = ['Ivory', 'Gold', 'Plum', 'Midnight', 'Emerald', 'Sapphire', 'Onyx'];
