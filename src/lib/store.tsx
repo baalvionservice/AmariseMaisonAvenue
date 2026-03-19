@@ -656,7 +656,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   });
   const updateSuggestionStatus = (id: string, status: AISuggestion['status']) => setAiSuggestions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
 
-  const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: currentUser?.name || 'System', action, module, timestamp: new Date().toISOString(), ipAddress: '127.0.0.1', severity, brandId: activeBrandId }, ...prev]);
+  const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: currentUser?.name || 'System', action, module, timestamp: new Date().toISOString(), ipAddress: 'Institutional Registry', severity, brandId: activeBrandId }, ...prev]);
   const addToCart = (product: Product) => setCart(prev => prev.find(item => item.id === product.id) ? prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item) : [...prev, { ...product, quantity: 1 }]);
   const removeFromCart = (productId: string) => setCart(prev => prev.filter(item => item.id !== productId));
   const toggleWishlist = (product: Product) => setWishlist(prev => prev.some(i => i.id === product.id) ? prev.filter(i => i.id !== product.id) : [...prev, product]);

@@ -224,8 +224,8 @@ export const INVOICES: Invoice[] = [
 ];
 
 export const AUDIT_LOGS: AuditLog[] = [
-  { id: 'log-1', adminId: 'adm-1', adminName: 'Maison CEO', action: 'Approved Vendor Geneva Horology', module: 'Vendor Management', timestamp: '2024-03-15T08:00:00Z', ipAddress: '192.168.1.1', severity: 'low' },
-  { id: 'log-2', adminId: 'adm-2', adminName: 'Operations Lead', action: 'Updated Global Tax Rules (UAE)', module: 'Website Settings', timestamp: '2024-03-15T07:45:00Z', ipAddress: '192.168.1.5', severity: 'medium' }
+  { id: 'log-1', adminId: 'adm-1', adminName: 'Maison CEO', action: 'Approved Vendor Geneva Horology', module: 'Vendor Management', timestamp: '2024-03-15T08:00:00Z', ipAddress: 'Institutional Node Alpha', severity: 'low' },
+  { id: 'log-2', adminId: 'adm-2', adminName: 'Operations Lead', action: 'Updated Global Tax Rules (UAE)', module: 'Website Settings', timestamp: '2024-03-15T07:45:00Z', ipAddress: 'Institutional Node Beta', severity: 'medium' }
 ];
 
 export const SUPPORT_TICKETS: SupportTicket[] = [
