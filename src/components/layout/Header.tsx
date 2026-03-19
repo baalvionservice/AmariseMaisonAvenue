@@ -85,7 +85,8 @@ export const Header = () => {
           }
         ],
         image: 'https://picsum.photos/seed/amarise-arrivals-bags/1200/800',
-        caption: 'Maison New Arrivals'
+        caption: 'Maison New Arrivals',
+        subCaption: 'THE LATEST ARCHIVE'
       }
     },
     { 
@@ -108,7 +109,8 @@ export const Header = () => {
           }
         ],
         image: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=1200',
-        caption: 'Hermès Bestsellers'
+        caption: 'Hermès Bestsellers',
+        subCaption: 'SHOP THE ICONIC SERIES'
       }
     },
     { 
@@ -155,7 +157,26 @@ export const Header = () => {
         subCaption: 'Iconic Style'
       }
     },
-    { name: 'OTHER BRANDS', href: `/${countryCode}/category/all` },
+    { 
+      name: 'OTHER BRANDS', 
+      href: `/${countryCode}/category/all`,
+      mega: true,
+      megaContent: {
+        columns: [
+          {
+            title: 'BRANDS',
+            links: ['The Row', 'Goyard', 'Louis Vuitton']
+          },
+          {
+            title: '',
+            links: ['Christian Dior', 'Fendi', 'Loro Piana']
+          }
+        ],
+        image: 'https://picsum.photos/seed/amarise-the-row/1200/800',
+        caption: 'New Bags From',
+        subCaption: 'THE ROW'
+      }
+    },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
     { name: 'LIVE SHOP', href: '#', services: true },
     { name: 'BLOG', href: `/${countryCode}/journal` },
@@ -328,8 +349,12 @@ export const Header = () => {
                 <div className="container mx-auto px-12 flex justify-center gap-24 max-w-[1600px]">
                   {link.megaContent.columns.map((col, idx) => (
                     <div key={idx} className="w-56 space-y-8">
-                      <h3 className="text-[11px] font-bold tracking-[0.2em] text-black uppercase border-b border-gray-100 pb-4">{col.title}</h3>
-                      <nav className="flex flex-col space-y-4" aria-label={`${link.name} - ${col.title}`}>
+                      {col.title ? (
+                        <h3 className="text-[11px] font-bold tracking-[0.2em] text-black uppercase border-b border-gray-100 pb-4">{col.title}</h3>
+                      ) : (
+                        <div className="h-[31px]" />
+                      )}
+                      <nav className="flex flex-col space-y-4" aria-label={col.title ? `${link.name} - ${col.title}` : `More ${link.name}`}>
                         {col.links.map((sub) => (
                           <Link 
                             key={sub} 
@@ -354,10 +379,14 @@ export const Header = () => {
                       />
                       <div className="absolute inset-0 bg-black/5 group-hover/img:bg-transparent transition-colors" />
                     </div>
-                    <div className="text-left space-y-1">
-                      <h4 className="text-xl font-body font-bold text-gray-900 uppercase tracking-widest leading-tight">{link.megaContent.caption}</h4>
+                    <div className="text-left space-y-2">
+                      <h4 className="text-2xl font-headline italic text-gray-900 leading-tight">
+                        {link.megaContent.caption}
+                      </h4>
                       {link.megaContent.subCaption && (
-                        <p className="text-sm text-gray-500 font-light italic">{link.megaContent.subCaption}</p>
+                        <p className="text-[11px] font-bold tracking-[0.2em] text-black uppercase">
+                          {link.megaContent.subCaption}
+                        </p>
                       )}
                     </div>
                   </div>
