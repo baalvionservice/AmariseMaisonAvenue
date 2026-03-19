@@ -264,14 +264,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [messagingTemplates, setMessagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
 
   // SEO state
-  const [seoRegistry] = useState<SEOMetadata[]>([
-    { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub.', keywords: 'luxury, heritage', h1: 'The Heritage Registry', brandId: activeBrandId, isGlobal: false }
+  const [seoRegistry, setSeoRegistry] = useState<SEOMetadata[]>([
+    { id: 'home-us', path: '/us', title: 'AMARISÉ | The Heritage Registry (USA)', description: 'Elite acquisition hub.', keywords: 'luxury, heritage', h1: 'The Heritage Registry', brandId: activeBrandId, isGlobal: false },
+    { id: 'home-ae', path: '/ae', title: 'AMARISÉ | The Heritage Registry (UAE)', description: 'Dubai Gold Collection.', keywords: 'luxury dubai, gold', h1: 'Dubai Ateliers', brandId: activeBrandId, isGlobal: false }
   ]);
 
   // AI & Automation state
   const [aiModules, setAiModules] = useState<AIModuleStatus[]>([
     { id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' },
-    { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' }
+    { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' },
+    { id: 'ai-content', name: 'AI Content Engine', enabled: true, level: 'assisted' },
+    { id: 'ai-seo', name: 'AI SEO Optimizer', enabled: true, level: 'auto' }
   ]);
   const [aiLogs, setAiLogs] = useState<AIActionLog[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
@@ -355,12 +358,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
 
-  // --- Scoped Views ---
-  const scopedProducts = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? products : products.filter(p => p.countryCode === currentUser.country || p.isGlobal), [products, currentUser]);
-  const scopedInquiries = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === currentUser.country.toLowerCase()), [privateInquiries, currentUser]);
-  const scopedEditorials = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? editorials : editorials.filter(e => e.country === currentUser.country || e.isGlobal), [editorials, currentUser]);
-  const scopedBuyingGuides = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? buyingGuides : buyingGuides.filter(g => g.country === currentUser.country || g.isGlobal), [buyingGuides, currentUser]);
-  const scopedReturns = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? returns : returns.filter(r => r.brandId === activeBrandId), [returns, currentUser, activeBrandId]);
+  // --- Scoped Views (Enforcing Jurisdictional Isolation) ---
+  const scopedProducts = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return products;
+    return products.filter(p => p.countryCode === currentUser.country || p.isGlobal);
+  }, [products, currentUser]);
+
+  const scopedInquiries = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return privateInquiries;
+    return privateInquiries.filter(i => i.country.toLowerCase() === currentUser.country.toLowerCase());
+  }, [privateInquiries, currentUser]);
+
+  const scopedEditorials = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return editorials;
+    return editorials.filter(e => e.country === currentUser.country || e.isGlobal);
+  }, [editorials, currentUser]);
+
+  const scopedBuyingGuides = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return buyingGuides;
+    return buyingGuides.filter(g => g.country === currentUser.country || g.isGlobal);
+  }, [buyingGuides, currentUser]);
+
+  const scopedReturns = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return returns;
+    return returns.filter(r => r.brandId === activeBrandId);
+  }, [returns, currentUser, activeBrandId]);
+
   const scopedTransactions = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return transactions;
     if (currentUser.role === 'vendor') return transactions.filter(t => t.vendorId === currentUser.id);
@@ -635,7 +658,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const upsertEditorial = (e: Editorial) => console.log('Update editorial', e);
 
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
-    // Audit-Driven Lead Tiering Logic
+    // Automated Lead Tiering Logic
     const leadTier = inquiry.budgetRange === 'Tier 1' || inquiry.intent === 'Collector' ? 1 : 
                      inquiry.budgetRange === 'Tier 2' ? 2 : 3;
     
@@ -645,12 +668,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
     
     if (leadTier === 1) {
-      sendNotification('country_admin', `HIGH PRIORITY Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase(), 'alert');
+      sendNotification('country_admin', `HIGH PRIORITY Acquisition Intent: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'alert');
     } else {
-      sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase(), 'info');
+      sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'info');
     }
     
-    logAction('Captured Acquisition Lead', inquiry.customerName, inquiry.country.toLowerCase(), leadTier === 1 ? 'medium' : 'low');
+    logAction('Captured Acquisition Lead', inquiry.customerName, enrichedInquiry.country.toLowerCase(), leadTier === 1 ? 'medium' : 'low');
   };
   
   const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
@@ -660,7 +683,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateAIModule = (id: string, enabled: boolean, level: AIAutomationLevel) => {
     setAiModules(prev => prev.map(m => m.id === id ? { ...m, enabled, level } : m));
-    recordLog(`AI Module ${id} updated to ${level}`, 'AI Autopilot');
     logAction(`Updated AI Module ${id}`, `Level: ${level}`, 'global');
   };
   const addAILog = (log: AIActionLog) => setAiLogs(prev => [log, ...prev].slice(0, 50));

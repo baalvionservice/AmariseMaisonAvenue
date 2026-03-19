@@ -206,10 +206,12 @@ export default function AIDashboard() {
                         "w-12 h-12 rounded-full border flex items-center justify-center transition-colors",
                         job.status === 'complete' ? "bg-green-50 border-green-100 text-green-500" :
                         job.status === 'running' ? "bg-plum/5 border-plum/20 text-plum animate-pulse" :
+                        job.status === 'failed' ? "bg-red-50 border-red-100 text-red-500" :
                         "bg-ivory border-border text-gray-300"
                       )}>
                         {job.status === 'complete' ? <CheckCircle2 className="w-5 h-5" /> : 
                          job.status === 'running' ? <RefreshCcw className="w-5 h-5 animate-spin" /> : 
+                         job.status === 'failed' ? <AlertCircle className="w-5 h-5" /> :
                          <Clock className="w-5 h-5" />}
                       </div>
                       <div className="space-y-1">
