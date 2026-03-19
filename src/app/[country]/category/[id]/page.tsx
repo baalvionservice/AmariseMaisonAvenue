@@ -86,6 +86,13 @@ export default function CategoryPage() {
     { name: 'Ivory', count: 29, hex: '#FFFFF0' },
   ];
 
+  // Condition Registry from reference image
+  const conditions = [
+    { name: 'New', count: 233 },
+    { name: 'Pre-owned', count: 256 },
+    { name: 'Vintage', count: 33 },
+  ];
+
   // Archival Birkin Sizes for the visual nav
   const birkinSizes = [
     { name: 'Birkin 25CM', id: '25cm' },
@@ -133,12 +140,14 @@ export default function CategoryPage() {
             {/* Ask Judy Floating Button - Positioned exactly as reference */}
             <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[60]">
               <button className="bg-[#262626] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-transform hover:scale-105 active:scale-95">
-                <Sparkles className="w-4 h-4 mb-0.5" />
-                <span className="text-[7px] font-bold tracking-tighter uppercase leading-none">ASK<br/>JUDY</span>
+                <p className="flex flex-col items-center">
+                  <Sparkles className="w-4 h-4 mb-0.5" />
+                  <span className="text-[7px] font-bold tracking-tighter uppercase leading-none">ASK<br/>JUDY</span>
+                </p>
               </button>
             </div>
 
-            <Accordion type="multiple" defaultValue={['COLOR']} className="w-full">
+            <Accordion type="multiple" defaultValue={['COLOR', 'CONDITION']} className="w-full">
               <AccordionItem value="COLOR" className="border-b border-gray-100 py-2">
                 <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
                   COLOR
@@ -165,9 +174,27 @@ export default function CategoryPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              {['CONDITION', 'HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
+              <AccordionItem value="CONDITION" className="border-b border-gray-100 py-2">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
+                  CONDITION
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-6">
+                  <div className="space-y-4 pl-1">
+                    {conditions.map((item) => (
+                      <div key={item.name} className="flex items-center space-x-4 group cursor-pointer">
+                        <Checkbox className="rounded-none border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                        <span className="text-xs font-light text-gray-700 tracking-wide flex-1">
+                          {item.name} <span className="text-gray-400 ml-1">({item.count})</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {['HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
                 <AccordionItem key={filter} value={filter} className="border-b border-gray-100 py-2">
-                  <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4">
+                  <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
                     {filter}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-6">
