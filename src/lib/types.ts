@@ -658,6 +658,20 @@ export interface Invoice {
   brandId: string;
 }
 
+export interface Transaction {
+  id: string;
+  country: string;
+  type: 'Sale' | 'Refund' | 'Payout';
+  clientName: string;
+  vendorId?: string;
+  amount: number;
+  currency: string;
+  status: 'Pending' | 'Completed' | 'Failed';
+  timestamp: string;
+  invoiceId?: string;
+  brandId: string;
+}
+
 export interface Affiliate {
   id: string;
   name: string;

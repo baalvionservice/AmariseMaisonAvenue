@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -46,11 +45,16 @@ type FinanceTab = 'overview' | 'invoices' | 'payouts' | 'tax' | 'compliance' | '
 
 export default function FinanceHub() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('overview');
-  const { invoices, vendors, globalSettings } = useAppStore();
+  const { scopedTransactions, invoices, processPayment, currentUser } = useAppStore();
   const { toast } = useToast();
 
   const handleAction = (msg: string) => {
     toast({ title: "Finance Operation", description: msg });
+  };
+
+  const handleCompletePayment = (id: string) => {
+    processPayment(id);
+    toast({ title: "Settlement Confirmed", description: `Transaction ${id} has been settled in the global ledger.` });
   };
 
   return (
@@ -78,22 +82,17 @@ export default function FinanceHub() {
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
             </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/us">
-              <LogOut className="w-4 h-4 mr-3" /> Exit Treasury
-            </Link>
-          </Button>
         </div>
       </aside>
 
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
-            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              {activeTab}
+            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest capitalize">
+              {activeTab} Hub
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Global Treasury Oversight • Multi-Market Liquidity
+              Global Treasury Oversight • {currentUser?.country.toUpperCase()} Jurisdiction
             </p>
           </div>
           <div className="flex items-center space-x-6">
@@ -109,42 +108,53 @@ export default function FinanceHub() {
           {activeTab === 'overview' && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard icon={<DollarSign />} label="Net Revenue (Global)" value="$1.2M" trend="+12.4%" positive />
-                <StatCard icon={<Globe />} label="Tax Liability accrued" value="$245k" trend="Compliance: 100%" positive />
+                <StatCard icon={<DollarSign />} label="Net Revenue (Scoped)" value={`$${(scopedTransactions.filter(t => t.status === 'Completed').reduce((a, b) => a + b.amount, 0) / 1000).toFixed(1)}k`} trend="+12.4%" positive />
+                <StatCard icon={<Globe />} label="Tax Liability" value="$42k" trend="Compliance: 100%" positive />
                 <StatCard icon={<ShieldCheck />} label="Verified Settlements" value="98.2%" trend="Optimal" positive />
-                <StatCard icon={<Clock />} label="Awaiting Release" value="$180k" trend="Scheduled" positive />
+                <StatCard icon={<Clock />} label="Pending Fund Release" value={`$${(scopedTransactions.filter(t => t.status === 'Pending').reduce((a, b) => a + b.amount, 0) / 1000).toFixed(1)}k`} trend="Scheduled" positive />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
+                <Card className="lg:col-span-2 bg-white border-border shadow-luxury overflow-hidden">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Transactional Registry</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Automated artisanal invoice logs & legal exports</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Ledger Registry</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time transactional stream for the {currentUser?.country.toUpperCase()} market</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader className="bg-ivory/50">
                         <TableRow>
                           <TableHead className="text-[9px] uppercase font-bold pl-8">Entry ID</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Connoisseur</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Value</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-center">Tax Cert</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Audit Export</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold">Amount</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {invoices.map(inv => (
-                          <TableRow key={inv.id} className="hover:bg-ivory/30">
-                            <TableCell className="text-xs font-bold font-mono pl-8">{inv.id}</TableCell>
-                            <TableCell className="text-xs font-light">{inv.customerName}</TableCell>
-                            <TableCell className="text-xs font-bold text-plum">{inv.currency} {inv.amount.toLocaleString()}</TableCell>
+                        {scopedTransactions.map(tx => (
+                          <TableRow key={tx.id} className="hover:bg-ivory/30">
+                            <TableCell className="text-xs font-bold font-mono pl-8">{tx.id}</TableCell>
+                            <TableCell>
+                               <div className="flex flex-col">
+                                  <span className="text-xs font-bold uppercase tracking-tighter">{tx.type}</span>
+                                  <span className="text-[8px] text-gray-400 italic">{tx.clientName}</span>
+                               </div>
+                            </TableCell>
+                            <TableCell className="text-xs font-bold text-plum">{tx.currency} {tx.amount.toLocaleString()}</TableCell>
                             <TableCell className="text-center">
-                              <Badge variant="outline" className="text-[8px] uppercase tracking-tighter">VAT-{inv.taxRate}% Certified</Badge>
+                              <Badge variant={tx.status === 'Completed' ? 'default' : 'outline'} className={cn("text-[8px] uppercase tracking-tighter", tx.status === 'Completed' ? "bg-green-500" : "text-orange-500 border-orange-200")}>
+                                {tx.status}
+                              </Badge>
                             </TableCell>
                             <TableCell className="text-right pr-8">
                               <div className="flex justify-end space-x-2">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleAction("Exporting ISO-certified PDF.")}><FileText className="w-4 h-4" /></Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleAction("Sent to external ERP.")}><RefreshCcw className="w-4 h-4" /></Button>
+                                {tx.status === 'Pending' && (
+                                  <Button size="sm" variant="outline" className="h-8 border-plum text-plum text-[8px] font-bold uppercase hover:bg-plum hover:text-white" onClick={() => handleCompletePayment(tx.id)}>
+                                    Process Payment
+                                  </Button>
+                                )}
+                                <Button variant="ghost" size="icon" className="h-8 w-8"><FileText className="w-4 h-4" /></Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -156,21 +166,21 @@ export default function FinanceHub() {
 
                 <Card className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Regional Payout Velocity</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Settlement Velocity</CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest">Global partner disbursement status</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8 space-y-8">
-                    <ComplianceRow label="Europe (EUR/GBP)" status="Ready" progress={100} />
-                    <ComplianceRow label="Americas (USD)" status="Optimal" progress={95} />
-                    <ComplianceRow label="Asia Pacific (SGD/INR)" status="Ready" progress={100} />
-                    <ComplianceRow label="Middle East (AED)" status="Reporting" progress={65} />
+                    <ComplianceRow label="Europe Ateliers" status="Optimal" progress={100} />
+                    <ComplianceRow label="Americas Hub" status="Verified" progress={95} />
+                    <ComplianceRow label="Asia Pacific" status="In Sync" progress={100} />
+                    <ComplianceRow label="UAE Treasury" status="Reporting" progress={65} />
                   </CardContent>
                 </Card>
               </div>
             </>
           )}
 
-          {['invoices', 'payouts', 'tax', 'compliance', 'reports'].includes(activeTab) && (
+          {activeTab !== 'overview' && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">

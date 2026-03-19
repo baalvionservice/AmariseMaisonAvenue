@@ -26,6 +26,7 @@ import {
   IndexingLog,
   Appointment,
   Invoice,
+  Transaction,
   Affiliate,
   ReturnRequest,
   PrivateInquiry,
@@ -96,6 +97,7 @@ interface AppContextType {
   scopedApprovals: ApprovalRequest[];
   scopedAuditLogs: AuditLogEntry[];
   scopedWorkflows: WorkflowTask[];
+  scopedTransactions: Transaction[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -149,6 +151,7 @@ interface AppContextType {
   indexingLogs: IndexingLog[];
   appointments: Appointment[];
   invoices: Invoice[];
+  transactions: Transaction[];
 
   // Showcase State
   isShowcaseMode: boolean;
@@ -202,6 +205,8 @@ interface AppContextType {
   setActiveVendor: (vendor: Vendor | null) => void;
   recordLog: (action: string, module: string, severity?: AuditLog['severity']) => void;
   createInvoice: (invoice: Invoice) => void;
+  createTransaction: (transaction: Transaction) => void;
+  processPayment: (transactionId: string) => void;
   toggleLike: (articleId: string, country: string) => void;
   trackShare: (articleId: string, country: string) => void;
   upsertAppointment: (appointment: Appointment) => void;
@@ -228,8 +233,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [categories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
   const [departments] = useState<Department[]>(INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId })));
   const [cities] = useState<City[]>(INITIAL_CITIES);
-  const [buyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES.map(g => ({ ...g, brandId: activeBrandId, isGlobal: false })));
-  const [editorials] = useState<Editorial[]>(EDITOR_INITIAL.map(e => ({ ...e, brandId: activeBrandId, isGlobal: false })));
+  const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES.map(g => ({ ...g, brandId: activeBrandId, isGlobal: false })));
+  const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL.map(e => ({ ...e, brandId: activeBrandId, isGlobal: false })));
 
   // CRM state
   const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
@@ -288,6 +293,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS.map(a => ({ ...a, brandId: activeBrandId })));
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES.map(i => ({ ...i, brandId: activeBrandId })));
+  const [transactions, setTransactions] = useState<Transaction[]>([
+    { id: 'tx-1', country: 'us', type: 'Sale', clientName: 'Julian Vandervilt', amount: 45000, currency: 'USD', status: 'Completed', timestamp: new Date().toISOString(), brandId: activeBrandId },
+    { id: 'tx-2', country: 'uk', type: 'Refund', clientName: 'Sophia Chen', amount: 9500, currency: 'GBP', status: 'Pending', timestamp: new Date().toISOString(), brandId: activeBrandId }
+  ]);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   
   const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
@@ -315,6 +324,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedEditorials = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? editorials : editorials.filter(e => e.country === currentUser.country || e.isGlobal), [editorials, currentUser]);
   const scopedBuyingGuides = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? buyingGuides : buyingGuides.filter(g => g.country === currentUser.country || g.isGlobal), [buyingGuides, currentUser]);
   const scopedReturns = useMemo(() => (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') ? returns : returns.filter(r => r.brandId === activeBrandId), [returns, currentUser, activeBrandId]);
+  const scopedTransactions = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return transactions;
+    if (currentUser.role === 'vendor') return transactions.filter(t => t.vendorId === currentUser.id);
+    return transactions.filter(t => t.country.toLowerCase() === currentUser.country.toLowerCase());
+  }, [transactions, currentUser]);
   
   const scopedNotifications = useMemo(() => {
     if (!currentUser) return [];
@@ -476,6 +490,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInvoices(prev => [inv, ...prev]);
     logAction('Generated Institutional Invoice', inv.orderId, inv.brandId);
   };
+
+  const createTransaction = (tx: Transaction) => {
+    setTransactions(prev => [tx, ...prev]);
+    logAction(`Logged Finance Transaction: ${tx.type}`, tx.id, tx.country);
+  };
+
+  const processPayment = (transactionId: string) => {
+    setTransactions(prev => prev.map(t => t.id === transactionId ? { ...t, status: 'Completed' } : t));
+    logAction('Completed Institutional Payment', transactionId, 'global');
+    console.log(`[FINANCE MOCK] Payment completed for Transaction ID: ${transactionId}`);
+  };
+
   const upsertAppointment = (apt: Appointment) => setAppointments(prev => [apt, ...prev]);
   
   const toggleLike = (id: string, country: string) => {
@@ -499,14 +525,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
-    indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
+    indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
@@ -514,18 +540,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     toggleEmergencyMode, triggerReindex, logAction,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
-    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, toggleLike, trackShare, upsertAppointment,
+    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
-    indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor
+    indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

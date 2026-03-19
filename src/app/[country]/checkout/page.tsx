@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -12,7 +11,7 @@ import { Check, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId } = useAppStore();
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
@@ -26,17 +25,36 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = () => {
     const orderId = `AM-${(Math.random() * 10000).toFixed(0)}`;
+    const invoiceId = `inv-${Date.now()}`;
+    const customerName = `${firstName} ${lastName}`;
     
     // Simulate generation of invoice in the mock system
     createInvoice({
-      id: `inv-${Date.now()}`,
+      id: invoiceId,
       orderId,
-      customerName: `${firstName} ${lastName}`,
+      customerName,
       amount: subtotal,
       currency: countryCode.toUpperCase(),
       status: 'paid',
       date: new Date().toISOString(),
-      taxAmount: subtotal * 0.08
+      taxAmount: subtotal * 0.08,
+      taxRate: 8,
+      complianceCertified: true,
+      brandId: activeBrandId
+    });
+
+    // Register Transaction in the Global Ledger
+    createTransaction({
+      id: `tx-${Date.now()}`,
+      country: countryCode,
+      type: 'Sale',
+      clientName: customerName,
+      amount: subtotal,
+      currency: countryCode.toUpperCase(),
+      status: 'Completed',
+      timestamp: new Date().toISOString(),
+      invoiceId: invoiceId,
+      brandId: activeBrandId
     });
 
     setStep(3);
