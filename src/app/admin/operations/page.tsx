@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, 
@@ -24,7 +24,9 @@ import {
   CheckCircle2,
   XCircle,
   MessageSquare,
-  History
+  History,
+  Filter,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,13 +45,20 @@ import {
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/types';
 import { guardPage } from '@/lib/access/routeGuard';
+import { useSearch } from '@/hooks/use-search';
 
 type OpsTab = 'dashboard' | 'catalog' | 'approvals' | 'inventory' | 'orders' | 'returns';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { scopedProducts, scopedReturns, scopedApprovals, handleApprovalAction, deleteProduct, upsertProduct, currentUser, scopedNotifications } = useAppStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  
+  const { scopedProducts, scopedReturns, scopedApprovals, handleApprovalAction, deleteProduct, upsertProduct, currentUser, scopedNotifications, categories } = useAppStore();
   const { toast } = useToast();
+
+  // Integrated Advanced Search
+  const filteredProducts = useSearch(scopedProducts, searchQuery, { categoryId: categoryFilter });
 
   useEffect(() => {
     if (!guardPage(currentUser, 'view_dashboard', currentUser?.country)) {
@@ -228,14 +237,44 @@ export default function OperationsAdminPanel() {
 
           {activeTab === 'catalog' && (
             <div className="space-y-12">
-              <div className="flex justify-between items-end">
+              <div className="flex flex-col md:flex-row md:items-end justify-between space-y-6 md:space-y-0">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-headline font-bold italic">Artifact Management</h2>
                   <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the {currentUser?.country.toUpperCase()} atelier creations</p>
                 </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
-                  <Plus className="w-4 h-4 mr-2" /> CREATE NEW ARCHIVE ENTRY
-                </Button>
+                
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
+                    <input 
+                      className="bg-white border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none w-48 focus:ring-1 focus:ring-plum transition-all shadow-sm" 
+                      placeholder="SEARCH SKU / NAME" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-plum">
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Filter className="w-3.5 h-3.5 text-gray-400" />
+                    <select 
+                      className="bg-white border border-border h-10 px-3 text-[9px] font-bold uppercase tracking-widest outline-none cursor-pointer focus:ring-1 focus:ring-plum shadow-sm"
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                    >
+                      <option value="all">ALL CATEGORIES</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[10px] font-bold tracking-widest uppercase shadow-sm">
+                    <Plus className="w-4 h-4 mr-2" /> NEW ENTRY
+                  </Button>
+                </div>
               </div>
 
               <Card className="bg-white border-border shadow-luxury overflow-hidden">
@@ -250,7 +289,7 @@ export default function OperationsAdminPanel() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {scopedProducts.slice(0, 15).map(product => (
+                    {filteredProducts.length > 0 ? filteredProducts.slice(0, 15).map(product => (
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
@@ -279,7 +318,16 @@ export default function OperationsAdminPanel() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="py-40 text-center">
+                          <div className="flex flex-col items-center space-y-4 opacity-20">
+                            <Search className="w-12 h-12" />
+                            <p className="text-xs font-bold uppercase tracking-[0.2em]">No artifacts found matching criteria</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </Card>

@@ -15,7 +15,9 @@ import {
   LayoutDashboard,
   FileText,
   Package,
-  Boxes
+  Boxes,
+  Search,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,10 +25,15 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useCMS } from '@/hooks/use-cms';
 import { cn } from '@/lib/utils';
+import { useSearch } from '@/hooks/use-search';
 
 export default function ContentAdminHub() {
   const { sections, updateSection } = useCMS();
   const [activeTab, setActiveTab] = useState('sections');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Integrated Advanced Search
+  const filteredSections = useSearch(sections, searchQuery);
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -60,15 +67,32 @@ export default function ContentAdminHub() {
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Atelier CMS</h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Institutional Storytelling & Layout</p>
           </div>
-          <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest">
-            <Plus className="w-3 h-3 mr-2" /> CREATE CONTENT
-          </Button>
+          
+          <div className="flex items-center space-x-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
+              <input 
+                className="bg-white border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none w-64 focus:ring-1 focus:ring-plum transition-all shadow-sm" 
+                placeholder="SEARCH CONTENT..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-plum">
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+            <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest">
+              <Plus className="w-3 h-3 mr-2" /> CREATE CONTENT
+            </Button>
+          </div>
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           {activeTab === 'sections' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {sections.map(section => (
+              {filteredSections.length > 0 ? filteredSections.map(section => (
                 <Card key={section.id} className="bg-white border-border shadow-luxury hover:border-plum transition-all group overflow-hidden">
                   <CardHeader className="border-b border-border bg-ivory/30">
                     <div className="flex justify-between items-start">
@@ -101,7 +125,12 @@ export default function ContentAdminHub() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )) : (
+                <div className="col-span-2 py-40 text-center space-y-6 opacity-20">
+                  <Search className="w-16 h-16 mx-auto" />
+                  <p className="text-2xl font-headline italic">No content sections match your search.</p>
+                </div>
+              )}
             </div>
           )}
 

@@ -19,7 +19,8 @@ import {
   Lock,
   ArrowUpRight,
   ShieldCheck,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,17 +36,24 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { CuratorChat } from '@/components/sales/CuratorChat';
+import { useSearch } from '@/hooks/use-search';
 
 type SalesTab = 'leads' | 'conversations' | 'performance' | 'strategy';
 
 export default function AdminSalesHub() {
   const [activeTab, setActiveTab] = useState<SalesTab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  
   const { privateInquiries, updateInquiryStatus } = useAppStore();
 
+  // Integrated Advanced Search
+  const filteredLeads = useSearch(privateInquiries, searchQuery, { status: statusFilter });
+
   const sortedLeads = useMemo(() => {
-    return [...privateInquiries].sort((a, b) => a.leadTier - b.leadTier);
-  }, [privateInquiries]);
+    return [...filteredLeads].sort((a, b) => a.leadTier - b.leadTier);
+  }, [filteredLeads]);
 
   const selectedLead = useMemo(() => 
     privateInquiries.find(i => i.id === selectedLeadId), 
@@ -112,14 +120,42 @@ export default function AdminSalesHub() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
               {/* Leads List */}
               <Card className="lg:col-span-7 bg-white border-border shadow-luxury overflow-hidden">
-                <CardHeader className="border-b border-border flex flex-row items-center justify-between">
+                <CardHeader className="border-b border-border flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
                   <div>
                     <CardTitle className="font-headline text-2xl">Active Acquisition Leads</CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest">Global registry of private intent</CardDescription>
                   </div>
-                  <div className="relative group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-300" />
-                    <input className="bg-ivory border border-border h-8 pl-8 pr-4 text-[9px] font-bold uppercase tracking-widest outline-none w-40" placeholder="SEARCH LEADS" />
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
+                      <input 
+                        className="bg-ivory border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none w-48 focus:ring-1 focus:ring-plum transition-all" 
+                        placeholder="SEARCH CONNOISSEURS" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-plum">
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Filter className="w-3.5 h-3.5 text-gray-400" />
+                      <select 
+                        className="bg-white border border-border h-10 px-3 text-[9px] font-bold uppercase tracking-widest outline-none cursor-pointer focus:ring-1 focus:ring-plum"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                      >
+                        <option value="all">ALL STAGES</option>
+                        <option value="new">NEW</option>
+                        <option value="contacted">CONTACTED</option>
+                        <option value="qualifying">QUALIFYING</option>
+                        <option value="presenting">PRESENTING</option>
+                        <option value="closing">CLOSING</option>
+                        <option value="won">WON</option>
+                      </select>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -133,7 +169,7 @@ export default function AdminSalesHub() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sortedLeads.map(lead => (
+                      {sortedLeads.length > 0 ? sortedLeads.map(lead => (
                         <TableRow 
                           key={lead.id} 
                           className={cn("hover:bg-ivory/30 cursor-pointer transition-colors", selectedLeadId === lead.id && "bg-plum/5")}
@@ -168,7 +204,16 @@ export default function AdminSalesHub() {
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><ChevronRight className="w-4 h-4" /></Button>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="py-20 text-center">
+                            <div className="flex flex-col items-center space-y-4 opacity-20">
+                              <Search className="w-12 h-12" />
+                              <p className="text-xs font-bold uppercase tracking-[0.2em]">No results found in current registry</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
