@@ -34,12 +34,15 @@ export default function CategoryPage() {
   const [activeSort, setActiveSort] = useState('Featured');
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'handbags': true,
-    'curations': true,
+    'curations': false,
     'birkin': false,
     'kelly': false,
     'constance': false,
     'evelyne': false,
-    'picotin': false
+    'picotin': false,
+    'accessories': false,
+    'jewelry': false,
+    'fine-jewelry': false
   });
 
   const toggleSection = (section: string) => {
@@ -175,8 +178,54 @@ export default function CategoryPage() {
                   )}
                 </div>
 
-                <SidebarNavItem label="ACCESSORIES" hasSub />
-                <SidebarNavItem label="JEWELRY" hasSub />
+                {/* ACCESSORIES Section */}
+                <div className="border-b border-gray-50 py-2">
+                  <SidebarNavItem 
+                    label="ACCESSORIES" 
+                    hasSub 
+                    isOpen={openSections['accessories']} 
+                    onClick={() => toggleSection('accessories')} 
+                  />
+                  {openSections['accessories'] && (
+                    <ul className="pl-4 mt-2 space-y-2 py-1">
+                      <SidebarLink label="Scarves" />
+                      <SidebarLink label="Wallets" />
+                      <SidebarLink label="Watches" />
+                      <SidebarLink label="Belts" />
+                      <SidebarLink label="Charms" />
+                    </ul>
+                  )}
+                </div>
+
+                {/* JEWELRY Section */}
+                <div className="border-b border-gray-50 py-2">
+                  <SidebarNavItem 
+                    label="JEWELRY" 
+                    hasSub 
+                    isOpen={openSections['jewelry']} 
+                    onClick={() => toggleSection('jewelry')} 
+                  />
+                  {openSections['jewelry'] && (
+                    <div className="pl-4 mt-2 space-y-1">
+                      <SidebarSubHeader 
+                        label="Fine Jewelry" 
+                        hasSub 
+                        isOpen={openSections['fine-jewelry']} 
+                        onClick={() => toggleSection('fine-jewelry')} 
+                      />
+                      {openSections['fine-jewelry'] && (
+                        <ul className="pl-4 space-y-2 py-1">
+                          <SidebarLink label="All Fine Jewelry" />
+                          <SidebarLink label="Necklaces" />
+                          <SidebarLink label="Bracelets" />
+                          <SidebarLink label="Earrings" />
+                          <SidebarLink label="Rings" />
+                        </ul>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <SidebarNavItem label="SHOES" />
                 
                 <div className="pt-4 space-y-1">
@@ -241,7 +290,7 @@ export default function CategoryPage() {
               {filteredProducts.map(product => (
                 <div key={product.id} className="group cursor-pointer">
                   <Link href={`/${countryCode}/product/${product.id}`} className="block">
-                    <div className="relative aspect-square bg-[#f8f8f8] mb-6 overflow-hidden flex items-center justify-center">
+                    <div className="relative aspect-square bg-[#f8f8f8] mb-6 overflow-hidden flex items-center justify-center border border-gray-50">
                       <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.4em] text-gray-200">
                         Atelier Asset
                       </div>
@@ -251,7 +300,7 @@ export default function CategoryPage() {
                     </div>
                     <div className="space-y-2 text-center px-4">
                       <h3 className="text-sm font-light text-gray-800 leading-relaxed line-clamp-2 uppercase tracking-wide">
-                        Hermès {product.name}
+                        {category.name} {product.name}
                       </h3>
                       <p className="text-sm font-bold text-black tracking-tight">
                         {formatPrice(product.basePrice, countryCode)}
