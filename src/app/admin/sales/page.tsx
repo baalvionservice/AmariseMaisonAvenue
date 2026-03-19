@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -25,6 +24,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { useAppStore } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -260,5 +260,42 @@ export default function AdminSalesHub() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function RevenueNavItem({ icon, label, active }: { icon: any, label: string, active: boolean }) {
+  return (
+    <button className={cn(
+      "w-full flex items-center space-x-4 px-6 py-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-all group rounded-sm border",
+      active ? "bg-plum text-white border-plum shadow-md" : "text-gray-400 hover:bg-ivory hover:text-plum border-transparent"
+    )}>
+      <span className={cn("transition-transform group-hover:scale-110", active ? "text-white" : "text-gold")}>
+        {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
+      </span>
+      <span>{label}</span>
+      {active && <ChevronRight className="w-4 h-4 ml-auto" />}
+    </button>
+  );
+}
+
+function StatCard({ icon, label, value, trend, positive }: { icon: any, label: string, value: string, trend: string, positive: boolean }) {
+  return (
+    <Card className="bg-white border-border shadow-luxury hover:border-gold transition-colors group">
+      <CardContent className="p-8 space-y-6">
+        <div className="flex justify-between items-start">
+          <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
+          <div className={cn(
+            "flex items-center text-[10px] font-bold tracking-widest uppercase",
+            positive ? "text-gold" : "text-gray-400"
+          )}>
+            {trend}
+          </div>
+        </div>
+        <div>
+          <div className="text-gray-400 text-[10px] uppercase tracking-[0.4em] font-bold">{label}</div>
+          <div className="text-4xl font-headline font-bold italic mt-2 text-gray-900">{value}</div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
