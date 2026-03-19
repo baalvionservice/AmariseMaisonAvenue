@@ -44,13 +44,29 @@ import {
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
 import { guardPage } from '@/lib/access/routeGuard';
+import { getAnalytics } from '@/lib/analytics/mock-data';
+import { 
+  Bar, 
+  BarChart, 
+  ResponsiveContainer, 
+  XAxis, 
+  YAxis, 
+  Tooltip,
+  Cell
+} from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function RevenueDashboard() {
-  const { scopedInquiries, leadConversations, updateInquiryStatus, currentUser, analyticsData } = useAppStore();
+  const { scopedInquiries, currentUser, analyticsData } = useAppStore();
   const metrics = MOCK_REVENUE_METRICS;
   
   const [filterTier, setFilterTier] = useState<string>('all');
-  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+
+  // Institution Analytics Access
+  const stats = useMemo(() => {
+    if (!currentUser) return null;
+    return getAnalytics(currentUser.role, currentUser.country);
+  }, [currentUser]);
 
   useEffect(() => {
     if (!guardPage(currentUser, 'view_revenue', currentUser?.country)) {
@@ -62,6 +78,8 @@ export default function RevenueDashboard() {
     if (filterTier === 'all') return scopedInquiries;
     return scopedInquiries.filter(i => i.leadTier.toString() === filterTier);
   }, [scopedInquiries, filterTier]);
+
+  if (!stats) return null;
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -111,31 +129,45 @@ export default function RevenueDashboard() {
             <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
               <CardHeader className="flex flex-row items-center justify-between border-b border-border">
                 <div>
-                  <CardTitle className="font-headline text-2xl">Growth Trajectory</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Institutional performance metrics</CardDescription>
+                  <CardTitle className="font-headline text-2xl">Regional Revenue Contribution</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Market participation by Hub</CardDescription>
                 </div>
-                <div className="flex space-x-2">
-                  <Badge className="bg-plum/5 text-plum border-plum/10 text-[8px] uppercase">Revenue</Badge>
-                  <Badge variant="outline" className="text-[8px] uppercase">Leads</Badge>
+                <div className="flex items-center space-x-2">
+                   <div className="w-2 h-2 rounded-full bg-plum" />
+                   <span className="text-[8px] font-bold uppercase text-gray-400">Hub Volume</span>
                 </div>
               </CardHeader>
               <CardContent className="p-8">
-                <div className="h-64 flex items-end justify-between space-x-4">
-                  {analyticsData.map((d, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center group">
-                      <div className="relative w-full bg-ivory flex flex-col justify-end">
-                        <div 
-                          className="w-full bg-plum/20 group-hover:bg-plum/40 transition-all cursor-pointer relative" 
-                          style={{ height: `${(d.revenue / 200000) * 100}%` }}
-                        >
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-bold text-plum opacity-0 group-hover:opacity-100 transition-opacity">
-                            ${(d.revenue / 1000).toFixed(0)}k
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-[8px] font-bold text-gray-400 mt-4 uppercase tracking-tighter">{d.date.split('-')[2]} Mar</span>
-                    </div>
-                  ))}
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats.sales}>
+                      <XAxis 
+                        dataKey="country" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 9, fontWeight: 700}}
+                      />
+                      <Tooltip 
+                        cursor={{fill: '#f9f7f9'}} 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-white border border-border p-4 shadow-luxury">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-plum mb-1">{payload[0].payload.country}</p>
+                                <p className="text-xl font-headline font-bold italic">${(payload[0].value as number).toLocaleString()}</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="value" radius={[2, 2, 0, 0]}>
+                        {stats.sales.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#7E3F98' : '#D4AF37'} fillOpacity={0.8} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
@@ -164,27 +196,27 @@ export default function RevenueDashboard() {
           <Card className="bg-white border-border shadow-luxury overflow-hidden">
             <CardHeader className="border-b border-border flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="font-headline text-2xl">Market Distribution</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Global revenue breakdown</CardDescription>
+                <CardTitle className="font-headline text-2xl">Maison Content Resonance</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Engagement metrics by editorial topic</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader className="bg-ivory/50">
                   <TableRow>
-                    <TableHead className="text-[9px] uppercase font-bold pl-8">Market Hub</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold">Contribution</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Trend</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold pl-8">Editorial Topic</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-center">Global Views</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-center">Resonance Score</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Performance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {metrics.topRegions.map((region, idx) => (
+                  {stats.contentEngagement.map((item, idx) => (
                     <TableRow key={idx} className="hover:bg-ivory/30 transition-colors">
-                      <TableCell className="pl-8 font-bold text-xs uppercase tracking-widest">{region.name}</TableCell>
-                      <TableCell className="text-xs font-bold text-plum">${(region.value / 1000000).toFixed(1)}M</TableCell>
+                      <TableCell className="pl-8 font-bold text-xs uppercase tracking-widest">{item.topic}</TableCell>
+                      <TableCell className="text-center text-xs font-light">{item.views.toLocaleString()}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="outline" className="text-[8px] uppercase border-plum/30 text-plum">Primary Market</Badge>
+                        <Badge variant="outline" className="text-[8px] uppercase border-plum/30 text-plum">{item.resonance}% Optimal</Badge>
                       </TableCell>
                       <TableCell className="text-right pr-8">
                         <ArrowUpRight className="w-4 h-4 ml-auto text-gold" />

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, 
@@ -30,11 +30,26 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { NotificationFeed } from '@/components/admin/NotificationFeed';
+import { getAnalytics } from '@/lib/analytics/mock-data';
+import { 
+  Pie, 
+  PieChart, 
+  ResponsiveContainer, 
+  Cell, 
+  Tooltip as RechartsTooltip
+} from 'recharts';
 
 export default function SuperAdminPanel() {
-  const { privateInquiries, scopedNotifications } = useAppStore();
+  const { privateInquiries, scopedNotifications, currentUser } = useAppStore();
 
-  const isSuperAdmin = true; 
+  const stats = useMemo(() => {
+    if (!currentUser) return null;
+    return getAnalytics(currentUser.role, currentUser.country);
+  }, [currentUser]);
+
+  const isSuperAdmin = currentUser?.role === 'super_admin'; 
+
+  if (!stats) return null;
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -111,22 +126,60 @@ export default function SuperAdminPanel() {
             {/* Primary Action Center */}
             <div className="lg:col-span-8 space-y-12">
               <Card className="bg-white border-border shadow-luxury overflow-hidden">
-                <CardHeader className="border-b border-border bg-ivory/10">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle className="font-headline text-2xl">Maison System Health</CardTitle>
-                      <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of business modules</CardDescription>
-                    </div>
-                    <Link href="/admin/notifications">
-                      <Button variant="ghost" className="text-[9px] font-bold uppercase tracking-widest text-plum">View All History</Button>
-                    </Link>
+                <CardHeader className="border-b border-border bg-ivory/10 flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="font-headline text-2xl">Global Market Resonance</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Regional lead distribution</CardDescription>
                   </div>
+                  <PieChart className="w-5 h-5 text-plum" />
                 </CardHeader>
-                <CardContent className="p-8 space-y-6">
-                  <ModuleStatus label="AI Autopilot" status="Active" progress={88} />
-                  <ModuleStatus label="Atelier CMS" status="Synchronized" progress={100} />
-                  <ModuleStatus label="Acquisition CRM" status="Live" progress={100} />
-                  <ModuleStatus label="SEO Authority Matrix" status="Indexing" progress={92} />
+                <CardContent className="p-8">
+                  <div className="flex flex-col lg:flex-row items-center gap-12">
+                    <div className="h-[250px] w-full lg:w-1/2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={stats.leads}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="total"
+                          >
+                            {stats.leads.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={['#7E3F98', '#D4AF37', '#000000', '#BFA2DB', '#FAF9F6'][index % 5]} />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip 
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="bg-white border border-border p-3 shadow-xl">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-plum">{payload[0].payload.country}</p>
+                                    <p className="text-lg font-headline font-bold italic">{payload[0].value} Leads</p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-4">
+                       <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 mb-6">Market Distribution Index</h4>
+                       {stats.leads.map((lead, idx) => (
+                         <div key={idx} className="flex items-center justify-between group cursor-default">
+                            <div className="flex items-center space-x-3">
+                               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#7E3F98', '#D4AF37', '#000000', '#BFA2DB', '#FAF9F6'][idx % 5] }} />
+                               <span className="text-xs font-bold uppercase tracking-tighter text-gray-600 group-hover:text-black transition-colors">{lead.country} Hub</span>
+                            </div>
+                            <span className="text-xs font-light italic text-gray-400">{((lead.total / stats.leads.reduce((a, b) => a + b.total, 0)) * 100).toFixed(0)}% participation</span>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -137,10 +190,10 @@ export default function SuperAdminPanel() {
                   <div className="relative z-10 space-y-6">
                     <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
                     <div className="space-y-4">
-                      <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
+                      <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left text-white">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
                       </Link>
-                      <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
+                      <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left text-white">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
                       </Link>
                     </div>
@@ -218,19 +271,5 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function ModuleStatus({ label, status, progress }: { label: string, status: string, progress: number }) {
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-        <span className="text-gray-500">{label}</span>
-        <span className="text-plum">{status}</span>
-      </div>
-      <div className="h-1 bg-ivory w-full overflow-hidden rounded-full">
-        <div className="h-full bg-plum transition-all" style={{ width: `${progress}%` }} />
-      </div>
-    </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Zap, 
@@ -28,10 +28,27 @@ import { Badge } from "@/components/ui/badge";
 import { useAI } from '@/hooks/use-ai';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { getAnalytics } from '@/lib/analytics/mock-data';
+import { 
+  Line, 
+  LineChart, 
+  ResponsiveContainer, 
+  XAxis, 
+  YAxis, 
+  Tooltip,
+  CartesianGrid
+} from 'recharts';
 
 export default function AIDashboard() {
   const { modules, logs, suggestions, approveSuggestion, rejectSuggestion } = useAI();
-  const { workflows, runWorkflowTask } = useAppStore();
+  const { workflows, runWorkflowTask, currentUser } = useAppStore();
+
+  const stats = useMemo(() => {
+    if (!currentUser) return null;
+    return getAnalytics(currentUser.role, currentUser.country);
+  }, [currentUser]);
+
+  if (!stats) return null;
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -72,43 +89,74 @@ export default function AIDashboard() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Workflow Tasks */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <History className="w-4 h-4 text-plum" />
-              <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Scheduled Workflows</h2>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {workflows.map(task => (
-                <Card key={task.id} className="bg-white border-border shadow-sm flex items-center p-6 space-x-6">
-                  <div className={cn(
-                    "p-3 rounded-full",
-                    task.status === 'running' ? "bg-plum/10 text-plum animate-spin" : "bg-ivory text-gray-400"
-                  )}>
-                    <RefreshCcw className="w-4 h-4" />
+          {/* AI Performance Insight */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="font-headline text-2xl">Maison Intelligence Accuracy</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Autopilot learning curve & engagement efficacy</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stats.aiPerformance}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="month" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 10, fontWeight: 600}}
+                      />
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-black text-white p-3 shadow-2xl border border-white/10">
+                                <p className="text-[8px] font-bold uppercase tracking-widest opacity-60">{payload[0].payload.month}</p>
+                                <p className="text-lg font-headline font-bold italic">{payload[0].value}% Accuracy</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="score" 
+                        stroke="#7E3F98" 
+                        strokeWidth={3} 
+                        dot={{fill: '#7E3F98', strokeWidth: 2, r: 4}}
+                        activeDot={{r: 6, stroke: '#D4AF37'}}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="lg:col-span-4 space-y-8">
+               <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-plum/20 rounded-full blur-3xl" />
+                  <div className="relative z-10 space-y-4">
+                    <div className="flex items-center space-x-3 text-secondary">
+                      <Zap className="w-5 h-5" />
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest">Global AI Pulse</h4>
+                    </div>
+                    <div className="space-y-6 pt-4">
+                       {stats.regionalAiPerformance.map(reg => (
+                         <div key={reg.code} className="space-y-2">
+                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
+                               <span className="opacity-60">{reg.country} Hub</span>
+                               <span className="text-secondary">{reg.score}%</span>
+                            </div>
+                            <div className="h-0.5 bg-white/10 w-full overflow-hidden">
+                               <div className="h-full bg-secondary" style={{ width: `${reg.score}%` }} />
+                            </div>
+                         </div>
+                       ))}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-xs font-bold uppercase tracking-widest">{task.taskName}</h4>
-                    <p className="text-[9px] text-gray-400 uppercase">{task.frequency} Cycle • {task.country.toUpperCase()}</p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <Badge variant="outline" className={cn("text-[8px] uppercase", 
-                      task.status === 'complete' ? "text-green-600 bg-green-50 border-green-100" : ""
-                    )}>
-                      {task.status}
-                    </Badge>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-plum hover:bg-plum/5"
-                      onClick={() => runWorkflowTask(task.id)}
-                      disabled={task.status === 'running'}
-                    >
-                      <Play className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
+               </Card>
             </div>
           </div>
 
