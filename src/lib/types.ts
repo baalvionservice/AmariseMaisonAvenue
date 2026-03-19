@@ -85,6 +85,9 @@ export interface Product {
   brandId: string;
   countryCode?: CountryCode;
   isGlobal: boolean;
+  scope: 'global' | 'regional';
+  regions: CountryCode[];
+  status: 'draft' | 'review' | 'verified' | 'published';
   // Enterprise Extensions
   regionalStock?: RegionalStock[];
   mediaGallery?: ProductMedia[];
@@ -275,6 +278,8 @@ export interface CountryConfig {
   messagingStrategy: 'WhatsApp' | 'Email' | 'Concierge';
   pricingVisibility: 'public' | 'gated' | 'mixed';
   featuredCategories: string[];
+  taxType: 'Sales Tax' | 'VAT' | 'GST';
+  taxRate: number;
 }
 
 export interface BrandConfig {
@@ -404,7 +409,7 @@ export interface QATestCase {
 
 export interface MaisonError {
   id: string;
-  module: 'AI Autopilot' | 'Finance' | 'Onboarding' | 'Content' | 'System';
+  module: 'AI Autopilot' | 'Finance' | 'Onboarding' | 'Content' | 'System' | 'CMS' | 'Sales';
   type: string;
   country: string;
   message: string;

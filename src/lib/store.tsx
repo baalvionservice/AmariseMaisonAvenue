@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -178,6 +177,7 @@ interface AppContextType {
   deleteProduct: (id: string) => void;
   upsertCollection: (collection: Collection) => void;
   upsertEditorial: (editorial: Editorial) => void;
+  syncGlobalProducts: (regions?: CountryCode[]) => void;
   
   // Sales Actions
   upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
@@ -240,7 +240,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   // Global Infrastructure
-  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG);
+  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
+    ...c,
+    taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
+    taxRate: c.code === 'uk' ? 20 : c.code === 'ae' ? 5 : c.code === 'in' ? 18 : c.code === 'sg' ? 9 : 8
+  })));
   const [brandConfigs, setBrandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
@@ -250,7 +254,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'hero', title: 'The Heritage Registry', visible: true, featured: true, brandId: activeBrandId },
     { id: 'private-salon', title: 'Private Acquisition Salon', visible: true, featured: true, brandId: activeBrandId }
   ]);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, isGlobal: true })));
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
+    ...p, 
+    brandId: activeBrandId, 
+    isGlobal: true, 
+    scope: 'global', 
+    regions: ['us', 'uk', 'ae', 'in', 'sg'],
+    status: 'published' 
+  })));
   const [collections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
   const [categories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
   const [departments] = useState<Department[]>(INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId })));
@@ -361,7 +372,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // --- Scoped Views (Enforcing Jurisdictional Isolation) ---
   const scopedProducts = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return products;
-    return products.filter(p => p.countryCode === currentUser.country || p.isGlobal);
+    return products.filter(p => p.regions.includes(currentUser.country as any) || p.isGlobal);
   }, [products, currentUser]);
 
   const scopedInquiries = useMemo(() => {
@@ -470,43 +481,52 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!task) return;
 
     setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'running', lastRun: new Date().toISOString() } : w));
-    console.log(`[AI AUTOPILOT MOCK] Running job: ${task.taskName} | Country: ${task.country}`);
+    
+    // Automation Logic for Batch Jobs
+    if (task.taskName === 'Batch Generate SEO Metadata') {
+      setTimeout(() => {
+        setProducts(prev => prev.map(p => ({ ...p, status: 'verified' })));
+        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete' } : w));
+        logAction('AI Batch Metadata Completion', 'Products Registry');
+      }, 3000);
+      return;
+    }
 
     setTimeout(() => {
-      // Simulate 10% failure rate for Error Matrix demonstration
-      const failed = Math.random() < 0.1;
-      
+      const failed = Math.random() < 0.05;
       if (failed) {
         setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'failed' } : w));
         logMaisonError({
           module: 'AI Autopilot',
           type: 'CycleFailure',
           country: task.country,
-          message: `Scheduled cycle "${task.taskName}" failed to terminate within designated timeout.`,
+          message: `Cycle "${task.taskName}" failed during execution.`,
           severity: 'high',
           brandId: activeBrandId
         });
       } else {
         setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
-        sendNotification('super_admin', `AI Job "${task.taskName}" completed`, task.country, 'success');
         logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
       }
     }, 2000);
   };
 
   const runWorkflowSequence = (workflowName: string, country: string = 'global') => {
-    console.log(`[AI WORKFLOW] Initiating sequence: ${workflowName} for ${country}`);
     const relevantTasks = workflows.filter(w => w.country === country || w.country === 'global');
     relevantTasks.forEach((task, idx) => {
-      setTimeout(() => runWorkflowTask(task.id), idx * 3000);
+      setTimeout(() => runWorkflowTask(task.id), idx * 1500);
     });
+  };
+
+  const syncGlobalProducts = (regions: CountryCode[] = ['us', 'uk', 'ae', 'in', 'sg']) => {
+    setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions } : p));
+    logAction('Master Product Hub Sync', `${regions.length} Countries`);
   };
 
   const submitApproval = (contentType: ApprovalRequest['contentType'], contentId: string, country = 'global') => {
     if (!currentUser) return;
     const req: ApprovalRequest = { id: `a-${Date.now()}`, userId: currentUser.id, userName: currentUser.name, contentType, contentId, country, status: 'pending', timestamp: new Date().toISOString() };
     setApprovalRequests(prev => [req, ...prev]);
-    sendNotification('country_admin', `${currentUser.name} submitted ${contentType} for review`, country.toLowerCase(), 'info');
     logAction(`Submitted ${contentType} for Approval`, contentId, country.toLowerCase());
   };
 
@@ -514,7 +534,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setApprovalRequests(prev => prev.map(a => {
       if (a.id === requestId) {
         const status = approve ? 'approved' : 'rejected';
-        sendNotification('operator', `Submission ${requestId} has been ${status}`, a.country, approve ? 'success' : 'alert');
+        if (approve && a.contentType === 'listing') {
+          setProducts(prevP => prevP.map(p => p.id === a.contentId ? { ...p, status: 'verified' } : p));
+        }
         logAction(`${approve ? 'Approved' : 'Rejected'} Submission`, a.contentId, a.country, approve ? 'low' : 'medium');
         return { ...a, status, comments, approvedBy: currentUser?.name };
       }
@@ -538,14 +560,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...data
     };
     setVendors(prev => [...prev, newVendor]);
-    sendNotification('country_admin', `New Partner Atelier Request: ${newVendor.name}`, 'global', 'info');
     logAction('Partner Atelier Registered', newVendor.name);
   };
 
   const approveVendor = (id: string) => {
     setVendors(prev => prev.map(v => {
       if (v.id === id) {
-        sendEmailMock('vendor', `Your partnership with Maison Amarisé has been approved.`, v.name);
         logAction('Approved Partner Atelier', v.name);
         return { ...v, status: 'active' };
       }
@@ -567,14 +587,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...data
     };
     setVipClients(prev => [...prev, newClient]);
-    sendNotification('country_admin', `Elite Registry Application: ${newClient.name}`, 'global', 'info');
     logAction('Connoisseur Registered', newClient.name);
   };
 
   const verifyClient = (id: string) => {
     setVipClients(prev => prev.map(c => {
       if (c.id === id) {
-        sendEmailMock('client', `Welcome to the Maison Amarisé Elite Registry. Your status is now verified.`, c.name);
         logAction('Verified Connoisseur', c.name);
         return { ...c, status: 'verified' };
       }
@@ -589,10 +607,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       logs: [{ id: `l-${Date.now()}`, message: 'Test cycle initiated...', timestamp: new Date().toISOString() }] 
     } : t));
     
-    console.log(`[QA MOCK] Running test: ${id}`);
-
     setTimeout(() => {
-      const passed = Math.random() > 0.1;
+      const passed = Math.random() > 0.05;
       setQaTests(prev => prev.map(t => t.id === id ? { 
         ...t, 
         status: passed ? 'passed' : 'failed', 
@@ -604,18 +620,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } : t));
       
       if (!passed) {
-        logMaisonError({
-          module: 'System',
-          type: 'QAFailure',
-          country: 'global',
-          message: `Integrity test "${id}" failed validation during automated batch execution.`,
-          severity: 'medium',
-          brandId: activeBrandId
-        });
+        logMaisonError({ module: 'System', type: 'QAFailure', country: 'global', message: `Test "${id}" failed validation.`, severity: 'medium', brandId: activeBrandId });
       }
-
       logAction(`Executed QA Test: ${id}`, 'QA System', 'global', passed ? 'low' : 'high');
-      sendNotification('super_admin', `QA Test "${id}" completed with status: ${passed ? 'PASSED' : 'FAILED'}`, 'global', passed ? 'success' : 'alert');
     }, 1500);
   };
 
@@ -668,9 +675,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
     
     if (leadTier === 1) {
-      sendNotification('country_admin', `HIGH PRIORITY Acquisition Intent: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'alert');
-    } else {
-      sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'info');
+      sendNotification('country_admin', `HIGH PRIORITY Lead: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'alert');
     }
     
     logAction('Captured Acquisition Lead', inquiry.customerName, enrichedInquiry.country.toLowerCase(), leadTier === 1 ? 'medium' : 'low');
@@ -746,7 +751,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
-    upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
+    upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
