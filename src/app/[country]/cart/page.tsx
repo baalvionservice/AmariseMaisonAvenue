@@ -6,8 +6,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
+import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
 import { Trash2, ShoppingBag } from 'lucide-react';
 
+/**
+ * CartPage: High-trust transactional review.
+ * Updated to use the Institutional Placeholder for artifact thumbnails.
+ */
 export default function CartPage() {
   const { cart, removeFromCart } = useAppStore();
   const { country } = useParams();
@@ -40,8 +45,9 @@ export default function CartPage() {
         <div className="lg:w-2/3 space-y-8">
           {cart.map((item) => (
             <div key={item.id} className="flex gap-8 pb-8 border-b border-border group">
-              <div className="relative w-32 h-40 bg-muted flex-shrink-0 flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-gray-300">
-                Piece
+              {/* Institutional Thumbnail Placeholder */}
+              <div className="relative w-32 h-40 flex-shrink-0">
+                <PlaceholderImage className="w-full h-full text-[6px] p-2" />
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">

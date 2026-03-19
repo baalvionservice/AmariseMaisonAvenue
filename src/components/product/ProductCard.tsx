@@ -11,7 +11,7 @@ import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
+import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
 
 interface ProductCardProps {
   product: Product;
@@ -19,7 +19,7 @@ interface ProductCardProps {
 
 /**
  * ProductCard: Optimized for institutional trust and private acquisition.
- * Uses semantic <article> tag and optimized Image delivery.
+ * Updated to use the Lens Opening Placeholder for artifact visuals.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -57,21 +57,9 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
 
   return (
     <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full" aria-labelledby={`title-${product.id}`}>
-      <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]" aria-label={`View details for ${product.name}`}>
-        {/* Loading placeholder optimized for CLS prevention */}
-        <div className="absolute inset-0 bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-[1.5s] group-hover:scale-105 group-hover:bg-ivory" aria-hidden="true">
-          Archive Asset
-        </div>
-        
-        {/* Main image using lazy loading for non-LCP content */}
-        <Image 
-          src={product.imageUrl} 
-          alt={`${product.name} - Atelier Archive View`}
-          fill
-          className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          loading="lazy"
-        />
+      <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden" aria-label={`View details for ${product.name}`}>
+        {/* Institutional Placeholder Replacement */}
+        <PlaceholderImage className="absolute inset-0 w-full h-full transition-transform duration-[1.5s] group-hover:scale-105" />
         
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         

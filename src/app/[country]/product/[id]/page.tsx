@@ -7,18 +7,18 @@ import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
-  ChevronRight,
-  Star,
-  Zap,
-  Calendar,
-  ShieldCheck,
-  TrendingUp,
-  Award,
-  Lock,
-  Sparkles,
-  Info,
-  Crown,
-  MessageSquare
+  ChevronRight, 
+  Star, 
+  Zap, 
+  Calendar, 
+  ShieldCheck, 
+  TrendingUp, 
+  Award, 
+  Lock, 
+  Sparkles, 
+  Info, 
+  Crown, 
+  MessageSquare 
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -27,10 +27,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ProductCard } from '@/components/product/ProductCard';
 import { InquiryModal } from '@/components/product/InquiryModal';
+import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import Image from 'next/image';
 
+/**
+ * ProductDetailPage: High-authority artifact acquisition view.
+ * Updated to use standard institutional placeholders for all product visuals.
+ */
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -126,14 +130,8 @@ export default function ProductPage() {
         <div className="flex flex-col lg:flex-row gap-24">
           <section className="w-full lg:w-[55%] space-y-8" aria-label="Product Gallery">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              <Image 
-                src={product.imageUrl} 
-                alt={`${product.name} - Heritage Perspective ${activeMediaIndex + 1}`}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
+              {/* Institutional Placeholder for Main Gallery */}
+              <PlaceholderImage className="w-full h-full" />
               
               {monetization.scarcityTag && (
                 <div className="absolute top-8 left-8 bg-black px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80 border border-white/10">
@@ -148,11 +146,11 @@ export default function ProductPage() {
                     onClick={() => setActiveMediaIndex(idx)}
                     aria-label={`Switch to frame ${idx + 1}`}
                     className={cn(
-                      "w-12 h-16 border transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter",
-                      activeMediaIndex === idx ? "border-plum bg-ivory text-plum scale-110 shadow-lg" : "border-border bg-muted text-gray-400 opacity-60"
+                      "w-12 h-16 border transition-all overflow-hidden relative",
+                      activeMediaIndex === idx ? "border-plum bg-ivory scale-110 shadow-lg" : "border-border bg-white text-gray-400 opacity-60"
                     )}
                    >
-                     FRAME {idx+1}
+                     <PlaceholderImage className="w-full h-full text-[6px] p-1" />
                    </button>
                  ))}
               </div>
