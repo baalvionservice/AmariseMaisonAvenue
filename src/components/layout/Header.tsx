@@ -242,7 +242,7 @@ export const Header = () => {
         </div>
         
         <nav className="flex items-center space-x-8" aria-label="Utility Navigation">
-          <Link href="#" className="hover:text-secondary transition-colors py-2">Consignment</Link>
+          <Link href={`/${countryCode}/how-to-sell`} className="hover:text-secondary transition-colors py-2">Consignment</Link>
           <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors py-2">Atelier Viewings</Link>
           <Link href={`/${countryCode}/contact`} className="hover:text-secondary transition-colors py-2">Specialist Inquiry</Link>
           
@@ -381,7 +381,7 @@ export const Header = () => {
                         {col.links.map((sub) => (
                           <Link 
                             key={sub} 
-                            href="#" 
+                            href={`/${countryCode}/category/${link.name.toLowerCase()}`} 
                             className="text-[13px] font-light text-gray-600 hover:text-black transition-colors"
                           >
                             {sub}

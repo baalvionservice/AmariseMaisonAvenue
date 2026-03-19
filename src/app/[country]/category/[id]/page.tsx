@@ -29,7 +29,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "@/components/sheet";
 import {
   Accordion,
   AccordionContent,
@@ -90,14 +90,12 @@ export default function CategoryPage() {
     { name: 'Ivory', count: 29, hex: '#FFFFF0' },
   ];
 
-  // Condition Registry from reference image
   const conditions = [
     { name: 'New', count: 233 },
     { name: 'Pre-owned', count: 256 },
     { name: 'Vintage', count: 33 },
   ];
 
-  // Hardware Registry from reference image
   const hardwares = [
     { name: 'Gold', count: 196 },
     { name: 'Brushed Gold', count: 20 },
@@ -107,7 +105,6 @@ export default function CategoryPage() {
     { name: 'Ruthenium', count: 1 },
   ];
 
-  // Size Registry from reference image
   const sizes = [
     { name: 'Small', count: 153 },
     { name: 'Medium', count: 225 },
@@ -115,14 +112,12 @@ export default function CategoryPage() {
     { name: 'Extra Large', count: 8 },
   ];
 
-  // Showroom Registry from reference image
   const showrooms = [
     { name: 'Both Showrooms - NYC & Palm Beach', count: 1 },
     { name: 'New York City', count: 64 },
     { name: 'Palm Beach', count: 41 },
   ];
 
-  // Archival Birkin Sizes for the visual nav
   const birkinSizes = [
     { name: 'Birkin 25CM', id: '25cm' },
     { name: 'Birkin 30CM', id: '30cm' },
@@ -131,24 +126,23 @@ export default function CategoryPage() {
     { name: 'Shoulder Birkins', id: 'shoulder' },
   ];
 
-  // Specific Mock Birkin Products for the demonstration
   const birkinProducts = [
     {
-      id: 'birkin-hss-25',
+      id: 'prod-1',
       name: 'Hermès Special Order (HSS) Birkin 25 White and Etoupe Clemence Brushed Gold Hardware',
       price: 31741.89,
       imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000'
     },
     {
-      id: 'birkin-hss-rose',
+      id: 'prod-10',
       name: 'Hermès Special Order (HSS) Birkin 25 White and Rose Sakura Clemence Rose Gold Hardware',
       price: 33481.17,
       imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Rose_Sakura_Clemence_Rose_Gold_Hardware_1.jpg?v=1691512345&width=1000'
     },
     {
-      id: 'birkin-white-25-swift',
-      name: 'Hermès Birkin 25 New White Swift Palladium Hardware',
-      price: 27393.69,
+      id: 'prod-50',
+      name: 'Pre-owned Hermès Birkin 30 White Epsom Palladium Hardware',
+      price: 15218.71,
       imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400',
       isNew: true
     }
@@ -162,7 +156,7 @@ export default function CategoryPage() {
 
   return (
     <div className="bg-white min-h-screen pb-20 animate-fade-in font-body">
-      {/* 1. Institutional Filter Sidebar (Drawer) */}
+      {/* Institutional Filter Sidebar */}
       <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
         <SheetContent side="right" className="w-full sm:max-w-[450px] p-0 border-none rounded-none bg-white flex flex-col h-full shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between p-8 border-b border-gray-100 bg-white z-20">
@@ -345,7 +339,7 @@ export default function CategoryPage() {
       <div className="container mx-auto px-6 max-w-[1600px] pt-12">
         <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* 2. Deep-Nested Navigation Sidebar */}
+          {/* Deep-Nested Navigation Sidebar */}
           <aside className="lg:w-72 shrink-0 space-y-12">
             <div className="space-y-10 sticky top-40">
               <h2 className="text-xl font-headline italic text-gray-400 border-b border-gray-100 pb-4">{category.name}</h2>
@@ -419,14 +413,14 @@ export default function CategoryPage() {
             </div>
           </aside>
 
-          {/* 3. Main Registry View */}
+          {/* Main Registry View */}
           <main className="flex-1 space-y-12">
             <header className="space-y-10">
               <h1 className="text-3xl font-headline font-medium text-black">
                 {selectedSub === '25cm' ? 'Hermès Birkin 25cm' : (id === 'hermes' ? 'Hermès Birkin Bags' : `${category.name} Archives`)}
               </h1>
 
-              {/* 4. Visual "Shop By Size" Matrix */}
+              {/* Visual "Shop By Size" Matrix */}
               <div className="space-y-6">
                 <span className="text-[10px] font-bold tracking-[0.1em] uppercase text-gray-400">SHOP BY SIZE:</span>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -451,7 +445,7 @@ export default function CategoryPage() {
                 </div>
               </div>
 
-              {/* 5. Controls Matrix */}
+              {/* Controls Matrix */}
               <div className="flex items-center justify-between py-4 bg-[#f8f8f8] px-6">
                 <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">
                   {selectedSub === '25cm' ? '150 products' : '524 products'}
@@ -477,10 +471,10 @@ export default function CategoryPage() {
               </div>
             </header>
 
-            {/* 6. High-Fidelity Product Grid */}
+            {/* High-Fidelity Product Grid - Linked to detail pages */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-24">
               {(selectedSub === '25cm' ? birkinProducts : birkinProducts).map(product => (
-                <div key={product.id} className="group cursor-pointer">
+                <Link key={product.id} href={`/${countryCode}/product/${product.id}`} className="group cursor-pointer block">
                   <div className="relative aspect-[4/5] bg-white mb-8 overflow-hidden flex items-center justify-center border border-gray-50 shadow-sm group-hover:shadow-md transition-all">
                     <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-8 transition-transform duration-700 group-hover:scale-105" />
                     
@@ -490,7 +484,7 @@ export default function CategoryPage() {
                       </div>
                     )}
 
-                    <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors bg-transparent border-none outline-none">
+                    <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors bg-transparent border-none outline-none" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                       <Heart className="w-5 h-5" />
                     </button>
                   </div>
@@ -502,11 +496,11 @@ export default function CategoryPage() {
                       €{product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
-            {/* 7. Judy Shopping Assistant Footer */}
+            {/* Judy Shopping Assistant Footer */}
             <div className="mt-40 pt-20 border-t border-gray-100 flex flex-col items-center space-y-12">
               <div className="flex flex-col items-center space-y-4">
                 <div className="flex items-center space-x-3 text-gray-900">
