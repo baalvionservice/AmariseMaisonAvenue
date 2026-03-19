@@ -17,23 +17,37 @@ import {
   Package,
   Boxes,
   Search,
-  X
+  X,
+  Send,
+  CheckCircle2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useCMS } from '@/hooks/use-cms';
+import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/hooks/use-search';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ContentAdminHub() {
   const { sections, updateSection } = useCMS();
+  const { submitApproval, currentUser } = useAppStore();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('sections');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Integrated Advanced Search
   const filteredSections = useSearch(sections, searchQuery);
+
+  const handlePublishRequest = (sectionId: string, title: string) => {
+    submitApproval('editorial', sectionId, currentUser?.country);
+    toast({
+      title: "Publishing Request Transmitted",
+      description: `Draft "${title}" has been sent to regional curators for verification.`,
+    });
+  };
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -116,9 +130,18 @@ export default function ContentAdminHub() {
                     </div>
                     
                     <div className="pt-6 border-t border-border flex justify-between items-center">
-                      <Button variant="ghost" className="h-8 px-4 text-[9px] font-bold uppercase text-gray-400 hover:text-plum">
-                        <Edit3 className="w-3 h-3 mr-2" /> Edit Layout
-                      </Button>
+                      <div className="flex space-x-2">
+                        <Button variant="ghost" className="h-8 px-4 text-[9px] font-bold uppercase text-gray-400 hover:text-plum">
+                          <Edit3 className="w-3 h-3 mr-2" /> Edit Layout
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="h-8 px-4 text-[9px] font-bold uppercase text-plum hover:bg-plum/5"
+                          onClick={() => handlePublishRequest(section.id, section.title)}
+                        >
+                          <Send className="w-3 h-3 mr-2" /> Submit for Approval
+                        </Button>
+                      </div>
                       <Button variant="ghost" className="h-8 px-4 text-[9px] font-bold uppercase text-gray-400">
                         <LayoutDashboard className="w-3 h-3 mr-2" /> Analytics
                       </Button>

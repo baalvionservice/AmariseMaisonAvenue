@@ -361,7 +361,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const scopedApprovals = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin') return approvalRequests;
-    return approvalRequests.filter(a => a.country === currentUser.country);
+    return approvalRequests.filter(a => a.country === currentUser.country || a.country === 'global');
   }, [approvalRequests, currentUser]);
 
   const scopedAuditLogs = useMemo(() => {

@@ -30,7 +30,8 @@ import {
   X,
   Store,
   Briefcase,
-  FlaskConical
+  FlaskConical,
+  CalendarDays
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -256,8 +257,8 @@ export default function OperationsAdminPanel() {
               </div>
 
               <div className="grid grid-cols-1 gap-8">
-                {scopedApprovals.map(req => (
-                  <Card key={req.id} className="bg-white border-border shadow-sm overflow-hidden flex flex-col md:row">
+                {scopedApprovals.length > 0 ? scopedApprovals.map(req => (
+                  <Card key={req.id} className="bg-white border-border shadow-sm overflow-hidden flex flex-col md:flex-row">
                     <div className="md:w-64 bg-ivory/50 p-8 border-r border-border flex flex-col justify-between">
                       <div className="space-y-4">
                         <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest">{req.contentType}</Badge>
@@ -278,9 +279,20 @@ export default function OperationsAdminPanel() {
                           <h3 className="text-xl font-headline font-bold italic">Institutional Review Required</h3>
                           <p className="text-xs text-gray-500 italic">"The submitted piece requires verification of provenance and material quality compliance."</p>
                         </div>
-                        <Badge variant={req.status === 'pending' ? 'outline' : 'default'} className="uppercase text-[8px]">
-                          {req.status}
-                        </Badge>
+                        <div className="flex flex-col items-end space-y-2">
+                          <Badge variant={req.status === 'pending' ? 'outline' : 'default'} className={cn(
+                            "uppercase text-[8px]",
+                            req.status === 'approved' && "bg-green-500",
+                            req.status === 'rejected' && "bg-red-500"
+                          )}>
+                            {req.status}
+                          </Badge>
+                          {req.status === 'approved' && (
+                            <span className="text-[8px] font-bold text-gray-400 uppercase flex items-center">
+                              <CalendarDays className="w-3 h-3 mr-1" /> Scheduled for Publish
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {req.status === 'pending' && (
@@ -300,9 +312,20 @@ export default function OperationsAdminPanel() {
                           </Button>
                         </div>
                       )}
+                      
+                      {req.comments && (
+                        <div className="mt-6 p-4 bg-muted text-[10px] italic text-gray-500 border-l-2 border-plum">
+                          Admin Comments: {req.comments}
+                        </div>
+                      )}
                     </div>
                   </Card>
-                ))}
+                )) : (
+                  <div className="py-40 text-center space-y-6 opacity-20 border-2 border-dashed border-border rounded-sm">
+                    <RotateCcw className="w-12 h-12 mx-auto" />
+                    <p className="text-xl font-headline italic">The Approval Queue is Currently Clear.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
