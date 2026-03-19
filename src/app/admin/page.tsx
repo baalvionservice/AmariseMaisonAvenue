@@ -23,7 +23,11 @@ import {
   Eye, 
   Target, 
   BarChart3, 
-  AlertTriangle 
+  AlertTriangle,
+  BrainCircuit,
+  Sparkles,
+  ChevronRight,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +49,36 @@ export default function AdminDashboard() {
     [selectedRegionId, regions]
   );
 
-  // Autonomous Intelligence Insight Generator
+  // --- Prediction & Insight Engine ---
+  const predictions = useMemo(() => {
+    return Object.values(regions).map(region => {
+      const highIntent = region.cart + region.checkout;
+      const avgValue = 25000; // Maison Avg Artifact Value
+      const probability = (region.purchased / (region.viewing || 1)) * 100;
+      
+      // Predicted Revenue = (Checkout * Value) + (Cart * Value * Probability Factor)
+      const predictedRev = (region.checkout * avgValue) + (region.cart * avgValue * 0.35);
+      
+      let aiInsight = "Market stability maintained. Monitor resonance.";
+      if (region.cart > 40 && region.purchased < 5) aiInsight = "Checkout friction detected — optimize pricing.";
+      else if (region.checkout > 15) aiInsight = "High conversion window — push private offers now.";
+      else if (region.wishlist > 80) aiInsight = "Strong archive interest — retarget collectors.";
+      else if (region.revenue > 1200000) aiInsight = "Momentum detected — scale jurisdictional traffic.";
+
+      return {
+        ...region,
+        highIntent,
+        predictedRev,
+        probability,
+        aiInsight
+      };
+    });
+  }, [regions]);
+
+  const globalForecast = useMemo(() => {
+    return predictions.reduce((acc, curr) => acc + curr.predictedRev, 0);
+  }, [predictions]);
+
   useEffect(() => {
     const generateInsights = () => {
       const newInsights: string[] = [];
@@ -80,9 +113,9 @@ export default function AdminDashboard() {
           <p className="text-sm text-slate-500 max-w-2xl">Real-time global yield monitoring and curatorial oversight.</p>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="flex items-center bg-white border border-slate-200 rounded-md p-1 mr-4">
-            <button className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-slate-900 text-white rounded">Live Simulation</button>
-            <button className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">Historical</button>
+          <div className="flex flex-col items-end mr-6 text-right">
+             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Aggregate Forecast (1h)</span>
+             <span className="text-xl font-headline font-bold text-emerald-600 italic tracking-tighter">+${(globalForecast / 1000).toFixed(1)}k</span>
           </div>
           <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-[10px] h-11 px-6 rounded-md shadow-lg shadow-blue-600/20">
             <RefreshCcw className="w-4 h-4 mr-2" /> Sync Registry
@@ -208,7 +241,23 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Market Intelligence Matrix (NEW) */}
+      <section className="space-y-8">
+        <div className="flex items-center space-x-4">
+           <div className="p-3 bg-plum/10 rounded-full text-plum"><BrainCircuit className="w-6 h-6" /></div>
+           <div>
+              <h2 className="text-2xl font-headline font-bold italic text-gray-900 uppercase tracking-tight">Market Intelligence Matrix</h2>
+              <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Jurisdictional Acquisition Forecasts</p>
+           </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
+           {predictions.map(pred => (
+             <PredictionCard key={pred.id} data={pred} />
+           ))}
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20">
         {/* Action Matrix */}
         <Card className="lg:col-span-12 bg-white border-slate-200 shadow-sm luxury-card-lift flex flex-col">
           <CardHeader className="border-b border-slate-100 p-8 bg-slate-50/30">
@@ -253,6 +302,54 @@ export default function AdminDashboard() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function PredictionCard({ data }: { data: any }) {
+  return (
+    <Card className="bg-white border-slate-200 shadow-sm overflow-hidden hover:border-plum transition-all duration-500 group">
+       <div className="p-6 space-y-6">
+          <div className="flex justify-between items-start">
+             <div className="space-y-1">
+                <h4 className="text-lg font-headline font-bold italic text-gray-900">{data.name}</h4>
+                <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Hub ID: {data.id.toUpperCase()}</p>
+             </div>
+             <Sparkles className="w-4 h-4 text-plum/40 group-hover:text-plum transition-colors" />
+          </div>
+
+          <div className="space-y-4">
+             <div className="space-y-1">
+                <p className="text-[9px] font-bold uppercase text-slate-400">Forecast (1h)</p>
+                <p className="text-2xl font-headline font-bold text-emerald-600 italic tracking-tighter">${data.predictedRev.toLocaleString()}</p>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+                <div className="space-y-1">
+                   <p className="text-[8px] font-bold uppercase text-slate-400">Intent Users</p>
+                   <p className="text-sm font-bold text-orange-500">{data.highIntent}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[8px] font-bold uppercase text-slate-400">Probability</p>
+                   <p className="text-sm font-bold text-blue-500">{data.probability.toFixed(1)}%</p>
+                </div>
+             </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-50">
+             <p className="text-[10px] text-gray-500 font-light italic leading-relaxed h-10 overflow-hidden line-clamp-2">
+               "{data.aiInsight}"
+             </p>
+          </div>
+       </div>
+       <div className="h-1 w-full bg-slate-50 relative overflow-hidden">
+          <motion.div 
+            className="h-full bg-plum absolute left-0" 
+            initial={{ width: 0 }}
+            animate={{ width: `${data.probability}%` }}
+            transition={{ duration: 1 }}
+          />
+       </div>
+    </Card>
   );
 }
 
