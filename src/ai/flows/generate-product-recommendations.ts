@@ -32,6 +32,9 @@ const RecommendedProductSchema = z.object({
     z.string().describe('Currency of the mock price (e.g., "USD", "GBP", "AED").'),
   imageUrl: z.string().url().describe('URL to a mock image of the product.'),
   category: z.string().describe('Category of the recommended product.'),
+  departmentId: z.string().describe('The department ID (women, men, jewelry, watches).'),
+  categoryId: z.string().describe('The category ID.'),
+  subcategoryId: z.string().describe('The subcategory slug.'),
   isVip: z.boolean().describe('Whether it is a VIP artifact.'),
   rating: z.number().describe('Mock rating from 4.0 to 5.0.'),
   reviewsCount: z.number().describe('Mock review count.'),
@@ -67,6 +70,9 @@ export async function generateProductRecommendations(
           currency: 'USD',
           imageUrl: 'https://picsum.photos/seed/amarise-fallback-1/800/800',
           category: 'Accessories',
+          departmentId: 'women',
+          categoryId: 'accessories',
+          subcategoryId: 'silk-scarves',
           isVip: true,
           rating: 4.9,
           reviewsCount: 124
@@ -79,6 +85,9 @@ export async function generateProductRecommendations(
           currency: 'USD',
           imageUrl: 'https://picsum.photos/seed/amarise-fallback-2/800/800',
           category: 'Watches',
+          departmentId: 'watches',
+          categoryId: 'wa-complications',
+          subcategoryId: 'tourbillons',
           isVip: true,
           rating: 5.0,
           reviewsCount: 18
@@ -91,6 +100,9 @@ export async function generateProductRecommendations(
           currency: 'USD',
           imageUrl: 'https://picsum.photos/seed/amarise-fallback-3/800/800',
           category: 'Apparel',
+          departmentId: 'women',
+          categoryId: 'w-couture',
+          subcategoryId: 'evening-gowns',
           isVip: false,
           rating: 4.8,
           reviewsCount: 42
@@ -111,7 +123,22 @@ User Scenario: {{{scenario}}}
 The user is currently viewing product with ID: {{{currentProductId}}}. Consider this in your recommendations.
 {{/if}}
 
-Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. Provide a unique ID, a concise name, a brief description, a mock base price (between 500 and 10000), a currency (USD, GBP, AED, INR, SGD), a placeholder image URL (use https://picsum.photos/seed/<unique_id>/800/800), a category, isVip (boolean), rating (4.0-5.0), and reviewsCount for each product.`,
+Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. 
+
+CRITICAL: You must provide the following fields exactly as named:
+- id: unique string
+- name: concise product name
+- description: brief narrative
+- basePrice: a number between 500 and 100000
+- currency: USD, GBP, or AED
+- imageUrl: https://picsum.photos/seed/<unique_id>/800/800
+- category: human-readable category name
+- departmentId: one of [women, men, jewelry, watches, accessories]
+- categoryId: e.g., w-bags, j-high, wa-complications
+- subcategoryId: slug-style subcategory
+- isVip: boolean
+- rating: number 4.0-5.0
+- reviewsCount: integer`,
 });
 
 const generateProductRecommendationsFlow = ai.defineFlow(
