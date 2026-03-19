@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { 
   ChevronRight, 
-  ChevronDown,
+  ChevronDown, 
   ChevronUp,
   Filter, 
   Heart,
@@ -29,7 +29,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/sheet";
+} from "@/components/ui/sheet";
 import {
   Accordion,
   AccordionContent,
