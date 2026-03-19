@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { 
   ChevronRight, 
   ChevronDown,
+  ChevronUp,
   Filter, 
   Search,
   Heart,
@@ -32,10 +33,7 @@ export default function CategoryPage() {
   
   const [activeSort, setActiveSort] = useState('Featured');
 
-  const isHermes = id === 'hermes';
-
   const filteredProducts = useMemo(() => {
-    // For demo, if it's Hermès, we show a subset or all products with a 'Hermès' vibe
     return PRODUCTS.slice(0, 36);
   }, []);
 
@@ -49,19 +47,16 @@ export default function CategoryPage() {
             <div className="space-y-10 sticky top-40">
               <h2 className="text-2xl font-headline italic text-gray-900 border-b border-gray-100 pb-4">{category.name}</h2>
               
-              <nav className="space-y-6">
+              <nav className="space-y-2">
                 <SidebarNavItem label="HANDBAGS" hasSub />
                 <SidebarNavItem label="ACCESSORIES" hasSub />
                 <SidebarNavItem label="JEWELRY" hasSub />
                 <SidebarNavItem label="SHOES" />
                 
                 <div className="pt-4 space-y-4">
-                  <div className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-gray-900">
-                    <span>CURATIONS</span>
-                    <ChevronDown className="w-3 h-3" />
-                  </div>
-                  <ul className="pl-4 space-y-3">
-                    <SidebarLink label="New Arrivals" active />
+                  <SidebarNavItem label="CURATIONS" hasSub isOpen />
+                  <ul className="pl-4 space-y-4 pt-2">
+                    <SidebarLink label="New Arrivals" />
                     <SidebarLink label="Bestsellers" />
                     <SidebarLink label="Pre-Owned & Vintage Handbags" />
                     <SidebarLink label="Exotic Handbags" hasSub />
@@ -149,11 +144,13 @@ export default function CategoryPage() {
   );
 }
 
-function SidebarNavItem({ label, hasSub }: { label: string, hasSub?: boolean }) {
+function SidebarNavItem({ label, hasSub, isOpen }: { label: string, hasSub?: boolean, isOpen?: boolean }) {
   return (
-    <div className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-gray-400 hover:text-black transition-colors cursor-pointer group">
+    <div className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:opacity-60 transition-opacity cursor-pointer border-b border-gray-50 py-4 first:pt-0">
       <span>{label}</span>
-      {hasSub && <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />}
+      {hasSub && (
+        isOpen ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+      )}
     </div>
   );
 }
@@ -162,7 +159,7 @@ function SidebarLink({ label, active, hasSub }: { label: string, active?: boolea
   return (
     <li className="flex items-center justify-between group cursor-pointer">
       <span className={cn(
-        "text-[12px] font-light transition-colors",
+        "text-[13px] font-light transition-colors leading-tight",
         active ? "text-gray-900 font-normal" : "text-gray-500 hover:text-black"
       )}>
         {label}
