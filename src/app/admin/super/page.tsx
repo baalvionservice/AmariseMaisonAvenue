@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Globe, 
@@ -23,7 +23,13 @@ import {
   AlertTriangle,
   RotateCcw,
   Search,
-  Activity
+  Activity,
+  History,
+  Lock,
+  ArrowRight,
+  ShieldAlert,
+  Download,
+  Filter
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +46,16 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { SyncCategory, CountryCode } from '@/lib/types';
 
 export default function SuperAdminHub() {
   const { 
@@ -53,17 +69,156 @@ export default function SuperAdminHub() {
     products,
     syncGlobalProducts,
     scopedErrors,
-    qaTests
+    qaTests,
+    globalSyncHistory,
+    executeSafeSync,
+    rollbackGlobalSync,
+    currentUser
   } = useAppStore();
 
-  const [activeTab, setActiveTab] = useState<'global' | 'countries' | 'brands' | 'infrastructure'>('global');
+  const [activeTab, setActiveTab] = useState<'global' | 'countries' | 'brands' | 'sync' | 'infrastructure'>('global');
+  const [isSyncModalOpen, setIsSyncOpen] = useState(false);
+  const [syncStep, setSyncStep] = useState(1);
+  const [selectedCats, setSyncCats] = useState<SyncCategory[]>(['products']);
+  const [selectedTargets, setSyncTargets] = useState<CountryCode[]>(['us', 'uk', 'ae', 'in', 'sg']);
 
   const globalTotalRevenue = invoices.reduce((acc, inv) => acc + inv.amount, 0);
   const globalLeads = privateInquiries.length;
   const syncRate = products.filter(p => p.scope === 'global').length / products.length * 100;
 
+  const isHighImpactSync = selectedCats.includes('config') || selectedCats.includes('roles');
+
+  const handleStartSync = () => {
+    executeSafeSync(selectedCats, selectedTargets);
+    setIsSyncOpen(false);
+    setSyncStep(1);
+  };
+
+  const toggleCategory = (cat: SyncCategory) => {
+    setSyncCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  };
+
+  const toggleTarget = (code: CountryCode) => {
+    setSyncTargets(prev => prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]);
+  };
+
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
+      {/* Global Safe Sync Interface */}
+      <Dialog open={isSyncModalOpen} onOpenChange={setIsSyncOpen}>
+        <DialogContent className="max-w-3xl bg-white border-none shadow-2xl rounded-none p-0 overflow-hidden">
+          <div className="flex h-[500px]">
+            {/* Steps Sidebar */}
+            <div className="w-48 bg-ivory border-r border-border p-8 flex flex-col space-y-8">
+               <SyncStep num={1} label="Selection" active={syncStep === 1} completed={syncStep > 1} />
+               <SyncStep num={2} label="Impact Analysis" active={syncStep === 2} completed={syncStep > 2} />
+               <SyncStep num={3} label="Confirmation" active={syncStep === 3} completed={syncStep === 3} />
+            </div>
+
+            {/* Step Content */}
+            <div className="flex-1 p-12 flex flex-col">
+              {syncStep === 1 && (
+                <div className="space-y-10 animate-fade-in">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-headline font-bold italic">Safe Sync Matrix</h3>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400">Define the global synchronization parameters</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-plum">Data Categories</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <SyncOption label="Atelier Artifacts" checked={selectedCats.includes('products')} onChange={() => toggleCategory('products')} />
+                        <SyncOption label="SEO Metadata" checked={selectedCats.includes('seo')} onChange={() => toggleCategory('seo')} />
+                        <SyncOption label="Jurisdictional Roles" checked={selectedCats.includes('roles')} onChange={() => toggleCategory('roles')} />
+                        <SyncOption label="System Config" checked={selectedCats.includes('config')} onChange={() => toggleCategory('config')} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-plum">Target Market Hubs</p>
+                      <div className="flex flex-wrap gap-2">
+                        {countryConfigs.map(c => (
+                          <button 
+                            key={c.code}
+                            onClick={() => toggleTarget(c.code)}
+                            className={cn(
+                              "h-10 px-4 border text-[10px] font-bold uppercase tracking-widest transition-all",
+                              selectedTargets.includes(c.code) ? "bg-plum text-white border-plum shadow-md" : "bg-white border-border text-gray-400"
+                            )}
+                          >
+                            {c.code}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {syncStep === 2 && (
+                <div className="space-y-10 animate-fade-in h-full">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-headline font-bold italic">Pre-Flight Impact Report</h3>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400">Analysis of the proposed synchronization session</p>
+                  </div>
+
+                  <div className="bg-ivory p-8 border border-border space-y-6 flex-1">
+                    <div className="flex justify-between items-center pb-4 border-b border-border/40">
+                       <span className="text-[10px] font-bold uppercase tracking-widest">Affected Artifacts</span>
+                       <span className="font-bold text-gray-900">{products.filter(p => p.scope === 'global').length} Global Entries</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-4 border-b border-border/40">
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Impact Radius</span>
+                       <span className="text-[10px] font-bold uppercase text-plum">{selectedTargets.length} Market Hubs</span>
+                    </div>
+                    {isHighImpactSync && (
+                      <div className="p-4 bg-red-50 border border-red-100 flex items-start space-x-4">
+                        <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
+                        <div className="space-y-1">
+                           <p className="text-[10px] font-bold text-red-700 uppercase">HIGH IMPACT DETECTED</p>
+                           <p className="text-[9px] text-red-500 leading-relaxed italic">Changes to System Config or Roles can trigger global node restarts.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {syncStep === 3 && (
+                <div className="space-y-10 animate-fade-in flex flex-col items-center justify-center text-center py-12">
+                  <div className="w-20 h-20 bg-plum/10 rounded-full flex items-center justify-center mb-4">
+                    <Lock className="w-10 h-10 text-plum" />
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-3xl font-headline font-bold italic">Authorization Required</h3>
+                    <p className="text-sm text-gray-500 font-light italic max-w-sm">
+                      "By executing this cycle, you are authorizing a master override across {selectedTargets.length} jurisdictions. This action is recorded in the institutional compliance registry."
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-8 border-t border-border mt-auto flex justify-between">
+                <Button 
+                  variant="ghost" 
+                  className="text-[9px] font-bold uppercase tracking-widest h-10 px-6 rounded-none"
+                  onClick={() => syncStep > 1 ? setSyncStep(syncStep - 1) : setIsSyncOpen(false)}
+                >
+                  {syncStep === 1 ? 'Cancel' : 'Back'}
+                </Button>
+                <Button 
+                  className="bg-black text-white hover:bg-plum h-10 px-10 rounded-none text-[9px] font-bold uppercase tracking-widest shadow-xl"
+                  onClick={() => syncStep < 3 ? setSyncStep(syncStep + 1) : handleStartSync()}
+                >
+                  {syncStep === 3 ? 'AUTHORIZE & EXECUTE' : 'Next Step'} <ArrowRight className="ml-3 w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20">
         <div className="space-y-4">
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
@@ -74,6 +229,7 @@ export default function SuperAdminHub() {
         
         <nav className="flex-1 space-y-1">
           <SuperNavItem icon={<LayoutDashboard />} label="Global Pulse" active={activeTab === 'global'} onClick={() => setActiveTab('global')} />
+          <SuperNavItem icon={<RefreshCcw />} label="Safe Sync Hub" active={activeTab === 'sync'} onClick={() => setActiveTab('sync')} />
           <SuperNavItem icon={<Globe />} label="Country Matrix" active={activeTab === 'countries'} onClick={() => setActiveTab('countries')} />
           <SuperNavItem icon={<Briefcase />} label="Brand Registry" active={activeTab === 'brands'} onClick={() => setActiveTab('brands')} />
           <SuperNavItem icon={<Settings />} label="System Config" active={activeTab === 'infrastructure'} onClick={() => setActiveTab('infrastructure')} />
@@ -96,10 +252,10 @@ export default function SuperAdminHub() {
           </div>
           <div className="flex items-center space-x-4">
              <Button 
-              className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
-              onClick={() => syncGlobalProducts()}
+              className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest shadow-lg"
+              onClick={() => { setSyncStep(1); setIsSyncOpen(true); }}
              >
-               <RefreshCcw className="w-3.5 h-3.5 mr-2" /> SYNC ALL HUBS
+               <Zap className="w-3.5 h-3.5 mr-2" /> SAFE GLOBAL SYNC
              </Button>
              <Badge className="bg-plum text-white text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-none">Super Admin Access</Badge>
           </div>
@@ -194,8 +350,82 @@ export default function SuperAdminHub() {
             </>
           )}
 
+          {activeTab === 'sync' && (
+            <div className="space-y-12 animate-fade-in">
+              <div className="flex justify-between items-end">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-headline font-bold italic">Global Sync History</h2>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Institutional registry of master overrides and reverts</p>
+                </div>
+                <div className="flex space-x-4">
+                   <Button variant="outline" className="h-10 border-border text-[9px] font-bold uppercase tracking-widest h-12 rounded-none px-8">
+                     <Download className="w-3.5 h-3.5 mr-2" /> Export Log
+                   </Button>
+                </div>
+              </div>
+
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Sync ID</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Timestamp</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Actor</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Categories</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Hubs</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Emergency</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {globalSyncHistory.map(session => (
+                      <TableRow key={session.id} className="hover:bg-ivory/30 transition-colors group">
+                        <TableCell className="pl-8 text-[10px] font-mono text-gray-400 uppercase">{session.id}</TableCell>
+                        <TableCell className="text-xs font-light">{new Date(session.timestamp).toLocaleString()}</TableCell>
+                        <TableCell className="text-[10px] font-bold uppercase">{session.actorName}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {session.categories.map(c => <Badge key={c} variant="outline" className="text-[7px] uppercase h-5">{c}</Badge>)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs text-plum font-bold uppercase">{session.targets.length} Hubs</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant={session.status === 'rolled_back' ? 'destructive' : 'default'} className="text-[8px] uppercase tracking-tighter">
+                            {session.status.replace('_', ' ')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-8">
+                          {session.status === 'applied' && (
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-8 border-red-200 text-red-600 text-[8px] font-bold uppercase hover:bg-red-50 rounded-none group-hover:shadow-md"
+                              onClick={() => rollbackGlobalSync(session.id)}
+                            >
+                              <RotateCcw className="w-3 h-3 mr-2" /> Rollback Hubs
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {globalSyncHistory.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} className="py-40 text-center">
+                          <div className="flex flex-col items-center space-y-4 opacity-20">
+                            <RefreshCcw className="w-12 h-12" />
+                            <p className="text-xs font-bold uppercase tracking-[0.2em]">No master sync sessions recorded</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
+          )}
+
           {activeTab === 'countries' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
               {countryConfigs.map(country => (
                 <Card key={country.code} className="bg-white border-border shadow-luxury">
                   <CardHeader className="border-b border-border flex flex-row justify-between items-center bg-ivory/20">
@@ -226,7 +456,7 @@ export default function SuperAdminHub() {
           )}
 
           {activeTab === 'brands' && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-fade-in">
                <div className="flex justify-between items-end mb-8">
                   <div className="space-y-2">
                     <h2 className="text-2xl font-headline font-bold italic">Brand Registry</h2>
@@ -263,6 +493,32 @@ export default function SuperAdminHub() {
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+function SyncStep({ num, label, active, completed }: { num: number, label: string, active: boolean, completed: boolean }) {
+  return (
+    <div className={cn(
+      "flex flex-col items-center space-y-2 transition-all",
+      active ? "opacity-100" : completed ? "opacity-60" : "opacity-30"
+    )}>
+      <div className={cn(
+        "w-8 h-8 rounded-full border flex items-center justify-center text-[10px] font-bold",
+        active ? "bg-plum text-white border-plum shadow-lg" : completed ? "bg-black text-white border-black" : "border-gray-300 text-gray-400"
+      )}>
+        {completed && !active ? <CheckCircle2 className="w-4 h-4" /> : num}
+      </div>
+      <span className="text-[8px] font-bold uppercase tracking-widest text-center">{label}</span>
+    </div>
+  );
+}
+
+function SyncOption({ label, checked, onChange }: { label: string, checked: boolean, onChange: () => void }) {
+  return (
+    <div className="flex items-center space-x-3 p-4 bg-white border border-border hover:border-plum transition-all cursor-pointer group" onClick={onChange}>
+      <Checkbox checked={checked} onCheckedChange={onChange} className="data-[state=checked]:bg-plum" />
+      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-plum">{label}</span>
     </div>
   );
 }

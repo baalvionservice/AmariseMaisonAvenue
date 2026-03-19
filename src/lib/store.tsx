@@ -51,7 +51,9 @@ import {
   QATestCase,
   MaisonError,
   ArtifactVersion,
-  TransactionStatus
+  TransactionStatus,
+  GlobalSyncSession,
+  SyncCategory
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -90,6 +92,7 @@ interface AppContextType {
   brandConfigs: BrandConfig[];
   activeBrandId: string;
   currentUser: MaisonUser | null;
+  globalSyncHistory: GlobalSyncSession[];
   
   // Scoped Data Views
   scopedProducts: Product[];
@@ -183,6 +186,10 @@ interface AppContextType {
   upsertEditorial: (editorial: Editorial) => void;
   syncGlobalProducts: (regions?: CountryCode[]) => void;
   
+  // Safe Global Sync Actions
+  executeSafeSync: (categories: SyncCategory[], targets: CountryCode[]) => void;
+  rollbackGlobalSync: (sessionId: string) => void;
+
   // Sales Actions
   upsertPrivateInquiry: (inquiry: PrivateInquiry) => void;
   updateInquiryStatus: (id: string, status: PrivateInquiry['status']) => void;
@@ -253,6 +260,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [brandConfigs, setBrandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
+  const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
 
   // Content state
   const [cmsSections, setCmsSections] = useState<CMSSection[]>([
@@ -505,6 +513,57 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const syncGlobalProducts = (regions: CountryCode[] = ['us', 'uk', 'ae', 'in', 'sg']) => {
     setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions, lastSyncedAt: new Date().toISOString() } : p));
     logAction('Master Product Hub Sync', `${regions.length} Countries`);
+  };
+
+  // Safe Global Sync Execution
+  const executeSafeSync = (categories: SyncCategory[], targets: CountryCode[]) => {
+    // 1. Create Snapshot for Rollback
+    const snapshot: GlobalSyncSession['snapshotBefore'] = {
+      products: JSON.parse(JSON.stringify(products)),
+      seo: JSON.parse(JSON.stringify(seoRegistry)),
+      config: JSON.parse(JSON.stringify(countryConfigs))
+    };
+
+    const sessionId = `sync-${Date.now()}`;
+    const session: GlobalSyncSession = {
+      id: sessionId,
+      timestamp: new Date().toISOString(),
+      categories,
+      targets,
+      snapshotBefore: snapshot,
+      actorName: currentUser?.name || 'Super Admin',
+      status: 'applied'
+    };
+
+    // 2. Apply Targeted Overrides
+    if (categories.includes('products')) {
+      setProducts(prev => prev.map(p => 
+        p.scope === 'global' ? { ...p, regions: targets, lastSyncedAt: session.timestamp } : p
+      ));
+    }
+
+    if (categories.includes('seo')) {
+      setSeoRegistry(prev => prev.map(s => 
+        s.isGlobal ? { ...s, lastSyncedAt: session.timestamp } : s
+      ));
+    }
+
+    // 3. Save to History
+    setGlobalSyncHistory(prev => [session, ...prev]);
+    logAction(`Executed Safe Global Sync (${categories.join(', ')})`, `Targets: ${targets.join(', ')}`, 'global', 'medium');
+  };
+
+  const rollbackGlobalSync = (sessionId: string) => {
+    const session = globalSyncHistory.find(s => s.id === sessionId);
+    if (!session || session.status === 'rolled_back') return;
+
+    // Restore Snapshot
+    if (session.categories.includes('products')) setProducts(session.snapshotBefore.products);
+    if (session.categories.includes('seo')) setSeoRegistry(session.snapshotBefore.seo);
+    if (session.categories.includes('config')) setCountryConfigs(session.snapshotBefore.config);
+
+    setGlobalSyncHistory(prev => prev.map(s => s.id === sessionId ? { ...s, status: 'rolled_back' } : s));
+    logAction(`Rolled Back Global Sync`, sessionId, 'global', 'high');
   };
 
   const upsertCMSSection = (s: CMSSection) => setCmsSections(prev => {
@@ -776,7 +835,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
@@ -787,6 +846,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
     upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
@@ -796,7 +856,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
-    countryConfigs, brandConfigs, activeBrandId, currentUser, 
+    countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
@@ -807,6 +867,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
     upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,

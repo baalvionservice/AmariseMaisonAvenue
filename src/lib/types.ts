@@ -679,3 +679,19 @@ export interface Transaction {
   taxAmount?: number;
   netAmount?: number;
 }
+
+export type SyncCategory = 'products' | 'seo' | 'roles' | 'config';
+
+export interface GlobalSyncSession {
+  id: string;
+  timestamp: string;
+  categories: SyncCategory[];
+  targets: CountryCode[];
+  snapshotBefore: {
+    products: Product[];
+    seo: SEOMetadata[];
+    config: CountryConfig[];
+  };
+  actorName: string;
+  status: 'applied' | 'rolled_back';
+}
