@@ -581,6 +581,7 @@ export interface GlobalSettings {
     autoScalingStatus: string;
   };
   emergencyMode: boolean;
+  isGuideMode: boolean;
 }
 
 export interface VipClient {

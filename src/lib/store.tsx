@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -177,6 +178,7 @@ interface AppContextType {
   updateCountryConfig: (config: CountryConfig) => void;
   setActiveBrand: (id: string) => void;
   setCurrentUser: (user: MaisonUser | null) => void;
+  setGuideMode: (val: boolean) => void;
   
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
@@ -389,7 +391,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     payments: { cards: true, wallets: true, crypto: false },
     compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
     performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
-    emergencyMode: false
+    emergencyMode: false,
+    isGuideMode: false
   });
 
   const [isShowcaseMode, setShowcaseMode] = useState(false);
@@ -700,6 +703,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const toggleWishlist = (product: Product) => setWishlist(prev => prev.some(i => i.id === product.id) ? prev.filter(i => i.id !== product.id) : [...prev, product]);
   const clearCart = () => setCart([]);
   const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
+  const setGuideMode = (val: boolean) => setGlobalSettings(prev => ({ ...prev, isGuideMode: val }));
   
   const createInvoice = (inv: Invoice) => {
     setInvoices(prev => [inv, ...prev]);
@@ -914,7 +918,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
-    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setGuideMode,
     upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
