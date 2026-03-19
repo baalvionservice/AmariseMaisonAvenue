@@ -255,22 +255,3 @@ function YieldRow({ label, val, status }: { label: string, val: number, status: 
     </div>
   );
 }
-
-function Table({ children }: { children: React.ReactNode }) {
-  return <table className="w-full text-left text-sm">{children}</table>;
-}
-function TableHeader({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <thead className={cn("border-b border-border", className)}>{children}</thead>;
-}
-function TableBody({ children }: { children: React.ReactNode }) {
-  return <tbody>{children}</tbody>;
-}
-function TableRow({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) {
-  return <tr className={cn("border-b border-border last:border-0", className)} onClick={onClick}>{children}</tr>;
-}
-function TableHead({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <th className={cn("h-12 px-4 align-middle", className)}>{children}</th>;
-}
-function TableCell({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <td className={cn("p-4 align-middle", className)}>{children}</td>;
-}

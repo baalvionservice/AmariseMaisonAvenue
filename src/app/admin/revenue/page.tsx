@@ -375,7 +375,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
           <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
           <div className={cn(
             "flex items-center text-[10px] font-bold tracking-widest uppercase",
-            positive ? "text-gold" : "text-red-500"
+            positive ? "text-gold" : "text-gray-400"
           )}>
             {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : <ArrowDownRight className="ml-1 w-3 h-3" />}
           </div>
