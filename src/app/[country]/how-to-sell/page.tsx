@@ -10,7 +10,7 @@ import { ChevronRight } from 'lucide-react';
 
 /**
  * HowToSellPage: Replicated "Sell or Consign" Informational Page.
- * Features a high-fidelity dual-panel hero and a centered authority text section.
+ * Features a high-fidelity dual-panel hero, an authority text section, and a procedural "How it Works" grid.
  */
 export default function HowToSellPage() {
   const { country } = useParams();
@@ -80,7 +80,70 @@ export default function HowToSellPage() {
         </div>
       </section>
 
-      {/* 3. Final Step Gateway */}
+      {/* 3. Procedural "How it Works" Section */}
+      <section className="container mx-auto px-6 py-24 border-t border-gray-100">
+        <div className="text-center space-y-24">
+          <h2 className="text-2xl font-headline font-bold uppercase tracking-widest text-gray-900">
+            HOW IT WORKS
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-20 max-w-6xl mx-auto">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center space-y-12 group">
+              <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                  {/* Birkin Inspired Minimalist Outline */}
+                  <path d="M20 40 L80 40 L85 85 L15 85 Z" />
+                  <path d="M35 40 C35 25, 65 25, 65 40" />
+                  <path d="M45 40 L45 50 M55 40 L55 50" />
+                  <path d="M15 85 L85 85" />
+                </svg>
+              </div>
+              <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-900 uppercase">
+                SUBMIT & GET AN ESTIMATE
+              </h3>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center space-y-12 group">
+              <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                  {/* Shipping Box with Bag being packed */}
+                  <path d="M20 50 L20 85 L80 85 L80 50" />
+                  <path d="M20 50 L10 35 L50 35 L50 50" />
+                  <path d="M80 50 L90 35 L50 35" />
+                  {/* Bag inside */}
+                  <path d="M40 60 L60 60 L62 75 L38 75 Z" opacity="0.5" />
+                  <path d="M45 60 C45 55, 55 55, 55 60" opacity="0.5" />
+                </svg>
+              </div>
+              <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-900 uppercase">
+                SHIP US YOUR ITEM
+              </h3>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center space-y-12 group">
+              <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                  {/* Hands with Cash illustration */}
+                  <path d="M30 70 C20 70, 10 60, 10 50 C10 40, 20 30, 35 30" />
+                  <path d="M70 70 C80 70, 90 60, 90 50 C90 40, 80 30, 65 30" />
+                  {/* Banknotes */}
+                  <rect x="35" y="35" width="30" height="15" rx="1" transform="rotate(-15 50 42)" />
+                  <rect x="35" y="45" width="30" height="15" rx="1" />
+                  <rect x="35" y="55" width="30" height="15" rx="1" transform="rotate(15 50 62)" />
+                </svg>
+              </div>
+              <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-900 uppercase">
+                GET PAID
+              </h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Final Step Gateway */}
       <section className="bg-ivory py-24 border-t border-gray-100">
         <div className="container mx-auto px-6 text-center space-y-8">
           <h3 className="text-2xl font-headline font-bold italic text-gray-900">Ready to begin your consignment?</h3>
