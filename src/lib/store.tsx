@@ -71,12 +71,15 @@ import {
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
+import { MOCK_SESSION_USER } from './rbac/mock-session';
+import { MaisonUser } from './rbac/mock-users';
 
 interface AppContextType {
   // --- Global Infrastructure ---
   countryConfigs: CountryConfig[];
   brandConfigs: BrandConfig[];
   activeBrandId: string;
+  currentUser: MaisonUser | null;
   
   // CMS State
   cmsSections: CMSSection[];
@@ -133,6 +136,7 @@ interface AppContextType {
   setCountryEnabled: (code: CountryCode, enabled: boolean) => void;
   updateCountryConfig: (config: CountryConfig) => void;
   setActiveBrand: (id: string) => void;
+  setCurrentUser: (user: MaisonUser | null) => void;
   
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
@@ -188,6 +192,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG);
   const [brandConfigs, setBrandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
+  const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
 
   // CMS Module
   const [cmsSections, setCmsSections] = useState<CMSSection[]>([
@@ -391,21 +396,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId,
+    countryConfigs, brandConfigs, activeBrandId, currentUser,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
-    setCountryEnabled, updateCountryConfig, setActiveBrand,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage, updateLeadTier, addInquiryNote,
     upsertSEOMetadata, upsertTemplate, toggleRule, upsertRule,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, updateQuantity, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog
-  }), [countryConfigs, brandConfigs, activeBrandId, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
