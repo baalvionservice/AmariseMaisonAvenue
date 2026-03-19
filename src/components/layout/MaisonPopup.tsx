@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -46,6 +47,8 @@ export function MaisonPopup() {
         <button 
           onClick={handleClose}
           className="absolute top-6 right-6 z-20 text-gray-400 hover:text-black transition-colors"
+          type="button"
+          aria-label="Close Invitation"
         >
           <X className="w-6 h-6 stroke-[1.5px]" />
         </button>

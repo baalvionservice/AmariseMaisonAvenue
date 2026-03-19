@@ -36,7 +36,10 @@ export const Header = () => {
   // We use 'us' as a stable fallback during the initial hydration pass
   const countryCode = mounted ? ((country as string) || 'us') : 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
+  
+  // Gate count calculations to ensure client matches server empty state on first pass
+  const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;
+  const wishlistCount = mounted ? wishlist.length : 0;
 
   const slides = [
     "PRIVATE CURATORIAL SESSIONS AVAILABLE IN NYC & LONDON",
@@ -71,19 +74,27 @@ export const Header = () => {
       {/* Institutional Ticker */}
       <div className="bg-[#fcfcfc] text-gray-500 h-10 flex items-center justify-center px-6 text-[9px] tracking-[0.4em] font-bold uppercase border-b border-gray-100">
         <div className="flex items-center space-x-10">
-          <ChevronLeft 
-            className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors opacity-40" 
+          <button 
+            type="button"
+            className="hover:text-black transition-colors opacity-40 p-1" 
             onClick={handlePrevSlide}
-          />
+            aria-label="Previous Slide"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
           <div className="overflow-hidden relative flex items-center justify-center min-w-[500px]">
             <span className="animate-fade-in text-center" key={activeSlide}>
               {slides[activeSlide]}
             </span>
           </div>
-          <ChevronRight 
-            className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors opacity-40" 
+          <button 
+            type="button"
+            className="hover:text-black transition-colors opacity-40 p-1" 
             onClick={handleNextSlide}
-          />
+            aria-label="Next Slide"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
@@ -151,17 +162,17 @@ export const Header = () => {
           </button>
           
           <Link href={`/${countryCode}/wishlist`} className="relative text-gray-400 hover:text-black transition-colors group">
-            <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlist.length > 0 && "fill-black text-black")} />
-            {wishlist.length > 0 && mounted && (
+            <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlistCount > 0 && "fill-black text-black")} />
+            {wishlistCount > 0 && (
               <span className="absolute -top-3 -right-3 bg-black text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
-                {wishlist.length}
+                {wishlistCount}
               </span>
             )}
           </Link>
 
           <Link href={`/${countryCode}/cart`} className="relative text-gray-400 hover:text-black transition-colors group">
             <ShoppingBag className="w-5 h-5 stroke-[1.5px]" />
-            {cartCount > 0 && mounted && (
+            {cartCount > 0 && (
               <span className="absolute -top-3 -right-3 bg-secondary text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {cartCount}
               </span>
@@ -176,8 +187,10 @@ export const Header = () => {
           <div key={link.name} className="group h-full flex items-center">
             {link.services ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all outline-none">
-                  {link.name}
+                <DropdownMenuTrigger asChild>
+                  <button type="button" className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all outline-none">
+                    {link.name}
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" className="bg-white border-border w-72 p-2 rounded-none shadow-2xl">
                   <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.5em] text-gray-400 p-4">Acquisition Services</DropdownMenuLabel>
