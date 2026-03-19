@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -19,7 +18,10 @@ import {
   Smartphone,
   Briefcase,
   Megaphone,
-  Network
+  Network,
+  UserCheck,
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,11 +38,11 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 
-type MarketingTab = 'dashboard' | 'campaigns' | 'segments' | 'affiliates' | 'subscriptions' | 'communications' | 'loyalty' | 'analytics';
+type MarketingTab = 'dashboard' | 'campaigns' | 'verification' | 'segments' | 'affiliates' | 'subscriptions' | 'communications' | 'loyalty' | 'analytics';
 
 export default function MarketingAdminPanel() {
   const [activeTab, setActiveTab] = useState<MarketingTab>('dashboard');
-  const { activeCampaigns, affiliates } = useAppStore();
+  const { activeCampaigns, affiliates, vipClients, verifyClient } = useAppStore();
   const { toast } = useToast();
 
   const handleAction = (msg: string) => {
@@ -60,6 +62,7 @@ export default function MarketingAdminPanel() {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <MarketingNavItem icon={<LayoutDashboard />} label="Engagement" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <MarketingNavItem icon={<Zap />} label="Campaigns" active={activeTab === 'campaigns'} onClick={() => setActiveTab('campaigns')} />
+          <MarketingNavItem icon={<UserCheck />} label="Client Verification" active={activeTab === 'verification'} onClick={() => setActiveTab('verification')} />
           <MarketingNavItem icon={<Network />} label="Affiliates" active={activeTab === 'affiliates'} onClick={() => setActiveTab('affiliates')} />
           <MarketingNavItem icon={<Crown />} label="Memberships" active={activeTab === 'subscriptions'} onClick={() => setActiveTab('subscriptions')} />
           <MarketingNavItem icon={<Target />} label="Segments" active={activeTab === 'segments'} onClick={() => setActiveTab('segments')} />
@@ -72,11 +75,6 @@ export default function MarketingAdminPanel() {
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/admin">
               <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/us">
-              <LogOut className="w-4 h-4 mr-3" /> Exit Hub
             </Link>
           </Button>
         </div>
@@ -112,7 +110,7 @@ export default function MarketingAdminPanel() {
                 <StatCard icon={<TrendingUp />} label="Marketing Revenue" value="$1.2M" trend="+18.4%" positive={true} />
                 <StatCard icon={<Briefcase />} label="Partner Sales" value="$420k" trend="+12.2%" positive={true} />
                 <StatCard icon={<Crown />} label="Subscription Volume" value="1,240" trend="+5%" positive={true} />
-                <StatCard icon={<Users />} label="New Connoisseurs" value="4.2k" trend="+8%" positive={true} />
+                <StatCard icon={<UserCheck />} label="Pending Verification" value={vipClients.filter(c => c.status === 'pending').length.toString()} trend="Action" positive={false} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -174,6 +172,71 @@ export default function MarketingAdminPanel() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'verification' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-headline font-bold italic">Elite Client Registry</h2>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400">Verify connoisseur credentials for archival acquisition access</p>
+              </div>
+
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Connoisseur</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Email</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Tier</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {vipClients.map(client => (
+                      <TableRow key={client.id} className="hover:bg-ivory/30 transition-colors">
+                        <TableCell className="pl-8">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold leading-tight uppercase tracking-tight">{client.name}</span>
+                            <span className="text-[8px] text-gray-400 uppercase tracking-widest">Lifetime Value: ${client.totalSpend.toLocaleString()}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs font-light">{client.email}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{client.tier}</Badge></TableCell>
+                        <TableCell className="text-center">
+                          <Badge className={cn("text-[8px] uppercase tracking-widest", 
+                            client.status === 'verified' ? 'bg-green-50 text-green-600' : 
+                            client.status === 'rejected' ? 'bg-red-50 text-red-600' : 
+                            'bg-gold/10 text-gold'
+                          )}>
+                            {client.status || 'pending'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-8">
+                          {client.status === 'pending' || !client.status ? (
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                size="sm" 
+                                className="h-8 bg-black text-white hover:bg-plum text-[8px] font-bold uppercase"
+                                onClick={() => verifyClient(client.id)}
+                              >
+                                VERIFY
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500"><ShieldCheck className="w-4 h-4" /></Button>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end items-center text-green-500 space-x-2">
+                               <CheckCircle2 className="w-4 h-4" />
+                               <span className="text-[8px] font-bold uppercase">Identity Secured</span>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           )}
 

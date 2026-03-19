@@ -559,6 +559,7 @@ export interface VipClient {
   isSubscriber: boolean;
   subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
   brandId: string;
+  status?: 'pending' | 'verified' | 'rejected';
 }
 
 export interface SupportTicket {

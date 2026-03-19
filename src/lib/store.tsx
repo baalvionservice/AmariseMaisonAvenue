@@ -79,6 +79,7 @@ import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 import { MOCK_SESSION_USER } from './rbac/mock-session';
 import { MaisonUser } from './rbac/mock-users';
+import { sendEmailMock } from './notifications/mock-engine';
 
 interface AppContextType {
   // --- Global Infrastructure ---
@@ -188,6 +189,12 @@ interface AppContextType {
   triggerReindex: (type: string) => void;
   logAction: (action: string, entity: string, country?: string, severity?: AuditLogEntry['severity']) => void;
 
+  // Onboarding Actions
+  registerVendor: (data: Partial<Vendor>) => void;
+  approveVendor: (id: string) => void;
+  registerClient: (data: Partial<VipClient>) => void;
+  verifyClient: (id: string) => void;
+
   // AI Actions
   updateAIModule: (id: string, enabled: boolean, level: AIAutomationLevel) => void;
   addAILog: (log: AIActionLog) => void;
@@ -284,12 +291,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   const [admins] = useState<AdminAccount[]>(ADMIN_ACCOUNTS);
-  const [vendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
-  const [affiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
+  const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
   const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS.map(r => ({ ...r, brandId: activeBrandId })));
   const [activeCampaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
-  const [vipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId })));
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId, status: 'verified' })));
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS.map(a => ({ ...a, brandId: activeBrandId })));
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES.map(i => ({ ...i, brandId: activeBrandId })));
@@ -424,6 +431,66 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const registerVendor = (data: Partial<Vendor>) => {
+    const newVendor: Vendor = {
+      id: `vend-${Date.now()}`,
+      name: data.name || 'Anonymous Atelier',
+      category: data.category || 'Luxury Goods',
+      performance: 100,
+      productCount: 0,
+      salesTotal: 0,
+      status: 'pending',
+      payoutSchedule: 'weekly',
+      joinedDate: new Date().toISOString(),
+      kpis: { returnRate: 0, fulfillmentSpeed: 'N/A', rating: 5.0 },
+      brandId: activeBrandId,
+      ...data
+    };
+    setVendors(prev => [...prev, newVendor]);
+    sendNotification('country_admin', `New Partner Atelier Request: ${newVendor.name}`, 'global', 'info');
+    logAction('Partner Atelier Registered', newVendor.name);
+  };
+
+  const approveVendor = (id: string) => {
+    setVendors(prev => prev.map(v => {
+      if (v.id === id) {
+        sendEmailMock('vendor', `Your partnership with Maison Amarisé has been approved.`, v.name);
+        logAction('Approved Partner Atelier', v.name);
+        return { ...v, status: 'active' };
+      }
+      return v;
+    }));
+  };
+
+  const registerClient = (data: Partial<VipClient>) => {
+    const newClient: VipClient = {
+      id: `vip-${Date.now()}`,
+      name: data.name || 'Discovery Client',
+      email: data.email || '',
+      tier: 'Silver',
+      loyaltyPoints: 0,
+      totalSpend: 0,
+      isSubscriber: false,
+      brandId: activeBrandId,
+      status: 'pending',
+      ...data
+    };
+    setVipClients(prev => [...prev, newClient]);
+    sendNotification('country_admin', `Elite Registry Application: ${newClient.name}`, 'global', 'info');
+    logAction('Connoisseur Registered', newClient.name);
+  };
+
+  const verifyClient = (id: string) => {
+    setVipClients(prev => prev.map(c => {
+      if (c.id === id) {
+        sendEmailMock('client', `Welcome to the Maison Amarisé Elite Registry. Your status is now verified.`, c.name);
+        logAction('Verified Connoisseur', c.name);
+        return { ...c, status: 'verified' };
+      }
+      return c;
+    }));
+  };
+
   const toggleEmergencyMode = () => {
     setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
     logAction('Toggled Emergency Fallback Mode', 'System Core', 'global', 'high');
@@ -537,7 +604,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
-    toggleEmergencyMode, triggerReindex, logAction,
+    toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,

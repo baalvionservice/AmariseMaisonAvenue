@@ -27,7 +27,9 @@ import {
   History,
   Filter,
   ShieldCheck,
-  X
+  X,
+  Store,
+  Briefcase
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,14 +50,25 @@ import { Product } from '@/lib/types';
 import { guardPage } from '@/lib/access/routeGuard';
 import { useSearch } from '@/hooks/use-search';
 
-type OpsTab = 'dashboard' | 'catalog' | 'approvals' | 'inventory' | 'orders' | 'returns';
+type OpsTab = 'dashboard' | 'catalog' | 'approvals' | 'onboarding' | 'inventory' | 'orders' | 'returns';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   
-  const { scopedProducts, scopedReturns, scopedApprovals, handleApprovalAction, deleteProduct, upsertProduct, currentUser, scopedNotifications, categories } = useAppStore();
+  const { 
+    scopedProducts, 
+    scopedReturns, 
+    scopedApprovals, 
+    handleApprovalAction, 
+    deleteProduct, 
+    currentUser, 
+    scopedNotifications, 
+    categories, 
+    vendors,
+    approveVendor
+  } = useAppStore();
   const { toast } = useToast();
 
   // Integrated Advanced Search
@@ -80,6 +93,7 @@ export default function OperationsAdminPanel() {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <OpsNavItem icon={<ShieldCheck />} label="Compliance" active={false} href="/admin/compliance" />
+          <OpsNavItem icon={<Briefcase />} label="Partner Onboarding" active={activeTab === 'onboarding'} onClick={() => setActiveTab('onboarding')} />
           <OpsNavItem icon={<RotateCcw />} label="Approval Queue" active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} />
           <OpsNavItem icon={<Package />} label="Ateliers Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
           <OpsNavItem icon={<Boxes />} label="Multi-Warehouse" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
@@ -104,7 +118,6 @@ export default function OperationsAdminPanel() {
           </div>
           
           <div className="flex items-center space-x-6">
-            {/* Notification Badge */}
             <div className="relative group cursor-pointer">
                <div className="p-2 bg-ivory border border-border rounded-full hover:border-plum transition-colors">
                   <Star className="w-4 h-4 text-plum" />
@@ -126,7 +139,7 @@ export default function OperationsAdminPanel() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
                   <StatCard icon={<RotateCcw />} label="Approvals" value={scopedApprovals.filter(a => a.status === 'pending').length.toString()} trend="Review Required" positive={false} />
-                  <StatCard icon={<Boxes />} label="Low Stock" value="12" trend="Replenish" positive={false} />
+                  <StatCard icon={<Store />} label="Pending Partners" value={vendors.filter(v => v.status === 'pending').length.toString()} trend="Verification" positive={false} />
                 </div>
 
                 <Card className="bg-white border-border shadow-luxury overflow-hidden">
@@ -163,11 +176,73 @@ export default function OperationsAdminPanel() {
                     <div className="space-y-4 pt-4">
                       <PerformanceRow label="Fulfillment" val={94} />
                       <PerformanceRow label="QC Accuracy" val={99} />
-                      <PerformanceRow label="Returns" val={1.2} />
+                      <PerformanceRow label="Partner Health" val={88} />
                     </div>
                   </div>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'onboarding' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-headline font-bold italic">Institutional Partner Registry</h2>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400">Verify and approve new artisanal ateliers for the Maison</p>
+              </div>
+
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Atelier</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Category</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Joined Date</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {vendors.map(vendor => (
+                      <TableRow key={vendor.id} className="hover:bg-ivory/30 transition-colors">
+                        <TableCell className="pl-8">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold leading-tight uppercase tracking-tight">{vendor.name}</span>
+                            <span className="text-[8px] text-gray-400 uppercase tracking-widest">ID: {vendor.id}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{vendor.category}</Badge></TableCell>
+                        <TableCell className="text-xs font-light italic">{new Date(vendor.joinedDate).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge className={cn("text-[8px] uppercase tracking-widest", 
+                            vendor.status === 'active' ? 'bg-green-50 text-green-600' : 
+                            vendor.status === 'rejected' ? 'bg-red-50 text-red-600' : 
+                            'bg-gold/10 text-gold'
+                          )}>
+                            {vendor.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-8">
+                          {vendor.status === 'pending' ? (
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                size="sm" 
+                                className="h-8 bg-black text-white hover:bg-plum text-[8px] font-bold uppercase"
+                                onClick={() => approveVendor(vendor.id)}
+                              >
+                                APPROVE
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500"><XCircle className="w-4 h-4" /></Button>
+                            </div>
+                          ) : (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><FileText className="w-4 h-4" /></Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           )}
 
@@ -180,7 +255,7 @@ export default function OperationsAdminPanel() {
 
               <div className="grid grid-cols-1 gap-8">
                 {scopedApprovals.map(req => (
-                  <Card key={req.id} className="bg-white border-border shadow-sm overflow-hidden flex flex-col md:flex-row">
+                  <Card key={req.id} className="bg-white border-border shadow-sm overflow-hidden flex flex-col md:row">
                     <div className="md:w-64 bg-ivory/50 p-8 border-r border-border flex flex-col justify-between">
                       <div className="space-y-4">
                         <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest">{req.contentType}</Badge>
@@ -226,13 +301,6 @@ export default function OperationsAdminPanel() {
                     </div>
                   </Card>
                 ))}
-                
-                {scopedApprovals.length === 0 && (
-                  <div className="py-40 text-center opacity-20">
-                    <CheckCircle2 className="w-16 h-16 mx-auto mb-4" />
-                    <p className="text-xl font-headline italic">Approval Queue Clear</p>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -260,19 +328,6 @@ export default function OperationsAdminPanel() {
                       </button>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Filter className="w-3.5 h-3.5 text-gray-400" />
-                    <select 
-                      className="bg-white border border-border h-10 px-3 text-[9px] font-bold uppercase tracking-widest outline-none cursor-pointer focus:ring-1 focus:ring-plum shadow-sm"
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                      <option value="all">ALL CATEGORIES</option>
-                      {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>
-                      ))}
-                    </select>
-                  </div>
                   <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[10px] font-bold tracking-widest uppercase shadow-sm">
                     <Plus className="w-4 h-4 mr-2" /> NEW ENTRY
                   </Button>
@@ -291,7 +346,7 @@ export default function OperationsAdminPanel() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredProducts.length > 0 ? filteredProducts.slice(0, 15).map(product => (
+                    {filteredProducts.slice(0, 15).map(product => (
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
@@ -320,16 +375,7 @@ export default function OperationsAdminPanel() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    )) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="py-40 text-center">
-                          <div className="flex flex-col items-center space-y-4 opacity-20">
-                            <Search className="w-12 h-12" />
-                            <p className="text-xs font-bold uppercase tracking-[0.2em]">No artifacts found matching criteria</p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    ))}
                   </TableBody>
                 </Table>
               </Card>
