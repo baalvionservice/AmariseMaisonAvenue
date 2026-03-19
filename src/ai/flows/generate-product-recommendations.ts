@@ -58,7 +58,7 @@ export async function generateProductRecommendations(
   try {
     return await generateProductRecommendationsFlow(input);
   } catch (error) {
-    console.warn("AI Recommendation Quota Exceeded. Returning curated fallback selection.");
+    console.warn("AI Recommendation Quota Exceeded or API Error. Returning curated fallback selection.");
     // Curated Fallback Selection for Maison Connoisseurs
     return {
       recommendations: [
@@ -125,8 +125,8 @@ The user is currently viewing product with ID: {{{currentProductId}}}. Consider 
 
 Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. 
 
-CRITICAL: You must provide the following fields exactly as named:
-- id: unique string
+CRITICAL: You must provide the following fields exactly as named in the output schema:
+- id: unique string starting with 'rec-'
 - name: concise product name
 - description: brief narrative
 - basePrice: a number between 500 and 100000
@@ -137,7 +137,7 @@ CRITICAL: You must provide the following fields exactly as named:
 - categoryId: e.g., w-bags, j-high, wa-complications
 - subcategoryId: slug-style subcategory
 - isVip: boolean
-- rating: number 4.0-5.0
+- rating: number between 4.0 and 5.0
 - reviewsCount: integer`,
 });
 

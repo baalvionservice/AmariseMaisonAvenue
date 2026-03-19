@@ -33,7 +33,7 @@ export async function generateCampaignCopy(
   try {
     return await generateCampaignCopyFlow(input);
   } catch (error) {
-    console.warn("AI Campaign Copy Quota Exceeded. Returning archive copy.");
+    console.warn("AI Campaign Copy Quota Exceeded or API Error. Returning archive copy.");
     if (input.campaignType === 'email') {
       return {
         subjectLine: `An Invitation to the ${input.category} Archive`,
@@ -65,9 +65,9 @@ Product: {{{productName}}} ({{{category}}})
 Region: {{{country}}}
 
 {{#if isEmail}}
-Write a subject line that invites curiosity and a brief 2-sentence opening body.
+Write a subject line that invites curiosity and a brief 2-sentence opening body. Ensure the subject line is high-authority and exclusive.
 {{else}}
-Write a punchy, ultra-luxury push notification (max 120 chars).
+Write a punchy, ultra-luxury push notification (max 120 chars). Focus on rarity and immediate action for the connoisseur.
 {{/if}}`,
 });
 
