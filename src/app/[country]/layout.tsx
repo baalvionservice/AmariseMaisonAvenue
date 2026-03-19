@@ -98,7 +98,7 @@ export default function CountryLayout({
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black border-b border-black pb-2 w-full">Sell With Us</h4>
                 <ul className="space-y-4">
                   <FooterLink href="#">How to Sell or Consign</FooterLink>
-                  <FooterLink href="#">Submit an Item</FooterLink>
+                  <FooterLink href={`/${countryCode}/sell`}>Submit an Item</FooterLink>
                 </ul>
               </div>
 
