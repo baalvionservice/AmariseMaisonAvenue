@@ -65,6 +65,7 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<LayoutDashboard />} label="Intelligence" active={true} href="/admin" />
           <AdminNavItem icon={<BrainCircuit />} label="AI Autopilot" active={false} href="/admin/ai-dashboard" />
           <AdminNavItem icon={<Bell />} label="Institutional Alerts" active={false} href="/admin/notifications" />
+          <AdminNavItem icon={<ShieldCheck />} label="Compliance" active={false} href="/admin/compliance" />
           <AdminNavItem icon={<LayoutTemplate />} label="Content (CMS)" active={false} href="/admin/content" />
           <AdminNavItem icon={<Target />} label="Sales (CRM)" active={false} href="/admin/sales" />
           <AdminNavItem icon={<Globe />} label="SEO Authority" active={false} href="/admin/seo" />
@@ -123,7 +124,7 @@ export default function SuperAdminPanel() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Primary Action Center */}
+            {/* Primary Action Center Center */}
             <div className="lg:col-span-8 space-y-12">
               <Card className="bg-white border-border shadow-luxury overflow-hidden">
                 <CardHeader className="border-b border-border bg-ivory/10 flex flex-row items-center justify-between">

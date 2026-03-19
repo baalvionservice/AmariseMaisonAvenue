@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -46,7 +45,8 @@ import {
   MaisonNotification,
   WorkflowTask,
   ApprovalRequest,
-  AnalyticsMetric
+  AnalyticsMetric,
+  AuditLogEntry
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -94,6 +94,7 @@ interface AppContextType {
   scopedReturns: ReturnRequest[];
   scopedNotifications: MaisonNotification[];
   scopedApprovals: ApprovalRequest[];
+  scopedAuditLogs: AuditLogEntry[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -124,6 +125,7 @@ interface AppContextType {
   workflows: WorkflowTask[];
   approvalRequests: ApprovalRequest[];
   analyticsData: AnalyticsMetric[];
+  auditRegistry: AuditLogEntry[];
   
   // Logistics & Admin State
   cart: CartItem[];
@@ -179,6 +181,7 @@ interface AppContextType {
   handleApprovalAction: (requestId: string, approve: boolean, comments?: string) => void;
   toggleEmergencyMode: () => void;
   triggerReindex: (type: string) => void;
+  logAction: (action: string, entity: string, country?: string, severity?: AuditLogEntry['severity']) => void;
 
   // AI Actions
   updateAIModule: (id: string, enabled: boolean, level: AIAutomationLevel) => void;
@@ -262,6 +265,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { date: '2024-03-08', revenue: 145000, leads: 52, conversionRate: 4.5, aiScore: 92 },
     { date: '2024-03-15', revenue: 180000, leads: 68, conversionRate: 5.1, aiScore: 95 }
   ]);
+  const [auditRegistry, setAuditRegistry] = useState<AuditLogEntry[]>([
+    { id: 'aud-1', actorId: 'adm-1', actorName: 'Maison CEO', actorRole: 'super_admin', country: 'global', action: 'Created AI Autopilot Cycle', entity: 'AI System', timestamp: new Date(Date.now() - 86400000).toISOString(), severity: 'low' },
+    { id: 'aud-2', actorId: 'adm-2', actorName: 'Operations Lead', actorRole: 'country_admin', country: 'ae', action: 'Approved Vendor Listing', entity: 'Artifact prod-50', timestamp: new Date(Date.now() - 3600000).toISOString(), severity: 'medium' }
+  ]);
 
   // Admin & Logistics state
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -271,7 +278,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [vendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
   const [affiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
   const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS.map(r => ({ ...r, brandId: activeBrandId })));
-  const [activeCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
+  const [activeCampaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(AUDIT_LOGS);
   const [vipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId })));
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
@@ -279,7 +286,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES.map(i => ({ ...i, brandId: activeBrandId })));
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   
-  // Support & Operational Definitions
   const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
@@ -317,7 +323,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return approvalRequests.filter(a => a.country === currentUser.country);
   }, [approvalRequests, currentUser]);
 
+  const scopedAuditLogs = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin') return auditRegistry;
+    // Regional admins only see logs for their country
+    return auditRegistry.filter(log => log.country === currentUser.country || log.country === 'global');
+  }, [auditRegistry, currentUser]);
+
   // --- Actions ---
+  const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
+    if (!currentUser) return;
+    const entry: AuditLogEntry = {
+      id: `aud-${Date.now()}`,
+      actorId: currentUser.id,
+      actorName: currentUser.name,
+      actorRole: currentUser.role,
+      country,
+      action,
+      entity,
+      timestamp: new Date().toISOString(),
+      severity,
+      brandId: activeBrandId
+    };
+    setAuditRegistry(prev => [entry, ...prev]);
+    console.log(`[INSTITUTIONAL AUDIT] ${action} on ${entity} by ${currentUser.name}`);
+  };
+
   const sendNotification = (toRole: string, message: string, country = 'global', type: MaisonNotification['type'] = 'info') => {
     const id = `n-${Date.now()}`;
     setNotifications(prev => [{ id, toRole, country, message, timestamp: new Date().toISOString(), read: false, type }, ...prev]);
@@ -334,6 +364,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => {
       setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete' } : w));
       sendNotification('super_admin', `Workflow Task Complete: ${id}`, 'global', 'success');
+      logAction(`Executed Workflow: ${id}`, 'Workflow System');
     }, 2000);
   };
 
@@ -342,6 +373,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const req: ApprovalRequest = { id: `a-${Date.now()}`, userId: currentUser.id, userName: currentUser.name, contentType, contentId, country, status: 'pending', timestamp: new Date().toISOString() };
     setApprovalRequests(prev => [req, ...prev]);
     sendNotification('country_admin', `${currentUser.name} submitted ${contentType} for review`, country, 'info');
+    logAction(`Submitted ${contentType} for Approval`, contentId, country);
   };
 
   const handleApprovalAction = (requestId: string, approve: boolean, comments?: string) => {
@@ -349,20 +381,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (a.id === requestId) {
         const status = approve ? 'approved' : 'rejected';
         sendNotification('operator', `Submission ${requestId} has been ${status}`, a.country, approve ? 'success' : 'alert');
+        logAction(`${approve ? 'Approved' : 'Rejected'} Submission`, a.contentId, a.country, approve ? 'low' : 'medium');
         return { ...a, status, comments, approvedBy: currentUser?.name };
       }
       return a;
     }));
   };
 
-  const toggleEmergencyMode = () => setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
+  const toggleEmergencyMode = () => {
+    setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
+    logAction('Toggled Emergency Fallback Mode', 'System Core', 'global', 'high');
+  };
   
   const triggerReindex = (type: string) => {
     setIndexingStatus(prev => ({ ...prev, sitemapStatus: 'Regenerating' }));
-    setTimeout(() => setIndexingStatus(prev => ({ ...prev, sitemapStatus: 'Up to date' })), 3000);
+    setTimeout(() => {
+      setIndexingStatus(prev => ({ ...prev, sitemapStatus: 'Up to date' }));
+      logAction(`Triggered Re-indexing: ${type}`, 'Search Engine');
+    }, 3000);
   };
 
-  const setCountryEnabled = (code: CountryCode, enabled: boolean) => setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
+  const setCountryEnabled = (code: CountryCode, enabled: boolean) => {
+    setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
+    logAction(`${enabled ? 'Enabled' : 'Disabled'} Market Hub: ${code}`, 'Global Config');
+  };
   const updateCountryConfig = (config: CountryConfig) => setCountryConfigs(prev => prev.map(c => c.code === config.code ? config : c));
   const setActiveBrand = (id: string) => setActiveBrandId(id);
 
@@ -382,6 +424,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPrivateInquiries(prev => [inquiry, ...prev]);
     setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
     sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase());
+    logAction('Captured Acquisition Lead', inquiry.customerName, inquiry.country.toLowerCase());
   };
   const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   const addLeadMessage = (inquiryId: string, text: string, sender: 'curator' | 'client') => {
@@ -391,6 +434,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateAIModule = (id: string, enabled: boolean, level: AIAutomationLevel) => {
     setAiModules(prev => prev.map(m => m.id === id ? { ...m, enabled, level } : m));
     recordLog(`AI Module ${id} updated to ${level}`, 'AI Autopilot');
+    logAction(`Updated AI Module ${id}`, `Level: ${level}`, 'global');
   };
   const addAILog = (log: AIActionLog) => setAiLogs(prev => [log, ...prev].slice(0, 50));
   const upsertAISuggestion = (s: AISuggestion) => setAiSuggestions(prev => {
@@ -406,7 +450,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => setCart([]);
   const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
   
-  const createInvoice = (inv: Invoice) => setInvoices(prev => [inv, ...prev]);
+  const createInvoice = (inv: Invoice) => {
+    setInvoices(prev => [inv, ...prev]);
+    logAction('Generated Institutional Invoice', inv.orderId, inv.brandId);
+  };
   const upsertAppointment = (apt: Appointment) => setAppointments(prev => [apt, ...prev]);
   
   const toggleLike = (id: string, country: string) => {
@@ -430,11 +477,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
-    notifications, workflows, approvalRequests, analyticsData,
+    notifications, workflows, approvalRequests, analyticsData, auditRegistry,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor,
@@ -442,18 +489,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, submitApproval, handleApprovalAction,
-    toggleEmergencyMode, triggerReindex,
+    toggleEmergencyMode, triggerReindex, logAction,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, 
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
-    notifications, workflows, approvalRequests, analyticsData,
+    notifications, workflows, approvalRequests, analyticsData, auditRegistry,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor

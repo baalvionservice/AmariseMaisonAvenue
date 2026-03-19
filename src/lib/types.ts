@@ -106,7 +106,6 @@ export interface Collection {
   departmentId?: string;
   isPrivate?: boolean;
   brandId: string;
-  countryCode?: CountryCode;
   isGlobal: boolean;
 }
 
@@ -365,6 +364,21 @@ export interface AnalyticsMetric {
   aiScore: number;
 }
 
+// --- COMPLIANCE & AUDIT ---
+
+export interface AuditLogEntry {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorRole: string;
+  country: string;
+  action: string;
+  entity: string;
+  timestamp: string;
+  severity: 'low' | 'medium' | 'high';
+  brandId?: string;
+}
+
 // --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {
@@ -491,20 +505,6 @@ export interface ReturnRequest {
   brandId: string;
 }
 
-export interface Invoice {
-  id: string;
-  orderId: string;
-  customerName: string;
-  amount: number;
-  currency: string;
-  status: 'issued' | 'paid' | 'overdue';
-  date: string;
-  taxAmount: number;
-  taxRate: number;
-  complianceCertified: boolean;
-  brandId: string;
-}
-
 export interface AuditLog {
   id: string;
   adminId: string;
@@ -628,4 +628,41 @@ export interface IndexingLog {
   itemsAffected: number;
   duration: string;
   status: 'Success' | 'Partial' | 'Failed';
+}
+
+export interface Appointment {
+  id: string;
+  customerId: string;
+  customerName: string;
+  type: 'Private Viewing' | 'Virtual Try-on' | 'Atelier Tour';
+  date: string;
+  time: string;
+  city: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  brandId: string;
+}
+
+export interface Invoice {
+  id: string;
+  orderId: string;
+  customerName: string;
+  amount: number;
+  currency: string;
+  status: 'issued' | 'paid' | 'overdue';
+  date: string;
+  taxAmount: number;
+  taxRate: number;
+  complianceCertified: boolean;
+  brandId: string;
+}
+
+export interface Affiliate {
+  id: string;
+  name: string;
+  tier: 'Silver' | 'Gold' | 'Diamond';
+  referralCode: string;
+  salesGenerated: number;
+  commissionEarned: number;
+  status: 'active' | 'pending';
+  brandId: string;
 }

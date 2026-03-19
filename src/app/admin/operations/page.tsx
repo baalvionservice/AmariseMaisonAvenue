@@ -26,6 +26,7 @@ import {
   MessageSquare,
   History,
   Filter,
+  ShieldCheck,
   X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -78,6 +79,7 @@ export default function OperationsAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <OpsNavItem icon={<ShieldCheck />} label="Compliance" active={false} href="/admin/compliance" />
           <OpsNavItem icon={<RotateCcw />} label="Approval Queue" active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} />
           <OpsNavItem icon={<Package />} label="Ateliers Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
           <OpsNavItem icon={<Boxes />} label="Multi-Warehouse" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
@@ -88,7 +90,7 @@ export default function OperationsAdminPanel() {
         <div className="pt-8 border-t border-border space-y-4">
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-gold group" asChild>
             <Link href="/admin">
-              <RotateCcw className="w-4 h-4 mr-3" /> Master Control
+              <RefreshCcw className="w-4 h-4 mr-3" /> Master Control
             </Link>
           </Button>
         </div>
@@ -339,8 +341,8 @@ export default function OperationsAdminPanel() {
   );
 }
 
-function OpsNavItem({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) {
-  return (
+function OpsNavItem({ icon, label, active, onClick, href }: { icon: any, label: string, active?: boolean, onClick?: () => void, href?: string }) {
+  const content = (
     <button 
       onClick={onClick}
       className={cn(
@@ -357,6 +359,9 @@ function OpsNavItem({ icon, label, active, onClick }: { icon: any, label: string
       {active && <ChevronRight className="w-4 h-4 ml-auto" />}
     </button>
   );
+
+  if (href) return <Link href={href}>{content}</Link>;
+  return content;
 }
 
 function StatCard({ icon, label, value, trend, positive }: { icon: any, label: string, value: string, trend: string, positive: boolean }) {
@@ -367,7 +372,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
           <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
           <div className={cn(
             "flex items-center text-[10px] font-bold tracking-widest uppercase",
-            positive ? "text-gold" : "text-gray-400"
+            positive ? "text-gold" : "text-red-500"
           )}>
             {trend}
           </div>
