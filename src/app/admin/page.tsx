@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -9,20 +10,20 @@ import {
   ArrowUpRight, 
   ArrowRight,
   Clock,
-  Zap,
-  ShieldCheck,
-  Globe,
-  ArrowDownRight,
-  Activity,
-  Cpu,
-  RefreshCcw,
-  X,
-  ShoppingCart,
-  Heart,
-  Eye,
-  Target,
-  BarChart3,
-  AlertTriangle
+  Zap, 
+  ShieldCheck, 
+  Globe, 
+  ArrowDownRight, 
+  Activity, 
+  Cpu, 
+  RefreshCcw, 
+  X, 
+  ShoppingCart, 
+  Heart, 
+  Eye, 
+  Target, 
+  BarChart3, 
+  AlertTriangle 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard() {
-  const { products, privateInquiries } = useAppStore();
+  const { products, privateInquiries, scopedErrors, scopedProducts } = useAppStore();
   const { regions, globalTotal, globalUsers, totalOrders, globalCart, globalWishlist, conversionRate } = useSimulationData();
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [insights, setInsights] = useState<string[]>([]);
