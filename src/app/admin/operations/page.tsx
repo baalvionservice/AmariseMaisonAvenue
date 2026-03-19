@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, 
@@ -39,18 +38,27 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/types';
+import { guardPage } from '@/lib/access/routeGuard';
 
 type OpsTab = 'dashboard' | 'catalog' | 'inventory' | 'orders' | 'returns' | 'cms' | 'customers' | 'logistics';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { products, returns, updateReturnStatus, deleteProduct, upsertProduct } = useAppStore();
+  const { scopedProducts, scopedReturns, updateReturnStatus, deleteProduct, upsertProduct, currentUser } = useAppStore();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Standard Route Guard Enforcement
+    if (!guardPage(currentUser, 'view_dashboard', currentUser?.country)) {
+      // In a real app, we'd redirect or show a 403 component
+      console.error("Institutional Access Violation Detected");
+    }
+  }, [currentUser]);
 
   const handleAddMockProduct = () => {
     const newProduct: Product = {
       id: `prod-${Date.now()}`,
-      name: 'New Artisanal Creation',
+      name: 'New Scoped Creation',
       departmentId: 'women',
       categoryId: 'w-couture',
       subcategoryId: 'evening-gowns',
@@ -61,10 +69,13 @@ export default function OperationsAdminPanel() {
       rating: 5.0,
       reviewsCount: 0,
       stock: 5,
-      vendorId: 'vend-1'
+      vendorId: 'vend-1',
+      brandId: 'amarise-luxe',
+      countryCode: currentUser?.country as any || 'us',
+      isGlobal: false
     };
     upsertProduct(newProduct);
-    toast({ title: "Maison Entry Created", description: "The new artifact has been added to the global catalog." });
+    toast({ title: "Atelier Registry Updated", description: `Artifact added to the ${currentUser?.country.toUpperCase()} catalog.` });
   };
 
   return (
@@ -74,7 +85,7 @@ export default function OperationsAdminPanel() {
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
             AMARISÉ <span className="text-gold text-xs font-normal tracking-[0.4em] ml-2">OPS</span>
           </div>
-          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Global Operations Hub</p>
+          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">{currentUser?.country.toUpperCase()} Operations Hub</p>
         </div>
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -109,7 +120,7 @@ export default function OperationsAdminPanel() {
               {activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Operational Oversight • Artisanal Logistics Terminal
+              {currentUser?.country.toUpperCase()} Market • Artisanal Logistics Terminal
             </p>
           </div>
           <div className="flex items-center space-x-6">
@@ -126,7 +137,7 @@ export default function OperationsAdminPanel() {
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
-                <StatCard icon={<RotateCcw />} label="Active Returns" value={returns.length.toString()} trend="Inspect Now" positive={false} />
+                <StatCard icon={<RotateCcw />} label="Active Returns" value={scopedReturns.length.toString()} trend="Inspect Now" positive={false} />
                 <StatCard icon={<Boxes />} label="Low Stock Alerts" value="12" trend="Replenish" positive={false} />
                 <StatCard icon={<Star />} label="VIP Inquiries" value="08" trend="Immediate" positive={false} />
               </div>
@@ -149,16 +160,10 @@ export default function OperationsAdminPanel() {
                       </TableHeader>
                       <TableBody>
                         <TableRow>
-                          <TableCell className="pl-8 text-xs font-bold">New York Fifth Ave</TableCell>
-                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">US Market</Badge></TableCell>
+                          <TableCell className="pl-8 text-xs font-bold">{currentUser?.country.toUpperCase()} Central Hub</TableCell>
+                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">{currentUser?.country.toUpperCase()} Market</Badge></TableCell>
                           <TableCell className="text-center text-green-600 font-bold text-[9px] uppercase">Optimal</TableCell>
                           <TableCell className="text-right pr-8"><Progress value={45} className="h-1 bg-ivory" /></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="pl-8 text-xs font-bold">London Bond Street</TableCell>
-                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">UK Market</Badge></TableCell>
-                          <TableCell className="text-center text-gold font-bold text-[9px] uppercase">High Load</TableCell>
-                          <TableCell className="text-right pr-8"><Progress value={88} className="h-1 bg-ivory" /></TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
@@ -185,7 +190,7 @@ export default function OperationsAdminPanel() {
               <div className="flex justify-between items-end">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-headline font-bold italic">Artifact Management</h2>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the Maison's global creations</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the {currentUser?.country.toUpperCase()} atelier creations</p>
                 </div>
                 <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={handleAddMockProduct}>
                   <Plus className="w-4 h-4 mr-2" /> CREATE NEW ARCHIVE ENTRY
@@ -198,13 +203,13 @@ export default function OperationsAdminPanel() {
                     <TableRow>
                       <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold">Department</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Global Stock</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Market Stock</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right">Acquisition Value</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {products.slice(0, 15).map(product => (
+                    {scopedProducts.slice(0, 15).map(product => (
                       <TableRow key={product.id} className="hover:bg-ivory/30 transition-colors">
                         <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
@@ -248,7 +253,7 @@ export default function OperationsAdminPanel() {
                 </div>
               </div>
               <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} workspace is currently synchronizing with global Maison registries.
+                The {activeTab} workspace is currently synchronizing with regional {currentUser?.country.toUpperCase()} registries.
               </p>
             </div>
           )}

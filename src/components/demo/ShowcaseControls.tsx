@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { COUNTRIES, VIP_CLIENTS } from '@/lib/mock-data';
+import { users as RBAC_USERS } from '@/lib/rbac/mock-users';
 import { Button } from '@/components/ui/button';
 import { 
   Globe, 
@@ -14,7 +15,9 @@ import {
   Zap,
   BookOpen,
   PieChart,
-  X
+  X,
+  UserCheck,
+  ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -24,13 +27,21 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ShowcaseControls: Redesigned for the Light/Elegant luxury theme.
+ * ShowcaseControls: Redesigned for Institutional Access & Multi-Persona Simulation.
  */
 export function ShowcaseControls() {
   const { country } = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const { activeVip, setActiveVip, isShowcaseMode, setShowcaseMode } = useAppStore();
+  const { 
+    activeVip, 
+    setActiveVip, 
+    isShowcaseMode, 
+    setShowcaseMode, 
+    currentUser, 
+    setCurrentUser,
+    recordLog 
+  } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const currentCountry = (country as string) || 'us';
@@ -40,12 +51,16 @@ export function ShowcaseControls() {
     router.push(newPath);
   };
 
-  const handleVipToggle = (id: string | null) => {
-    if (!id) {
-      setActiveVip(null);
-    } else {
-      const vip = VIP_CLIENTS.find(v => v.id === id);
-      if (vip) setActiveVip(vip);
+  const handlePersonaSwitch = (userId: string) => {
+    const user = RBAC_USERS.find(u => u.id === userId);
+    if (user) {
+      setCurrentUser(user);
+      recordLog(`Security Persona Switched to ${user.name}`, 'System');
+      setIsOpen(false);
+      // Redirect to home if current page is restricted for new persona
+      if (pathname.includes('/admin')) {
+        router.push(`/${user.country === 'GLOBAL' ? 'us' : user.country}`);
+      }
     }
   };
 
@@ -73,18 +88,41 @@ export function ShowcaseControls() {
         <PopoverContent align="end" className="w-80 p-0 bg-white border-border shadow-luxury overflow-hidden">
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Super-Demo Mode</h3>
+                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Access Controls</h3>
                 <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
              </div>
-             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Maison Amarisé | Light Edition</p>
+             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Maison Amarisé | Institutional Node</p>
           </div>
 
-          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto">
+          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            {/* Security Context: Persona Switching */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
+                <UserCheck className="w-3 h-3" />
+                <span>Security Persona</span>
+              </div>
+              <div className="space-y-2">
+                {RBAC_USERS.map(user => (
+                  <button 
+                    key={user.id}
+                    onClick={() => handlePersonaSwitch(user.id)}
+                    className={cn(
+                      "w-full p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex items-center justify-between transition-all",
+                      currentUser?.id === user.id ? "bg-plum text-white border-plum" : "bg-ivory border-border text-gray-400 hover:bg-plum/5 hover:text-plum"
+                    )}
+                  >
+                    <span>{user.name}</span>
+                    <span className="opacity-60">[{user.role.split('_')[0]}]</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Market Context */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Globe className="w-3 h-3" />
-                <span>Global Market Hub</span>
+                <span>Regional Hub</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {Object.keys(COUNTRIES).map(code => (
@@ -102,40 +140,17 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* Persona Simulation */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
-                <Crown className="w-3 h-3" />
-                <span>Client Tiers</span>
-              </div>
-              <div className="space-y-2">
-                <VipButton 
-                  active={!activeVip} 
-                  label="Guest Prospect" 
-                  onClick={() => handleVipToggle(null)} 
-                />
-                {VIP_CLIENTS.map(vip => (
-                  <VipButton 
-                    key={vip.id} 
-                    active={activeVip?.id === vip.id} 
-                    label={`${vip.name} (${vip.tier})`} 
-                    onClick={() => handleVipToggle(vip.id)} 
-                  />
-                ))}
-              </div>
-            </div>
-
             {/* Quick Experience Jumps */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Zap className="w-3 h-3" />
-                <span>Experience Flow</span>
+                <span>Institutional Links</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <ActionLink href="/admin" icon={<LayoutDashboard />} label="Super-Dashboard" />
-                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Maison Journal" />
-                <ActionLink href={`/${currentCountry}/category/apparel`} icon={<PieChart />} label="Global Catalog" />
-                <ActionLink href={`/${currentCountry}/wishlist`} icon={<Crown />} label="Private Selection" />
+                <ActionLink href="/admin" icon={<LayoutDashboard />} label="Command Center" />
+                <ActionLink href="/admin/operations" icon={<PieChart />} label="Ops Hub" />
+                <ActionLink href="/admin/revenue" icon={<ShieldAlert />} label="Lead Matrix" />
+                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Public Journal" />
               </div>
             </div>
           </div>
@@ -147,26 +162,11 @@ export function ShowcaseControls() {
              >
                Exit Super-Demo
              </button>
-             <span className="text-[8px] text-gray-300 tracking-widest uppercase">v4.0.0-LUXE</span>
+             <span className="text-[8px] text-gray-300 tracking-widest uppercase">v5.2.0-SECURE</span>
           </div>
         </PopoverContent>
       </Popover>
     </div>
-  );
-}
-
-function VipButton({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={cn(
-        "w-full h-12 px-4 border text-[10px] font-bold uppercase tracking-widest text-left flex items-center justify-between transition-all",
-        active ? "bg-gold/10 border-gold text-plum shadow-sm" : "bg-ivory border-border text-gray-400 hover:bg-gold/5 hover:text-gray-900"
-      )}
-    >
-      <span>{label}</span>
-      {active && <div className="w-2 h-2 rounded-full bg-gold animate-pulse shadow-gold-glow" />}
-    </button>
   );
 }
 

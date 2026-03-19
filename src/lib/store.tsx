@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import { 
   CartItem, 
   Product, 
@@ -81,7 +81,14 @@ interface AppContextType {
   activeBrandId: string;
   currentUser: MaisonUser | null;
   
-  // CMS State
+  // Scoped Data Views (Country Isolation)
+  scopedProducts: Product[];
+  scopedInquiries: PrivateInquiry[];
+  scopedEditorials: Editorial[];
+  scopedBuyingGuides: BuyingGuide[];
+  scopedReturns: ReturnRequest[];
+  
+  // Original Lists
   cmsSections: CMSSection[];
   products: Product[];
   collections: Collection[];
@@ -273,6 +280,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
 
+  // --- Scoped Views (Country Isolation Logic) ---
+  const scopedProducts = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return products;
+    return products.filter(p => p.countryCode === currentUser.country || p.isGlobal);
+  }, [products, currentUser]);
+
+  const scopedInquiries = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return privateInquiries;
+    return privateInquiries.filter(i => i.country.toLowerCase() === currentUser.country.toLowerCase());
+  }, [privateInquiries, currentUser]);
+
+  const scopedEditorials = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return editorials;
+    return editorials.filter(e => e.country === currentUser.country || e.isGlobal);
+  }, [editorials, currentUser]);
+
+  const scopedBuyingGuides = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return buyingGuides;
+    return buyingGuides.filter(g => g.country === currentUser.country || g.isGlobal);
+  }, [buyingGuides, currentUser]);
+
+  const scopedReturns = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return returns;
+    return returns.filter(r => {
+      const warehouse = r.warehouseId.split('-')[1]; // Mock wh-ny, wh-ldn...
+      return warehouse === currentUser.country;
+    });
+  }, [returns, currentUser]);
+
   // --- Infrastructure Actions ---
   const setCountryEnabled = (code: CountryCode, enabled: boolean) => {
     setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
@@ -397,6 +433,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
@@ -410,7 +447,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, updateQuantity, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog
-  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions, cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs, vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, isShowcaseMode, activeVip, activeVendor]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

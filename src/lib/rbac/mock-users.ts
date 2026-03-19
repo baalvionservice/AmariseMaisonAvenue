@@ -2,6 +2,7 @@ import { Role, ROLES } from "./roles";
 
 /**
  * @fileOverview Mock user registry for RBAC testing.
+ * Standardized with CountryCodes for geographic isolation.
  */
 
 export interface MaisonUser {
@@ -9,7 +10,7 @@ export interface MaisonUser {
   name: string;
   email: string;
   role: Role;
-  country: string; // "GLOBAL" or a specific CountryCode
+  country: string; // "GLOBAL" or a specific CountryCode ('us', 'uk', 'ae', 'in', 'sg')
 }
 
 export const users: MaisonUser[] = [
@@ -29,14 +30,14 @@ export const users: MaisonUser[] = [
   },
   {
     id: "u-3",
-    name: "John Smith (Operator)",
+    name: "John Smith (US Operator)",
     email: "john@amarise-luxe.com",
     role: ROLES.OPERATOR,
     country: "us",
   },
   {
     id: "u-4",
-    name: "Lumière Atelier (Vendor)",
+    name: "Lumière Atelier (AE Vendor)",
     email: "contact@lumiere.com",
     role: ROLES.VENDOR,
     country: "ae",

@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, 
@@ -45,13 +44,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { guardAction } from '@/lib/access/apiGuard';
 
 type VendorTab = 'dashboard' | 'catalog' | 'orders' | 'reports' | 'finances' | 'profile';
 
 export default function VendorAdminPanel() {
   const [activeTab, setActiveTab] = useState<VendorTab>('dashboard');
-  const { activeVendor, setActiveVendor, vendors, products, deleteProduct } = useAppStore();
+  const { activeVendor, setActiveVendor, vendors, products, deleteProduct, currentUser } = useAppStore();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Scoped Brand Isolation: Vendors cannot switch context manually if already set by session
+    if (currentUser?.role === 'vendor' && activeVendor?.id !== currentUser.id) {
+      // In a real system, the store would enforce this automatically
+      console.warn("Brand Identity Isolation Enforced");
+    }
+  }, [currentUser, activeVendor]);
 
   const vendorProducts = useMemo(() => 
     products.filter(p => p.vendorId === activeVendor?.id), 
@@ -62,8 +70,19 @@ export default function VendorAdminPanel() {
     toast({ title: "Atelier Action", description: msg });
   };
 
+  const handleDelete = (id: string) => {
+    // Functional API Guard Enforcement
+    const res = guardAction(currentUser, 'delete_listing', activeVendor?.id);
+    if (res.success) {
+      deleteProduct(id);
+      toast({ title: "Artifact De-Registered", description: "Entry removed from Maison archive." });
+    } else {
+      toast({ variant: "destructive", title: "Security Alert", description: res.error });
+    }
+  };
+
   if (!activeVendor) {
-    return <div className="h-screen flex items-center justify-center bg-ivory uppercase tracking-[0.5em] font-headline">Access Denied</div>;
+    return <div className="h-screen flex items-center justify-center bg-ivory uppercase tracking-[0.5em] font-headline text-muted-foreground animate-pulse">Establishing Brand Identity...</div>;
   }
 
   return (
@@ -89,19 +108,21 @@ export default function VendorAdminPanel() {
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
-          <div className="space-y-2">
-             <p className="text-[8px] text-gray-400 uppercase tracking-widest px-4 font-bold">Switch Identity</p>
-             <Select value={activeVendor.id} onValueChange={(id) => setActiveVendor(vendors.find(v => v.id === id) || null)}>
-                <SelectTrigger className="bg-ivory border-border text-[10px] font-bold uppercase h-10 rounded-none">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-border shadow-luxury">
-                  {vendors.map(v => (
-                    <SelectItem key={v.id} value={v.id} className="text-[10px] uppercase font-bold">{v.name}</SelectItem>
-                  ))}
-                </SelectContent>
-             </Select>
-          </div>
+          {currentUser?.role === 'super_admin' && (
+            <div className="space-y-2">
+               <p className="text-[8px] text-gray-400 uppercase tracking-widest px-4 font-bold">Switch Identity (Global)</p>
+               <Select value={activeVendor.id} onValueChange={(id) => setActiveVendor(vendors.find(v => v.id === id) || null)}>
+                  <SelectTrigger className="bg-ivory border-border text-[10px] font-bold uppercase h-10 rounded-none">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-border shadow-luxury">
+                    {vendors.map(v => (
+                      <SelectItem key={v.id} value={v.id} className="text-[10px] uppercase font-bold">{v.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+               </Select>
+            </div>
+          )}
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
             <Link href="/us">
               <LogOut className="w-4 h-4 mr-3" /> Exit Portal
@@ -251,7 +272,7 @@ export default function VendorAdminPanel() {
                         <TableCell className="text-right pr-8">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Edit3 className="w-3.5 h-3.5" /></Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-destructive" onClick={() => deleteProduct(product.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-destructive" onClick={() => handleDelete(product.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                           </div>
                         </TableCell>
                       </TableRow>

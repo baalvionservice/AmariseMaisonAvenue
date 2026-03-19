@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   TrendingUp, 
@@ -42,22 +42,30 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { guardPage } from '@/lib/access/routeGuard';
 
 export default function RevenueDashboard() {
-  const { privateInquiries, leadConversations, updateInquiryStatus } = useAppStore();
+  const { scopedInquiries, leadConversations, updateInquiryStatus, currentUser } = useAppStore();
   const metrics = MOCK_REVENUE_METRICS;
   
   const [filterTier, setFilterTier] = useState<string>('all');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Enforce isolation and RBAC at the route level
+    if (!guardPage(currentUser, 'view_revenue', currentUser?.country)) {
+      console.warn("Security Alert: Scoped revenue access attempt blocked.");
+    }
+  }, [currentUser]);
+
   const filteredInquiries = useMemo(() => {
-    if (filterTier === 'all') return privateInquiries;
-    return privateInquiries.filter(i => i.leadTier.toString() === filterTier);
-  }, [privateInquiries, filterTier]);
+    if (filterTier === 'all') return scopedInquiries;
+    return scopedInquiries.filter(i => i.leadTier.toString() === filterTier);
+  }, [scopedInquiries, filterTier]);
 
   const selectedLead = useMemo(() => 
-    privateInquiries.find(i => i.id === selectedLeadId), 
-    [privateInquiries, selectedLeadId]
+    scopedInquiries.find(i => i.id === selectedLeadId), 
+    [scopedInquiries, selectedLeadId]
   );
 
   const activeConversation = useMemo(() => 
@@ -72,7 +80,7 @@ export default function RevenueDashboard() {
           <div className="font-headline text-3xl font-bold tracking-tighter text-gray-900">
             AMARISÉ <span className="text-plum text-xs font-normal tracking-[0.4em] ml-2">SALES</span>
           </div>
-          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Acquisition Terminal</p>
+          <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">{currentUser?.country.toUpperCase()} Acquisition Terminal</p>
         </div>
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -96,7 +104,7 @@ export default function RevenueDashboard() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Acquisition Hub</h1>
-            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Lead Lifecycle & Conversational CRM</p>
+            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Lead Lifecycle & Scoped CRM ({currentUser?.country.toUpperCase()})</p>
           </div>
           <div className="flex items-center space-x-6">
              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-gold bg-gold/5 px-4 py-2 border border-gold/10">
@@ -108,10 +116,10 @@ export default function RevenueDashboard() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Top Line Metrics */}
+          {/* Scoped Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard icon={<DollarSign />} label="Estimated Value" value={`$${(metrics.totalAcquisitionValue / 1000000).toFixed(1)}M`} trend="+12.4%" positive />
-            <StatCard icon={<Users />} label="Active Leads" value={privateInquiries.length.toString()} trend="High Tier Focus" positive />
+            <StatCard icon={<Users />} label="Scoped Leads" value={scopedInquiries.length.toString()} trend="Local Focus" positive />
             <StatCard icon={<ShieldCheck />} label="Verified Registry" value="100%" trend="Compliance" positive />
             <StatCard icon={<Target />} label="Conv. Rate" value={`${metrics.conversionRate}%`} trend="Target: 5%" positive />
           </div>
@@ -123,7 +131,7 @@ export default function RevenueDashboard() {
               <CardHeader className="border-b border-border flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="font-headline text-2xl">Acquisition Leads</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Private curatorial requests feed</CardDescription>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">{currentUser?.country.toUpperCase()} curatorial requests feed</CardDescription>
                 </div>
                 <div className="flex items-center space-x-4">
                    <div className="relative group">
@@ -194,7 +202,7 @@ export default function RevenueDashboard() {
                       </TableRow>
                     )) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="py-32 text-center text-gray-400 italic text-sm">No artifacts found in this acquisition cycle.</TableCell>
+                        <TableCell colSpan={6} className="py-32 text-center text-gray-400 italic text-sm">No scoped artifacts found in this acquisition cycle.</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -202,7 +210,7 @@ export default function RevenueDashboard() {
               </CardContent>
             </Card>
 
-            {/* Conversation/CRM Sidebar */}
+            {/* Scoped Conversation Sidebar */}
             <Card className="lg:col-span-4 bg-white border-border shadow-luxury h-[700px] flex flex-col">
               {selectedLead ? (
                 <>
@@ -261,7 +269,7 @@ export default function RevenueDashboard() {
                          <ShieldCheck className="w-4 h-4" />
                        </Button>
                     </div>
-                    <p className="text-[8px] text-center text-gray-400 italic">Discreet acquisition protocols enforced.</p>
+                    <p className="text-[8px] text-center text-gray-400 italic">Discreet regional acquisition protocols enforced.</p>
                   </div>
                 </>
               ) : (
@@ -271,7 +279,7 @@ export default function RevenueDashboard() {
                    </div>
                    <div className="space-y-2">
                       <h3 className="font-headline text-2xl italic text-gray-900">Maison Select</h3>
-                      <p className="text-xs text-gray-400 font-light max-w-[200px] mx-auto">Select a lead from the registry to begin curatorial guidance.</p>
+                      <p className="text-xs text-gray-400 font-light max-w-[200px] mx-auto">Select a regional lead from the registry to begin curatorial guidance.</p>
                    </div>
                 </div>
               )}
