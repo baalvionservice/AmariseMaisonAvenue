@@ -49,7 +49,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-0 bg-background min-h-screen pb-40 animate-fade-in">
-      {/* Hero: Institutional Authority */}
+      {/* Hero: Institutional Authority - LCP OPTIMIZED */}
       <section className="relative h-[90vh] w-full flex items-end overflow-hidden">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
@@ -57,6 +57,8 @@ export default function HomePage() {
           fill
           className="object-cover animate-slow-zoom"
           priority
+          fetchPriority="high"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="container mx-auto px-12 pb-32 relative z-10 text-white max-w-[1600px]">
@@ -101,6 +103,7 @@ export default function HomePage() {
               alt="Maison Mastery" 
               fill 
               className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
           <div className="lg:w-1/2 space-y-10 text-center lg:text-left">
@@ -155,6 +158,7 @@ export default function HomePage() {
               alt="Atelier Silence" 
               fill 
               className="object-cover opacity-40 grayscale"
+              sizes="66vw"
             />
           </div>
           <div className="container mx-auto px-12 relative z-10 max-w-[1600px]">
@@ -256,7 +260,7 @@ export default function HomePage() {
                   placeholder="ACQUISITION EMAIL" 
                   className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
                 />
-                <button className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4">
+                <button className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
                   SUBMIT
                 </button>
              </div>

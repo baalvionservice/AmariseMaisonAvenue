@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -32,12 +31,9 @@ export const Header = () => {
     setMounted(true);
   }, []);
 
-  // Stabilize values during hydration to match server-rendered output
-  // We use 'us' as a stable fallback during the initial hydration pass
   const countryCode = mounted ? ((country as string) || 'us') : 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   
-  // Gate count calculations to ensure client matches server empty state on first pass
   const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;
   const wishlistCount = mounted ? wishlist.length : 0;
 
@@ -76,22 +72,22 @@ export const Header = () => {
         <div className="flex items-center space-x-10">
           <button 
             type="button"
-            className="hover:text-black transition-colors opacity-40 p-1" 
+            className="hover:text-black transition-colors opacity-40 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" 
             onClick={handlePrevSlide}
-            aria-label="Previous Slide"
+            aria-label="Previous Announcement"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <div className="overflow-hidden relative flex items-center justify-center min-w-[500px]">
-            <span className="animate-fade-in text-center" key={activeSlide}>
+            <span className="animate-fade-in text-center" key={activeSlide} role="status">
               {slides[activeSlide]}
             </span>
           </div>
           <button 
             type="button"
-            className="hover:text-black transition-colors opacity-40 p-1" 
+            className="hover:text-black transition-colors opacity-40 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" 
             onClick={handleNextSlide}
-            aria-label="Next Slide"
+            aria-label="Next Announcement"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -106,13 +102,17 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center space-x-8">
-          <Link href="#" className="hover:text-secondary transition-colors">Consignment</Link>
-          <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors">Atelier Viewings</Link>
-          <Link href={`/${countryCode}/contact`} className="hover:text-secondary transition-colors">Specialist Inquiry</Link>
+          <Link href="#" className="hover:text-secondary transition-colors py-2">Consignment</Link>
+          <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors py-2">Atelier Viewings</Link>
+          <Link href={`/${countryCode}/contact`} className="hover:text-secondary transition-colors py-2">Specialist Inquiry</Link>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:opacity-80 transition-all group border-l border-white/10 pl-8" type="button">
+              <button 
+                className="flex items-center space-x-3 hover:opacity-80 transition-all group border-l border-white/10 pl-8 min-h-[44px]" 
+                type="button"
+                aria-label={`Change Region (Current: ${currentCountry.name})`}
+              >
                 <span className="text-sm leading-none grayscale brightness-200">{currentCountry.flag}</span>
                 <span className="font-bold tracking-widest text-[10px] text-white uppercase">{currentCountry.name}</span>
               </button>
@@ -143,12 +143,12 @@ export const Header = () => {
       {/* Maison Brand Header */}
       <div className="h-28 border-b border-gray-100 px-12 flex items-center justify-between relative bg-white">
         <div className="flex items-center space-x-6 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-          <Link href="#" className="hover:text-black border-r border-gray-100 pr-6">Client Portal</Link>
-          <Link href="#" className="hover:text-black">Join</Link>
+          <Link href="#" className="hover:text-black border-r border-gray-100 pr-6 py-2">Client Portal</Link>
+          <Link href="#" className="hover:text-black py-2">Join</Link>
         </div>
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-          <Link href={`/${countryCode}`} className="group flex flex-col items-center">
+          <Link href={`/${countryCode}`} className="group flex flex-col items-center" aria-label="Maison Amarisé Home">
             <span className="font-headline text-5xl font-medium tracking-[0.05em] text-black transition-all duration-700 group-hover:tracking-[0.1em]">
               AMARISÉ <span className="font-light italic text-3xl opacity-80">MAISON</span>
             </span>
@@ -156,24 +156,36 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center space-x-10">
-          <button className="text-gray-400 hover:text-black transition-colors group relative flex items-center" type="button">
+          <button 
+            className="text-gray-400 hover:text-black transition-colors group relative flex items-center min-w-[44px] min-h-[44px] justify-center" 
+            type="button"
+            aria-label="Search Maison Intelligence"
+          >
             <Search className="w-5 h-5 stroke-[1.5px]" />
             <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Intelligence</span>
           </button>
           
-          <Link href={`/${countryCode}/wishlist`} className="relative text-gray-400 hover:text-black transition-colors group">
+          <Link 
+            href={`/${countryCode}/wishlist`} 
+            className="relative text-gray-400 hover:text-black transition-colors group min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label={`View Wishlist (${wishlistCount} items)`}
+          >
             <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlistCount > 0 && "fill-black text-black")} />
             {wishlistCount > 0 && (
-              <span className="absolute -top-3 -right-3 bg-black text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+              <span className="absolute top-0 right-0 bg-black text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                 {wishlistCount}
               </span>
             )}
           </Link>
 
-          <Link href={`/${countryCode}/cart`} className="relative text-gray-400 hover:text-black transition-colors group">
+          <Link 
+            href={`/${countryCode}/cart`} 
+            className="relative text-gray-400 hover:text-black transition-colors group min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label={`View Shopping Bag (${cartCount} items)`}
+          >
             <ShoppingBag className="w-5 h-5 stroke-[1.5px]" />
             {cartCount > 0 && (
-              <span className="absolute -top-3 -right-3 bg-secondary text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+              <span className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {cartCount}
               </span>
             )}
@@ -182,13 +194,13 @@ export const Header = () => {
       </div>
 
       {/* Curatorial Navigation */}
-      <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-12">
+      <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-12" aria-label="Main Navigation">
         {navLinks.map((link) => (
           <div key={link.name} className="group h-full flex items-center">
             {link.services ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button type="button" className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all outline-none">
+                  <button type="button" className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all outline-none py-2">
                     {link.name}
                   </button>
                 </DropdownMenuTrigger>
@@ -208,20 +220,19 @@ export const Header = () => {
             ) : (
               <Link 
                 href={link.href} 
-                className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all relative"
+                className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all relative py-2"
               >
                 {link.name}
                 <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-secondary transition-all group-hover:w-full group-hover:left-0" />
               </Link>
             )}
 
-            {/* Mega Menu implementation */}
             {link.mega && (
               <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50">
                 <div className="container mx-auto px-20 flex gap-40 max-w-[1600px]">
                   <div className="w-72 space-y-10">
                     <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">Atelier Edits</h3>
-                    <div className="flex flex-col space-y-6">
+                    <nav className="flex flex-col space-y-6" aria-label="Mega Menu Navigation">
                       {['Hermès Heritage', 'Chanel Seasonal', 'Maison Accessories', 'Artisanal Jewelry'].map((sub) => (
                         <Link 
                           key={sub} 
@@ -231,16 +242,17 @@ export const Header = () => {
                           {sub}
                         </Link>
                       ))}
-                    </div>
+                    </nav>
                   </div>
 
                   <div className="flex-1 space-y-10">
                     <div className="aspect-[21/9] w-full bg-muted border border-gray-100 flex items-center justify-center group/img relative overflow-hidden shadow-sm">
                       <Image 
                         src="https://picsum.photos/seed/amarise-arrivals-bags/1200/800" 
-                        alt="New Arrivals" 
+                        alt="New Arrivals Heritage Showcase" 
                         fill 
                         className="object-cover transition-transform duration-[3s] group-hover/img:scale-105"
+                        sizes="50vw"
                       />
                       <div className="absolute inset-0 bg-black/10 group-hover/img:bg-transparent transition-colors" />
                     </div>
@@ -263,7 +275,13 @@ export const Header = () => {
 
       {/* Mobile Trigger */}
       <div className="lg:hidden h-16 bg-white flex items-center px-12 justify-between border-b border-gray-100">
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black" type="button">
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)} 
+          className="text-black min-w-[44px] min-h-[44px] flex items-center justify-center" 
+          type="button"
+          aria-expanded={isMenuOpen}
+          aria-label="Toggle Navigation Menu"
+        >
           {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
         <span className="text-[10px] font-bold uppercase tracking-[0.5em] italic">Maison Menu</span>

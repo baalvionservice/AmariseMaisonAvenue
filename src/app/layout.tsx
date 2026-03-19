@@ -1,23 +1,50 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { Inter, Alegreya } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from '@/lib/store';
 
-/**
- * RootLayout optimized for Global SEO and Asset Delivery.
- * Features hreflang support and canonical link logic for multi-country hubs.
- */
+// Optimize Font Loading
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const alegreya = Alegreya({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-alegreya',
+  style: ['normal', 'italic'],
+});
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://amarise-maison-avenue.com'),
   title: {
     default: 'AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury',
     template: '%s | AMARISÉ MAISON AVENUE'
   },
-  description: 'Experience curated luxury from around the world. Exclusive collections in fashion, watches, and fine jewelry. Hand-crafted heritage for the modern era.',
-  keywords: 'luxury fashion, high-end watches, fine jewelry, bespoke apparel, haute couture, luxury shopping',
+  description: 'Curating the world\'s most exquisite treasures since 1924. Explore exclusive collections in haute couture, high-end watches, and fine jewelry.',
+  keywords: ['luxury fashion', 'high-end watches', 'fine jewelry', 'bespoke apparel', 'haute couture', 'luxury shopping'],
+  authors: [{ name: 'Amarisé Curation Team' }],
+  creator: 'Amarisé Maison',
+  publisher: 'Amarisé Maison Avenue',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     title: 'AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury',
     description: 'Curating the world\'s most exquisite treasures since 1924.',
+    url: 'https://amarise-maison-avenue.com',
+    siteName: 'Amarisé Maison Avenue',
     type: 'website',
     images: [{
       url: 'https://picsum.photos/seed/amarise-og/1200/630',
@@ -29,7 +56,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury',
-    description: 'The Pinnacle of Global Luxury Heritage',
+    description: 'The Pinnacle of Global Luxury Heritage since 1924.',
     images: ['https://picsum.photos/seed/amarise-og/1200/630'],
   },
   alternates: {
@@ -61,11 +88,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light scroll-smooth">
+    <html lang="en" className={`${inter.variable} ${alegreya.variable} light scroll-smooth`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+        {/* Preconnect to critical assets */}
+        <link rel="preconnect" href="https://picsum.photos" />
+        <link rel="preconnect" href="https://madisonavenuecouture.com" />
+        
+        {/* Structured Data for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
