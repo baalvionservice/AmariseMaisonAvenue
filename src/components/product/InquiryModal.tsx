@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -53,7 +54,8 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
       budgetRange: formData.budget as any,
       intent: formData.intent as any,
       message: formData.message,
-      contactMethod: formData.contactMethod as any
+      contactMethod: formData.contactMethod as any,
+      brandId: 'amarise-luxe'
     });
 
     toast({
@@ -77,7 +79,9 @@ export function InquiryModal({ isOpen, onClose, product, service }: InquiryModal
           <div className="space-y-6">
             <div className="flex items-center space-x-3 text-secondary">
                <Crown className="w-5 h-5" />
-               <span className="text-[10px] font-bold tracking-[0.5em] uppercase">Acquisition Desk</span>
+               <span className="text-[10px] font-bold tracking-[0.5em] uppercase border-b border-gold/40 pb-1">
+                 Acquisition Desk
+               </span>
             </div>
             <h2 className="text-5xl font-headline font-bold italic leading-[0.9] text-gray-900 tracking-tighter">
               Private <br /> Curation

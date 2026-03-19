@@ -1,3 +1,4 @@
+
 import { ProductExtended, MaisonService, MaisonReport, PrivateInquiry } from './types';
 
 /**
@@ -37,7 +38,9 @@ export const MAISON_SERVICES: MaisonService[] = [
     description: 'A private concierge service dedicated to sourcing rare artifacts globally, managing international logistics, and providing white-glove delivery.',
     priceRange: 'On Commission',
     features: ['Global Sourcing Network', 'Tax & Duty Optimization', 'Private Viewings', 'Bespoke Logistics'],
-    imageUrl: 'https://picsum.photos/seed/maison-concierge/1600/900'
+    imageUrl: 'https://picsum.photos/seed/maison-concierge/1600/900',
+    brandId: 'amarise-luxe',
+    isGlobal: true
   },
   {
     id: 'advisory',
@@ -46,7 +49,9 @@ export const MAISON_SERVICES: MaisonService[] = [
     description: 'Bespoke advisory for collectors seeking to build high-value artisanal portfolios with long-term capital appreciation.',
     priceRange: 'Annual Retainer',
     features: ['Market Performance Reports', 'Private Auction Access', 'Provenance Verification', 'Exit Strategy Planning'],
-    imageUrl: 'https://picsum.photos/seed/maison-advisory/1600/900'
+    imageUrl: 'https://picsum.photos/seed/maison-advisory/1600/900',
+    brandId: 'amarise-luxe',
+    isGlobal: true
   },
   {
     id: 'authentication',
@@ -55,7 +60,9 @@ export const MAISON_SERVICES: MaisonService[] = [
     description: 'Official Maison authentication service for high-value artifacts, including digital NFC certification and archival documentation.',
     priceRange: '$1,500 per Artifact',
     features: ['Atelier Inspection', 'Digital Heritage Seal', 'Blockchain Tracking', 'Official Appraisal'],
-    imageUrl: 'https://picsum.photos/seed/maison-auth/1600/900'
+    imageUrl: 'https://picsum.photos/seed/maison-auth/1600/900',
+    brandId: 'amarise-luxe',
+    isGlobal: true
   }
 ];
 
@@ -67,7 +74,8 @@ export const MAISON_REPORTS: MaisonReport[] = [
     date: 'March 2024',
     author: 'Elena Vance, Head of Curation',
     isPremium: true,
-    previewImage: 'https://picsum.photos/seed/report-preview/800/1200'
+    previewImage: 'https://picsum.photos/seed/report-preview/800/1200',
+    brandId: 'amarise-luxe'
   }
 ];
 

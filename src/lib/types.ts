@@ -272,6 +272,7 @@ export interface SEOMetadata {
   structuredData?: any;
   brandId: string;
   isGlobal: boolean;
+  lastSyncedAt?: string;
 }
 
 export interface CMSSection {
