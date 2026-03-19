@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -14,7 +13,9 @@ import {
   Shirt,
   Gem,
   Watch,
-  Award
+  Award,
+  Zap,
+  Target
 } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
@@ -34,8 +35,8 @@ export default function HomePage() {
     async function loadRecs() {
       try {
         const scenario = activeVip 
-          ? `Private curation for elite client ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on high-value institutional artifacts.`
-          : `Luxury discovery for a new connoisseur in ${currentCountry.name}. Seasonal heritage pieces.`;
+          ? `Private curation for elite client ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on high-value institutional artifacts based on intent: ${activeVip.subscriptionPlan || 'Heritage'}.`
+          : `Luxury discovery for a new connoisseur in ${currentCountry.name}. Seasonal heritage pieces with high market resonance.`;
 
         const res = await generateProductRecommendations({ scenario });
         setRecommendations(res.recommendations.slice(0, 3));
@@ -86,12 +87,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-primary py-5 text-center border-b border-white/5">
+      {/* Autonomous Ticker: Real-time Engagement */}
+      <section className="bg-primary py-5 text-center border-b border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+           <Zap className="w-64 h-64 text-white" />
+        </div>
         <Link 
           href={`/${countryCode}/category/hermes`} 
-          className="text-white text-[9px] font-bold tracking-[0.4em] uppercase hover:text-secondary transition-colors"
+          className="text-white text-[9px] font-bold tracking-[0.4em] uppercase hover:text-secondary transition-colors relative z-10"
         >
-          Specialist Access: Private Acquisition Flow for the 1924 Heritage Series Now Active
+          Specialist Access: Private Acquisition Flow for the 1924 Heritage Series Now Active in {currentCountry.name}
         </Link>
       </section>
 
@@ -151,63 +156,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Pause Moment: Architecture */}
-        <section className="relative h-[60vh] w-full flex items-center overflow-hidden bg-ivory">
-          <div className="absolute right-0 top-0 w-2/3 h-full overflow-hidden">
-            <Image 
-              src="https://picsum.photos/seed/amarise-pause/1920/1080" 
-              alt="Atelier Silence - Minimalist Architecture" 
-              fill 
-              className="object-cover opacity-40 grayscale"
-              sizes="66vw"
-            />
-          </div>
-          <div className="container mx-auto px-12 relative z-10 max-w-[1600px]">
-            <div className="max-w-2xl space-y-8">
-              <h2 className="text-6xl md:text-8xl font-headline font-medium italic text-black leading-none">The Luxury <br /> of Silence</h2>
-              <p className="text-lg text-gray-600 font-light italic max-md">
-                Refining the intervals where craftsmanship transforms into a global institutional legacy.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Curation: Series Edit */}
-        <section className="container mx-auto px-12 py-12 max-w-[1600px]">
-          <div className="flex flex-col items-center text-center space-y-6 mb-24">
-             <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Market Curation</span>
-             <h2 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900">Institutional Edits</h2>
-             <div className="w-12 h-px bg-secondary" />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {COLLECTIONS.slice(0, 3).map((col) => (
-              <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]" aria-label={`Explore ${col.name} Archive`}>
-                <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-105 group-hover:bg-ivory">
-                  {col.name} Archive
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
-                <div className="absolute inset-0 flex flex-col items-center justify-end p-16 text-center space-y-4">
-                  <span className="text-secondary text-[9px] font-bold tracking-[0.5em] uppercase">Archive Registry Only</span>
-                  <h3 className="text-3xl font-headline font-bold text-white italic">{col.name}</h3>
-                  <div className="flex items-center text-white text-[9px] font-bold tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
-                    Explore Series <ArrowRight className="ml-2 w-3 h-3" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Private Salon: High Intent Recs */}
+        {/* Private Salon: High Intent Recs (Behavior Driven) */}
         <section className="container mx-auto px-12 py-24 max-w-[1600px]">
           <div className="flex flex-col lg:flex-row items-end justify-between mb-24 gap-8">
             <div className="space-y-4">
                <div className="flex items-center space-x-3">
                   <Crown className="w-5 h-5 text-secondary" />
-                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">The Private Acquisition Salon</span>
+                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Personalized Acquisition Salon</span>
                </div>
-               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">Discreet Allocation Only</h2>
-               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">Curatorial Verification Required for {currentCountry.name} Market</p>
+               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">
+                 {activeVip ? `Curated for ${activeVip.name}` : "Discreet Allocation Only"}
+               </h2>
+               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">
+                 {activeVip ? "AI-Optimized based on historical intent" : `Curatorial Verification Required for ${currentCountry.name} Market`}
+               </p>
             </div>
             <Link href={`/${countryCode}/wishlist`}>
               <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors" aria-label="View Personal Registry">
@@ -227,20 +189,22 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Heritage Trust Section */}
-        <section className="py-48 text-center bg-ivory">
-          <div className="container mx-auto px-12 max-w-[1600px] flex flex-col items-center space-y-12">
-            <Award className="w-12 h-12 text-secondary mb-4" />
-            <h3 className="text-4xl md:text-5xl font-headline font-medium italic text-black tracking-widest leading-relaxed max-w-4xl mx-auto">
-              "A global network of rare artifacts, <br /> audited for provenance and permanence."
-            </h3>
-            <div className="w-16 h-px bg-secondary" />
-            <Link href={`/${countryCode}/appointments`}>
-               <Button variant="outline" className="border-black h-16 px-16 rounded-none text-[10px] font-bold tracking-[0.4em] uppercase hover:bg-black hover:text-white transition-all" aria-label="Request Private Appointment">
-                 Request Private Appointment
-               </Button>
-            </Link>
-          </div>
+        {/* Automated Retargeting Moment */}
+        <section className="bg-plum/5 py-32 border-y border-border">
+           <div className="container mx-auto px-12 max-w-4xl text-center space-y-12">
+              <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-lg">
+                 <Target className="w-8 h-8 text-plum" />
+              </div>
+              <h3 className="text-4xl md:text-5xl font-headline font-bold italic tracking-tight">The Heritage Intelligence</h3>
+              <p className="text-xl text-gray-600 font-light leading-relaxed italic max-w-2xl mx-auto">
+                "Our curatorial AI monitors global market resonance to invite you into the world's most significant collection events before they reach the public hub."
+              </p>
+              <Link href={`/${countryCode}/journal`}>
+                 <Button className="bg-black text-white hover:bg-gold px-12 h-14 rounded-none text-[9px] font-bold uppercase tracking-widest">
+                    EXPLORE THE INTELLIGENCE HUB
+                 </Button>
+              </Link>
+           </div>
         </section>
 
         {/* Final Registry Invitation */}

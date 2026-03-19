@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -23,7 +22,9 @@ import {
   Play,
   History,
   FastForward,
-  Plus
+  Plus,
+  Coins,
+  Target
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,14 @@ export default function AIDashboard() {
     runSequence('SEO Metadata Cycle', currentUser?.country);
   };
 
+  const handleRevenueCycle = () => {
+    toast({
+      title: "Revenue Cycle Triggered",
+      description: "Maison Autopilot is executing multi-channel retargeting and trending artifact pushes.",
+    });
+    runSequence('Revenue Generation', currentUser?.country);
+  };
+
   if (!stats) return null;
 
   return (
@@ -94,21 +103,51 @@ export default function AIDashboard() {
           </div>
           <div className="flex items-center space-x-6">
              <Button 
-              className="bg-black text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
+              className="bg-plum text-white hover:bg-black h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
+              onClick={handleRevenueCycle}
+             >
+               <Coins className="w-3.5 h-3.5 mr-2" /> TRIGGER REVENUE CYCLE
+             </Button>
+             <Button 
+              variant="outline"
+              className="border-border text-gray-900 hover:bg-ivory h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
               onClick={handleBatchGeneration}
              >
-               <Plus className="w-3.5 h-3.5 mr-2" /> BATCH GENERATE METADATA
+               <Plus className="w-3.5 h-3.5 mr-2" /> BATCH SEO GEN
              </Button>
-             <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-4 py-2 border border-green-100 rounded-sm">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Autopilot Active</span>
-             </div>
              <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">AI</div>
           </div>
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* AI Performance Insight */}
+          {/* Automation Strategy Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             <Card className="bg-white border-border shadow-sm p-8 space-y-4">
+                <div className="flex items-center space-x-3 text-plum">
+                   <Target className="w-5 h-5" />
+                   <h4 className="text-[10px] font-bold uppercase tracking-widest">Autonomous Targeting</h4>
+                </div>
+                <p className="text-xl font-headline font-bold italic">842 Connoisseurs reached today</p>
+                <p className="text-[10px] text-gray-400 italic">Retargeting cycles executed every 4 hours.</p>
+             </Card>
+             <Card className="bg-white border-border shadow-sm p-8 space-y-4">
+                <div className="flex items-center space-x-3 text-plum">
+                   <TrendingUp className="w-5 h-5" />
+                   <h4 className="text-[10px] font-bold uppercase tracking-widest">Revenue Pull-through</h4>
+                </div>
+                <p className="text-xl font-headline font-bold italic">$124k Automated Pipeline</p>
+                <p className="text-[10px] text-gray-400 italic">Conversion from AI-suggested follow-ups.</p>
+             </Card>
+             <Card className="bg-white border-border shadow-sm p-8 space-y-4">
+                <div className="flex items-center space-x-3 text-plum">
+                   <Search className="w-5 h-5" />
+                   <h4 className="text-[10px] font-bold uppercase tracking-widest">Index Velocity</h4>
+                </div>
+                <p className="text-xl font-headline font-bold italic">100% SEO Compliance</p>
+                <p className="text-[10px] text-gray-400 italic">Automatic rich snippet generation active.</p>
+             </Card>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
               <CardHeader className="border-b border-border flex flex-row items-center justify-between">
@@ -187,67 +226,6 @@ export default function AIDashboard() {
                </Card>
             </div>
           </div>
-
-          {/* Autonomous Job Queue */}
-          <Card className="bg-white border-border shadow-luxury overflow-hidden">
-            <CardHeader className="border-b border-border bg-ivory/10 flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="font-headline text-2xl">Autonomous Job Queue</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Maison autopilot execution registry</CardDescription>
-              </div>
-              <Badge variant="outline" className="text-[8px] uppercase border-plum text-plum">{jobs.length} ACTIVE JOBS</Badge>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-border/40">
-                {jobs.map(job => (
-                  <div key={job.id} className="p-8 flex items-center justify-between hover:bg-ivory/30 transition-colors">
-                    <div className="flex items-center space-x-8">
-                      <div className={cn(
-                        "w-12 h-12 rounded-full border flex items-center justify-center transition-colors",
-                        job.status === 'complete' ? "bg-green-50 border-green-100 text-green-500" :
-                        job.status === 'running' ? "bg-plum/5 border-plum/20 text-plum animate-pulse" :
-                        job.status === 'failed' ? "bg-red-50 border-red-100 text-red-500" :
-                        "bg-ivory border-border text-gray-300"
-                      )}>
-                        {job.status === 'complete' ? <CheckCircle2 className="w-5 h-5" /> : 
-                         job.status === 'running' ? <RefreshCcw className="w-5 h-5 animate-spin" /> : 
-                         job.status === 'failed' ? <AlertCircle className="w-5 h-5" /> :
-                         <Clock className="w-5 h-5" />}
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-bold uppercase tracking-tight text-gray-900">{job.taskName}</h4>
-                        <div className="flex items-center space-x-4">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{job.frequency} Logic</span>
-                          <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                          <span className="text-[9px] font-bold text-plum uppercase tracking-widest">{job.country.toUpperCase()} Hub</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-12">
-                      <div className="text-right space-y-1">
-                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Last Execution</p>
-                        <p className="text-[10px] font-bold text-gray-600">{job.lastRun ? new Date(job.lastRun).toLocaleTimeString() : 'N/A'}</p>
-                      </div>
-                      <div className="text-right space-y-1">
-                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Next Scheduled</p>
-                        <p className="text-[10px] font-bold text-gray-600">{job.nextRun ? new Date(job.nextRun).toLocaleTimeString() : 'Pending Cycle'}</p>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-10 w-10 text-gray-400 hover:text-plum hover:bg-plum/5"
-                        onClick={() => runJob(job.id)}
-                        disabled={job.status === 'running'}
-                      >
-                        <Play className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Live Action Feed */}
