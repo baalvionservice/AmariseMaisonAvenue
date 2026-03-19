@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -19,17 +20,20 @@ import {
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
+interface MegaColumn {
+  title: string;
+  links: string[];
+}
+
 interface NavLink {
   name: string;
   href: string;
   mega?: boolean;
   services?: boolean;
   megaContent?: {
-    title: string;
-    links: string[];
+    columns: MegaColumn[];
     image: string;
-    tagline: string;
-    desc: string;
+    caption: string;
   };
 }
 
@@ -74,24 +78,37 @@ export const Header = () => {
       href: `/${countryCode}/category/new-arrivals`, 
       mega: true,
       megaContent: {
-        title: 'Atelier Edits',
-        links: ['The 1924 Series', 'Mediterranean Dawn', 'Resort Curations', 'Evening Registry'],
+        columns: [
+          {
+            title: 'ATELIER EDITS',
+            links: ['The 1924 Series', 'Mediterranean Dawn', 'Resort Curations', 'Evening Registry']
+          }
+        ],
         image: 'https://picsum.photos/seed/amarise-arrivals-bags/1200/800',
-        tagline: 'Spring Summer 2024',
-        desc: 'Exploring the latest heritage releases from our Parisian atelier.'
+        caption: 'Maison New Arrivals'
       }
     },
-    { name: 'COLLECTIONS', href: `/${countryCode}/collections` },
     { 
       name: 'HERMÈS', 
       href: `/${countryCode}/category/hermes`,
       mega: true,
       megaContent: {
-        title: 'Hermès Archives',
-        links: ['Birkin & Kelly', 'Silk Scarves', 'Leather Accessories', 'Atelier Homme'],
+        columns: [
+          {
+            title: 'HANDBAGS',
+            links: ['Birkin', 'Kelly', 'Constance', 'Evelyne', 'Picotin', 'Lindy', 'Herbag', 'Other Bags', 'All Hermès Bags']
+          },
+          {
+            title: 'ACCESSORIES',
+            links: ['Wallets', 'Watches', 'Belts', 'Charms', 'Scarves', 'Shoes', 'Jewelry']
+          },
+          {
+            title: 'CURATIONS',
+            links: ['New Arrivals', 'Best Sellers', 'Exotic Handbags', 'Rare & Unique Bags', 'HSS Horseshoe Stamp Bags', 'Pre-Owned & Vintage Handbags', 'Home Goods', 'Atelier Bags', 'Palm Beach Collection', 'Bag Besties & Organizers']
+          }
+        ],
         image: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=1200',
-        tagline: 'Timeless Icons',
-        desc: 'The absolute standard of leather mastery and equestrian heritage.'
+        caption: 'Hermès Bestsellers'
       }
     },
     { 
@@ -99,14 +116,18 @@ export const Header = () => {
       href: `/${countryCode}/category/chanel`,
       mega: true,
       megaContent: {
-        title: 'Chanel Heritage',
-        links: ['Classic Flap Bags', 'Ready-to-Wear', 'Vintage Jewelry', 'Boy Chanel'],
+        columns: [
+          {
+            title: 'CHANEL HERITAGE',
+            links: ['Classic Flap Bags', 'Ready-to-Wear', 'Vintage Jewelry', 'Boy Chanel']
+          }
+        ],
         image: 'https://picsum.photos/seed/chanel-mega/1200/800',
-        tagline: 'The Spirit of Rue Cambon',
-        desc: 'A dialogue between avant-garde vision and timeless elegance.'
+        caption: 'The Spirit of Rue Cambon'
       }
     },
-    { name: 'ACCESSORIES', href: `/${countryCode}/category/accessories` },
+    { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
+    { name: 'OTHER BRANDS', href: `/${countryCode}/category/all` },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
     { name: 'PRIVATE ADVISORY', href: '#', services: true },
     { name: 'THE JOURNAL', href: `/${countryCode}/journal` },
@@ -275,42 +296,38 @@ export const Header = () => {
             )}
 
             {link.mega && link.megaContent && (
-              <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50 translate-y-4 group-hover:translate-y-0">
-                <div className="container mx-auto px-20 flex gap-40 max-w-[1600px]">
-                  <div className="w-72 space-y-10">
-                    <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">{link.megaContent.title}</h3>
-                    <nav className="flex flex-col space-y-6" aria-label={`${link.name} Mega Menu`}>
-                      {link.megaContent.links.map((sub) => (
-                        <Link 
-                          key={sub} 
-                          href="#" 
-                          className="text-2xl font-headline font-medium text-gray-600 hover:text-black transition-all hover:italic hover:pl-2"
-                        >
-                          {sub}
-                        </Link>
-                      ))}
-                    </nav>
-                  </div>
+              <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-16 pb-20 border-t border-gray-50 translate-y-4 group-hover:translate-y-0">
+                <div className="container mx-auto px-12 flex justify-center gap-24 max-w-[1600px]">
+                  {link.megaContent.columns.map((col, idx) => (
+                    <div key={idx} className="w-56 space-y-8">
+                      <h3 className="text-[11px] font-bold tracking-[0.2em] text-black uppercase border-b border-gray-100 pb-4">{col.title}</h3>
+                      <nav className="flex flex-col space-y-4" aria-label={`${link.name} - ${col.title}`}>
+                        {col.links.map((sub) => (
+                          <Link 
+                            key={sub} 
+                            href="#" 
+                            className="text-[13px] font-light text-gray-600 hover:text-black transition-colors"
+                          >
+                            {sub}
+                          </Link>
+                        ))}
+                      </nav>
+                    </div>
+                  ))}
 
-                  <div className="flex-1 space-y-10">
-                    <div className="aspect-[21/9] w-full bg-muted border border-gray-100 flex items-center justify-center group/img relative overflow-hidden shadow-sm">
+                  <div className="w-[450px] space-y-6">
+                    <div className="aspect-[16/10] w-full bg-muted border border-gray-100 flex items-center justify-center group/img relative overflow-hidden shadow-sm">
                       <Image 
                         src={link.megaContent.image} 
-                        alt={`${link.name} Showcase`} 
+                        alt={link.megaContent.caption} 
                         fill 
                         className="object-cover transition-transform duration-[3s] group-hover/img:scale-105"
-                        sizes="50vw"
+                        sizes="400px"
                       />
-                      <div className="absolute inset-0 bg-black/10 group-hover/img:bg-transparent transition-colors" />
+                      <div className="absolute inset-0 bg-black/5 group-hover/img:bg-transparent transition-colors" />
                     </div>
-                    <div className="flex justify-between items-end border-l-2 border-secondary/20 pl-10">
-                      <div className="space-y-2">
-                        <h4 className="text-5xl font-headline font-medium text-black uppercase tracking-tight">{link.megaContent.tagline}</h4>
-                        <p className="text-lg font-light text-gray-400 italic">{link.megaContent.desc}</p>
-                      </div>
-                      <Button variant="outline" className="rounded-none border-black text-[9px] font-bold tracking-[0.4em] uppercase h-12 px-10 hover:bg-black hover:text-white transition-all">
-                        Explore Collection
-                      </Button>
+                    <div className="text-left">
+                      <h4 className="text-2xl font-headline font-medium text-gray-900 italic leading-none">{link.megaContent.caption}</h4>
                     </div>
                   </div>
                 </div>
