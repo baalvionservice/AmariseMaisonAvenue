@@ -389,7 +389,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scopedQATests = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return qaTests;
-    return qaTests.filter(t => t.country === currentUser.country || t.global || t.country === 'global');
+    return qaTests.filter(t => t.country === currentUser.country || t.country === 'global');
   }, [qaTests, currentUser]);
 
   const scopedErrors = useMemo(() => {
