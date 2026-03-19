@@ -6,7 +6,8 @@ import {
   AIActionLog, 
   AISuggestion, 
   AIAutomationLevel, 
-  PrivateInquiry 
+  PrivateInquiry,
+  WorkflowTask
 } from '@/lib/types';
 import { generateAIReply, detectIntent } from '@/lib/ai-autopilot/ai-sales-agent';
 import { generateAIProductDraft, generateAIBlogDraft } from '@/lib/ai-autopilot/ai-content-engine';
@@ -18,10 +19,13 @@ export function useAI() {
     aiModules, 
     aiLogs, 
     aiSuggestions, 
+    scopedWorkflows,
     updateAIModule, 
     addAILog, 
     upsertAISuggestion, 
-    updateSuggestionStatus 
+    updateSuggestionStatus,
+    runWorkflowTask,
+    runWorkflowSequence
   } = useAppStore();
 
   const getModule = (id: string) => aiModules.find(m => m.id === id);
@@ -42,9 +46,12 @@ export function useAI() {
     modules: aiModules,
     logs: aiLogs,
     suggestions: aiSuggestions,
+    jobs: scopedWorkflows,
     updateModule: updateAIModule,
     approveSuggestion: (id: string) => updateSuggestionStatus(id, 'approved'),
     rejectSuggestion: (id: string) => updateSuggestionStatus(id, 'rejected'),
+    runJob: runWorkflowTask,
+    runSequence: runWorkflowSequence,
     logAction
   };
 }

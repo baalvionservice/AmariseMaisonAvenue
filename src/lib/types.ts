@@ -341,6 +341,8 @@ export interface WorkflowTask {
   country: string;
   status: 'pending' | 'running' | 'complete' | 'failed';
   lastRun?: string;
+  nextRun?: string;
+  dependencyId?: string;
 }
 
 export interface ApprovalRequest {

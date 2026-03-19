@@ -20,7 +20,8 @@ import {
   Lightbulb,
   AlertCircle,
   Play,
-  History
+  History,
+  FastForward
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ import {
 } from 'recharts';
 
 export default function AIDashboard() {
-  const { modules, logs, suggestions, approveSuggestion, rejectSuggestion } = useAI();
+  const { modules, logs, suggestions, jobs, runJob, runSequence, approveSuggestion, rejectSuggestion } = useAI();
   const { workflows, runWorkflowTask, currentUser } = useAppStore();
 
   const stats = useMemo(() => {
@@ -92,9 +93,18 @@ export default function AIDashboard() {
           {/* AI Performance Insight */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
-              <CardHeader className="border-b border-border">
-                <CardTitle className="font-headline text-2xl">Maison Intelligence Accuracy</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Autopilot learning curve & engagement efficacy</CardDescription>
+              <CardHeader className="border-b border-border flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="font-headline text-2xl">Maison Intelligence Accuracy</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Autopilot learning curve & engagement efficacy</CardDescription>
+                </div>
+                <Button 
+                  size="sm" 
+                  className="bg-plum text-white hover:bg-black rounded-none text-[9px] font-bold uppercase h-9 px-6"
+                  onClick={() => runSequence('Daily Intelligence Cycle', currentUser?.country)}
+                >
+                  <FastForward className="w-3.5 h-3.5 mr-2" /> TRIGGER CYCLE
+                </Button>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="h-[250px] w-full">
@@ -135,7 +145,7 @@ export default function AIDashboard() {
             </Card>
 
             <div className="lg:col-span-4 space-y-8">
-               <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden">
+               <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden h-full flex flex-col justify-center">
                   <div className="absolute -top-10 -right-10 w-32 h-32 bg-plum/20 rounded-full blur-3xl" />
                   <div className="relative z-10 space-y-4">
                     <div className="flex items-center space-x-3 text-secondary">
@@ -159,6 +169,65 @@ export default function AIDashboard() {
                </Card>
             </div>
           </div>
+
+          {/* Autonomous Job Queue */}
+          <Card className="bg-white border-border shadow-luxury overflow-hidden">
+            <CardHeader className="border-b border-border bg-ivory/10 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-headline text-2xl">Autonomous Job Queue</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Maison autopilot execution registry</CardDescription>
+              </div>
+              <Badge variant="outline" className="text-[8px] uppercase border-plum text-plum">{jobs.length} ACTIVE JOBS</Badge>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-border/40">
+                {jobs.map(job => (
+                  <div key={job.id} className="p-8 flex items-center justify-between hover:bg-ivory/30 transition-colors">
+                    <div className="flex items-center space-x-8">
+                      <div className={cn(
+                        "w-12 h-12 rounded-full border flex items-center justify-center transition-colors",
+                        job.status === 'complete' ? "bg-green-50 border-green-100 text-green-500" :
+                        job.status === 'running' ? "bg-plum/5 border-plum/20 text-plum animate-pulse" :
+                        "bg-ivory border-border text-gray-300"
+                      )}>
+                        {job.status === 'complete' ? <CheckCircle2 className="w-5 h-5" /> : 
+                         job.status === 'running' ? <RefreshCcw className="w-5 h-5 animate-spin" /> : 
+                         <Clock className="w-5 h-5" />}
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold uppercase tracking-tight text-gray-900">{job.taskName}</h4>
+                        <div className="flex items-center space-x-4">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{job.frequency} Logic</span>
+                          <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                          <span className="text-[9px] font-bold text-plum uppercase tracking-widest">{job.country.toUpperCase()} Hub</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-12">
+                      <div className="text-right space-y-1">
+                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Last Execution</p>
+                        <p className="text-[10px] font-bold text-gray-600">{job.lastRun ? new Date(job.lastRun).toLocaleTimeString() : 'N/A'}</p>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Next Scheduled</p>
+                        <p className="text-[10px] font-bold text-gray-600">{job.nextRun ? new Date(job.nextRun).toLocaleTimeString() : 'Pending Cycle'}</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-10 w-10 text-gray-400 hover:text-plum hover:bg-plum/5"
+                        onClick={() => runJob(job.id)}
+                        disabled={job.status === 'running'}
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Live Action Feed */}

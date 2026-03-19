@@ -95,6 +95,7 @@ interface AppContextType {
   scopedNotifications: MaisonNotification[];
   scopedApprovals: ApprovalRequest[];
   scopedAuditLogs: AuditLogEntry[];
+  scopedWorkflows: WorkflowTask[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -177,6 +178,7 @@ interface AppContextType {
   markNotificationRead: (id: string) => void;
   scheduleWorkflow: (taskName: string, frequency: WorkflowTask['frequency'], country?: string) => void;
   runWorkflowTask: (id: string) => void;
+  runWorkflowSequence: (workflowName: string, country?: string) => void;
   submitApproval: (contentType: ApprovalRequest['contentType'], contentId: string, country?: string) => void;
   handleApprovalAction: (requestId: string, approve: boolean, comments?: string) => void;
   toggleEmergencyMode: () => void;
@@ -254,8 +256,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'n2', toRole: 'super_admin', country: 'global', message: 'Global AI Sentiment Analysis Complete', timestamp: new Date().toISOString(), read: false, type: 'success' }
   ]);
   const [workflows, setWorkflows] = useState<WorkflowTask[]>([
-    { id: 'w1', taskName: 'Global AI Sentiment Loop', frequency: 'hourly', country: 'global', status: 'complete', lastRun: new Date().toISOString() },
-    { id: 'w2', taskName: 'Catalog Search Index Sync', frequency: 'daily', country: 'us', status: 'pending' }
+    { id: 'w1', taskName: 'Global AI Sentiment Loop', frequency: 'hourly', country: 'global', status: 'complete', lastRun: new Date().toISOString(), nextRun: new Date(Date.now() + 3600000).toISOString() },
+    { id: 'w2', taskName: 'Catalog Search Index Sync', frequency: 'daily', country: 'us', status: 'pending', nextRun: new Date(Date.now() + 86400000).toISOString() },
+    { id: 'w3', taskName: 'Daily Content Update', frequency: 'daily', country: 'us', status: 'pending', nextRun: new Date(Date.now() + 3600000).toISOString() },
+    { id: 'w4', taskName: 'SEO Audit Cycle', frequency: 'daily', country: 'ae', status: 'pending', dependencyId: 'w3', nextRun: new Date(Date.now() + 10800000).toISOString() }
   ]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([
     { id: 'a1', userId: 'u-4', userName: 'Lumière Atelier', contentType: 'listing', contentId: 'prod-50', country: 'ae', status: 'pending', timestamp: new Date().toISOString() }
@@ -325,9 +329,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scopedAuditLogs = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin') return auditRegistry;
-    // Regional admins only see logs for their country
     return auditRegistry.filter(log => log.country === currentUser.country || log.country === 'global');
   }, [auditRegistry, currentUser]);
+
+  const scopedWorkflows = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin') return workflows;
+    return workflows.filter(w => w.country === currentUser.country || w.country === 'global');
+  }, [workflows, currentUser]);
 
   // --- Actions ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
@@ -356,16 +364,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const markNotificationRead = (id: string) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
 
   const scheduleWorkflow = (taskName: string, frequency: WorkflowTask['frequency'], country = 'global') => {
-    setWorkflows(prev => [...prev, { id: `w-${Date.now()}`, taskName, frequency, country, status: 'pending' }]);
+    setWorkflows(prev => [...prev, { id: `w-${Date.now()}`, taskName, frequency, country, status: 'pending', nextRun: new Date(Date.now() + 3600000).toISOString() }]);
   };
 
   const runWorkflowTask = (id: string) => {
+    const task = workflows.find(w => w.id === id);
+    if (!task) return;
+
     setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'running', lastRun: new Date().toISOString() } : w));
+    console.log(`[AI AUTOPILOT MOCK] Running job: ${task.taskName} | Country: ${task.country}`);
+
     setTimeout(() => {
-      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete' } : w));
-      sendNotification('super_admin', `Workflow Task Complete: ${id}`, 'global', 'success');
-      logAction(`Executed Workflow: ${id}`, 'Workflow System');
+      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
+      sendNotification('super_admin', `AI Job "${task.taskName}" completed`, task.country, 'success');
+      logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
+      console.log(`[AI AUTOPILOT MOCK] Completed job: ${task.taskName} | Country: ${task.country}`);
     }, 2000);
+  };
+
+  const runWorkflowSequence = (workflowName: string, country: string = 'global') => {
+    console.log(`[AI WORKFLOW] Initiating sequence: ${workflowName} for ${country}`);
+    const relevantTasks = workflows.filter(w => w.country === country || w.country === 'global');
+    relevantTasks.forEach((task, idx) => {
+      setTimeout(() => runWorkflowTask(task.id), idx * 3000);
+    });
   };
 
   const submitApproval = (contentType: ApprovalRequest['contentType'], contentId: string, country = 'global') => {
@@ -477,7 +499,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
@@ -488,7 +510,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
     upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
-    sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, submitApproval, handleApprovalAction,
+    sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
@@ -496,7 +518,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
