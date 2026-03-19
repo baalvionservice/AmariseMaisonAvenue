@@ -15,11 +15,26 @@ import {
   ChevronUp,
   Filter, 
   Heart,
-  Sparkles
+  Sparkles,
+  X,
+  Plus
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 /**
  * CategoryPage: Replicated for the Madison Avenue Couture archive view.
@@ -30,6 +45,7 @@ export default function CategoryPage() {
   const countryCode = (country as string) || 'us';
   const category = CATEGORIES.find(c => c.id === id) || { name: id === 'hermes' ? 'Hermès' : 'Department', subcategories: [] };
   
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeSort, setActiveSort] = useState('Featured');
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'handbags': true,
@@ -81,10 +97,63 @@ export default function CategoryPage() {
 
   return (
     <div className="bg-white min-h-screen pb-20 animate-fade-in font-body">
+      {/* 1. Institutional Filter Sidebar (Drawer) */}
+      <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-[450px] p-0 border-none rounded-none bg-white flex flex-col h-full shadow-2xl">
+          <div className="flex items-center justify-between p-8 border-b border-gray-100">
+            <span className="text-sm font-bold tracking-[0.2em] text-gray-900 uppercase">FILTER BY</span>
+            <button onClick={() => setIsFilterOpen(false)} className="hover:opacity-60 transition-opacity">
+              <X className="w-6 h-6 stroke-[1px]" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-8 py-4 relative">
+            {/* Ask Judy Floating Button */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
+              <button className="bg-[#262626] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-2xl translate-x-4">
+                <Sparkles className="w-4 h-4 mb-0.5" />
+                <span className="text-[7px] font-bold tracking-tighter uppercase leading-none">ASK<br/>JUDY</span>
+              </button>
+            </div>
+
+            <Accordion type="multiple" className="w-full">
+              {['COLOR', 'CONDITION', 'HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
+                <AccordionItem key={filter} value={filter} className="border-b border-gray-100 py-2">
+                  <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4">
+                    {filter}
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2 pb-6">
+                    <div className="space-y-3 pl-2">
+                      <p className="text-xs text-gray-400 italic">Curating options...</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+
+          <div className="p-8 border-t border-gray-100 bg-white grid grid-cols-2 gap-4">
+            <Button 
+              variant="outline" 
+              className="h-14 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
+              onClick={() => setIsFilterOpen(false)}
+            >
+              CLEAR ALL
+            </Button>
+            <Button 
+              className="h-14 rounded-none bg-black text-white hover:opacity-90 text-[10px] font-bold tracking-[0.3em] uppercase transition-all"
+              onClick={() => setIsFilterOpen(false)}
+            >
+              VIEW (524)
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <div className="container mx-auto px-6 max-w-[1600px] pt-12">
         <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* 1. Deep-Nested Navigation Sidebar */}
+          {/* 2. Deep-Nested Navigation Sidebar */}
           <aside className="lg:w-72 shrink-0 space-y-12">
             <div className="space-y-10 sticky top-40">
               <h2 className="text-xl font-headline italic text-gray-400 border-b border-gray-100 pb-4">{category.name}</h2>
@@ -123,31 +192,49 @@ export default function CategoryPage() {
                       <SidebarLink label="Scarves" />
                       <SidebarLink label="Wallets" />
                       <SidebarLink label="Watches" />
+                      <SidebarLink label="Belts" />
+                      <SidebarLink label="Charms" />
                     </ul>
                   )}
                 </div>
 
                 <div className="border-b border-gray-50 py-2">
                   <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry')} />
+                  {openSections['jewelry'] && (
+                    <div className="pl-4 mt-2">
+                      <SidebarSubHeader label="Fine Jewelry" hasSub />
+                    </div>
+                  )}
                 </div>
 
                 <SidebarNavItem label="SHOES" />
                 
                 <div className="pt-4">
                   <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations')} />
+                  {openSections['curations'] && (
+                    <ul className="pl-4 mt-2 space-y-2 py-1">
+                      <SidebarLink label="New Arrivals" />
+                      <SidebarLink label="Bestsellers" />
+                      <SidebarLink label="Pre-Owned & Vintage Handbags" />
+                      <SidebarLink label="Exotic Handbags" hasSub />
+                      <SidebarLink label="Pre-Owned Exotic Handbags" />
+                      <SidebarLink label="Home Goods" />
+                      <SidebarLink label="Atelier Bags" />
+                    </ul>
+                  )}
                 </div>
               </nav>
             </div>
           </aside>
 
-          {/* 2. Main Registry View */}
+          {/* 3. Main Registry View */}
           <main className="flex-1 space-y-12">
             <header className="space-y-10">
               <h1 className="text-3xl font-headline font-medium text-black">
                 {id === 'hermes' ? 'Hermès Birkin Bags' : `${category.name} Archives`}
               </h1>
 
-              {/* 3. Visual "Shop By Size" Matrix */}
+              {/* 4. Visual "Shop By Size" Matrix */}
               <div className="space-y-6">
                 <span className="text-[10px] font-bold tracking-[0.1em] uppercase text-gray-400">SHOP BY SIZE:</span>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -169,13 +256,16 @@ export default function CategoryPage() {
                 </div>
               </div>
 
-              {/* 4. Controls Matrix */}
+              {/* 5. Controls Matrix */}
               <div className="flex items-center justify-between py-4 bg-[#f8f8f8] px-6">
                 <div className="text-[11px] font-medium text-gray-400">
                   524 products
                 </div>
                 <div className="flex items-center space-x-10">
-                  <button className="flex items-center space-x-2 text-[11px] font-bold tracking-[0.2em] text-black hover:opacity-60 transition-opacity">
+                  <button 
+                    onClick={() => setIsFilterOpen(true)}
+                    className="flex items-center space-x-2 text-[11px] font-bold tracking-[0.2em] text-black hover:opacity-60 transition-opacity bg-transparent border-none outline-none cursor-pointer"
+                  >
                     <span className="uppercase">FILTER</span>
                     <Filter className="w-3.5 h-3.5" />
                   </button>
@@ -191,13 +281,13 @@ export default function CategoryPage() {
               </div>
             </header>
 
-            {/* 5. High-Fidelity Product Grid */}
+            {/* 6. High-Fidelity Product Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-24">
               {birkinProducts.map(product => (
                 <div key={product.id} className="group cursor-pointer">
                   <div className="relative aspect-[4/5] bg-white mb-8 overflow-hidden flex items-center justify-center border border-gray-50">
                     <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-10 transition-transform duration-700 group-hover:scale-105" />
-                    <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors">
+                    <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors bg-transparent border-none outline-none">
                       <Heart className="w-5 h-5" />
                     </button>
                   </div>
