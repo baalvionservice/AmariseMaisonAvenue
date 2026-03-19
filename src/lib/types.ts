@@ -116,6 +116,10 @@ export interface Product {
     userName: string;
     expiresAt: string;
   };
+  // High Fidelity Fields
+  condition?: string;
+  conditionDetails?: string;
+  specialNotes?: string;
 }
 
 export interface CartItem extends Product {

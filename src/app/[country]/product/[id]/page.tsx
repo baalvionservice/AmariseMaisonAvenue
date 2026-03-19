@@ -4,321 +4,236 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PRODUCTS, formatPrice, COUNTRIES } from '@/lib/mock-data';
-import { PRODUCTS_EXTENDED } from '@/lib/mock-monetization';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
   ChevronRight, 
-  Star, 
-  Zap, 
-  Calendar, 
-  ShieldCheck, 
-  TrendingUp, 
-  Award, 
-  Lock, 
-  Sparkles, 
+  ChevronUp,
+  ChevronDown,
   Info, 
-  Crown, 
-  MessageSquare 
+  Plus,
+  ArrowRight,
+  ShieldCheck,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  HelpCircle
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
-import { generateProductDescription } from '@/ai/flows/generate-product-description';
-import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ProductCard } from '@/components/product/ProductCard';
-import { InquiryModal } from '@/components/product/InquiryModal';
-import { PlaceholderImage } from '@/components/ui/PlaceholderImage';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 
 /**
- * ProductDetailPage: High-authority artifact acquisition view.
- * Updated to use standard institutional placeholders for all product visuals.
+ * ProductDetailPage: High-Fidelity Madison Avenue Couture Archetype.
+ * Replicates the 3-column layout: Thumbnails, Main Gallery, and Detailed Curation.
  */
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
-  const router = useRouter();
   const { toast } = useToast();
-  const { toggleWishlist, wishlist } = useAppStore();
+  const { toggleWishlist, wishlist, addToCart } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
-  const monetization = useMemo(() => PRODUCTS_EXTENDED[id as string] || { priceVisible: true }, [id]);
-  
-  const [aiDescription, setAiDescription] = useState<string | null>(null);
-  const [loadingAi, setLoadingAi] = useState(true);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [loadingRecs, setLoadingRecs] = useState(true);
-  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
-  
   const isWishlisted = wishlist.some(i => i.id === product?.id);
-
-  useEffect(() => {
-    if (!product) return;
-    
-    async function fetchData() {
-      try {
-        const [descRes, recRes] = await Promise.all([
-          generateProductDescription({
-            productName: product.name,
-            category: product.category,
-          }),
-          generateProductRecommendations({
-            scenario: `Private acquisition recommendations for elite client viewing ${product.name}. Focus on collector synergy and institutional value.`,
-            currentProductId: product.id
-          })
-        ]);
-        setAiDescription(descRes.description);
-        setRecommendations(recRes.recommendations.slice(0, 4));
-      } catch (e) {
-        setAiDescription(null);
-      } finally {
-        setLoadingAi(false);
-        setLoadingRecs(false);
-      }
-    }
-    fetchData();
-  }, [product, id]);
 
   if (!product) {
     return <div className="container mx-auto px-6 py-40 text-center font-headline text-3xl">Artifact not found.</div>;
   }
 
   return (
-    <div className="bg-ivory min-h-screen">
-      <InquiryModal 
-        isOpen={isInquiryOpen} 
-        onClose={() => setIsInquiryOpen(false)} 
-        product={product} 
-      />
-
-      {/* SEO Schema Injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "description": aiDescription || product.name,
-            "image": product.imageUrl,
-            "offers": {
-              "@type": "Offer",
-              "priceCurrency": countryCode.toUpperCase(),
-              "price": product.basePrice,
-              "availability": "https://schema.org/InStock",
-              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`
-            },
-            "brand": {
-              "@type": "Brand",
-              "name": "AMARISÉ MAISON AVENUE"
-            }
-          })
-        }}
-      />
-
-      <main className="container mx-auto px-6 py-12 max-w-[1600px]">
-        <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground font-bold">
-          <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Maison</Link>
-          <ChevronRight className="w-3 h-3" />
-          <Link href={`/${countryCode}/category/${product.categoryId}`} className="hover:text-primary transition-colors uppercase">{product.categoryId}</Link>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-foreground font-black" aria-current="page">{product.name}</span>
-        </nav>
-
-        <div className="flex flex-col lg:flex-row gap-24">
-          <section className="w-full lg:w-[55%] space-y-8" aria-label="Product Gallery">
-            <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              {/* Institutional Placeholder for Main Gallery */}
-              <PlaceholderImage className="w-full h-full" />
-              
-              {monetization.scarcityTag && (
-                <div className="absolute top-8 left-8 bg-black px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80 border border-white/10">
-                  {monetization.scarcityTag}
-                </div>
-              )}
-
-              <div className="absolute bottom-8 left-8 flex space-x-3">
-                 {[...Array(4)].map((_, idx) => (
-                   <button 
-                    key={idx} 
-                    onClick={() => setActiveMediaIndex(idx)}
-                    aria-label={`Switch to frame ${idx + 1}`}
-                    className={cn(
-                      "w-12 h-16 border transition-all overflow-hidden relative",
-                      activeMediaIndex === idx ? "border-plum bg-ivory scale-110 shadow-lg" : "border-border bg-white text-gray-400 opacity-60"
-                    )}
-                   >
-                     <PlaceholderImage className="w-full h-full text-[6px] p-1" />
-                   </button>
-                 ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="w-full lg:w-[45%] space-y-12" aria-label="Acquisition Details">
-            <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 text-secondary">
-                   <Crown className="w-5 h-5" />
-                   <span className="text-[10px] font-bold tracking-[0.5em] uppercase border-b border-gold/40 pb-1">
-                     Private Acquisition Flow
-                   </span>
-                </div>
-                <Button variant="ghost" size="icon" className="hover:text-primary transition-all min-w-[44px] min-h-[44px]" onClick={() => toggleWishlist(product)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>
-                  <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                <h1 className="text-6xl md:text-8xl font-headline font-bold leading-[0.9] text-gray-900 italic tracking-tighter">{product.name}</h1>
-                <div className="flex items-center space-x-6 pt-2">
-                   <div className="flex text-gold" aria-label={`Rating: ${product.rating} stars`}>
-                    {[...Array(5)].map((_, i) => <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />)}
-                   </div>
-                   <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold border-l border-border pl-6">{product.reviewsCount} Archive Appreciations</span>
-                </div>
-              </div>
-
-              <div className="text-7xl font-light tracking-tighter text-gray-900">
-                {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Private Price"}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-               <IntelligenceTile icon={<Award className="w-5 h-5" />} label="Collector Status" value={monetization.collectorValue || 'Signature Artifact'} />
-               <IntelligenceTile icon={<TrendingUp className="w-5 h-5" />} label="Market Resiliency" value={monetization.marketRange || 'Optimal'} />
-            </div>
-
-            <div className="space-y-6 pt-4">
-              <Button 
-                size="lg" 
-                className="w-full bg-plum text-white hover:bg-black h-24 rounded-none text-[11px] font-bold tracking-[0.5em] shadow-2xl transition-all border-none"
-                onClick={() => setIsInquiryOpen(true)}
-              >
-                <Lock className="w-4 h-4 mr-4" /> REQUEST PRIVATE ACQUISITION
-              </Button>
-              
-              <div className="grid grid-cols-2 gap-6">
-                <Button 
-                  variant="outline" 
-                  className="h-16 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 hover:text-white transition-all"
-                  onClick={() => setIsInquiryOpen(true)}
-                >
-                  <MessageSquare className="w-4 h-4 mr-3" /> SPEAK WITH A CURATOR
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-16 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 hover:text-white transition-all"
-                  onClick={() => router.push(`/${countryCode}/appointments`)}
-                >
-                  <Calendar className="w-4 h-4 mr-3" /> ATELIER VIEWING
-                </Button>
-              </div>
-            </div>
-
-            <Tabs defaultValue="intelligence" className="w-full pt-16">
-              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-14 p-0 space-x-12">
-                <TabsTrigger value="intelligence" className="tab-trigger">Collector Analysis</TabsTrigger>
-                <TabsTrigger value="narrative" className="tab-trigger">The Narrative</TabsTrigger>
-                <TabsTrigger value="provenance" className="tab-trigger">Provenance</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="intelligence" className="pt-12 space-y-10 animate-fade-in min-h-[300px]">
-                 <div className="p-12 bg-white border border-border shadow-luxury relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                       <Zap className="w-40 h-40 text-black" />
-                    </div>
-                    <div className="relative z-10 space-y-8">
-                       <div className="flex items-center space-x-4 text-plum">
-                          <TrendingUp className="w-6 h-6" />
-                          <h3 className="text-[11px] font-bold uppercase tracking-[0.5em]">Investment Trajectory</h3>
-                       </div>
-                       <p className="text-xl text-gray-600 font-light leading-relaxed italic border-l-2 border-plum/20 pl-10">
-                         {monetization.investmentInsight || "This artifact represents a stable position within the Maison archives, showing consistent performance in global collector secondary markets."}
-                       </p>
-                    </div>
-                 </div>
-                 <div className="flex items-center space-x-4 text-gray-400">
-                    <ShieldCheck className="w-5 h-5 text-secondary" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Maison Registry Verification: COMPLETE</span>
-                 </div>
-              </TabsContent>
-
-              <TabsContent value="narrative" className="pt-12 animate-fade-in min-h-[300px]">
-                {loadingAi ? (
-                  <div className="space-y-6 animate-pulse" aria-hidden="true">
-                    <div className="h-6 bg-muted w-full" />
-                    <div className="h-6 bg-muted w-5/6" />
-                    <div className="h-6 bg-muted w-4/6" />
-                  </div>
-                ) : (
-                  <div className="text-2xl text-gray-700 font-light leading-relaxed whitespace-pre-wrap first-letter:text-[120px] first-letter:font-headline first-letter:mr-8 first-letter:float-left first-letter:text-black italic">
-                    {aiDescription || "This artifact represents the pinnacle of Maison Amarisé's century-long pursuit of excellence."}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="provenance" className="pt-12">
-                <ul className="space-y-10">
-                  <DetailRow label="Atelier Origin" value={`Maison Amarisé Ateliers, Paris Central`} />
-                  <DetailRow label="Heritage Registry" value="Archive No. 1924-EXP-001" />
-                  <DetailRow label="Certification" value="ISO-Certified Global Provenance Documentation" />
-                  <DetailRow label="Material Purity" value="Audited for Institutional Responsibility" />
-                </ul>
-              </TabsContent>
-            </Tabs>
-          </section>
+    <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
+      {/* Breadcrumbs */}
+      <nav className="container mx-auto px-12 pt-8 pb-4 max-w-[1600px]">
+        <div className="flex items-center space-x-2 text-[11px] font-normal text-gray-500 uppercase tracking-wide">
+          <Link href={`/${countryCode}`} className="hover:text-black">Home</Link>
+          <ChevronRight className="w-2.5 h-2.5" />
+          <Link href={`/${countryCode}/category/hermes`} className="hover:text-black">Hermès Birkin 25cm</Link>
+          <ChevronRight className="w-2.5 h-2.5" />
+          <span className="text-gray-900 line-clamp-1">{product.name}</span>
         </div>
+      </nav>
 
-        <section className="mt-60 border-t border-border pt-32" aria-labelledby="related-title">
-          <div className="flex items-end justify-between mb-24">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4 text-plum">
-                 <Award className="w-8 h-8 text-gold" />
-                 <span className="text-[11px] font-bold tracking-[0.6em] uppercase">Private Selection</span>
-              </div>
-              <h2 id="related-title" className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Synergistic Artifacts</h2>
-            </div>
-            <Link href={`/${countryCode}/category/all`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-plum transition-colors border-b border-black pb-2 flex items-center">
-               Explore Full Archive <ChevronRight className="w-3 h-3 ml-2" />
-            </Link>
-          </div>
+      <main className="container mx-auto px-12 py-12 max-w-[1600px]">
+        <div className="flex flex-col lg:flex-row gap-16">
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16">
-            {loadingRecs ? (
-              [...Array(4)].map((_, i) => <div key={i} className="aspect-[4/5] bg-muted border border-border animate-pulse" aria-hidden="true" />)
-            ) : (
-              recommendations.map(p => (
-                <ProductCard key={p.id} product={p} />
-              ))
-            )}
+          {/* Column 1: Vertical Thumbnails (Archival Style) */}
+          <div className="hidden lg:flex flex-col space-y-4 w-20 shrink-0">
+            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors">
+              <ChevronUp className="w-5 h-5" />
+            </button>
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="aspect-square bg-white border border-gray-100 p-1 cursor-pointer hover:border-black transition-all">
+                  <div className="relative w-full h-full bg-[#f8f8f8]">
+                    <Image src={product.imageUrl} alt={`View ${i}`} fill className="object-contain" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors">
+              <ChevronDown className="w-5 h-5" />
+            </button>
           </div>
-        </section>
+
+          {/* Column 2: Main Gallery & Verification */}
+          <div className="flex-1 space-y-12">
+            <div className="relative aspect-[4/5] bg-white border border-gray-50 group shadow-sm">
+              <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-12" priority />
+              <div className="absolute top-8 left-8">
+                <Button variant="outline" className="h-9 px-6 rounded-none border-gray-900 bg-white text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all">
+                  SEE SIZE
+                </Button>
+              </div>
+            </div>
+
+            {/* Authenticity Badge */}
+            <div className="bg-[#f8f8f8] p-8 flex items-start space-x-6 border border-gray-100">
+              <div className="w-12 h-12 bg-white border border-gray-200 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-6 h-6 text-gray-400 stroke-[1px]" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-light text-gray-600 leading-relaxed italic">
+                  Comes with a Madison Avenue Certificate of Authenticity.
+                </p>
+                <p className="text-[10px] text-gray-400 font-light">
+                  All of our products are authenticated and certified by our team of luxury experts. <Link href="#" className="underline decoration-gray-200 hover:text-black">See Our Authentication Process</Link>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: Strategic Details & CTA */}
+          <div className="w-full lg:w-[450px] space-y-10">
+            <header className="space-y-6">
+              <h1 className="text-3xl font-headline font-medium text-gray-900 leading-tight">
+                {product.name}
+              </h1>
+              <p className="text-xl font-bold text-black tracking-tight">
+                {formatPrice(product.basePrice, countryCode)}
+              </p>
+            </header>
+
+            {/* AI Prompts */}
+            <div className="grid grid-cols-1 gap-3">
+              <Button variant="outline" className="h-12 justify-between px-6 rounded-none border-gray-100 bg-[#fcfcfc] text-[11px] font-light italic text-gray-600 hover:bg-white hover:border-gray-900 transition-all group">
+                <div className="flex items-center">
+                  <Plus className="w-3.5 h-3.5 mr-3 text-gray-300 group-hover:text-black" />
+                  What makes this bag so special and rare?
+                </div>
+              </Button>
+              <Button variant="outline" className="h-12 justify-between px-6 rounded-none border-gray-100 bg-[#fcfcfc] text-[11px] font-light italic text-gray-600 hover:bg-white hover:border-gray-900 transition-all group">
+                <div className="flex items-center">
+                  <Plus className="w-3.5 h-3.5 mr-3 text-gray-300 group-hover:text-black" />
+                  Can you describe its condition?
+                </div>
+              </Button>
+            </div>
+
+            {/* Main CTAs */}
+            <div className="flex gap-4">
+              <Button 
+                onClick={() => addToCart(product)}
+                className="flex-[2] h-14 bg-black text-white hover:bg-gray-800 rounded-none text-[11px] font-bold tracking-[0.3em] uppercase shadow-lg"
+              >
+                ADD TO BAG
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => toggleWishlist(product)}
+                className={cn(
+                  "flex-1 h-14 rounded-none border-gray-900 text-[11px] font-bold tracking-[0.2em] uppercase transition-all",
+                  isWishlisted ? "bg-black text-white" : "bg-white text-black"
+                )}
+              >
+                <Heart className={cn("w-4 h-4 mr-3", isWishlisted && "fill-current")} />
+                ADD TO WISHLIST
+              </Button>
+            </div>
+
+            {/* Availability Node */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-2">
+                <span className="text-[11px] font-bold tracking-[0.1em] text-black uppercase">IN STOCK:</span>
+                <p className="text-[11px] font-light text-gray-500 leading-relaxed italic">
+                  In stock & available now with FREE Express shipping or pickup at our <Link href="#" className="underline decoration-gray-200 text-gray-900">New York City Showroom</Link>
+                </p>
+              </div>
+            </div>
+
+            {/* Condition Matrix */}
+            <div className="space-y-10 pt-6">
+              <div className="flex items-center space-x-2">
+                <span className="text-[11px] font-bold tracking-[0.1em] text-black uppercase">CONDITION:</span>
+                <span className="bg-gray-100 px-3 py-1 text-[10px] font-bold tracking-widest text-gray-900">NEW</span>
+                <Info className="w-3.5 h-3.5 text-gray-300" />
+              </div>
+
+              {/* Condition Slider Visual */}
+              <div className="relative pt-4 pb-8 border-b border-gray-100">
+                <div className="h-px w-full bg-gray-200 relative">
+                  <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-200" />
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-full bg-black" />
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 -translate-x-0 w-3 h-3 rounded-full bg-black border-4 border-white shadow-sm" />
+                </div>
+                <div className="flex justify-between mt-4">
+                  <span className="text-[11px] font-light text-gray-400">New</span>
+                  <span className="text-[11px] font-bold text-black uppercase tracking-widest">Never worn</span>
+                </div>
+                <p className="text-[11px] font-light text-gray-500 italic mt-8 leading-relaxed">
+                  {product.conditionDetails || "Never worn (plastic on hardware) - The open pocket on the front wall has two faint scuff marks"}
+                </p>
+              </div>
+            </div>
+
+            {/* Details Accordion */}
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="description" className="border-b border-gray-100">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] uppercase py-6 hover:no-underline">DESCRIPTION</AccordionTrigger>
+                <AccordionContent className="text-xs font-light text-gray-600 leading-relaxed italic pb-8">
+                  {product.specialNotes || "This rare Hermès Special Order (HSS) Birkin is a masterpiece of the archive. Featuring a dual-tone White and Etoupe configuration in Clemence leather."}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="shipping" className="border-b border-gray-100">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] uppercase py-6 hover:no-underline">FREE EXPRESS SHIPPING</AccordionTrigger>
+                <AccordionContent className="text-xs font-light text-gray-600 leading-relaxed pb-8">
+                  Complimentary white-glove shipping is included with all archival acquisitions.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="returns" className="border-b border-gray-100">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] uppercase py-6 hover:no-underline">RETURN & EXCHANGE POLICY</AccordionTrigger>
+                <AccordionContent className="text-xs font-light text-gray-600 leading-relaxed pb-8">
+                  Standard 30-day curatorial return window applies.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            {/* Footer Interaction Bar */}
+            <footer className="pt-10 flex items-center justify-between">
+              <button className="flex items-center space-x-3 text-[11px] font-medium text-gray-900 group">
+                <HelpCircle className="w-4 h-4 text-gray-300 group-hover:text-black transition-colors" />
+                <span className="underline underline-offset-4 decoration-gray-200">Have Questions? Ask An Expert</span>
+              </button>
+              
+              <div className="flex items-center space-x-6">
+                <span className="text-[9px] font-bold tracking-widest text-gray-400 uppercase">SHARE</span>
+                <div className="flex items-center space-x-4 text-gray-400">
+                  <Facebook className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors" />
+                  <Twitter className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors" />
+                  <Instagram className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors" />
+                  <MessageCircle className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors" />
+                  <Mail className="w-3.5 h-3.5 cursor-pointer hover:text-black transition-colors" />
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
       </main>
-    </div>
-  );
-}
-
-function IntelligenceTile({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
-  return (
-    <div className="bg-white p-8 border border-border space-y-4 hover:border-gold transition-colors group">
-      <div className="flex items-center space-x-3 text-secondary group-hover:scale-110 transition-transform origin-left">
-         {icon}
-         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 group-hover:text-plum">{label}</span>
-      </div>
-      <p className="text-2xl font-headline font-bold italic text-gray-900">{value}</p>
-    </div>
-  );
-}
-
-function DetailRow({ label, value }: { label: string, value: string }) {
-  return (
-    <div className="grid grid-cols-3 gap-12 py-6 border-b border-border/40 last:border-0 group">
-      <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-plum group-hover:text-gold transition-colors">{label}</span>
-      <span className="col-span-2 text-lg text-gray-500 font-light italic leading-snug">{value}</span>
     </div>
   );
 }
