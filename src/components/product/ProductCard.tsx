@@ -98,7 +98,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
               variant="outline" 
               className={cn("flex-1 h-12 rounded-none border-gray-200 text-gray-900 hover:bg-gray-50 transition-all text-[9px] font-bold tracking-[0.3em] uppercase", isWishlisted && "bg-black text-white hover:bg-black border-black")}
               onClick={handleToggleWishlist}
-              aria-label={isWishlisted ? "Remove from Registry" : "Save to Archive"}
+              aria-label={isWishlisted ? "In Registry" : "Save to Archive"}
             >
               {isWishlisted ? "In Registry" : "Save to Archive"}
             </Button>
