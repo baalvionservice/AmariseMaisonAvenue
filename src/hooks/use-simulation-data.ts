@@ -17,12 +17,16 @@ export interface RegionData {
   lng: number;
 }
 
+/**
+ * useSimulationData: Institutional Intelligence Engine.
+ * Recalibrated coordinates for 5 key Maison hubs.
+ */
 export function useSimulationData() {
   const [regions, setRegions] = useState<Record<string, RegionData>>({
-    us: { id: 'us', name: 'USA Hub', revenue: 1245000, activeUsers: 420, viewing: 250, wishlist: 80, cart: 45, checkout: 12, purchased: 124, growth: 12.4, lat: 40.7128, lng: -74.0060 },
-    uk: { id: 'uk', name: 'London Hub', revenue: 842000, activeUsers: 215, viewing: 130, wishlist: 42, cart: 22, checkout: 8, purchased: 82, growth: 8.2, lat: 51.5074, lng: -0.1278 },
-    ae: { id: 'ae', name: 'Dubai Hub', revenue: 1540000, activeUsers: 580, viewing: 340, wishlist: 110, cart: 65, checkout: 24, purchased: 156, growth: 15.6, lat: 25.2048, lng: 55.2708 },
-    in: { id: 'in', name: 'Mumbai Hub', revenue: 420000, activeUsers: 180, viewing: 110, wishlist: 35, cart: 18, checkout: 5, purchased: 42, growth: 22.1, lat: 19.0760, lng: 72.8777 },
+    us: { id: 'us', name: 'USA Hub', revenue: 1245000, activeUsers: 420, viewing: 250, wishlist: 80, cart: 45, checkout: 12, purchased: 124, growth: 12.4, lat: 37.0902, lng: -95.7129 },
+    uk: { id: 'uk', name: 'UK Hub', revenue: 842000, activeUsers: 215, viewing: 130, wishlist: 42, cart: 22, checkout: 8, purchased: 82, growth: 8.2, lat: 55.3781, lng: -3.4360 },
+    ae: { id: 'ae', name: 'UAE Hub', revenue: 1540000, activeUsers: 580, viewing: 340, wishlist: 110, cart: 65, checkout: 24, purchased: 156, growth: 15.6, lat: 23.4241, lng: 53.8478 },
+    in: { id: 'in', name: 'India Hub', revenue: 420000, activeUsers: 180, viewing: 110, wishlist: 35, cart: 18, checkout: 5, purchased: 42, growth: 22.1, lat: 20.5937, lng: 78.9629 },
     sg: { id: 'sg', name: 'Singapore Hub', revenue: 620000, activeUsers: 240, viewing: 150, wishlist: 48, cart: 28, checkout: 10, purchased: 68, growth: 5.4, lat: 1.3521, lng: 103.8198 },
   });
 
@@ -37,7 +41,7 @@ export function useSimulationData() {
         const userSign = Math.random() > 0.4 ? 1 : -1;
         region.activeUsers = Math.max(50, region.activeUsers + userChange * userSign);
 
-        // 2. Maintain Funnel Ratios (approximate)
+        // 2. Maintain Funnel Ratios
         region.viewing = Math.floor(region.activeUsers * 0.65);
         region.wishlist = Math.max(5, Math.floor(region.viewing * 0.35) + (Math.random() > 0.8 ? 2 : 0));
         region.cart = Math.max(2, Math.floor(region.wishlist * 0.45) + (Math.random() > 0.9 ? 1 : 0));
