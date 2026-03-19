@@ -1,9 +1,9 @@
 
 'use client';
 
-import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Sphere, Html, Float, QuadraticBezierLine } from '@react-three/drei';
+import React, { useRef, useMemo, useState, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Sphere, Html, QuadraticBezierLine, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { RegionData } from '@/hooks/use-simulation-data';
 import { cn } from '@/lib/utils';
@@ -26,13 +26,12 @@ function latLngToVector3(lat: number, lng: number, radius: number) {
 function DataArc({ start, end }: { start: THREE.Vector3, end: THREE.Vector3 }) {
   const mid = start.clone().lerp(end, 0.5);
   const distance = start.distanceTo(end);
-  mid.normalize().multiplyScalar(2 + distance * 0.2); // Push midpoint out for curve
+  mid.normalize().multiplyScalar(2 + distance * 0.2);
 
   const lineRef = useRef<any>(null);
   
-  useFrame((state) => {
+  useFrame(() => {
     if (lineRef.current) {
-      // Simulate moving light particle via dash offset
       lineRef.current.dashOffset -= 0.005;
     }
   });
@@ -71,14 +70,13 @@ function HubPoint({
   const glowMesh = useRef<THREE.Mesh>(null!);
   const pos = useMemo(() => latLngToVector3(region.lat, region.lng, 2), [region.lat, region.lng]);
 
-  // Activity-based intensity (scaled 0.5 to 1.5)
   const intensity = useMemo(() => 0.5 + (region.activeUsers / 600), [region.activeUsers]);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const pulse = 1 + Math.sin(time * 3) * 0.15 * intensity;
     if (mesh.current) mesh.current.scale.setScalar(pulse);
-    if (glowMesh.current) glowMesh.current.scale.setScalar(pulse * 2);
+    if (glowMesh.current) glowMesh.current.scale.setScalar(pulse * 2.5);
   });
 
   return (
@@ -89,8 +87,8 @@ function HubPoint({
       </mesh>
       {/* Outer Glow */}
       <mesh ref={glowMesh}>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshBasicMaterial color="#3B82F6" transparent opacity={0.15 * intensity} />
+        <sphereGeometry args={[0.06, 16, 16]} />
+        <meshBasicMaterial color="#3B82F6" transparent opacity={0.3 * intensity} />
       </mesh>
       
       {/* Label & Intelligence Panel */}
@@ -135,13 +133,32 @@ function HubPoint({
  */
 function Atmosphere() {
   return (
-    <Sphere args={[2.1, 64, 64]}>
+    <Sphere args={[2.15, 64, 64]}>
       <meshBasicMaterial 
         color="#3B82F6" 
         transparent 
-        opacity={0.05} 
+        opacity={0.08} 
         side={THREE.BackSide} 
         blending={THREE.AdditiveBlending}
+      />
+    </Sphere>
+  );
+}
+
+/**
+ * GlobeSphere: The textured core of the planet
+ */
+function GlobeSphere() {
+  const texture = useTexture('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
+  
+  return (
+    <Sphere args={[2, 64, 64]}>
+      <meshStandardMaterial 
+        map={texture}
+        roughness={0.8}
+        metalness={0.1}
+        emissive="#111111"
+        emissiveIntensity={0.2}
       />
     </Sphere>
   );
@@ -153,7 +170,6 @@ function Atmosphere() {
 function GlobeScene({ regions, onRegionClick }: { regions: Record<string, RegionData>, onRegionClick: (id: string) => void }) {
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
   const groupRef = useRef<THREE.Group>(null!);
-  const [isInteracting, setIsInteracting] = useState(false);
 
   // Connection arcs
   const arcs = useMemo(() => {
@@ -170,9 +186,9 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
     return pairs;
   }, [regions]);
 
-  useFrame((state) => {
-    if (!isInteracting && groupRef.current) {
-      groupRef.current.rotation.y += 0.0012;
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += 0.001;
     }
   });
 
@@ -185,24 +201,18 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
     <group ref={groupRef}>
       <Atmosphere />
       
-      {/* Main Glass Sphere */}
-      <Sphere args={[2, 64, 64]}>
-        <meshStandardMaterial 
-          color="#0A0A0B" 
-          roughness={0.4}
-          metalness={0.8}
-          transparent 
-          opacity={0.9} 
-        />
-      </Sphere>
+      {/* Textured Main Globe */}
+      <Suspense fallback={<Sphere args={[2, 32, 32]}><meshStandardMaterial color="#0A0A0B" /></Sphere>}>
+        <GlobeSphere />
+      </Suspense>
 
-      {/* Surface Detail / Grid */}
-      <Sphere args={[2.005, 48, 48]}>
+      {/* Subtle Grid Overlay */}
+      <Sphere args={[2.01, 48, 48]}>
         <meshBasicMaterial 
           color="#3B82F6" 
           wireframe 
           transparent 
-          opacity={0.02} 
+          opacity={0.03} 
         />
       </Sphere>
 
@@ -234,9 +244,11 @@ export function IntelligenceGlobe({
   return (
     <div className="w-full h-full cursor-grab active:cursor-grabbing relative">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[5, 5, 5]} intensity={2} color="#FFFFFF" />
-        <pointLight position={[-5, 3, -5]} intensity={1} color="#3B82F6" />
+        <ambientLight intensity={0.4} />
+        {/* Directional light from top-left */}
+        <directionalLight position={[-5, 5, 5]} intensity={1.5} color="#FFFFFF" />
+        {/* Soft fill from the bottom */}
+        <pointLight position={[0, -5, 2]} intensity={0.5} color="#3B82F6" />
         
         <GlobeScene regions={regions} onRegionClick={onRegionClick} />
 
@@ -246,11 +258,10 @@ export function IntelligenceGlobe({
           minDistance={3.5} 
           maxDistance={7} 
           rotateSpeed={0.4}
-          onStart={() => {}} // User starts interacting
         />
       </Canvas>
 
-      {/* Instructional Legend Overlay */}
+      {/* Legend Overlay */}
       <div className="absolute bottom-8 left-10 space-y-4 pointer-events-none">
         <div className="flex items-center space-x-3 opacity-40">
           <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
