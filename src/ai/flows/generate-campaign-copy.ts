@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A Genkit flow for generating luxury marketing campaign copy.
@@ -20,7 +19,7 @@ const GenerateCampaignCopyInputSchema = z.object({
 export type GenerateCampaignCopyInput = z.infer<typeof GenerateCampaignCopyInputSchema>;
 
 const GenerateCampaignCopyOutputSchema = z.object({
-  subjectLine: z.string().describe('An evocative, luxury-themed subject line.'),
+  subjectLine: z.string().describe('An evocative, sophisticated subject line.'),
   bodyText: z.string().describe('The core message or push body text.'),
 });
 export type GenerateCampaignCopyOutput = z.infer<typeof GenerateCampaignCopyOutputSchema>;
@@ -51,7 +50,11 @@ export async function generateCampaignCopy(
 
 const campaignCopyPrompt = ai.definePrompt({
   name: 'campaignCopyPrompt',
-  input: {schema: GenerateCampaignCopyInputSchema},
+  input: {
+    schema: GenerateCampaignCopyInputSchema.extend({
+      isEmail: z.boolean().describe('True if campaign type is email'),
+    }),
+  },
   output: {schema: GenerateCampaignCopyOutputSchema},
   prompt: `You are the Global Marketing Director for AMARISÉ Luxe.
 Your task is to write high-end marketing copy for a new campaign in the {{{country}}} market.
@@ -61,7 +64,7 @@ Type: {{{campaignType}}}
 Product: {{{productName}}} ({{{category}}})
 Region: {{{country}}}
 
-{{#if (eq campaignType "email")}}
+{{#if isEmail}}
 Write a subject line that invites curiosity and a brief 2-sentence opening body.
 {{else}}
 Write a punchy, ultra-luxury push notification (max 120 chars).
@@ -75,7 +78,10 @@ const generateCampaignCopyFlow = ai.defineFlow(
     outputSchema: GenerateCampaignCopyOutputSchema,
   },
   async input => {
-    const {output} = await campaignCopyPrompt(input);
+    const {output} = await campaignCopyPrompt({
+      ...input,
+      isEmail: input.campaignType === 'email',
+    });
     return output!;
   }
 );
