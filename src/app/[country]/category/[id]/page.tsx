@@ -8,23 +8,22 @@ import {
   CATEGORIES, 
   formatPrice 
 } from '@/lib/mock-data';
-import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { 
   ChevronRight, 
   ChevronDown,
   ChevronUp,
   Filter, 
-  Search,
   Heart,
   Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 /**
- * CategoryPage: Refined for brand-specific storytelling (e.g., Hermès).
- * Features a navigation-first sidebar with deep-nested hierarchical sub-menus.
+ * CategoryPage: Replicated for the Madison Avenue Couture archive view.
+ * Features: Visual "Shop by Size" navigation, full-width filter bar, and archival grid.
  */
 export default function CategoryPage() {
   const { country, id } = useParams();
@@ -35,14 +34,11 @@ export default function CategoryPage() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'handbags': true,
     'curations': false,
-    'birkin': false,
+    'birkin': true,
     'kelly': false,
     'constance': false,
-    'evelyne': false,
-    'picotin': false,
     'accessories': false,
     'jewelry': false,
-    'fine-jewelry': false
   });
 
   const toggleSection = (section: string) => {
@@ -52,40 +48,54 @@ export default function CategoryPage() {
     }));
   };
 
-  const filteredProducts = useMemo(() => {
-    return PRODUCTS.slice(0, 36);
-  }, []);
+  // Archival Birkin Sizes for the visual nav
+  const birkinSizes = [
+    { name: 'Birkin 25CM', id: '25cm' },
+    { name: 'Birkin 30CM', id: '30cm' },
+    { name: 'Birkin 35CM', id: '35cm' },
+    { name: 'Birkin 40+CM', id: '40cm' },
+    { name: 'Shoulder Birkins', id: 'shoulder' },
+  ];
+
+  // Specific Mock Birkin Products for the demonstration
+  const birkinProducts = [
+    {
+      id: 'birkin-hss-25',
+      name: 'Hermès Special Order (HSS) Birkin 25 White and Etoupe Clemence Brushed Gold Hardware',
+      price: 31741.89,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000'
+    },
+    {
+      id: 'birkin-hss-rose',
+      name: 'Hermès Special Order (HSS) Birkin 25 White and Rose Sakura Clemence Rose Gold Hardware',
+      price: 33481.17,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Rose_Sakura_Clemence_Rose_Gold_Hardware_1.jpg?v=1691512345&width=1000'
+    },
+    {
+      id: 'birkin-white-30',
+      name: 'Pre-owned Hermès Birkin 30 White Epsom Palladium Hardware',
+      price: 15218.71,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_30_White_Epsom_Palladium_Hardware_1.jpg?v=1691512345&width=1000'
+    }
+  ];
 
   return (
     <div className="bg-white min-h-screen pb-20 animate-fade-in font-body">
       <div className="container mx-auto px-6 max-w-[1600px] pt-12">
         <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* Brand Navigation Sidebar */}
+          {/* 1. Deep-Nested Navigation Sidebar */}
           <aside className="lg:w-72 shrink-0 space-y-12">
             <div className="space-y-10 sticky top-40">
-              <h2 className="text-2xl font-headline italic text-gray-900 border-b border-gray-100 pb-4">{category.name}</h2>
+              <h2 className="text-xl font-headline italic text-gray-400 border-b border-gray-100 pb-4">{category.name}</h2>
               
               <nav className="space-y-0.5">
-                {/* HANDBAGS Section */}
                 <div className="border-b border-gray-50 py-2">
-                  <SidebarNavItem 
-                    label="HANDBAGS" 
-                    hasSub 
-                    isOpen={openSections['handbags']} 
-                    onClick={() => toggleSection('handbags')} 
-                  />
-                  
+                  <SidebarNavItem label="HANDBAGS" hasSub isOpen={openSections['handbags']} onClick={() => toggleSection('handbags')} />
                   {openSections['handbags'] && (
                     <div className="pl-4 mt-2 space-y-1">
-                      {/* Birkin Bags Sub-Menu */}
                       <div className="space-y-1">
-                        <SidebarSubHeader 
-                          label="Birkin Bags" 
-                          hasSub 
-                          isOpen={openSections['birkin']} 
-                          onClick={() => toggleSection('birkin')} 
-                        />
+                        <SidebarSubHeader label="Birkin Bags" hasSub isOpen={openSections['birkin']} onClick={() => toggleSection('birkin')} />
                         {openSections['birkin'] && (
                           <ul className="pl-4 space-y-2 py-1">
                             <SidebarLink label="Birkin 25CM" />
@@ -96,172 +106,73 @@ export default function CategoryPage() {
                           </ul>
                         )}
                       </div>
-
-                      {/* Kelly Bags Sub-Menu */}
-                      <div className="space-y-1">
-                        <SidebarSubHeader 
-                          label="Kelly Bags" 
-                          hasSub 
-                          isOpen={openSections['kelly']} 
-                          onClick={() => toggleSection('kelly')} 
-                        />
-                        {openSections['kelly'] && (
-                          <ul className="pl-4 space-y-2 py-1">
-                            <SidebarLink label="Kelly 20CM" />
-                            <SidebarLink label="Kelly 25CM" />
-                            <SidebarLink label="Kelly 28CM" />
-                            <SidebarLink label="Kelly 32CM" />
-                            <SidebarLink label="Kelly 35CM+" />
-                          </ul>
-                        )}
-                      </div>
-
-                      {/* Constance Bags Sub-Menu */}
-                      <div className="space-y-1">
-                        <SidebarSubHeader 
-                          label="Constance Bags" 
-                          hasSub 
-                          isOpen={openSections['constance']} 
-                          onClick={() => toggleSection('constance')} 
-                        />
-                        {openSections['constance'] && (
-                          <ul className="pl-4 space-y-2 py-1">
-                            <SidebarLink label="Constance 18CM" />
-                            <SidebarLink label="Constance 24/25CM" />
-                          </ul>
-                        )}
-                      </div>
-
+                      <SidebarSubHeader label="Kelly Bags" hasSub isOpen={openSections['kelly']} onClick={() => toggleSection('kelly')} />
+                      <SidebarSubHeader label="Constance Bags" hasSub isOpen={openSections['constance']} onClick={() => toggleSection('constance')} />
                       <SidebarLink label="Pochettes & Kelly Cuts" />
-                      <SidebarLink label="Horseshoe Stamp (HSS) Bags" />
-
-                      {/* Evelyne Bags Sub-Menu */}
-                      <div className="space-y-1">
-                        <SidebarSubHeader 
-                          label="Evelyne Bags" 
-                          hasSub 
-                          isOpen={openSections['evelyne']} 
-                          onClick={() => toggleSection('evelyne')} 
-                        />
-                        {openSections['evelyne'] && (
-                          <ul className="pl-4 space-y-2 py-1">
-                            <SidebarLink label="Mini Evelyne (TPM) Bags" />
-                            <SidebarLink label="Evelyne 23 Bags" />
-                            <SidebarLink label="Evelyne III PM" />
-                          </ul>
-                        )}
-                      </div>
-
-                      {/* Picotin Bags Sub-Menu */}
-                      <div className="space-y-1">
-                        <SidebarSubHeader 
-                          label="Picotin Bags" 
-                          hasSub 
-                          isOpen={openSections['picotin']} 
-                          onClick={() => toggleSection('picotin')} 
-                        />
-                        {openSections['picotin'] && (
-                          <ul className="pl-4 space-y-2 py-1">
-                            <SidebarLink label="Picotin 18CM" />
-                            <SidebarLink label="Picotin 22CM" />
-                          </ul>
-                        )}
-                      </div>
-
-                      <SidebarLink label="Lindy Bags" />
-                      <SidebarLink label="Bolide Bags" />
-                      <SidebarLink label="Herbag Collection" />
-                      <SidebarLink label="Garden Party Bags" />
-                      <SidebarLink label="Rare & Unique Bags" />
+                      <SidebarLink label="Evelyne Bags" hasSub />
+                      <SidebarLink label="Picotin Bags" hasSub />
                       <SidebarLink label="Other Bags" />
                     </div>
                   )}
                 </div>
 
-                {/* ACCESSORIES Section */}
                 <div className="border-b border-gray-50 py-2">
-                  <SidebarNavItem 
-                    label="ACCESSORIES" 
-                    hasSub 
-                    isOpen={openSections['accessories']} 
-                    onClick={() => toggleSection('accessories')} 
-                  />
+                  <SidebarNavItem label="ACCESSORIES" hasSub isOpen={openSections['accessories']} onClick={() => toggleSection('accessories')} />
                   {openSections['accessories'] && (
                     <ul className="pl-4 mt-2 space-y-2 py-1">
                       <SidebarLink label="Scarves" />
                       <SidebarLink label="Wallets" />
                       <SidebarLink label="Watches" />
-                      <SidebarLink label="Belts" />
-                      <SidebarLink label="Charms" />
                     </ul>
                   )}
                 </div>
 
-                {/* JEWELRY Section */}
                 <div className="border-b border-gray-50 py-2">
-                  <SidebarNavItem 
-                    label="JEWELRY" 
-                    hasSub 
-                    isOpen={openSections['jewelry']} 
-                    onClick={() => toggleSection('jewelry')} 
-                  />
-                  {openSections['jewelry'] && (
-                    <div className="pl-4 mt-2 space-y-1">
-                      <SidebarSubHeader 
-                        label="Fine Jewelry" 
-                        hasSub 
-                        isOpen={openSections['fine-jewelry']} 
-                        onClick={() => toggleSection('fine-jewelry')} 
-                      />
-                      {openSections['fine-jewelry'] && (
-                        <ul className="pl-4 space-y-2 py-1">
-                          <SidebarLink label="All Fine Jewelry" />
-                          <SidebarLink label="Necklaces" />
-                          <SidebarLink label="Bracelets" />
-                          <SidebarLink label="Earrings" />
-                          <SidebarLink label="Rings" />
-                        </ul>
-                      )}
-                    </div>
-                  )}
+                  <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry')} />
                 </div>
 
                 <SidebarNavItem label="SHOES" />
                 
-                <div className="pt-4 space-y-1">
-                  <SidebarNavItem 
-                    label="CURATIONS" 
-                    hasSub 
-                    isOpen={openSections['curations']} 
-                    onClick={() => toggleSection('curations')} 
-                  />
-                  {openSections['curations'] && (
-                    <ul className="pl-4 space-y-4 pt-4">
-                      <SidebarLink label="New Arrivals" />
-                      <SidebarLink label="Bestsellers" />
-                      <SidebarLink label="Pre-Owned & Vintage Handbags" />
-                      <SidebarLink label="Exotic Handbags" hasSub />
-                      <SidebarLink label="Pre-Owned Exotic Handbags" />
-                      <SidebarLink label="Home Goods" />
-                      <SidebarLink label="Atelier Bags" />
-                    </ul>
-                  )}
+                <div className="pt-4">
+                  <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations')} />
                 </div>
               </nav>
             </div>
           </aside>
 
-          {/* Catalog Main View */}
-          <main className="flex-1">
-            <header className="mb-12 space-y-8">
+          {/* 2. Main Registry View */}
+          <main className="flex-1 space-y-12">
+            <header className="space-y-10">
               <h1 className="text-3xl font-headline font-medium text-black">
-                {category.name} Handbags - New Arrivals
+                {id === 'hermes' ? 'Hermès Birkin Bags' : `${category.name} Archives`}
               </h1>
 
-              {/* Controls Bar */}
-              <div className="flex items-center justify-between py-4 border-y border-gray-100 bg-white/50">
+              {/* 3. Visual "Shop By Size" Matrix */}
+              <div className="space-y-6">
+                <span className="text-[10px] font-bold tracking-[0.1em] uppercase text-gray-400">SHOP BY SIZE:</span>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {birkinSizes.map((size) => (
+                    <div key={size.id} className="group cursor-pointer text-center space-y-4">
+                      <div className="relative aspect-[4/5] bg-[#f8f8f8] flex items-center justify-center p-6 border border-transparent group-hover:border-gray-200 transition-all">
+                        <div className="relative w-full h-full grayscale-[0.5] group-hover:grayscale-0 transition-all">
+                           <Image 
+                            src="https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400" 
+                            alt={size.name} 
+                            fill 
+                            className="object-contain p-4"
+                           />
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-light text-gray-500 uppercase tracking-widest block">{size.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Controls Matrix */}
+              <div className="flex items-center justify-between py-4 bg-[#f8f8f8] px-6">
                 <div className="text-[11px] font-medium text-gray-400">
-                  36 products
+                  524 products
                 </div>
                 <div className="flex items-center space-x-10">
                   <button className="flex items-center space-x-2 text-[11px] font-bold tracking-[0.2em] text-black hover:opacity-60 transition-opacity">
@@ -270,43 +181,34 @@ export default function CategoryPage() {
                   </button>
                   <div className="flex items-center space-x-3 text-[11px] font-bold tracking-[0.2em] text-black">
                     <span className="uppercase text-gray-400">SORT</span>
-                    <select 
-                      className="bg-transparent outline-none cursor-pointer"
-                      value={activeSort}
-                      onChange={(e) => setActiveSort(e.target.value)}
-                    >
+                    <select className="bg-transparent outline-none cursor-pointer">
                       <option>Featured</option>
-                      <option>Price: Low to High</option>
-                      <option>Price: High to Low</option>
                       <option>Newest</option>
+                      <option>Price: High to Low</option>
                     </select>
                   </div>
                 </div>
               </div>
             </header>
 
-            {/* Product Grid - 3 Columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-20">
-              {filteredProducts.map(product => (
+            {/* 5. High-Fidelity Product Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-24">
+              {birkinProducts.map(product => (
                 <div key={product.id} className="group cursor-pointer">
-                  <Link href={`/${countryCode}/product/${product.id}`} className="block">
-                    <div className="relative aspect-square bg-[#f8f8f8] mb-6 overflow-hidden flex items-center justify-center border border-gray-50">
-                      <div className="w-full h-full flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.4em] text-gray-200">
-                        Atelier Asset
-                      </div>
-                      <button className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors">
-                        <Heart className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="space-y-2 text-center px-4">
-                      <h3 className="text-sm font-light text-gray-800 leading-relaxed line-clamp-2 uppercase tracking-wide">
-                        {category.name} {product.name}
-                      </h3>
-                      <p className="text-sm font-bold text-black tracking-tight">
-                        {formatPrice(product.basePrice, countryCode)}
-                      </p>
-                    </div>
-                  </Link>
+                  <div className="relative aspect-[4/5] bg-white mb-8 overflow-hidden flex items-center justify-center border border-gray-50">
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-10 transition-transform duration-700 group-hover:scale-105" />
+                    <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors">
+                      <Heart className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-3 text-center px-6">
+                    <h3 className="text-[13px] font-light text-gray-800 leading-relaxed uppercase tracking-wide">
+                      {product.name}
+                    </h3>
+                    <p className="text-[14px] font-bold text-black tracking-tight">
+                      €{product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
