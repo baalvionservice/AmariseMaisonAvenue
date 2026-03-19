@@ -49,7 +49,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-0 bg-background min-h-screen pb-40 animate-fade-in">
-      {/* Hero: Institutional Authority - LCP OPTIMIZED */}
+      {/* Hero: Institutional Authority */}
       <section className="relative h-[90vh] w-full flex items-end overflow-hidden">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
@@ -57,7 +57,6 @@ export default function HomePage() {
           fill
           className="object-cover animate-slow-zoom"
           priority
-          fetchPriority="high"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

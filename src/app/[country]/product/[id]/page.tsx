@@ -31,10 +31,6 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 
-/**
- * ProductPage: Optimized for high-ticket acquisition.
- * Features LCP optimization for the primary product image.
- */
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -130,13 +126,11 @@ export default function ProductPage() {
         <div className="flex flex-col lg:flex-row gap-24">
           <section className="w-full lg:w-[55%] space-y-8" aria-label="Product Gallery">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              {/* LCP Optimized Product Image */}
               <Image 
                 src={product.imageUrl} 
                 alt={`${product.name} - Heritage Perspective ${activeMediaIndex + 1}`}
                 fill
                 priority
-                fetchPriority="high"
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
