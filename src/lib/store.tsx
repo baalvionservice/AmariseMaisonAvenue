@@ -53,7 +53,8 @@ import {
   ArtifactVersion,
   TransactionStatus,
   GlobalSyncSession,
-  SyncCategory
+  SyncCategory,
+  StressTest
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -107,6 +108,7 @@ interface AppContextType {
   scopedTransactions: Transaction[];
   scopedQATests: QATestCase[];
   scopedErrors: MaisonError[];
+  scopedStressTests: StressTest[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -119,6 +121,7 @@ interface AppContextType {
   editorials: Editorial[];
   qaTests: QATestCase[];
   maisonErrors: MaisonError[];
+  stressTests: StressTest[];
   
   // CRM State
   privateInquiries: PrivateInquiry[];
@@ -226,6 +229,7 @@ interface AppContextType {
   // QA Actions
   runQATest: (id: string) => void;
   runAllQATests: () => void;
+  runStressTest: (loadSize: number, type: StressTest['type']) => void;
 
   // Global Actions
   addToCart: (product: Product) => void;
@@ -341,6 +345,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'qa-5', name: 'RBAC Permission Enforcement', module: 'Security', status: 'pending', logs: [], country: 'uk', brandId: activeBrandId }
   ]);
 
+  const [stressTests, setStressTests] = useState<StressTest[]>([]);
+
   // Error Handling state
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([
     { id: 'err-1', module: 'AI Autopilot', type: 'JobFailed', country: 'us', message: 'Predictive lead scoring cycle failed due to data drift.', stackTrace: 'ReferenceError: leadScore is not defined at analysis.ts:42', resolved: false, timestamp: new Date().toISOString(), severity: 'high', brandId: activeBrandId },
@@ -450,6 +456,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return maisonErrors;
     return maisonErrors.filter(e => e.country === currentUser.country || e.country === 'global');
   }, [maisonErrors, currentUser]);
+
+  const scopedStressTests = useMemo(() => {
+    return stressTests;
+  }, [stressTests]);
 
   // --- Actions ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
@@ -810,6 +820,64 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     qaTests.forEach(t => runQATest(t.id));
   };
 
+  const runStressTest = (loadSize: number, type: StressTest['type']) => {
+    const testId = `stress-${Date.now()}`;
+    const newTest: StressTest = {
+      id: testId,
+      name: `High-Load ${type} Matrix [${loadSize}]`,
+      loadSize,
+      type,
+      status: 'running',
+      metrics: {
+        startTime: new Date().toISOString(),
+        processedCount: 0,
+        errorCount: 0,
+        failureCount: 0
+      },
+      logs: [{ id: `l-${Date.now()}`, message: `Initiating ${loadSize} iteration cycle for ${type} subsystem...`, timestamp: new Date().toISOString() }],
+      country: currentUser?.country || 'global'
+    };
+
+    setStressTests(prev => [newTest, ...prev]);
+
+    // Simulated Processing Loop
+    let count = 0;
+    const interval = setInterval(() => {
+      const stepSize = Math.ceil(loadSize / 20);
+      count += stepSize;
+      
+      if (count >= loadSize) {
+        count = loadSize;
+        clearInterval(interval);
+        
+        const duration = Math.random() * 2000 + 500; // Simulated duration
+        setStressTests(prev => prev.map(t => t.id === testId ? {
+          ...t,
+          status: 'passed',
+          metrics: {
+            ...t.metrics,
+            endTime: new Date().toISOString(),
+            durationMs: duration,
+            processedCount: loadSize,
+            errorCount: Math.floor(Math.random() * (loadSize / 1000)),
+            failureCount: 0
+          },
+          logs: [
+            ...t.logs,
+            { id: `l-finish-${Date.now()}`, message: `Stress test complete. Subsystem maintained integrity.`, timestamp: new Date().toISOString() },
+            { id: `l-perf-${Date.now()}`, message: `Average throughput: ${Math.floor(loadSize / (duration / 1000))} items/sec`, timestamp: new Date().toISOString() }
+          ]
+        } : t));
+        logAction(`Completed Stress Test: ${newTest.name}`, 'QA Laboratory', newTest.country, 'medium');
+      } else {
+        setStressTests(prev => prev.map(t => t.id === testId ? {
+          ...t,
+          metrics: { ...t.metrics, processedCount: count }
+        } : t));
+      }
+    }, 150);
+  };
+
   const handleApprovalAction = (requestId: string, approve: boolean, comments?: string) => {
     setApprovalRequests(prev => prev.map(req => req.id === requestId ? { ...req, status: approve ? 'approved' : 'rejected', comments, approvedBy: currentUser?.name } : req));
     const req = approvalRequests.find(r => r.id === requestId);
@@ -836,8 +904,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
@@ -851,14 +919,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
-    runQATest, runAllQATests, logMaisonError, resolveMaisonError,
+    runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
@@ -872,7 +940,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
-    runQATest, runAllQATests, logMaisonError, resolveMaisonError,
+    runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage

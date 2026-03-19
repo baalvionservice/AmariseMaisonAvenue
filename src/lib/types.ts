@@ -413,6 +413,24 @@ export interface QATestCase {
   brandId: string;
 }
 
+export interface StressTest {
+  id: string;
+  name: string;
+  loadSize: number;
+  type: 'AI' | 'CMS' | 'SEO' | 'CRM';
+  status: 'pending' | 'running' | 'passed' | 'failed';
+  metrics: {
+    startTime: string;
+    endTime?: string;
+    durationMs?: number;
+    processedCount: number;
+    errorCount: number;
+    failureCount: number;
+  };
+  logs: QALogEntry[];
+  country: string;
+}
+
 export interface MaisonError {
   id: string;
   module: 'AI Autopilot' | 'Finance' | 'Onboarding' | 'Content' | 'System' | 'CMS' | 'Sales';
