@@ -7,7 +7,7 @@ import { OrbitControls, Sphere, Html, QuadraticBezierLine, useTexture } from '@r
 import * as THREE from 'three';
 import { RegionData } from '@/hooks/use-simulation-data';
 import { cn } from '@/lib/utils';
-import { Plus, Minus, RefreshCcw, Lock, TrendingUp, Users, ShoppingCart, Zap, Crown } from 'lucide-react';
+import { Plus, Minus, RefreshCcw, Lock, TrendingUp, Users, ShoppingCart, Zap, Crown, Globe } from 'lucide-react';
 
 /**
  * Institutional Color Palette for Heatmap & Markers
