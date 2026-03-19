@@ -35,6 +35,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 
 /**
  * CategoryPage: Replicated for the Madison Avenue Couture archive view.
@@ -63,6 +64,27 @@ export default function CategoryPage() {
       [section]: !prev[section]
     }));
   };
+
+  // Color Registry from reference
+  const colors = [
+    { name: 'Beige', count: 14, hex: '#D2B48C' },
+    { name: 'Black', count: 43, hex: '#000000' },
+    { name: 'Blue', count: 99, hex: '#4169E1' },
+    { name: 'Brown', count: 59, hex: '#8B4513' },
+    { name: 'Gold', count: 6, hex: '#D4AF37' },
+    { name: 'Grey', count: 42, hex: '#A9A9A9' },
+    { name: 'Green', count: 58, hex: '#2E8B57' },
+    { name: 'Multi', count: 12, isMulti: true },
+    { name: 'Orange', count: 23, hex: '#FFA500' },
+    { name: 'Pink', count: 50, hex: '#FF69B4' },
+    { name: 'Purple', count: 14, hex: '#9370DB' },
+    { name: 'Red', count: 49, hex: '#B22222' },
+    { name: 'Tan', count: 5, hex: '#D2B48C' },
+    { name: 'White', count: 11, hex: '#FFFFFF' },
+    { name: 'Yellow', count: 16, hex: '#FFFF00' },
+    { name: 'Burgundy', count: 12, hex: '#800020' },
+    { name: 'Ivory', count: 29, hex: '#FFFFF0' },
+  ];
 
   // Archival Birkin Sizes for the visual nav
   const birkinSizes = [
@@ -99,25 +121,51 @@ export default function CategoryPage() {
     <div className="bg-white min-h-screen pb-20 animate-fade-in font-body">
       {/* 1. Institutional Filter Sidebar (Drawer) */}
       <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-[450px] p-0 border-none rounded-none bg-white flex flex-col h-full shadow-2xl">
-          <div className="flex items-center justify-between p-8 border-b border-gray-100">
+        <SheetContent side="right" className="w-full sm:max-w-[450px] p-0 border-none rounded-none bg-white flex flex-col h-full shadow-2xl overflow-hidden">
+          <div className="flex items-center justify-between p-8 border-b border-gray-100 bg-white z-20">
             <span className="text-sm font-bold tracking-[0.2em] text-gray-900 uppercase">FILTER BY</span>
             <button onClick={() => setIsFilterOpen(false)} className="hover:opacity-60 transition-opacity">
               <X className="w-6 h-6 stroke-[1px]" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-8 py-4 relative">
-            {/* Ask Judy Floating Button */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
-              <button className="bg-[#262626] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-2xl translate-x-4">
+          <div className="flex-1 overflow-y-auto px-8 py-4 relative custom-scrollbar">
+            {/* Ask Judy Floating Button - Positioned exactly as reference */}
+            <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[60]">
+              <button className="bg-[#262626] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-transform hover:scale-105 active:scale-95">
                 <Sparkles className="w-4 h-4 mb-0.5" />
                 <span className="text-[7px] font-bold tracking-tighter uppercase leading-none">ASK<br/>JUDY</span>
               </button>
             </div>
 
-            <Accordion type="multiple" className="w-full">
-              {['COLOR', 'CONDITION', 'HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
+            <Accordion type="multiple" defaultValue={['COLOR']} className="w-full">
+              <AccordionItem value="COLOR" className="border-b border-gray-100 py-2">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
+                  COLOR
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-6">
+                  <div className="space-y-4 pl-1">
+                    {colors.map((color) => (
+                      <div key={color.name} className="flex items-center space-x-4 group cursor-pointer">
+                        <Checkbox className="rounded-none border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                        <div 
+                          className="w-4 h-4 rounded-full border border-gray-100 shadow-sm" 
+                          style={{ 
+                            background: color.isMulti 
+                              ? 'conic-gradient(red, yellow, green, blue, purple, red)' 
+                              : color.hex 
+                          }} 
+                        />
+                        <span className="text-xs font-light text-gray-700 tracking-wide flex-1">
+                          {color.name} <span className="text-gray-400 ml-1">({color.count})</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {['CONDITION', 'HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
                 <AccordionItem key={filter} value={filter} className="border-b border-gray-100 py-2">
                   <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4">
                     {filter}
@@ -132,7 +180,7 @@ export default function CategoryPage() {
             </Accordion>
           </div>
 
-          <div className="p-8 border-t border-gray-100 bg-white grid grid-cols-2 gap-4">
+          <div className="p-8 border-t border-gray-100 bg-white grid grid-cols-2 gap-4 sticky bottom-0 z-20">
             <Button 
               variant="outline" 
               className="h-14 rounded-none border-gray-900 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-50 transition-all"
