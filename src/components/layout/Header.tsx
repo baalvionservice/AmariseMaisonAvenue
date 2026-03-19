@@ -177,7 +177,30 @@ export const Header = () => {
         subCaption: 'THE ROW'
       }
     },
-    { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
+    { 
+      name: 'JEWELRY', 
+      href: `/${countryCode}/category/jewelry`,
+      mega: true,
+      megaContent: {
+        columns: [
+          {
+            title: 'JEWELRY',
+            links: ['Fine Jewelry', 'Vintage', 'Contemporary', 'Costume Jewelry', 'New Arrivals']
+          },
+          {
+            title: 'CATEGORY',
+            links: ['Earrings', 'Bracelets', 'Necklaces', 'Rings', 'Watches']
+          },
+          {
+            title: 'BRAND',
+            links: ['Hermès', 'Tiffany', 'Van Cleef & Arpels']
+          }
+        ],
+        image: 'https://picsum.photos/seed/vca-jewelry/1200/800',
+        caption: 'Van Cleef & Arpels',
+        subCaption: 'NEW ARRIVALS'
+      }
+    },
     { name: 'LIVE SHOP', href: '#', services: true },
     { name: 'BLOG', href: `/${countryCode}/journal` },
   ];

@@ -48,6 +48,12 @@
       "description": "New Arrivals Luxury Handbags",
       "imageUrl": "https://picsum.photos/seed/amarise-arrivals-bags/1200/800",
       "imageHint": "luxury handbags"
+    },
+    {
+      "id": "mega-menu-jewelry",
+      "description": "Van Cleef & Arpels Jewelry Showcase",
+      "imageUrl": "https://picsum.photos/seed/vca-jewelry/1200/800",
+      "imageHint": "luxury jewelry"
     }
   ]
 }
