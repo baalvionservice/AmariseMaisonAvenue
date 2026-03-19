@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * CategoryPage: Refined for brand-specific storytelling (e.g., Hermès).
- * Features a navigation-first sidebar and minimalist product gallery.
+ * Features a navigation-first sidebar with deep-nested hierarchical sub-menus.
  */
 export default function CategoryPage() {
   const { country, id } = useParams();
@@ -32,38 +32,171 @@ export default function CategoryPage() {
   const category = CATEGORIES.find(c => c.id === id) || { name: id === 'hermes' ? 'Hermès' : 'Department', subcategories: [] };
   
   const [activeSort, setActiveSort] = useState('Featured');
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    'handbags': true,
+    'curations': true,
+    'birkin': false,
+    'kelly': false,
+    'constance': false,
+    'evelyne': false,
+    'picotin': false
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.slice(0, 36);
   }, []);
 
   return (
-    <div className="bg-white min-h-screen pb-20 animate-fade-in">
+    <div className="bg-white min-h-screen pb-20 animate-fade-in font-body">
       <div className="container mx-auto px-6 max-w-[1600px] pt-12">
         <div className="flex flex-col lg:flex-row gap-16">
           
           {/* Brand Navigation Sidebar */}
-          <aside className="lg:w-64 shrink-0 space-y-12">
+          <aside className="lg:w-72 shrink-0 space-y-12">
             <div className="space-y-10 sticky top-40">
               <h2 className="text-2xl font-headline italic text-gray-900 border-b border-gray-100 pb-4">{category.name}</h2>
               
-              <nav className="space-y-2">
-                <SidebarNavItem label="HANDBAGS" hasSub />
+              <nav className="space-y-0.5">
+                {/* HANDBAGS Section */}
+                <div className="border-b border-gray-50 py-2">
+                  <SidebarNavItem 
+                    label="HANDBAGS" 
+                    hasSub 
+                    isOpen={openSections['handbags']} 
+                    onClick={() => toggleSection('handbags')} 
+                  />
+                  
+                  {openSections['handbags'] && (
+                    <div className="pl-4 mt-2 space-y-1">
+                      {/* Birkin Bags Sub-Menu */}
+                      <div className="space-y-1">
+                        <SidebarSubHeader 
+                          label="Birkin Bags" 
+                          hasSub 
+                          isOpen={openSections['birkin']} 
+                          onClick={() => toggleSection('birkin')} 
+                        />
+                        {openSections['birkin'] && (
+                          <ul className="pl-4 space-y-2 py-1">
+                            <SidebarLink label="Birkin 25CM" />
+                            <SidebarLink label="Birkin 30CM" />
+                            <SidebarLink label="Birkin 35CM" />
+                            <SidebarLink label="Birkin 40+CM" />
+                            <SidebarLink label="Shoulder Birkins" />
+                          </ul>
+                        )}
+                      </div>
+
+                      {/* Kelly Bags Sub-Menu */}
+                      <div className="space-y-1">
+                        <SidebarSubHeader 
+                          label="Kelly Bags" 
+                          hasSub 
+                          isOpen={openSections['kelly']} 
+                          onClick={() => toggleSection('kelly')} 
+                        />
+                        {openSections['kelly'] && (
+                          <ul className="pl-4 space-y-2 py-1">
+                            <SidebarLink label="Kelly 20CM" />
+                            <SidebarLink label="Kelly 25CM" />
+                            <SidebarLink label="Kelly 28CM" />
+                            <SidebarLink label="Kelly 32CM" />
+                            <SidebarLink label="Kelly 35CM+" />
+                          </ul>
+                        )}
+                      </div>
+
+                      {/* Constance Bags Sub-Menu */}
+                      <div className="space-y-1">
+                        <SidebarSubHeader 
+                          label="Constance Bags" 
+                          hasSub 
+                          isOpen={openSections['constance']} 
+                          onClick={() => toggleSection('constance')} 
+                        />
+                        {openSections['constance'] && (
+                          <ul className="pl-4 space-y-2 py-1">
+                            <SidebarLink label="Constance 18CM" />
+                            <SidebarLink label="Constance 24/25CM" />
+                          </ul>
+                        )}
+                      </div>
+
+                      <SidebarLink label="Pochettes & Kelly Cuts" />
+                      <SidebarLink label="Horseshoe Stamp (HSS) Bags" />
+
+                      {/* Evelyne Bags Sub-Menu */}
+                      <div className="space-y-1">
+                        <SidebarSubHeader 
+                          label="Evelyne Bags" 
+                          hasSub 
+                          isOpen={openSections['evelyne']} 
+                          onClick={() => toggleSection('evelyne')} 
+                        />
+                        {openSections['evelyne'] && (
+                          <ul className="pl-4 space-y-2 py-1">
+                            <SidebarLink label="Mini Evelyne (TPM) Bags" />
+                            <SidebarLink label="Evelyne 23 Bags" />
+                            <SidebarLink label="Evelyne III PM" />
+                          </ul>
+                        )}
+                      </div>
+
+                      {/* Picotin Bags Sub-Menu */}
+                      <div className="space-y-1">
+                        <SidebarSubHeader 
+                          label="Picotin Bags" 
+                          hasSub 
+                          isOpen={openSections['picotin']} 
+                          onClick={() => toggleSection('picotin')} 
+                        />
+                        {openSections['picotin'] && (
+                          <ul className="pl-4 space-y-2 py-1">
+                            <SidebarLink label="Picotin 18CM" />
+                            <SidebarLink label="Picotin 22CM" />
+                          </ul>
+                        )}
+                      </div>
+
+                      <SidebarLink label="Lindy Bags" />
+                      <SidebarLink label="Bolide Bags" />
+                      <SidebarLink label="Herbag Collection" />
+                      <SidebarLink label="Garden Party Bags" />
+                      <SidebarLink label="Rare & Unique Bags" />
+                      <SidebarLink label="Other Bags" />
+                    </div>
+                  )}
+                </div>
+
                 <SidebarNavItem label="ACCESSORIES" hasSub />
                 <SidebarNavItem label="JEWELRY" hasSub />
                 <SidebarNavItem label="SHOES" />
                 
-                <div className="pt-4 space-y-4">
-                  <SidebarNavItem label="CURATIONS" hasSub isOpen />
-                  <ul className="pl-4 space-y-4 pt-2">
-                    <SidebarLink label="New Arrivals" />
-                    <SidebarLink label="Bestsellers" />
-                    <SidebarLink label="Pre-Owned & Vintage Handbags" />
-                    <SidebarLink label="Exotic Handbags" hasSub />
-                    <SidebarLink label="Pre-Owned Exotic Handbags" />
-                    <SidebarLink label="Home Goods" />
-                    <SidebarLink label="Atelier Bags" />
-                  </ul>
+                <div className="pt-4 space-y-1">
+                  <SidebarNavItem 
+                    label="CURATIONS" 
+                    hasSub 
+                    isOpen={openSections['curations']} 
+                    onClick={() => toggleSection('curations')} 
+                  />
+                  {openSections['curations'] && (
+                    <ul className="pl-4 space-y-4 pt-4">
+                      <SidebarLink label="New Arrivals" />
+                      <SidebarLink label="Bestsellers" />
+                      <SidebarLink label="Pre-Owned & Vintage Handbags" />
+                      <SidebarLink label="Exotic Handbags" hasSub />
+                      <SidebarLink label="Pre-Owned Exotic Handbags" />
+                      <SidebarLink label="Home Goods" />
+                      <SidebarLink label="Atelier Bags" />
+                    </ul>
+                  )}
                 </div>
               </nav>
             </div>
@@ -144,9 +277,12 @@ export default function CategoryPage() {
   );
 }
 
-function SidebarNavItem({ label, hasSub, isOpen }: { label: string, hasSub?: boolean, isOpen?: boolean }) {
+function SidebarNavItem({ label, hasSub, isOpen, onClick }: { label: string, hasSub?: boolean, isOpen?: boolean, onClick?: () => void }) {
   return (
-    <div className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:opacity-60 transition-opacity cursor-pointer border-b border-gray-50 py-4 first:pt-0">
+    <div 
+      onClick={onClick}
+      className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:opacity-60 transition-opacity cursor-pointer py-4 first:pt-0"
+    >
       <span>{label}</span>
       {hasSub && (
         isOpen ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
@@ -155,12 +291,26 @@ function SidebarNavItem({ label, hasSub, isOpen }: { label: string, hasSub?: boo
   );
 }
 
+function SidebarSubHeader({ label, hasSub, isOpen, onClick }: { label: string, hasSub?: boolean, isOpen?: boolean, onClick?: () => void }) {
+  return (
+    <div 
+      onClick={onClick}
+      className="flex items-center justify-between text-[13px] font-light text-gray-700 hover:text-black transition-colors cursor-pointer py-2 group"
+    >
+      <span>{label}</span>
+      {hasSub && (
+        isOpen ? <ChevronUp className="w-3 h-3 text-gray-300 group-hover:text-black" /> : <ChevronDown className="w-3 h-3 text-gray-300 group-hover:text-black" />
+      )}
+    </div>
+  );
+}
+
 function SidebarLink({ label, active, hasSub }: { label: string, active?: boolean, hasSub?: boolean }) {
   return (
-    <li className="flex items-center justify-between group cursor-pointer">
+    <li className="flex items-center justify-between group cursor-pointer list-none py-1.5">
       <span className={cn(
         "text-[13px] font-light transition-colors leading-tight",
-        active ? "text-gray-900 font-normal" : "text-gray-500 hover:text-black"
+        active ? "text-gray-900 font-normal underline" : "text-gray-500 hover:text-black"
       )}>
         {label}
       </span>
