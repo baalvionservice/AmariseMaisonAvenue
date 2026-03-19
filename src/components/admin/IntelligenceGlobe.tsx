@@ -6,6 +6,7 @@ import { OrbitControls, Sphere, Html, QuadraticBezierLine, useTexture } from '@r
 import * as THREE from 'three';
 import { RegionData } from '@/hooks/use-simulation-data';
 import { cn } from '@/lib/utils';
+import { Plus, Minus } from 'lucide-react';
 
 /**
  * Institutional Color Palette for Heatmap
@@ -40,14 +41,12 @@ function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THR
   
   useFrame(() => {
     if (lineRef.current) {
-      // Moves the light particles along the line
       lineRef.current.dashOffset -= 0.004 * (0.5 + intensity);
     }
   });
 
   return (
     <group>
-      {/* Base Path Line */}
       <QuadraticBezierLine
         start={start}
         end={end}
@@ -57,7 +56,6 @@ function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THR
         transparent
         opacity={0.1}
       />
-      {/* Animated Light Flow */}
       <QuadraticBezierLine
         ref={lineRef}
         start={start}
@@ -78,7 +76,6 @@ function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THR
 
 /**
  * HubPoint: Revenue Heatmap Marker
- * Coupling size, color, and glow to simulated revenue intensity.
  */
 function HubPoint({ 
   region, 
@@ -95,10 +92,8 @@ function HubPoint({
   const glowMesh = useRef<THREE.Mesh>(null!);
   const pos = useMemo(() => latLngToVector3(region.lat, region.lng, 2), [region.lat, region.lng]);
 
-  // Normalize revenue for heatmap (0 to 1)
   const normalizedHeat = useMemo(() => Math.min(1, region.revenue / (maxRevenue || 1)), [region.revenue, maxRevenue]);
   
-  // Determine color based on normalized heat
   const heatColor = useMemo(() => {
     if (normalizedHeat > 0.7) return HEAT_COLORS.high;
     if (normalizedHeat > 0.35) return HEAT_COLORS.medium;
@@ -121,7 +116,6 @@ function HubPoint({
         <meshBasicMaterial color={isSelected ? "#FFFFFF" : heatColor} />
       </mesh>
       
-      {/* Outer Heat Aura */}
       <mesh ref={glowMesh}>
         <sphereGeometry args={[0.05, 16, 16]} />
         <meshBasicMaterial color={heatColor} transparent opacity={0.2 + normalizedHeat * 0.2} />
@@ -192,11 +186,18 @@ function GlobeSphere() {
   );
 }
 
-function GlobeScene({ regions, onRegionClick }: { regions: Record<string, RegionData>, onRegionClick: (id: string) => void }) {
+function GlobeScene({ 
+  regions, 
+  onRegionClick, 
+  controlsRef 
+}: { 
+  regions: Record<string, RegionData>, 
+  onRegionClick: (id: string) => void,
+  controlsRef: React.RefObject<any>
+}) {
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
   const groupRef = useRef<THREE.Group>(null!);
 
-  // Find max revenue for normalization
   const maxRevenue = useMemo(() => 
     Math.max(...Object.values(regions).map(r => r.revenue), 1), 
   [regions]);
@@ -204,7 +205,6 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
   const arcs = useMemo(() => {
     if (!regions.in || !regions.us || !regions.uk || !regions.ae || !regions.sg) return [];
     
-    // Configurable Flow Pairs
     const flows = [
       { s: regions.in, e: regions.us },
       { s: regions.uk, e: regions.ae },
@@ -236,7 +236,6 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
         <GlobeSphere />
       </Suspense>
 
-      {/* Hub Points with Heatmap logic */}
       {Object.values(regions).map(region => (
         <HubPoint 
           key={region.id} 
@@ -247,10 +246,21 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
         />
       ))}
 
-      {/* User Flow Arcs */}
       {arcs.map((arc, idx) => (
         <DataArc key={idx} start={arc.start} end={arc.end} intensity={arc.intensity} />
       ))}
+
+      <OrbitControls 
+        ref={controlsRef}
+        enablePan={false} 
+        enableZoom={true} 
+        minDistance={3.2} 
+        maxDistance={6} 
+        rotateSpeed={0.4}
+        autoRotate={false}
+        enableDamping={true}
+        dampingFactor={0.05}
+      />
     </group>
   );
 }
@@ -262,6 +272,17 @@ export function IntelligenceGlobe({
   regions: Record<string, RegionData>, 
   onRegionClick: (id: string) => void 
 }) {
+  const controlsRef = useRef<any>(null);
+
+  const handleManualZoom = (direction: 'in' | 'out') => {
+    if (controlsRef.current) {
+      const camera = controlsRef.current.object;
+      const zoomFactor = direction === 'in' ? 0.85 : 1.15;
+      camera.position.multiplyScalar(zoomFactor);
+      controlsRef.current.update();
+    }
+  };
+
   return (
     <div className="w-full h-full cursor-grab active:cursor-grabbing relative">
       <Canvas camera={{ position: [0, 1, 5], fov: 40 }} dpr={[1, 2]}>
@@ -269,16 +290,7 @@ export function IntelligenceGlobe({
         <directionalLight position={[-5, 5, 5]} intensity={1.2} color="#FFFFFF" />
         <pointLight position={[0, -5, 2]} intensity={0.4} color="#3B82F6" />
         
-        <GlobeScene regions={regions} onRegionClick={onRegionClick} />
-
-        <OrbitControls 
-          enablePan={false} 
-          enableZoom={true} 
-          minDistance={3.2} 
-          maxDistance={6} 
-          rotateSpeed={0.3}
-          autoRotate={false}
-        />
+        <GlobeScene regions={regions} onRegionClick={onRegionClick} controlsRef={controlsRef} />
       </Canvas>
 
       {/* Institutional Network Legend */}
@@ -289,13 +301,30 @@ export function IntelligenceGlobe({
           <LegendItem color={HEAT_COLORS.medium} label="Strategic Flow" />
           <LegendItem color={HEAT_COLORS.low} label="Initial Resonance" />
         </div>
-        
-        <div className="pt-4 border-t border-white/5 space-y-2">
-          <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Active Protocols</p>
-          <div className="flex items-center space-x-3 opacity-30">
-            <div className="w-6 h-px bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0" />
-            <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white">Registry Sync Path</span>
-          </div>
+      </div>
+
+      {/* Tactical Zoom Controls */}
+      <div className="absolute bottom-8 right-10 flex flex-col space-y-2">
+        <button 
+          onClick={() => handleManualZoom('in')}
+          className="w-10 h-10 bg-[#111113] border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-blue-500/50 transition-all shadow-xl"
+          aria-label="Zoom In"
+        >
+          <Plus size={16} />
+        </button>
+        <button 
+          onClick={() => handleManualZoom('out')}
+          className="w-10 h-10 bg-[#111113] border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-blue-500/50 transition-all shadow-xl"
+          aria-label="Zoom Out"
+        >
+          <Minus size={16} />
+        </button>
+      </div>
+
+      {/* Floating Instruction */}
+      <div className="absolute top-10 left-10 z-10 space-y-2 pointer-events-none">
+        <div className="flex items-center space-x-3 text-white/20">
+          <span className="text-[10px] font-bold uppercase tracking-[0.5em]">Global Matrix Active</span>
         </div>
       </div>
     </div>
