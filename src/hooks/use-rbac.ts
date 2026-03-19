@@ -5,7 +5,7 @@ import { canPerform } from '@/lib/rbac/core';
 import { Permission } from '@/lib/rbac/permissions';
 
 /**
- * @fileOverview Frontend hook for access control checks.
+ * @fileOverview Frontend hook for access control and UI visibility checks.
  */
 export function useRBAC() {
   const { currentUser } = useAppStore();
@@ -13,9 +13,18 @@ export function useRBAC() {
   return {
     user: currentUser,
     /**
+     * Functional permission check.
      * Usage: can('edit_content', 'in')
      */
     can: (permission: Permission, country?: string) => {
+      if (!currentUser) return false;
+      return canPerform(currentUser, permission, country);
+    },
+    /**
+     * UI Visibility alias for cleaner template logic.
+     * Usage: {showIf('control_ai') && <Button />}
+     */
+    showIf: (permission: Permission, country?: string) => {
       if (!currentUser) return false;
       return canPerform(currentUser, permission, country);
     },
