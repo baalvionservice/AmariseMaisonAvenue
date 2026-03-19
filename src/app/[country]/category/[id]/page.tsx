@@ -457,6 +457,7 @@ export default function CategoryPage() {
                       <option>Featured</option>
                       <option>Newest</option>
                       <option>Price: High to Low</option>
+                      <option>Price: Low to High</option>
                     </select>
                   </div>
                 </div>
