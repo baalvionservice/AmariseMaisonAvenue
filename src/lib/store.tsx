@@ -13,6 +13,8 @@ import {
   SocialMetrics,
   AdminAccount,
   Vendor,
+  Affiliate,
+  ReturnRequest,
   Campaign,
   AuditLog,
   VipClient,
@@ -27,8 +29,6 @@ import {
   Appointment,
   Invoice,
   Transaction,
-  Affiliate,
-  ReturnRequest,
   PrivateInquiry,
   LeadConversation,
   CuratorMessage,
@@ -47,7 +47,8 @@ import {
   WorkflowTask,
   ApprovalRequest,
   AnalyticsMetric,
-  AuditLogEntry
+  AuditLogEntry,
+  QATestCase
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -59,6 +60,8 @@ import {
   EDITOR_INITIAL,
   ADMIN_ACCOUNTS,
   VENDORS,
+  AFFILIATES,
+  RETURNS,
   CAMPAIGNS,
   AUDIT_LOGS,
   VIP_CLIENTS,
@@ -70,9 +73,7 @@ import {
   INDEXING_STATUS,
   INDEXING_LOGS,
   APPOINTMENTS,
-  INVOICES,
-  AFFILIATES,
-  RETURNS
+  INVOICES
 } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
@@ -99,6 +100,7 @@ interface AppContextType {
   scopedAuditLogs: AuditLogEntry[];
   scopedWorkflows: WorkflowTask[];
   scopedTransactions: Transaction[];
+  scopedQATests: QATestCase[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -109,6 +111,7 @@ interface AppContextType {
   cities: City[];
   buyingGuides: BuyingGuide[];
   editorials: Editorial[];
+  qaTests: QATestCase[];
   
   // CRM State
   privateInquiries: PrivateInquiry[];
@@ -201,6 +204,10 @@ interface AppContextType {
   upsertAISuggestion: (suggestion: AISuggestion) => void;
   updateSuggestionStatus: (id: string, status: AISuggestion['status']) => void;
 
+  // QA Actions
+  runQATest: (id: string) => void;
+  runAllQATests: () => void;
+
   // Global Actions
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -286,6 +293,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'aud-2', actorId: 'adm-2', actorName: 'Operations Lead', actorRole: 'country_admin', country: 'ae', action: 'Approved Vendor Listing', entity: 'Artifact prod-50', timestamp: new Date(Date.now() - 3600000).toISOString(), severity: 'medium' }
   ]);
 
+  // QA Tests state
+  const [qaTests, setQaTests] = useState<QATestCase[]>([
+    { id: 'qa-1', name: 'AI Autopilot Job Execution', module: 'AI', status: 'pending', logs: [], country: 'global', brandId: activeBrandId },
+    { id: 'qa-2', name: 'Vendor Registration Workflow', module: 'Onboarding', status: 'pending', logs: [], country: 'us', brandId: activeBrandId },
+    { id: 'qa-3', name: 'Finance Transaction Retrieval', module: 'Finance', status: 'pending', logs: [], country: 'ae', brandId: activeBrandId },
+    { id: 'qa-4', name: 'Audit Log Recording', module: 'Audit', status: 'pending', logs: [], country: 'in', brandId: activeBrandId },
+    { id: 'qa-5', name: 'RBAC Permission Enforcement', module: 'Security', status: 'pending', logs: [], country: 'uk', brandId: activeBrandId }
+  ]);
+
   // Admin & Logistics state
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
@@ -357,6 +373,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!currentUser || currentUser.role === 'super_admin') return workflows;
     return workflows.filter(w => w.country === currentUser.country || w.country === 'global');
   }, [workflows, currentUser]);
+
+  const scopedQATests = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return qaTests;
+    return qaTests.filter(t => t.country === currentUser.country || t.country === 'global');
+  }, [qaTests, currentUser]);
 
   // --- Actions ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
@@ -491,6 +512,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const runQATest = (id: string) => {
+    setQaTests(prev => prev.map(t => t.id === id ? { 
+      ...t, 
+      status: 'running', 
+      logs: [{ id: `l-${Date.now()}`, message: 'Test cycle initiated...', timestamp: new Date().toISOString() }] 
+    } : t));
+    
+    console.log(`[QA MOCK] Running test: ${id}`);
+
+    setTimeout(() => {
+      const passed = Math.random() > 0.1;
+      setQaTests(prev => prev.map(t => t.id === id ? { 
+        ...t, 
+        status: passed ? 'passed' : 'failed', 
+        lastRun: new Date().toISOString(),
+        logs: [
+          ...t.logs,
+          { id: `l-${Date.now()}-2`, message: passed ? 'Institutional integrity verified.' : 'Module integrity validation failure.', timestamp: new Date().toISOString() }
+        ]
+      } : t));
+      
+      logAction(`Executed QA Test: ${id}`, 'QA System', 'global', passed ? 'low' : 'high');
+      sendNotification('super_admin', `QA Test "${id}" completed with status: ${passed ? 'PASSED' : 'FAILED'}`, 'global', passed ? 'success' : 'alert');
+      console.log(`[QA MOCK] Test completed: ${id} | Result: ${passed ? 'Passed' : 'Failed'}`);
+    }, 1500);
+  };
+
+  const runAllQATests = () => {
+    console.log("[QA MOCK] Batch test execution triggered.");
+    qaTests.forEach((t, i) => {
+      setTimeout(() => runQATest(t.id), i * 500);
+    });
+  };
+
   const toggleEmergencyMode = () => {
     setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
     logAction('Toggled Emergency Fallback Mode', 'System Core', 'global', 'high');
@@ -592,8 +647,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
@@ -606,13 +661,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
+    runQATest, runAllQATests,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,

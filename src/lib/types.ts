@@ -381,6 +381,25 @@ export interface AuditLogEntry {
   brandId?: string;
 }
 
+// --- QA & TESTING ---
+
+export interface QALogEntry {
+  id: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface QATestCase {
+  id: string;
+  name: string;
+  module: 'AI' | 'Finance' | 'Onboarding' | 'Audit' | 'Security';
+  status: 'pending' | 'running' | 'passed' | 'failed';
+  lastRun?: string;
+  logs: QALogEntry[];
+  country: string;
+  brandId: string;
+}
+
 // --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {
@@ -453,34 +472,6 @@ export interface Affiliate {
   salesGenerated: number;
   commissionEarned: number;
   status: 'active' | 'pending';
-  brandId: string;
-}
-
-export interface Campaign {
-  id: string;
-  title: string;
-  type: 'Flash Sale' | 'VIP Loyalty' | 'Seasonal' | 'Launch' | 'Email' | 'Social';
-  status: 'scheduled' | 'active' | 'completed' | 'draft';
-  discountValue: number;
-  startDate: string;
-  endDate: string;
-  market: CountryCode | 'global';
-  roi?: number;
-  reach?: number;
-  conversions?: number;
-  predictedRoi?: number;
-  abTestActive: boolean;
-  brandId: string;
-}
-
-export interface CustomerSegment {
-  id: string;
-  name: string;
-  description: string;
-  userCount: number;
-  avgOrderValue: number;
-  tags: string[];
-  predictedChurn: number;
   brandId: string;
 }
 
@@ -633,18 +624,6 @@ export interface IndexingLog {
   status: 'Success' | 'Partial' | 'Failed';
 }
 
-export interface Appointment {
-  id: string;
-  customerId: string;
-  customerName: string;
-  type: 'Private Viewing' | 'Virtual Try-on' | 'Atelier Tour';
-  date: string;
-  time: string;
-  city: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  brandId: string;
-}
-
 export interface Invoice {
   id: string;
   orderId: string;
@@ -670,16 +649,5 @@ export interface Transaction {
   status: 'Pending' | 'Completed' | 'Failed';
   timestamp: string;
   invoiceId?: string;
-  brandId: string;
-}
-
-export interface Affiliate {
-  id: string;
-  name: string;
-  tier: 'Silver' | 'Gold' | 'Diamond';
-  referralCode: string;
-  salesGenerated: number;
-  commissionEarned: number;
-  status: 'active' | 'pending';
   brandId: string;
 }

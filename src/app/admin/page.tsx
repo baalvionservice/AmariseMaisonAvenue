@@ -22,7 +22,8 @@ import {
   DollarSign,
   Crown,
   BrainCircuit,
-  Bell
+  Bell,
+  FlaskConical
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,7 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<Globe />} label="SEO Authority" active={false} href="/admin/seo" />
           <AdminNavItem icon={<Mail />} label="Outreach" active={false} href="/admin/messaging" />
           <AdminNavItem icon={<Zap />} label="Automation" active={false} href="/admin/automation" />
+          <AdminNavItem icon={<FlaskConical />} label="QA Automation" active={false} href="/admin/qa" />
           
           <div className="pt-6 pb-2 px-6 text-[8px] font-bold uppercase tracking-widest text-gray-300">Department Hubs</div>
           <AdminNavItem icon={<CreditCard />} label="Finance Hub" active={false} href="/admin/finance" />

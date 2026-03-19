@@ -29,7 +29,8 @@ import {
   ShieldCheck,
   X,
   Store,
-  Briefcase
+  Briefcase,
+  FlaskConical
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,6 +94,7 @@ export default function OperationsAdminPanel() {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <OpsNavItem icon={<ShieldCheck />} label="Compliance" active={false} href="/admin/compliance" />
+          <OpsNavItem icon={<FlaskConical />} label="QA Automation" active={false} href="/admin/qa" />
           <OpsNavItem icon={<Briefcase />} label="Partner Onboarding" active={activeTab === 'onboarding'} onClick={() => setActiveTab('onboarding')} />
           <OpsNavItem icon={<RotateCcw />} label="Approval Queue" active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} />
           <OpsNavItem icon={<Package />} label="Ateliers Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
