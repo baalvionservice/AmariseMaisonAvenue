@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -8,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Heart, 
   ChevronRight, 
-  ChevronUp,
+  ChevronUp, 
   ChevronDown,
   Info, 
   Plus,
@@ -31,7 +30,7 @@ import Image from 'next/image';
 
 /**
  * ProductDetailPage: High-Fidelity Madison Avenue Couture Archetype.
- * Replicates the 3-column layout: Thumbnails, Main Gallery, and Detailed Curation.
+ * Features advanced JSON-LD for Search Authority and optimized Core Web Vitals.
  */
 export default function ProductPage() {
   const { id, country } = useParams();
@@ -48,6 +47,36 @@ export default function ProductPage() {
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
+      {/* SEO Schema: Product Rich Snippet */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.imageUrl,
+            "description": product.specialNotes || product.name,
+            "brand": {
+              "@type": "Brand",
+              "name": "AMARISÉ MAISON AVENUE"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`,
+              "priceCurrency": "USD",
+              "price": product.basePrice,
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating,
+              "reviewCount": product.reviewsCount
+            }
+          })
+        }}
+      />
+
       {/* Breadcrumbs */}
       <nav className="container mx-auto px-12 pt-8 pb-4 max-w-[1600px]">
         <div className="flex items-center space-x-2 text-[11px] font-normal text-gray-500 uppercase tracking-wide">
@@ -64,19 +93,19 @@ export default function ProductPage() {
           
           {/* Column 1: Vertical Thumbnails (Archival Style) */}
           <div className="hidden lg:flex flex-col space-y-4 w-20 shrink-0">
-            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors">
+            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors" aria-label="Scroll Thumbnails Up">
               <ChevronUp className="w-5 h-5" />
             </button>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="aspect-square bg-white border border-gray-100 p-1 cursor-pointer hover:border-black transition-all">
                   <div className="relative w-full h-full bg-[#f8f8f8]">
-                    <Image src={product.imageUrl} alt={`View ${i}`} fill className="object-contain" />
+                    <Image src={product.imageUrl} alt={`View ${i} of ${product.name}`} fill className="object-contain" sizes="80px" />
                   </div>
                 </div>
               ))}
             </div>
-            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors">
+            <button className="flex justify-center p-2 text-gray-300 hover:text-black transition-colors" aria-label="Scroll Thumbnails Down">
               <ChevronDown className="w-5 h-5" />
             </button>
           </div>
@@ -84,7 +113,7 @@ export default function ProductPage() {
           {/* Column 2: Main Gallery & Verification */}
           <div className="flex-1 space-y-12">
             <div className="relative aspect-[4/5] bg-white border border-gray-50 group shadow-sm">
-              <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-12" priority />
+              <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-12" priority fetchPriority="high" />
               <div className="absolute top-8 left-8">
                 <Button variant="outline" className="h-9 px-6 rounded-none border-gray-900 bg-white text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-black hover:text-white transition-all">
                   SEE SIZE
@@ -215,7 +244,7 @@ export default function ProductPage() {
 
             {/* Footer Interaction Bar */}
             <footer className="pt-10 flex items-center justify-between">
-              <button className="flex items-center space-x-3 text-[11px] font-medium text-gray-900 group">
+              <button className="flex items-center space-x-3 text-[11px] font-medium text-gray-900 group" aria-label="Ask an expert about this product">
                 <HelpCircle className="w-4 h-4 text-gray-300 group-hover:text-black transition-colors" />
                 <span className="underline underline-offset-4 decoration-gray-200">Have Questions? Ask An Expert</span>
               </button>
