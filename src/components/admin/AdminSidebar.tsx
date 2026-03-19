@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -16,101 +15,83 @@ import {
   ShieldAlert, 
   ShieldCheck, 
   FlaskConical,
-  ChevronDown,
   ChevronRight,
   LogOut,
-  Settings,
-  CircleHelp
+  Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAppStore } from '@/lib/store';
 
 /**
- * AdminSidebar: Grouped Enterprise Navigation
- * Categorizes 11 specialized terminals into logical business units.
+ * AdminSidebar: Minimal Dark Navigation
+ * Redesigned for high-ticket curatorial oversight.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
-  const { currentUser } = useAppStore();
 
   const menuGroups = [
     {
-      title: "Dashboard",
+      title: "Tactical",
       items: [
-        { icon: <LayoutDashboard />, label: "Command Center", href: "/admin" },
+        { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
       ]
     },
     {
-      title: "Products",
+      title: "Inventory",
       items: [
-        { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
+        { icon: <Package />, label: "Registry", href: "/admin/content" },
         { icon: <Zap />, label: "AI Autopilot", href: "/admin/ai-dashboard" },
       ]
     },
     {
-      title: "Sales",
+      title: "Acquisition",
       items: [
-        { icon: <Target />, label: "Sales CRM", href: "/admin/sales" },
+        { icon: <Target />, label: "CRM", href: "/admin/sales" },
+        { icon: <CreditCard />, label: "Treasury", href: "/admin/finance" },
       ]
     },
     {
-      title: "Operations",
+      title: "Infrastructure",
       items: [
-        { icon: <Truck />, label: "Operations Hub", href: "/admin/operations" },
-        { icon: <CreditCard />, label: "Finance Hub", href: "/admin/finance" },
-      ]
-    },
-    {
-      title: "Growth",
-      items: [
-        { icon: <Search />, label: "SEO Authority", href: "/admin/seo" },
-      ]
-    },
-    {
-      title: "System",
-      items: [
-        { icon: <ShieldAlert />, label: "Error Matrix", href: "/admin/errors" },
-        { icon: <ShieldCheck />, label: "Compliance Hub", href: "/admin/compliance" },
-        { icon: <FlaskConical />, label: "QA Terminal", href: "/admin/qa" },
+        { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
+        { icon: <ShieldCheck />, label: "Audit", href: "/admin/compliance" },
       ]
     }
   ];
 
   return (
-    <aside className="w-72 bg-[#132F3F] text-slate-300 flex flex-col shadow-2xl z-50">
-      {/* Brand Identity */}
-      <div className="p-8 border-b border-white/5">
+    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50">
+      {/* Brand Signature */}
+      <div className="p-10 border-b border-white/5">
         <Link href="/admin">
-          <div className="font-headline text-2xl font-bold tracking-tighter text-white flex items-center group">
-            AMARISÉ <span className="text-teal-400 text-[10px] font-bold tracking-[0.3em] ml-2 opacity-80 group-hover:opacity-100 transition-opacity">CORE</span>
+          <div className="font-headline text-3xl font-bold tracking-tighter text-white flex items-center group">
+            AMARISÉ <span className="text-blue-500 text-[10px] font-bold tracking-[0.4em] ml-2 opacity-60">CORE</span>
           </div>
         </Link>
-        <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-2">Maison OS v5.2</p>
       </div>
 
-      {/* Grouped Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4 py-6 space-y-8 custom-scrollbar">
+      {/* Navigation Matrix */}
+      <nav className="flex-1 overflow-y-auto p-6 py-10 space-y-12 custom-scrollbar">
         {menuGroups.map((group) => (
-          <div key={group.title} className="space-y-2">
-            <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{group.title}</h4>
+          <div key={group.title} className="space-y-4">
+            <h4 className="px-4 text-[9px] font-bold uppercase tracking-[0.3em] text-white/20">{group.title}</h4>
             <div className="space-y-1">
               {group.items.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <button className={cn(
-                    "w-full flex items-center space-x-3 px-4 py-3 rounded-md transition-all duration-300 text-sm font-medium group",
+                    "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-xs group",
                     pathname === item.href 
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20" 
-                      : "hover:bg-white/5 hover:text-white"
+                      ? "bg-white/5 text-white border-l-2 border-blue-500" 
+                      : "text-white/40 hover:text-white hover:bg-white/5"
                   )}>
                     <span className={cn(
-                      "transition-transform group-hover:scale-110",
-                      pathname === item.href ? "text-white" : "text-teal-500/60 group-hover:text-teal-400"
+                      "transition-transform duration-500 group-hover:scale-110",
+                      pathname === item.href ? "text-blue-500" : "text-white/20 group-hover:text-white/60"
                     )}>
-                      {React.cloneElement(item.icon as React.ReactElement, { size: 18 })}
+                      {React.cloneElement(item.icon as React.ReactElement, { size: 16 })}
                     </span>
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {pathname === item.href && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                    <span className="flex-1 text-left tracking-widest uppercase">{item.label}</span>
+                    {pathname === item.href && <ChevronRight className="w-3 h-3 text-blue-500" />}
                   </button>
                 </Link>
               ))}
@@ -119,16 +100,16 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      {/* Sidebar Footer */}
-      <div className="p-4 border-t border-white/5 space-y-2">
-        <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium hover:bg-white/5 transition-colors text-slate-400">
-          <Settings size={18} />
-          <span>Settings</span>
+      {/* Terminal Footer */}
+      <div className="p-6 border-t border-white/5 space-y-2">
+        <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors">
+          <Settings size={16} />
+          <span>Config</span>
         </button>
         <Link href="/us">
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium hover:bg-red-500/10 text-red-400 transition-colors">
-            <LogOut size={18} />
-            <span>Exit Admin</span>
+          <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors">
+            <LogOut size={16} />
+            <span>Exit Node</span>
           </button>
         </Link>
       </div>
