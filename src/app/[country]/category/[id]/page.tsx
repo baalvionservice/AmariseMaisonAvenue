@@ -112,6 +112,13 @@ export default function CategoryPage() {
     { name: 'Extra Large', count: 8 },
   ];
 
+  // Showroom Registry from reference image
+  const showrooms = [
+    { name: 'Both Showrooms - NYC & Palm Beach', count: 1 },
+    { name: 'New York City', count: 64 },
+    { name: 'Palm Beach', count: 41 },
+  ];
+
   // Archival Birkin Sizes for the visual nav
   const birkinSizes = [
     { name: 'Birkin 25CM', id: '25cm' },
@@ -168,7 +175,7 @@ export default function CategoryPage() {
               </button>
             </div>
 
-            <Accordion type="multiple" defaultValue={['COLOR', 'CONDITION', 'HARDWARE', 'SIZE', 'PRICE']} className="w-full">
+            <Accordion type="multiple" defaultValue={['COLOR', 'CONDITION', 'HARDWARE', 'SIZE', 'PRICE', 'SHOWROOM']} className="w-full">
               <AccordionItem value="COLOR" className="border-b border-gray-100 py-2">
                 <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
                   COLOR
@@ -292,8 +299,15 @@ export default function CategoryPage() {
                   SHOWROOM
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-6">
-                  <div className="space-y-3 pl-2">
-                    <p className="text-xs text-gray-400 italic">Curating options...</p>
+                  <div className="space-y-4 pl-1">
+                    {showrooms.map((item) => (
+                      <div key={item.name} className="flex items-center space-x-4 group cursor-pointer">
+                        <Checkbox className="rounded-none border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                        <span className="text-xs font-light text-gray-700 tracking-wide flex-1">
+                          {item.name} <span className="text-gray-400 ml-1">({item.count})</span>
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </AccordionContent>
               </AccordionItem>
