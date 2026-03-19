@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -50,13 +51,14 @@ export default function HomePage() {
   return (
     <div className="space-y-0 bg-background min-h-screen pb-40 animate-fade-in">
       {/* Hero: Institutional Authority */}
-      <section className="relative h-[90vh] w-full flex items-end overflow-hidden">
+      <section className="relative h-[90vh] w-full flex items-end overflow-hidden" aria-label="Heritage Registry Hero">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
-          alt="Maison Amarisé Heritage Auction"
+          alt="Maison Amarisé Heritage Auction - Elite Birkin Collection"
           fill
           className="object-cover animate-slow-zoom"
           priority
+          fetchPriority="high"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -75,7 +77,7 @@ export default function HomePage() {
             </p>
             <div className="pt-6">
               <Link href={`/${countryCode}/buying-guide`}>
-                <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all shadow-2xl uppercase">
+                <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all shadow-2xl uppercase" aria-label="Enter the Heritage Registry">
                   ENTER THE REGISTRY
                 </Button>
               </Link>
@@ -99,7 +101,7 @@ export default function HomePage() {
           <div className="lg:w-1/2 relative aspect-[4/5] w-full overflow-hidden shadow-luxury group">
             <Image 
               src="https://picsum.photos/seed/amarise-mastery/1200/1500" 
-              alt="Maison Mastery" 
+              alt="Artisanal Mastery at Maison Amarisé" 
               fill 
               className="object-cover transition-transform duration-[3s] group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -154,7 +156,7 @@ export default function HomePage() {
           <div className="absolute right-0 top-0 w-2/3 h-full overflow-hidden">
             <Image 
               src="https://picsum.photos/seed/amarise-pause/1920/1080" 
-              alt="Atelier Silence" 
+              alt="Atelier Silence - Minimalist Architecture" 
               fill 
               className="object-cover opacity-40 grayscale"
               sizes="66vw"
@@ -163,7 +165,7 @@ export default function HomePage() {
           <div className="container mx-auto px-12 relative z-10 max-w-[1600px]">
             <div className="max-w-2xl space-y-8">
               <h2 className="text-6xl md:text-8xl font-headline font-medium italic text-black leading-none">The Luxury <br /> of Silence</h2>
-              <p className="text-lg text-gray-600 font-light italic max-w-md">
+              <p className="text-lg text-gray-600 font-light italic max-md">
                 Refining the intervals where craftsmanship transforms into a global institutional legacy.
               </p>
             </div>
@@ -179,7 +181,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {COLLECTIONS.slice(0, 3).map((col) => (
-              <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]">
+              <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]" aria-label={`Explore ${col.name} Archive`}>
                 <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-all duration-[2s] group-hover:scale-105 group-hover:bg-ivory">
                   {col.name} Archive
                 </div>
@@ -208,7 +210,7 @@ export default function HomePage() {
                <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">Curatorial Verification Required for {currentCountry.name} Market</p>
             </div>
             <Link href={`/${countryCode}/wishlist`}>
-              <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors">
+              <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors" aria-label="View Personal Registry">
                 View Personal Registry <ArrowRight className="ml-2 w-3 h-3" />
               </Button>
             </Link>
@@ -234,7 +236,7 @@ export default function HomePage() {
             </h3>
             <div className="w-16 h-px bg-secondary" />
             <Link href={`/${countryCode}/appointments`}>
-               <Button variant="outline" className="border-black h-16 px-16 rounded-none text-[10px] font-bold tracking-[0.4em] uppercase hover:bg-black hover:text-white transition-all">
+               <Button variant="outline" className="border-black h-16 px-16 rounded-none text-[10px] font-bold tracking-[0.4em] uppercase hover:bg-black hover:text-white transition-all" aria-label="Request Private Appointment">
                  Request Private Appointment
                </Button>
             </Link>
@@ -253,16 +255,18 @@ export default function HomePage() {
                   Join our verified collector network for private acquisition invitations and digital previews of the Maison archives.
                 </p>
              </div>
-             <div className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors">
+             <form className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors" aria-label="Institutional Registry Signup">
                 <input 
                   type="email" 
                   placeholder="ACQUISITION EMAIL" 
                   className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
+                  required
+                  aria-label="Collector Email Address"
                 />
-                <button className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
+                <button type="submit" className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
                   SUBMIT
                 </button>
-             </div>
+             </form>
              <p className="text-[8px] text-gray-300 uppercase tracking-[0.4em] font-medium">
                Audited compliance with the Global Heritage Responsibility Charter.
              </p>
@@ -275,7 +279,7 @@ export default function HomePage() {
 
 function DepartmentCard({ icon, title, desc, href }: { icon: React.ReactNode, title: string, desc: string, href: string }) {
   return (
-    <Link href={href} className="group p-12 bg-white border border-gray-50 hover:border-gray-200 hover:shadow-luxury transition-all duration-700 text-center space-y-8">
+    <Link href={href} className="group p-12 bg-white border border-gray-50 hover:border-gray-200 hover:shadow-luxury transition-all duration-700 text-center space-y-8" aria-label={`Visit ${title} Department`}>
       <div className="inline-flex items-center justify-center w-14 h-14 bg-[#fcfcfc] border border-gray-100 rounded-full text-gray-400 group-hover:bg-secondary group-hover:text-white group-hover:border-secondary transition-all duration-500">
         {icon}
       </div>

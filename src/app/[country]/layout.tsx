@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -20,7 +21,7 @@ export default function CountryLayout({
     <>
       <MaisonPopup />
       <Header />
-      <main className="min-h-screen pt-[148px] animate-fade-in relative bg-white">
+      <main id="main-content" className="min-h-screen pt-[148px] animate-fade-in relative bg-white">
         {children}
       </main>
 
@@ -39,6 +40,7 @@ export default function CountryLayout({
               type="email" 
               placeholder="COLLECTOR EMAIL" 
               className="flex-1 h-full px-5 text-[10px] font-bold tracking-widest text-gray-600 outline-none placeholder:text-gray-300 uppercase"
+              aria-label="Institutional Email Signup"
             />
             <button className="h-full px-8 text-[10px] font-bold tracking-[0.3em] uppercase text-black hover:text-plum transition-colors border-l border-gray-100">
               REGISTER
@@ -110,10 +112,10 @@ export default function CountryLayout({
                 <div className="w-full h-px bg-black/10" />
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black">Identity</h4>
                 <div className="flex space-x-5 text-black items-center">
-                  <Link href="#" className="hover:opacity-60 transition-opacity"><Facebook className="w-4 h-4 fill-current" /></Link>
-                  <Link href="#" className="hover:opacity-60 transition-opacity"><Twitter className="w-4 h-4 fill-current" /></Link>
-                  <Link href="#" className="hover:opacity-60 transition-opacity"><Instagram className="w-4 h-4" /></Link>
-                  <Link href="#" className="hover:opacity-60 transition-opacity"><Youtube className="w-4 h-4" /></Link>
+                  <Link href="#" className="hover:opacity-60 transition-opacity" aria-label="Facebook"><Facebook className="w-4 h-4 fill-current" /></Link>
+                  <Link href="#" className="hover:opacity-60 transition-opacity" aria-label="Twitter"><Twitter className="w-4 h-4 fill-current" /></Link>
+                  <Link href="#" className="hover:opacity-60 transition-opacity" aria-label="Instagram"><Instagram className="w-4 h-4" /></Link>
+                  <Link href="#" className="hover:opacity-60 transition-opacity" aria-label="Youtube"><Youtube className="w-4 h-4" /></Link>
                 </div>
               </div>
 
@@ -129,7 +131,7 @@ export default function CountryLayout({
             </div>
           </div>
 
-          <div className="pt-12 border-t border-gray-100 flex flex-col md:row justify-between items-center text-[9px] text-gray-400 tracking-[0.4em] uppercase font-bold">
+          <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-[9px] text-gray-400 tracking-[0.4em] uppercase font-bold">
             <p>© 2024 AMARISÉ MAISON AVENUE | Institutional Acquisition House</p>
             <div className="flex space-x-10 mt-6 md:mt-0">
               <Link href="#" className="hover:text-black transition-colors">Privacy Charter</Link>
@@ -140,9 +142,9 @@ export default function CountryLayout({
         </div>
       </footer>
 
-      {/* Specialist Floating Trigger */}
-      <div className="fixed bottom-8 left-8 z-[60]">
-        <button className="flex items-center space-x-4 bg-black text-white px-6 py-3 rounded-none shadow-2xl border border-white/10 hover:bg-secondary hover:text-black transition-all group">
+      {/* Specialist Floating Trigger - Hidden on very small screens to avoid obstruction */}
+      <div className="fixed bottom-24 left-8 md:bottom-8 z-[60] hidden xs:block">
+        <button className="flex items-center space-x-4 bg-black text-white px-6 py-3 rounded-none shadow-2xl border border-white/10 hover:bg-secondary hover:text-black transition-all group min-h-[44px]" aria-label="Speak with a Maison Curator">
           <Globe className="w-4 h-4 text-secondary group-hover:text-black" />
           <span className="text-[10px] font-bold tracking-[0.4em] uppercase">
             SPEAK WITH A CURATOR
