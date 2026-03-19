@@ -29,9 +29,10 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
+import { NotificationFeed } from '@/components/admin/NotificationFeed';
 
 export default function SuperAdminPanel() {
-  const { privateInquiries, scopedNotifications, markNotificationRead } = useAppStore();
+  const { privateInquiries, scopedNotifications } = useAppStore();
 
   const isSuperAdmin = true; 
 
@@ -48,6 +49,7 @@ export default function SuperAdminPanel() {
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <AdminNavItem icon={<LayoutDashboard />} label="Intelligence" active={true} href="/admin" />
           <AdminNavItem icon={<BrainCircuit />} label="AI Autopilot" active={false} href="/admin/ai-dashboard" />
+          <AdminNavItem icon={<Bell />} label="Institutional Alerts" active={false} href="/admin/notifications" />
           <AdminNavItem icon={<LayoutTemplate />} label="Content (CMS)" active={false} href="/admin/content" />
           <AdminNavItem icon={<Target />} label="Sales (CRM)" active={false} href="/admin/sales" />
           <AdminNavItem icon={<Globe />} label="SEO Authority" active={false} href="/admin/seo" />
@@ -82,42 +84,22 @@ export default function SuperAdminPanel() {
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Platform Intelligence & Unit Economics</p>
           </div>
           <div className="flex items-center space-x-6">
+            <Link href="/admin/notifications" className="relative group">
+               <div className="p-2 bg-ivory border border-border rounded-full hover:border-plum transition-colors">
+                  <Bell className="w-4 h-4 text-plum" />
+               </div>
+               {scopedNotifications.filter(n => !n.read).length > 0 && (
+                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                   {scopedNotifications.filter(n => !n.read).length}
+                 </span>
+               )}
+            </Link>
             <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MC</div>
           </div>
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Notifications Center */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <Bell className="w-4 h-4 text-plum" />
-              <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Institutional Alerts</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {scopedNotifications.slice(0, 3).map(note => (
-                <Card key={note.id} className={cn(
-                  "border-l-4 p-6 bg-white shadow-sm flex flex-col justify-between h-40",
-                  note.type === 'alert' ? "border-l-red-500" : "border-l-green-500"
-                )}>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start">
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">{note.country.toUpperCase()} Market</span>
-                      <span className="text-[8px] text-gray-300">{new Date(note.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <p className="text-xs font-medium leading-relaxed">{note.message}</p>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    className="self-end text-[9px] font-bold uppercase tracking-widest text-plum h-auto p-0"
-                    onClick={() => markNotificationRead(note.id)}
-                  >
-                    Dismiss
-                  </Button>
-                </Card>
-              ))}
-            </div>
-          </div>
-
+          {/* Dashboard Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard icon={<DollarSign />} label="Estimated Rev." value="$1.2M" trend="+12.4%" positive />
             <StatCard icon={<Users />} label="Active Leads" value={privateInquiries.length.toString()} trend="High Value" positive />
@@ -125,37 +107,77 @@ export default function SuperAdminPanel() {
             <StatCard icon={<ActivitySquare />} label="Conv. Rate" value="4.2%" trend="+0.8%" positive />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
-              <CardHeader className="border-b border-border">
-                <CardTitle className="font-headline text-2xl">Maison System Health</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of business modules</CardDescription>
-              </CardHeader>
-              <CardContent className="p-8 space-y-6">
-                <ModuleStatus label="AI Autopilot" status="Active" progress={88} />
-                <ModuleStatus label="Atelier CMS" status="Synchronized" progress={100} />
-                <ModuleStatus label="Acquisition CRM" status="Live" progress={100} />
-                <ModuleStatus label="SEO Authority Matrix" status="Indexing" progress={92} />
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            {/* Primary Action Center */}
+            <div className="lg:col-span-8 space-y-12">
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <CardHeader className="border-b border-border bg-ivory/10">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="font-headline text-2xl">Maison System Health</CardTitle>
+                      <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of business modules</CardDescription>
+                    </div>
+                    <Link href="/admin/notifications">
+                      <Button variant="ghost" className="text-[9px] font-bold uppercase tracking-widest text-plum">View All History</Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8 space-y-6">
+                  <ModuleStatus label="AI Autopilot" status="Active" progress={88} />
+                  <ModuleStatus label="Atelier CMS" status="Synchronized" progress={100} />
+                  <ModuleStatus label="Acquisition CRM" status="Live" progress={100} />
+                  <ModuleStatus label="SEO Authority Matrix" status="Indexing" progress={92} />
+                </CardContent>
+              </Card>
 
-            <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
-              <div className="relative z-10 space-y-6">
-                <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
-                <div className="space-y-4">
-                  <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
-                  </Link>
-                  <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
-                  </Link>
-                  <Link href="/admin/super" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Global Infrastructure</p>
-                  </Link>
-                </div>
+              {/* Quick Jump Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
+                  <div className="relative z-10 space-y-6">
+                    <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
+                    <div className="space-y-4">
+                      <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
+                      </Link>
+                      <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="bg-white border-border shadow-luxury p-10 flex flex-col justify-between">
+                   <div className="space-y-4">
+                      <div className="flex items-center space-x-3 text-plum">
+                         <Building2 className="w-5 h-5" />
+                         <h4 className="text-[10px] font-bold uppercase tracking-widest">Infrastructure Hub</h4>
+                      </div>
+                      <p className="text-xs text-gray-500 font-light italic leading-relaxed">
+                        Manage the global Maison node configuration, regional overrides, and multi-brand expansion strategy.
+                      </p>
+                   </div>
+                   <Link href="/admin/super">
+                      <Button variant="outline" className="w-full rounded-none border-border text-[9px] font-bold uppercase tracking-widest h-12 hover:bg-ivory">
+                        Open Global Matrix
+                      </Button>
+                   </Link>
+                </Card>
               </div>
-            </Card>
+            </div>
+
+            {/* Live Intelligence Sidebar */}
+            <aside className="lg:col-span-4">
+              <Card className="bg-white border-border shadow-luxury h-full flex flex-col">
+                <CardHeader className="border-b border-border bg-ivory/5">
+                  <CardTitle className="font-headline text-xl">Intelligence Pulse</CardTitle>
+                  <CardDescription className="text-[9px] uppercase tracking-widest font-bold">Real-time Maison activity</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 flex-1 overflow-y-auto custom-scrollbar">
+                  <NotificationFeed showTitle={false} maxItems={8} />
+                </CardContent>
+              </Card>
+            </aside>
           </div>
         </div>
       </main>
