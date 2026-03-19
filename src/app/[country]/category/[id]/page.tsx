@@ -17,7 +17,8 @@ import {
   Heart,
   Sparkles,
   X,
-  Plus
+  Plus,
+  Search as SearchIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -49,6 +50,8 @@ export default function CategoryPage() {
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 225000]);
+  const [selectedSub, setSelectedSub] = useState<string | null>(null);
+  
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'handbags': true,
     'curations': false,
@@ -143,11 +146,18 @@ export default function CategoryPage() {
       imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Rose_Sakura_Clemence_Rose_Gold_Hardware_1.jpg?v=1691512345&width=1000'
     },
     {
-      id: 'birkin-white-30',
-      name: 'Pre-owned Hermès Birkin 30 White Epsom Palladium Hardware',
-      price: 15218.71,
-      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400'
+      id: 'birkin-white-25-swift',
+      name: 'Hermès Birkin 25 New White Swift Palladium Hardware',
+      price: 27393.69,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400',
+      isNew: true
     }
+  ];
+
+  const judySuggestions = [
+    "How does Beton Matte Alligator compare?",
+    "Which Birkin has the most unique leather?",
+    "What's special about the Special Order?"
   ];
 
   return (
@@ -163,7 +173,7 @@ export default function CategoryPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto px-8 py-4 relative custom-scrollbar">
-            {/* Ask Judy Floating Button - Positioned exactly as reference */}
+            {/* Ask Judy Floating Button */}
             <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[60]">
               <button className="bg-[#262626] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-transform hover:scale-105 active:scale-95">
                 <p className="flex flex-col items-center">
@@ -349,11 +359,11 @@ export default function CategoryPage() {
                         <SidebarSubHeader label="Birkin Bags" hasSub isOpen={openSections['birkin']} onClick={() => toggleSection('birkin')} />
                         {openSections['birkin'] && (
                           <ul className="pl-4 space-y-2 py-1">
-                            <SidebarLink label="Birkin 25CM" />
-                            <SidebarLink label="Birkin 30CM" />
-                            <SidebarLink label="Birkin 35CM" />
-                            <SidebarLink label="Birkin 40+CM" />
-                            <SidebarLink label="Shoulder Birkins" />
+                            <SidebarLink label="Birkin 25CM" onClick={() => setSelectedSub('25cm')} active={selectedSub === '25cm'} />
+                            <SidebarLink label="Birkin 30CM" onClick={() => setSelectedSub('30cm')} active={selectedSub === '30cm'} />
+                            <SidebarLink label="Birkin 35CM" onClick={() => setSelectedSub('35cm')} active={selectedSub === '35cm'} />
+                            <SidebarLink label="Birkin 40+CM" onClick={() => setSelectedSub('40cm')} active={selectedSub === '40cm'} />
+                            <SidebarLink label="Shoulder Birkins" onClick={() => setSelectedSub('shoulder')} active={selectedSub === 'shoulder'} />
                           </ul>
                         )}
                       </div>
@@ -413,7 +423,7 @@ export default function CategoryPage() {
           <main className="flex-1 space-y-12">
             <header className="space-y-10">
               <h1 className="text-3xl font-headline font-medium text-black">
-                {id === 'hermes' ? 'Hermès Birkin Bags' : `${category.name} Archives`}
+                {selectedSub === '25cm' ? 'Hermès Birkin 25cm' : (id === 'hermes' ? 'Hermès Birkin Bags' : `${category.name} Archives`)}
               </h1>
 
               {/* 4. Visual "Shop By Size" Matrix */}
@@ -421,9 +431,12 @@ export default function CategoryPage() {
                 <span className="text-[10px] font-bold tracking-[0.1em] uppercase text-gray-400">SHOP BY SIZE:</span>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {birkinSizes.map((size) => (
-                    <div key={size.id} className="group cursor-pointer text-center space-y-4">
-                      <div className="relative aspect-[4/5] bg-[#f8f8f8] flex items-center justify-center p-6 border border-transparent group-hover:border-gray-200 transition-all">
-                        <div className="relative w-full h-full grayscale-[0.5] group-hover:grayscale-0 transition-all">
+                    <div key={size.id} onClick={() => setSelectedSub(size.id)} className="group cursor-pointer text-center space-y-4">
+                      <div className={cn(
+                        "relative aspect-[4/5] bg-[#f8f8f8] flex items-center justify-center p-6 border transition-all",
+                        selectedSub === size.id ? "border-black shadow-md" : "border-transparent group-hover:border-gray-200"
+                      )}>
+                        <div className={cn("relative w-full h-full grayscale-[0.5] group-hover:grayscale-0 transition-all", selectedSub === size.id && "grayscale-0")}>
                            <Image 
                             src="https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400" 
                             alt={size.name} 
@@ -432,7 +445,7 @@ export default function CategoryPage() {
                            />
                         </div>
                       </div>
-                      <span className="text-[11px] font-light text-gray-500 uppercase tracking-widest block">{size.name}</span>
+                      <span className={cn("text-[11px] font-light text-gray-500 uppercase tracking-widest block", selectedSub === size.id && "text-black font-bold")}>{size.name}</span>
                     </div>
                   ))}
                 </div>
@@ -440,8 +453,8 @@ export default function CategoryPage() {
 
               {/* 5. Controls Matrix */}
               <div className="flex items-center justify-between py-4 bg-[#f8f8f8] px-6">
-                <div className="text-[11px] font-medium text-gray-400">
-                  524 products
+                <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">
+                  {selectedSub === '25cm' ? '150 products' : '524 products'}
                 </div>
                 <div className="flex items-center space-x-10">
                   <button 
@@ -466,16 +479,23 @@ export default function CategoryPage() {
 
             {/* 6. High-Fidelity Product Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-24">
-              {birkinProducts.map(product => (
+              {(selectedSub === '25cm' ? birkinProducts : birkinProducts).map(product => (
                 <div key={product.id} className="group cursor-pointer">
-                  <div className="relative aspect-[4/5] bg-white mb-8 overflow-hidden flex items-center justify-center border border-gray-50">
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-10 transition-transform duration-700 group-hover:scale-105" />
+                  <div className="relative aspect-[4/5] bg-white mb-8 overflow-hidden flex items-center justify-center border border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-8 transition-transform duration-700 group-hover:scale-105" />
+                    
+                    {product.isNew && (
+                      <div className="absolute top-4 left-4 bg-[#f2f2f2] px-3 py-1 text-[8px] font-bold uppercase tracking-widest text-gray-600 rounded-full">
+                        NEW ARRIVAL
+                      </div>
+                    )}
+
                     <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors bg-transparent border-none outline-none">
                       <Heart className="w-5 h-5" />
                     </button>
                   </div>
-                  <div className="space-y-3 text-center px-6">
-                    <h3 className="text-[13px] font-light text-gray-800 leading-relaxed uppercase tracking-wide">
+                  <div className="space-y-3 text-center px-4">
+                    <h3 className="text-[12px] font-light text-gray-800 leading-relaxed uppercase tracking-wide px-4">
                       {product.name}
                     </h3>
                     <p className="text-[14px] font-bold text-black tracking-tight">
@@ -486,12 +506,37 @@ export default function CategoryPage() {
               ))}
             </div>
 
-            {/* Shopping Assistant Bar */}
-            <div className="mt-40 pt-12 border-t border-gray-100 flex items-center justify-center">
-              <div className="flex items-center space-x-3 text-gray-900">
-                <span className="font-headline italic text-2xl lowercase tracking-tight">judy</span>
-                <Sparkles className="w-4 h-4 text-gray-300" />
-                <span className="text-[12px] font-medium tracking-tight">Shopping Assistant</span>
+            {/* 7. Judy Shopping Assistant Footer */}
+            <div className="mt-40 pt-20 border-t border-gray-100 flex flex-col items-center space-y-12">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="flex items-center space-x-3 text-gray-900">
+                  <span className="font-headline italic text-4xl lowercase tracking-tight">judy</span>
+                  <Sparkles className="w-5 h-5 text-gray-300" />
+                  <span className="text-[14px] font-medium tracking-[0.1em] uppercase">Shopping Assistant</span>
+                </div>
+                <h2 className="text-xl text-gray-500 font-light italic">
+                  Need help finding <span className="text-gray-900 font-normal">what makes MAC different from other luxury resellers?</span>
+                </h2>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-4 max-w-4xl">
+                {judySuggestions.map((text, i) => (
+                  <button key={i} className="flex items-center space-x-3 bg-[#f8f8f8] hover:bg-[#f2f2f2] px-6 py-3 transition-colors border border-transparent hover:border-gray-200">
+                    <Plus className="w-3.5 h-3.5 text-gray-400" />
+                    <span className="text-xs font-light text-gray-700">{text}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="w-full max-w-3xl relative">
+                <input 
+                  type="text" 
+                  placeholder="What can I help you find?"
+                  className="w-full h-16 bg-white border border-gray-200 pl-8 pr-16 text-sm font-light italic outline-none focus:border-black transition-colors shadow-sm"
+                />
+                <button className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors">
+                  <SearchIcon className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </main>
@@ -529,9 +574,9 @@ function SidebarSubHeader({ label, hasSub, isOpen, onClick }: { label: string, h
   );
 }
 
-function SidebarLink({ label, active, hasSub }: { label: string, active?: boolean, hasSub?: boolean }) {
+function SidebarLink({ label, active, hasSub, onClick }: { label: string, active?: boolean, hasSub?: boolean, onClick?: () => void }) {
   return (
-    <li className="flex items-center justify-between group cursor-pointer list-none py-1.5">
+    <li className="flex items-center justify-between group cursor-pointer list-none py-1.5" onClick={onClick}>
       <span className={cn(
         "text-[13px] font-light transition-colors leading-tight",
         active ? "text-gray-900 font-normal underline" : "text-gray-500 hover:text-black"
