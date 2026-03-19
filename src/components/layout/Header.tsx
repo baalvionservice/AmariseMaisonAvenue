@@ -139,11 +139,26 @@ export const Header = () => {
         subCaption: 'Discover the Beauty of Chanel'
       }
     },
-    { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
+    { 
+      name: 'GOYARD', 
+      href: `/${countryCode}/category/goyard`,
+      mega: true,
+      megaContent: {
+        columns: [
+          {
+            title: 'HANDBAGS',
+            links: ['Saint Louis', 'Saigon', 'Anjou', 'Artois', 'Other', 'All Goyard Bags']
+          }
+        ],
+        image: 'https://picsum.photos/seed/amarise-goyard-saigon/1200/800',
+        caption: 'The Saigon Bag',
+        subCaption: 'Iconic Style'
+      }
+    },
     { name: 'OTHER BRANDS', href: `/${countryCode}/category/all` },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
-    { name: 'PRIVATE ADVISORY', href: '#', services: true },
-    { name: 'THE JOURNAL', href: `/${countryCode}/journal` },
+    { name: 'LIVE SHOP', href: '#', services: true },
+    { name: 'BLOG', href: `/${countryCode}/journal` },
   ];
 
   return (
