@@ -1,9 +1,10 @@
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, Crown } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -20,13 +21,20 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
 export const Header = () => {
+  const [mounted, setMounted] = useState(false);
   const { country } = useParams();
   const router = useRouter();
   const { cart, wishlist } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   
-  const countryCode = (country as string) || 'us';
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Stabilize values during hydration to match server-rendered output
+  // We use 'us' as a stable fallback during the initial hydration pass
+  const countryCode = mounted ? ((country as string) || 'us') : 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const cartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
 
@@ -93,7 +101,7 @@ export const Header = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:opacity-80 transition-all group border-l border-white/10 pl-8">
+              <button className="flex items-center space-x-3 hover:opacity-80 transition-all group border-l border-white/10 pl-8" type="button">
                 <span className="text-sm leading-none grayscale brightness-200">{currentCountry.flag}</span>
                 <span className="font-bold tracking-widest text-[10px] text-white uppercase">{currentCountry.name}</span>
               </button>
@@ -137,14 +145,14 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center space-x-10">
-          <button className="text-gray-400 hover:text-black transition-colors group relative flex items-center">
+          <button className="text-gray-400 hover:text-black transition-colors group relative flex items-center" type="button">
             <Search className="w-5 h-5 stroke-[1.5px]" />
             <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Intelligence</span>
           </button>
           
           <Link href={`/${countryCode}/wishlist`} className="relative text-gray-400 hover:text-black transition-colors group">
             <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlist.length > 0 && "fill-black text-black")} />
-            {wishlist.length > 0 && (
+            {wishlist.length > 0 && mounted && (
               <span className="absolute -top-3 -right-3 bg-black text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                 {wishlist.length}
               </span>
@@ -153,7 +161,7 @@ export const Header = () => {
 
           <Link href={`/${countryCode}/cart`} className="relative text-gray-400 hover:text-black transition-colors group">
             <ShoppingBag className="w-5 h-5 stroke-[1.5px]" />
-            {cartCount > 0 && (
+            {cartCount > 0 && mounted && (
               <span className="absolute -top-3 -right-3 bg-secondary text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {cartCount}
               </span>
@@ -242,7 +250,7 @@ export const Header = () => {
 
       {/* Mobile Trigger */}
       <div className="lg:hidden h-16 bg-white flex items-center px-12 justify-between border-b border-gray-100">
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black">
+        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black" type="button">
           {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
         <span className="text-[10px] font-bold uppercase tracking-[0.5em] italic">Maison Menu</span>
