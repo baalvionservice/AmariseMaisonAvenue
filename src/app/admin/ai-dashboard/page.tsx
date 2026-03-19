@@ -25,7 +25,9 @@ import {
   FastForward,
   Plus,
   Coins,
-  Target
+  Target,
+  Database,
+  Cpu
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,7 @@ import { useAI } from '@/hooks/use-ai';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { getAnalytics } from '@/lib/analytics/mock-data';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Line, 
   LineChart, 
@@ -45,6 +48,10 @@ import {
 } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * AI Autopilot: High-Frequency Automation Terminal
+ * Tab 1: Performance Overview, Tab 2: Automation Logs, Tab 3: Neural Parameters
+ */
 export default function AIDashboard() {
   const { modules, logs, suggestions, jobs, runJob, runSequence, approveSuggestion, rejectSuggestion } = useAI();
   const { workflows, runWorkflowTask, currentUser } = useAppStore();
@@ -58,17 +65,9 @@ export default function AIDashboard() {
   const handleBatchGeneration = () => {
     toast({
       title: "Batch Generation Initiated",
-      description: "AI is currently drafting regional SEO metadata for 1,240 new archive arrivals.",
+      description: "AI is crafting market-specific SEO descriptors for the registry.",
     });
     runSequence('SEO Metadata Cycle', currentUser?.country);
-  };
-
-  const handleRevenueCycle = () => {
-    toast({
-      title: "Revenue Cycle Triggered",
-      description: "Maison Autopilot is executing multi-channel retargeting and trending artifact pushes.",
-    });
-    runSequence('Revenue Generation', currentUser?.country);
   };
 
   if (!stats) return null;
@@ -80,218 +79,180 @@ export default function AIDashboard() {
           <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center space-x-2">
              <Link href="/admin">Dashboard</Link>
              <ChevronRight className="w-2.5 h-2.5" />
-             <span className="text-plum">AI Autopilot</span>
+             <span className="text-plum">Autonomous Operations</span>
           </nav>
-          <h1 className="text-4xl font-headline font-bold italic tracking-tight text-gray-900">AI Autopilot</h1>
-          <p className="text-sm text-gray-500 font-light italic">Autonomous business orchestration & curatorial intelligence.</p>
+          <h1 className="text-4xl font-headline font-bold italic tracking-tight text-gray-900 uppercase">AI Autopilot</h1>
+          <p className="text-sm text-gray-500 font-light italic">Orchestrating high-volume curatorial and business logic.</p>
         </div>
         <div className="flex items-center space-x-4">
-           <Button 
-            className="bg-plum text-white hover:bg-black h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
-            onClick={handleRevenueCycle}
-           >
-             <Coins className="w-3.5 h-3.5 mr-2" /> TRIGGER REVENUE CYCLE
-           </Button>
-           <Button 
-            variant="outline"
-            className="border-border text-gray-900 hover:bg-ivory h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
-            onClick={handleBatchGeneration}
-           >
-             <Plus className="w-3.5 h-3.5 mr-2" /> BATCH SEO GEN
+           <Button className="h-14 px-10 rounded-none bg-plum text-white hover:bg-black transition-all text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl shadow-plum/20" onClick={handleBatchGeneration}>
+             <Zap className="w-4 h-4 mr-3" /> BATCH GENERATE METADATA
            </Button>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         <Card className="bg-white border-border shadow-sm p-8 space-y-4">
-            <div className="flex items-center space-x-3 text-plum">
-               <Target className="w-5 h-5" />
-               <h4 className="text-[10px] font-bold uppercase tracking-widest">Autonomous Targeting</h4>
-            </div>
-            <p className="text-xl font-headline font-bold italic">842 Connoisseurs reached today</p>
-            <p className="text-[10px] text-gray-400 italic">Retargeting cycles executed every 4 hours.</p>
-         </Card>
-         <Card className="bg-white border-border shadow-sm p-8 space-y-4">
-            <div className="flex items-center space-x-3 text-plum">
-               <TrendingUp className="w-5 h-5" />
-               <h4 className="text-[10px] font-bold uppercase tracking-widest">Revenue Pull-through</h4>
-            </div>
-            <p className="text-xl font-headline font-bold italic">$124k Automated Pipeline</p>
-            <p className="text-[10px] text-gray-400 italic">Conversion from AI-suggested follow-ups.</p>
-         </Card>
-         <Card className="bg-white border-border shadow-sm p-8 space-y-4">
-            <div className="flex items-center space-x-3 text-plum">
-               <Search className="w-5 h-5" />
-               <h4 className="text-[10px] font-bold uppercase tracking-widest">Index Velocity</h4>
-            </div>
-            <p className="text-xl font-headline font-bold italic">100% SEO Compliance</p>
-            <p className="text-[10px] text-gray-400 italic">Automatic rich snippet generation active.</p>
-         </Card>
-      </div>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="bg-white border-b border-border h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
+          <TabsTrigger value="overview" className="tab-trigger">Efficiency Overview</TabsTrigger>
+          <TabsTrigger value="logs" className="tab-trigger">Automation Logs</TabsTrigger>
+          <TabsTrigger value="parameters" className="tab-trigger">Neural Parameters</TabsTrigger>
+        </TabsList>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
-          <CardHeader className="border-b border-border flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="font-headline text-2xl">Maison Intelligence Accuracy</CardTitle>
-              <CardDescription className="text-[10px] uppercase tracking-widest">Autopilot learning curve & engagement efficacy</CardDescription>
-            </div>
-            <Button 
-              size="sm" 
-              className="bg-plum text-white hover:bg-black rounded-none text-[9px] font-bold uppercase h-9 px-6"
-              onClick={() => runSequence('Daily Intelligence Cycle', currentUser?.country)}
-            >
-              <FastForward className="w-3.5 h-3.5 mr-2" /> TRIGGER CYCLE
-            </Button>
-          </CardHeader>
-          <CardContent className="p-8">
-            <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stats.aiPerformance}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="month" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{fontSize: 10, fontWeight: 600}}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-black text-white p-3 shadow-2xl border border-white/10">
-                            <p className="text-[8px] font-bold uppercase tracking-widest opacity-60">{payload[0].payload.month}</p>
-                            <p className="text-lg font-headline font-bold italic">{payload[0].value}% Accuracy</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="#7E3F98" 
-                    strokeWidth={3} 
-                    dot={{fill: '#7E3F98', strokeWidth: 2, r: 4}}
-                    activeDot={{r: 6, stroke: '#D4AF37'}}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview" className="space-y-12 animate-fade-in">
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <StatsTile label="Autonomous Accuracy" value="95.2%" trend="Neural Confidence" />
+              <StatsTile label="Requests Processed" value="1.2M" trend="+14.2% Vol" />
+              <StatsTile label="Mean Response" value="142ms" trend="Optimal" />
+           </div>
 
-        <div className="lg:col-span-4 space-y-8">
-           <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden h-full flex flex-col justify-center">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-plum/20 rounded-full blur-3xl" />
-              <div className="relative z-10 space-y-4">
-                <div className="flex items-center space-x-3 text-secondary">
-                  <Zap className="w-5 h-5" />
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest">Global AI Pulse</h4>
-                </div>
-                <div className="space-y-6 pt-4">
-                   {stats.regionalAiPerformance.map(reg => (
-                     <div key={reg.code} className="space-y-2">
-                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
-                           <span className="opacity-60">{reg.country} Hub</span>
-                           <span className="text-secondary">{reg.score}%</span>
-                        </div>
-                        <div className="h-0.5 bg-white/10 w-full overflow-hidden">
-                           <div className="h-full bg-secondary" style={{ width: `${reg.score}%` }} />
-                        </div>
-                     </div>
-                   ))}
-                </div>
-              </div>
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <Card className="lg:col-span-8 bg-white border-border shadow-luxury overflow-hidden">
+                <CardHeader className="border-b border-border">
+                   <CardTitle className="font-headline text-2xl">Learning Trajectory</CardTitle>
+                   <CardDescription className="text-[10px] uppercase tracking-widest">Model alignment efficacy over 30 days</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 h-[300px]">
+                   <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={stats.aiPerformance}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} />
+                        <Tooltip contentStyle={{ borderRadius: '0px', border: '1px solid #eee' }} />
+                        <Line type="monotone" dataKey="score" stroke="#7E3F98" strokeWidth={3} dot={{fill: '#7E3F98'}} />
+                      </LineChart>
+                   </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-4 bg-black text-white p-10 flex flex-col justify-center space-y-10 shadow-2xl relative overflow-hidden">
+                 <div className="absolute -top-10 -right-10 p-12 opacity-10 pointer-events-none"><Cpu className="w-40 h-40" /></div>
+                 <div className="space-y-4">
+                    <h3 className="text-3xl font-headline font-bold italic tracking-tight">System Pulse</h3>
+                    <p className="text-sm font-light italic text-white/60 leading-relaxed">
+                      "Autonomous business orchestration is currently maintaining a high-fidelity sync across all five Maison hubs."
+                    </p>
+                 </div>
+                 <div className="space-y-6 pt-6 border-t border-white/10">
+                    {stats.regionalAiPerformance.map(reg => (
+                      <div key={reg.code} className="space-y-2">
+                         <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-[0.3em]">
+                            <span className="opacity-60">{reg.country} Hub</span>
+                            <span className="text-gold">{reg.score}%</span>
+                         </div>
+                         <div className="h-0.5 bg-white/10 w-full rounded-full overflow-hidden">
+                            <div className="h-full bg-gold" style={{ width: `${reg.score}%` }} />
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </Card>
+           </div>
+        </TabsContent>
+
+        <TabsContent value="logs" className="space-y-8 animate-fade-in">
+           <Card className="bg-white border-border shadow-luxury overflow-hidden">
+              <Table>
+                <TableHeader className="bg-ivory/50">
+                  <TableRow>
+                    <TableHead className="text-[9px] uppercase font-bold pl-8">Protocol</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold">Action</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold">Timestamp</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs.map(log => (
+                    <TableRow key={log.id} className="hover:bg-ivory/30 transition-colors">
+                      <TableCell className="pl-8 font-bold text-[10px] uppercase tracking-widest text-plum">{log.moduleId}</TableCell>
+                      <TableCell className="text-xs font-light italic text-gray-600">"{log.action}"</TableCell>
+                      <TableCell className="text-[9px] text-gray-400 font-mono uppercase">{new Date(log.timestamp).toLocaleTimeString()}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-200 text-green-600 bg-green-50">{log.status}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {logs.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="py-40 text-center opacity-30">
+                         <History className="w-12 h-12 mx-auto mb-4" />
+                         <p className="text-sm font-bold uppercase tracking-widest italic">Neural logs are currently synchronizing.</p>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
            </Card>
-        </div>
-      </div>
+        </TabsContent>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <Card className="lg:col-span-7 bg-white border-border shadow-luxury h-[600px] flex flex-col">
-          <CardHeader className="border-b border-border">
-            <div className="flex items-center space-x-3">
-               <Activity className="w-5 h-5 text-plum" />
-               <CardTitle className="font-headline text-2xl">Intelligence Feed</CardTitle>
-            </div>
-            <CardDescription className="text-[10px] uppercase tracking-widest">Real-time autonomous business orchestration</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto p-0 custom-scrollbar bg-ivory/5">
-            <div className="divide-y divide-border/40">
-              {logs.map(log => (
-                <div key={log.id} className="p-6 flex items-start space-x-6 hover:bg-white transition-colors group">
-                  <div className="p-3 bg-ivory rounded-full border border-border group-hover:bg-plum/5 transition-colors">
-                     {getModuleIcon(log.moduleId)}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                     <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-plum">{log.action}</span>
-                        <span className="text-[8px] text-gray-400 uppercase">{new Date(log.timestamp).toLocaleTimeString()}</span>
-                     </div>
-                     <p className="text-xs text-gray-600 italic font-light">"{log.details}"</p>
-                     <div className="flex items-center space-x-2 pt-2">
-                        <Badge className="bg-green-50 text-green-600 text-[7px] uppercase tracking-tighter border-none">{log.status}</Badge>
-                        <span className="text-[8px] text-gray-300 uppercase tracking-widest">{log.moduleId}</span>
-                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="parameters" className="animate-fade-in space-y-12">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8">
+                 <div className="flex items-center space-x-4 text-plum">
+                    <Settings className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Automation Levels</h3>
+                 </div>
+                 <p className="text-sm text-gray-500 font-light italic leading-relaxed">
+                   Define the degree of autonomous intervention across Maison business logic. `Assisted` requires curatorial oversight before execution.
+                 </p>
+                 <div className="space-y-6 pt-4 border-t border-border">
+                    {modules.map(mod => (
+                      <div key={mod.id} className="flex justify-between items-center">
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900">{mod.name}</span>
+                         <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest px-3 py-1 cursor-pointer hover:bg-black transition-all">
+                            {mod.level}
+                         </Badge>
+                      </div>
+                    ))}
+                 </div>
+              </Card>
 
-        <Card className="lg:col-span-5 bg-white border-border shadow-luxury flex flex-col">
-          <CardHeader className="border-b border-border">
-            <div className="flex items-center space-x-3">
-               <Lightbulb className="w-5 h-5 text-gold" />
-               <CardTitle className="font-headline text-2xl">Specialist Oversight</CardTitle>
-            </div>
-            <CardDescription className="text-[10px] uppercase tracking-widest">AI proposals awaiting curatorial approval</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-            {suggestions.filter(s => s.status === 'pending').map(sug => (
-              <div key={sug.id} className="p-6 bg-ivory/30 border border-border space-y-4 animate-in fade-in slide-in-from-right-4">
-                <div className="flex justify-between items-start">
-                   <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-plum/30 text-plum">{sug.type}</Badge>
-                   <span className="text-[8px] text-gray-400 font-bold">{new Date(sug.timestamp).toLocaleDateString()}</span>
-                </div>
-                <div className="space-y-1">
-                   <h4 className="text-sm font-headline font-bold uppercase italic">{sug.title}</h4>
-                   <p className="text-[11px] text-gray-500 font-light italic leading-relaxed">{sug.description}</p>
-                </div>
-                <div className="flex space-x-3 pt-2">
-                   <Button 
-                    size="sm" 
-                    className="flex-1 h-9 rounded-none bg-black text-white hover:bg-plum text-[9px] font-bold uppercase"
-                    onClick={() => approveSuggestion(sug.id)}
-                   >
-                     APPROVE
-                   </Button>
-                   <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="h-9 rounded-none border-border text-gray-400 text-[9px] font-bold uppercase"
-                    onClick={() => rejectSuggestion(sug.id)}
-                   >
-                     REJECT
-                   </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 border-l-4 border-l-gold">
+                 <div className="flex items-center space-x-4 text-gold">
+                    <Database className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Memory Isolation</h3>
+                 </div>
+                 <p className="text-sm text-gray-500 font-light italic leading-relaxed">
+                   Enforce strict regional hub context for AI memory to prevent data leakage between non-synergistic market hubs.
+                 </p>
+                 <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Cross-Hub Isolation Active</span>
+                    <Switch defaultChecked className="data-[state=checked]:bg-gold" />
+                 </div>
+              </Card>
+           </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
-function getModuleIcon(id: string) {
-  switch (id) {
-    case 'ai-sales': return <MessageSquare className="w-4 h-4" />;
-    case 'ai-content': return <FileText className="w-4 h-4" />;
-    case 'ai-seo': return <Search className="w-4 h-4" />;
-    case 'ai-analytics': return <TrendingUp className="w-4 h-4" />;
-    default: return <Zap className="w-4 h-4" />;
-  }
+function StatsTile({ label, value, trend }: { label: string, value: string, trend: string }) {
+  return (
+    <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all">
+       <div className="flex justify-between items-start">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 group-hover:text-plum transition-colors">{label}</span>
+          <Badge variant="outline" className="text-[8px] uppercase">{trend}</Badge>
+       </div>
+       <div className="text-4xl font-headline font-bold italic text-gray-900">{value}</div>
+    </Card>
+  );
+}
+
+function Table({ children }: { children: React.ReactNode }) {
+  return <table className="w-full text-left text-sm">{children}</table>;
+}
+function TableHeader({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <thead className={cn("border-b border-border", className)}>{children}</thead>;
+}
+function TableBody({ children }: { children: React.ReactNode }) {
+  return <tbody>{children}</tbody>;
+}
+function TableRow({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) {
+  return <tr className={cn("border-b border-border last:border-0", className)} onClick={onClick}>{children}</tr>;
+}
+function TableHead({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <th className={cn("h-12 px-4 align-middle", className)}>{children}</th>;
+}
+function TableCell({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <td className={cn("p-4 align-middle", className)}>{children}</td>;
 }

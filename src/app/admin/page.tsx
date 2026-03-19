@@ -16,7 +16,14 @@ import {
   DollarSign,
   PieChart,
   ActivitySquare,
-  Bell
+  Bell,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  ShieldCheck,
+  Plus,
+  Lock,
+  Package
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +31,7 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { NotificationFeed } from '@/components/admin/NotificationFeed';
 import { getAnalytics } from '@/lib/analytics/mock-data';
+import { Badge } from '@/components/ui/badge';
 import { 
   Pie, 
   PieChart as RechartsPieChart, 
@@ -33,10 +41,18 @@ import {
 } from 'recharts';
 
 /**
- * Command Center: Updated to use global AdminLayout
+ * Command Center: Unified Strategic Dashboard
+ * Focuses on Actions Required and Platform Resilience.
  */
 export default function CommandCenter() {
-  const { privateInquiries, scopedNotifications, currentUser } = useAppStore();
+  const { 
+    privateInquiries, 
+    scopedNotifications, 
+    currentUser, 
+    scopedApprovals, 
+    scopedErrors, 
+    runWorkflowSequence 
+  } = useAppStore();
 
   const stats = useMemo(() => {
     if (!currentUser) return null;
@@ -47,31 +63,55 @@ export default function CommandCenter() {
 
   return (
     <div className="space-y-12 animate-fade-in">
-      <header className="space-y-2">
-        <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center space-x-2">
-           <Link href="/admin">Dashboard</Link>
-           <ChevronRight className="w-2.5 h-2.5" />
-           <span className="text-plum">Command Center</span>
-        </nav>
-        <h1 className="text-4xl font-headline font-bold italic tracking-tight text-gray-900">Command Center</h1>
-        <p className="text-sm text-gray-500 font-light italic">Institutional Yield & Platform Intelligence overview.</p>
+      <header className="flex justify-between items-end">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-headline font-bold italic tracking-tight text-gray-900">Today's Focus</h1>
+          <p className="text-sm text-gray-500 font-light italic">Your institutional queue for {currentUser?.country.toUpperCase()} market hub.</p>
+        </div>
+        <div className="flex items-center space-x-4">
+           <Button variant="outline" className="h-12 px-8 rounded-none border-border text-[9px] font-bold uppercase tracking-widest hover:bg-ivory" asChild>
+              <Link href="/admin/finance">VIEW GLOBAL YIELD</Link>
+           </Button>
+           <Button className="h-12 px-8 rounded-none bg-plum text-white hover:bg-black transition-all text-[9px] font-bold uppercase tracking-widest shadow-xl shadow-plum/10" onClick={() => runWorkflowSequence('Daily Intelligence Cycle', currentUser?.country)}>
+              <Zap className="w-3.5 h-3.5 mr-2" /> TRIGGER DAILY CYCLE
+           </Button>
+        </div>
       </header>
 
-      {/* Stats Matrix */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <StatCard icon={<DollarSign />} label="Estimated Rev." value="$1.2M" trend="+12.4%" positive />
-        <StatCard icon={<Users />} label="Active Leads" value={privateInquiries.length.toString()} trend="High Value" positive />
-        <StatCard icon={<Zap />} label="Registry Health" value="100%" trend="Optimal" positive />
-        <StatCard icon={<ActivitySquare />} label="Conv. Rate" value="4.2%" trend="+0.8%" positive />
+      {/* Strategic Task Matrix */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+         <TaskCard 
+          icon={<Package className="text-plum" />} 
+          label="Registry Audit" 
+          count={scopedApprovals.filter(a => a.status === 'pending').length} 
+          desc="Artifacts awaiting curatorial verification."
+          href="/admin/operations"
+         />
+         <TaskCard 
+          icon={<Users className="text-gold" />} 
+          label="Priority Leads" 
+          count={privateInquiries.filter(i => i.leadTier === 1 && i.status === 'new').length} 
+          desc="Tier 1 connoisseurs requesting dialogue."
+          href="/admin/sales"
+         />
+         <TaskCard 
+          icon={<ShieldCheck className="text-green-500" />} 
+          label="System Resilience" 
+          count={scopedErrors.filter(e => !e.resolved).length} 
+          desc="Anomalies detected in local hub logic."
+          href="/admin/errors"
+          status={scopedErrors.filter(e => !e.resolved).length === 0 ? 'Optimal' : 'Action Required'}
+         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div className="lg:col-span-8 space-y-12">
+          {/* Market Resonance Card */}
           <Card className="bg-white border-border shadow-luxury overflow-hidden">
             <CardHeader className="border-b border-border bg-ivory/10 flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="font-headline text-2xl">Global Market Resonance</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Regional lead distribution</CardDescription>
+                <CardTitle className="font-headline text-2xl">Regional Yield Matrix</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Global lead distribution by market hub</CardDescription>
               </div>
               <PieChart className="w-5 h-5 text-plum" />
             </CardHeader>
@@ -117,7 +157,7 @@ export default function CommandCenter() {
                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#7E3F98', '#D4AF37', '#000000', '#BFA2DB', '#FAF9F6'][idx % 5] }} />
                            <span className="text-xs font-bold uppercase tracking-tighter text-gray-600 group-hover:text-black transition-colors">{lead.country} Hub</span>
                         </div>
-                        <span className="text-xs font-light italic text-gray-400">{((lead.total / stats.leads.reduce((a, b) => a + b.total, 0)) * 100).toFixed(0)}% participation</span>
+                        <span className="text-xs font-light italic text-gray-400">{((lead.total / stats.leads.reduce((a, b) => a + b.total, 0)) * 100).toFixed(0)}% resonance</span>
                      </div>
                    ))}
                 </div>
@@ -125,35 +165,45 @@ export default function CommandCenter() {
             </CardContent>
           </Card>
 
+          {/* Institutional Actions Card */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden">
+            <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden flex flex-col justify-between">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
               <div className="relative z-10 space-y-6">
-                <h3 className="text-3xl font-headline font-bold italic">Quick Access</h3>
+                <h3 className="text-3xl font-headline font-bold italic">Quick Triggers</h3>
                 <div className="space-y-4">
-                  <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left text-white">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
-                  </Link>
-                  <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left text-white">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
-                  </Link>
+                  <QuickActionBtn href="/admin/content" label="Register New Artifact" icon={<Plus />} />
+                  <QuickActionBtn href="/admin/ai-dashboard" label="Execute SEO Cycle" icon={<Zap />} />
+                  <QuickActionBtn href="/admin/sales" label="Review Tier 1 Leads" icon={<Target />} />
                 </div>
               </div>
+              <p className="text-[8px] text-white/30 uppercase tracking-widest mt-8">Institutional Node: SECURE-01</p>
             </Card>
 
-            <Card className="bg-white border-border shadow-luxury p-10 flex flex-col justify-between">
+            <Card className="bg-white border-border shadow-luxury p-10 flex flex-col justify-between border-l-4 border-l-gold">
                <div className="space-y-4">
-                  <div className="flex items-center space-x-3 text-plum">
-                     <Globe className="w-5 h-5" />
-                     <h4 className="text-[10px] font-bold uppercase tracking-widest">Global Matrix</h4>
+                  <div className="flex items-center space-x-3 text-gold">
+                     <AlertTriangle className="w-5 h-5" />
+                     <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-900">System Anomaly Feed</h4>
                   </div>
-                  <p className="text-xs text-gray-500 font-light italic leading-relaxed">
-                    Manage the global node configuration, regional overrides, and multi-brand expansion strategy.
-                  </p>
+                  <div className="space-y-4 pt-4">
+                     {scopedErrors.filter(e => !e.resolved).slice(0, 2).map(err => (
+                       <div key={err.id} className="p-4 bg-red-50 border border-red-100 space-y-1">
+                          <p className="text-[10px] font-bold uppercase text-red-700">{err.type}</p>
+                          <p className="text-[9px] text-red-500 italic line-clamp-1">"{err.message}"</p>
+                       </div>
+                     ))}
+                     {scopedErrors.filter(e => !e.resolved).length === 0 && (
+                       <div className="flex flex-col items-center py-8 opacity-20 space-y-2">
+                          <ShieldCheck className="w-8 h-8" />
+                          <p className="text-[9px] font-bold uppercase tracking-widest">No Active Anomalies</p>
+                       </div>
+                     )}
+                  </div>
                </div>
-               <Link href="/admin/super">
-                  <Button variant="outline" className="w-full rounded-none border-border text-[9px] font-bold uppercase tracking-widest h-12 hover:bg-ivory">
-                    Open Global Matrix
+               <Link href="/admin/errors">
+                  <Button variant="outline" className="w-full rounded-none border-border text-[9px] font-bold uppercase tracking-widest h-12 hover:bg-ivory mt-6">
+                    Open Error Matrix
                   </Button>
                </Link>
             </Card>
@@ -176,21 +226,51 @@ export default function CommandCenter() {
   );
 }
 
-function StatCard({ icon, label, value, trend, positive }: { icon: any, label: string, value: string, trend: string, positive: boolean }) {
+function TaskCard({ icon, label, count, desc, href, status }: { icon: any, label: string, count: number, desc: string, href: string, status?: string }) {
   return (
-    <Card className="bg-white border-border shadow-luxury hover:border-gold transition-colors group">
-      <CardContent className="p-8 space-y-6">
-        <div className="flex justify-between items-start">
-          <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
-          <div className={cn("text-[10px] font-bold tracking-widest uppercase", positive ? "text-gold" : "text-red-500")}>
-            {trend}
+    <Link href={href}>
+      <Card className="bg-white border-border shadow-luxury hover:border-plum hover:shadow-xl transition-all group overflow-hidden relative">
+        {count > 0 && <div className="absolute top-0 left-0 w-full h-1 bg-plum" />}
+        <CardContent className="p-8 space-y-6">
+          <div className="flex justify-between items-start">
+            <div className="p-4 bg-ivory rounded-full group-hover:bg-plum/5 transition-colors">{icon}</div>
+            <Badge variant={count > 0 ? 'default' : 'outline'} className={cn(
+              "text-[9px] uppercase tracking-widest px-3 py-1",
+              count > 0 ? "bg-plum text-white" : "border-gray-100 text-gray-300"
+            )}>
+              {status || (count > 0 ? 'ACTION' : 'CLEARED')}
+            </Badge>
           </div>
+          <div>
+            <div className="flex items-baseline space-x-3">
+               <span className="text-4xl font-headline font-bold italic text-gray-900">{count}</span>
+               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">{label}</span>
+            </div>
+            <p className="text-[11px] text-gray-500 font-light italic mt-3 leading-relaxed">
+              {desc}
+            </p>
+          </div>
+          <div className="pt-4 flex items-center text-[9px] font-bold uppercase tracking-widest text-gray-300 group-hover:text-plum transition-colors">
+             Open Terminal <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+function QuickActionBtn({ href, label, icon }: { href: string, label: string, icon: any }) {
+  return (
+    <Link href={href} className="block w-full">
+      <button className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group">
+        <div className="flex items-center space-x-4">
+           <span className="text-gold opacity-40 group-hover:opacity-100 transition-opacity">
+             {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4" })}
+           </span>
+           <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">{label}</span>
         </div>
-        <div>
-          <div className="text-gray-400 text-[10px] uppercase tracking-[0.4em] font-bold">{label}</div>
-          <div className="text-4xl font-headline font-bold italic mt-2 text-gray-900">{value}</div>
-        </div>
-      </CardContent>
-    </Card>
+        <ChevronRight className="w-3 h-3 text-white/20 group-hover:translate-x-1 transition-all" />
+      </button>
+    </Link>
   );
 }

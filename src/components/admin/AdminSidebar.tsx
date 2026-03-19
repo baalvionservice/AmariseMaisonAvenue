@@ -19,21 +19,25 @@ import {
   ChevronRight,
   ChevronDown,
   RefreshCcw,
-  BookOpen
+  BookOpen,
+  Eye,
+  Settings2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
+import { Switch } from '@/components/ui/switch';
 
 /**
- * AdminSidebar: Categorized Navigation
- * Organizes the 11 panels into coherent blocks.
+ * AdminSidebar: Tiered Navigation Hub
+ * Filters terminals based on Operator Mode (Simple vs. Advanced).
  */
 export function AdminSidebar() {
   const pathname = usePathname();
-  const { currentUser } = useAppStore();
+  const { currentUser, globalSettings, setAdminViewMode } = useAppStore();
 
   const isJunior = currentUser?.role === 'operator';
   const isSuper = currentUser?.role === 'super_admin';
+  const isAdvancedMode = globalSettings.adminViewMode === 'advanced';
 
   return (
     <aside className="w-72 border-r border-border bg-white p-8 flex flex-col space-y-12 shadow-sm z-20 shrink-0">
@@ -43,48 +47,47 @@ export function AdminSidebar() {
             AMARISÉ <span className="text-plum text-xs font-normal tracking-[0.4em] ml-2">CORE</span>
           </div>
         </Link>
-        <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Business OS v5.2.0</p>
+        
+        {/* Operator Mode Toggle */}
+        <div className="flex items-center justify-between p-3 bg-ivory border border-border rounded-sm">
+           <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Advanced Mode</span>
+           <Switch 
+            checked={isAdvancedMode} 
+            onCheckedChange={(val) => setAdminViewMode(val ? 'advanced' : 'simple')}
+            className="data-[state=checked]:bg-plum scale-75" 
+           />
+        </div>
       </div>
       
       <nav className="flex-1 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
-        {/* Block 1: Dashboard */}
+        {/* Block 1: Intelligence (Always Visible) */}
         <NavBlock title="Intelligence">
-          <NavLink icon={<LayoutDashboard />} label="Command Center" href="/admin" active={pathname === '/admin'} />
-          {isSuper && <NavLink icon={<Globe />} label="Global Matrix" href="/admin/super" active={pathname === '/admin/super'} />}
+          <NavLink icon={<LayoutDashboard />} label="Today's Focus" href="/admin" active={pathname === '/admin'} />
+          {isSuper && isAdvancedMode && <NavLink icon={<Globe />} label="Global Matrix" href="/admin/super" active={pathname === '/admin/super'} />}
         </NavBlock>
 
-        {/* Block 2: Products */}
-        <NavBlock title="Acquisition">
-          <NavLink icon={<Package />} label="Atelier CMS" href="/admin/content" active={pathname === '/admin/content'} />
-          <NavLink icon={<Zap />} label="AI Autopilot" href="/admin/ai-dashboard" active={pathname === '/admin/ai-dashboard'} />
+        {/* Block 2: Commerce (Always Visible) */}
+        <NavBlock title="Commerce">
+          <NavLink icon={<Package />} label="Atelier Registry" href="/admin/content" active={pathname === '/admin/content'} />
+          <NavLink icon={<Target />} label="Connoisseur CRM" href="/admin/sales" active={pathname === '/admin/sales'} />
+          {isAdvancedMode && <NavLink icon={<Zap />} label="AI Autopilot" href="/admin/ai-dashboard" active={pathname === '/admin/ai-dashboard'} />}
         </NavBlock>
 
-        {/* Block 3: Sales */}
-        <NavBlock title="Connoisseurs">
-          <NavLink icon={<Target />} label="Sales CRM" href="/admin/sales" active={pathname === '/admin/sales'} />
-        </NavBlock>
-
-        {/* Block 4: Operations & Finance (Hidden for Juniors) */}
-        {!isJunior && (
+        {/* Block 3: Institutional (Advanced Only) */}
+        {isAdvancedMode && !isJunior && (
           <NavBlock title="Institutional">
             <NavLink icon={<Truck />} label="Operations Hub" href="/admin/operations" active={pathname === '/admin/operations'} />
             <NavLink icon={<CreditCard />} label="Finance Hub" href="/admin/finance" active={pathname === '/admin/finance'} />
-          </NavBlock>
-        )}
-
-        {/* Block 5: Growth */}
-        {!isJunior && (
-          <NavBlock title="Authority">
             <NavLink icon={<Search />} label="SEO Authority" href="/admin/seo" active={pathname === '/admin/seo'} />
           </NavBlock>
         )}
 
-        {/* Block 6: Resilience (Hidden for Juniors) */}
-        {!isJunior && (
+        {/* Block 4: System Resilience (Advanced Only) */}
+        {isAdvancedMode && !isJunior && (
           <NavBlock title="Resilience">
             <NavLink icon={<ShieldAlert />} label="Error Matrix" href="/admin/errors" active={pathname === '/admin/errors'} />
             <NavLink icon={<ShieldCheck />} label="Compliance Hub" href="/admin/compliance" active={pathname === '/admin/compliance'} />
-            <NavLink icon={<FlaskConical />} label="QA Terminal" href="/admin/qa" active={pathname === '/admin/qa'} />
+            <NavLink icon={<FlaskConical />} label="QA Laboratory" href="/admin/qa" active={pathname === '/admin/qa'} />
           </NavBlock>
         )}
       </nav>
@@ -114,10 +117,10 @@ function NavLink({ icon, label, href, active }: { icon: any, label: string, href
   return (
     <Link href={href}>
       <button className={cn(
-        "w-full flex items-center space-x-4 px-6 py-3.5 text-[11px] font-bold uppercase tracking-[0.2em] transition-all group rounded-sm",
-        active ? "bg-plum text-white shadow-lg" : "text-gray-400 hover:bg-ivory hover:text-plum"
+        "w-full flex items-center space-x-4 px-6 py-3.5 text-[11px] font-bold uppercase tracking-[0.2em] transition-all group rounded-sm border border-transparent",
+        active ? "bg-plum text-white shadow-xl shadow-plum/10 border-plum/20" : "text-gray-400 hover:bg-ivory hover:text-plum"
       )}>
-        <span className={cn("transition-transform group-hover:scale-110", active ? "text-white" : "text-gold")}>
+        <span className={cn("transition-transform group-hover:scale-110", active ? "text-gold" : "text-gold/40 group-hover:text-gold")}>
           {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4" })}
         </span>
         <span className="truncate">{label}</span>

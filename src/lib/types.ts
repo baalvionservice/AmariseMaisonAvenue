@@ -554,6 +554,8 @@ export interface AuditLog {
   brandId?: string;
 }
 
+export type AdminViewMode = 'simple' | 'advanced';
+
 export interface GlobalSettings {
   theme: {
     primary: string;
@@ -582,6 +584,7 @@ export interface GlobalSettings {
   };
   emergencyMode: boolean;
   isGuideMode: boolean;
+  adminViewMode: AdminViewMode;
 }
 
 export interface VipClient {

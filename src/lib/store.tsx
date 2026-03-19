@@ -55,7 +55,8 @@ import {
   TransactionStatus,
   GlobalSyncSession,
   SyncCategory,
-  StressTest
+  StressTest,
+  AdminViewMode
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -179,6 +180,7 @@ interface AppContextType {
   setActiveBrand: (id: string) => void;
   setCurrentUser: (user: MaisonUser | null) => void;
   setGuideMode: (val: boolean) => void;
+  setAdminViewMode: (val: AdminViewMode) => void;
   
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
@@ -392,7 +394,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
     performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
     emergencyMode: false,
-    isGuideMode: false
+    isGuideMode: false,
+    adminViewMode: 'advanced'
   });
 
   const [isShowcaseMode, setShowcaseMode] = useState(false);
@@ -530,9 +533,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     logAction('Master Product Hub Sync', `${regions.length} Countries`);
   };
 
-  // Safe Global Sync Execution
   const executeSafeSync = (categories: SyncCategory[], targets: CountryCode[]) => {
-    // 1. Create Snapshot for Rollback
     const snapshot: GlobalSyncSession['snapshotBefore'] = {
       products: JSON.parse(JSON.stringify(products)),
       seo: JSON.parse(JSON.stringify(seoRegistry)),
@@ -550,7 +551,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       status: 'applied'
     };
 
-    // 2. Apply Targeted Overrides
     if (categories.includes('products')) {
       setProducts(prev => prev.map(p => 
         p.scope === 'global' ? { ...p, regions: targets, lastSyncedAt: session.timestamp } : p
@@ -563,7 +563,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ));
     }
 
-    // 3. Save to History
     setGlobalSyncHistory(prev => [session, ...prev]);
     logAction(`Executed Safe Global Sync (${categories.join(', ')})`, `Targets: ${targets.join(', ')}`, 'global', 'medium');
   };
@@ -572,7 +571,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const session = globalSyncHistory.find(s => s.id === sessionId);
     if (!session || session.status === 'rolled_back') return;
 
-    // Restore Snapshot
     if (session.categories.includes('products')) setProducts(session.snapshotBefore.products);
     if (session.categories.includes('seo')) setSeoRegistry(session.snapshotBefore.seo);
     if (session.categories.includes('config')) setCountryConfigs(session.snapshotBefore.config);
@@ -591,10 +589,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const idx = prev.findIndex(item => item.id === p.id);
       if (idx > -1) {
         const existing = prev[idx];
-        
-        // Conflict Logic Enforcement
         if (existing.scope === 'global' && existing.conflictStrategy === 'global-priority' && currentUser?.country !== 'GLOBAL') {
-          console.warn("Global Registry Overwrite Prevented by Conflict Strategy");
           return prev;
         }
 
@@ -639,7 +634,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           return {
             ...version.data,
             versionHistory: p.versionHistory,
-            currentVersion: p.currentVersion, // Keep the sequence
+            currentVersion: p.currentVersion,
             lastSyncedAt: new Date().toISOString()
           };
         }
@@ -659,7 +654,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       editingLock: {
         userId: currentUser?.id || 'sys',
         userName: currentUser?.name || 'System',
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 min lock
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
       }
     } : prod));
     return true;
@@ -704,6 +699,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => setCart([]);
   const updateGlobalSettings = (s: GlobalSettings) => setGlobalSettings(s);
   const setGuideMode = (val: boolean) => setGlobalSettings(prev => ({ ...prev, isGuideMode: val }));
+  const setAdminViewMode = (val: AdminViewMode) => setGlobalSettings(prev => ({ ...prev, adminViewMode: val }));
   
   const createInvoice = (inv: Invoice) => {
     setInvoices(prev => [inv, ...prev]);
@@ -846,7 +842,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     setStressTests(prev => [newTest, ...prev]);
 
-    // Simulated Processing Loop
     let count = 0;
     const interval = setInterval(() => {
       const stepSize = Math.ceil(loadSize / 20);
@@ -856,7 +851,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         count = loadSize;
         clearInterval(interval);
         
-        const duration = Math.random() * 2000 + 500; // Simulated duration
+        const duration = Math.random() * 2000 + 500;
         setStressTests(prev => prev.map(t => t.id === testId ? {
           ...t,
           status: 'passed',
@@ -918,7 +913,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
-    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setGuideMode,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setGuideMode, setAdminViewMode,
     upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
