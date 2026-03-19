@@ -8,6 +8,15 @@ import { RegionData } from '@/hooks/use-simulation-data';
 import { cn } from '@/lib/utils';
 
 /**
+ * Institutional Color Palette for Heatmap
+ */
+const HEAT_COLORS = {
+  low: "#3B82F6",    // Authority Blue
+  medium: "#F59E0B", // Focus Amber
+  high: "#10B981"    // Success Emerald
+};
+
+/**
  * Utility: Convert Lat/Lng to Vector3 on a sphere
  */
 function latLngToVector3(lat: number, lng: number, radius: number) {
@@ -20,9 +29,9 @@ function latLngToVector3(lat: number, lng: number, radius: number) {
 }
 
 /**
- * DataArc: Animated curved line between two specific hubs
+ * DataArc: Animated curved line between hubs with moving light particles
  */
-function DataArc({ start, end }: { start: THREE.Vector3, end: THREE.Vector3 }) {
+function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THREE.Vector3, intensity?: number }) {
   const mid = start.clone().lerp(end, 0.5);
   const distance = start.distanceTo(end);
   mid.normalize().multiplyScalar(2 + distance * 0.2);
@@ -31,37 +40,54 @@ function DataArc({ start, end }: { start: THREE.Vector3, end: THREE.Vector3 }) {
   
   useFrame(() => {
     if (lineRef.current) {
-      lineRef.current.dashOffset -= 0.005;
+      // Moves the light particles along the line
+      lineRef.current.dashOffset -= 0.004 * (0.5 + intensity);
     }
   });
 
   return (
-    <QuadraticBezierLine
-      ref={lineRef}
-      start={start}
-      end={end}
-      mid={mid}
-      color="#3B82F6"
-      lineWidth={0.4}
-      transparent
-      opacity={0.2}
-      dashed
-      dashScale={50}
-      dashSize={1}
-      dashOffset={0}
-    />
+    <group>
+      {/* Base Path Line */}
+      <QuadraticBezierLine
+        start={start}
+        end={end}
+        mid={mid}
+        color="#3B82F6"
+        lineWidth={0.2}
+        transparent
+        opacity={0.1}
+      />
+      {/* Animated Light Flow */}
+      <QuadraticBezierLine
+        ref={lineRef}
+        start={start}
+        end={end}
+        mid={mid}
+        color="#60A5FA"
+        lineWidth={0.6}
+        transparent
+        opacity={0.4}
+        dashed
+        dashScale={40}
+        dashSize={0.5}
+        dashOffset={0}
+      />
+    </group>
   );
 }
 
 /**
- * HubPoint: Pulsing geographic marker for key markets
+ * HubPoint: Revenue Heatmap Marker
+ * Coupling size, color, and glow to simulated revenue intensity.
  */
 function HubPoint({ 
   region, 
+  maxRevenue,
   onClick, 
   isSelected 
 }: { 
   region: RegionData, 
+  maxRevenue: number,
   onClick: (id: string) => void,
   isSelected: boolean 
 }) {
@@ -69,25 +95,36 @@ function HubPoint({
   const glowMesh = useRef<THREE.Mesh>(null!);
   const pos = useMemo(() => latLngToVector3(region.lat, region.lng, 2), [region.lat, region.lng]);
 
-  const intensity = useMemo(() => 0.5 + (region.activeUsers / 600), [region.activeUsers]);
+  // Normalize revenue for heatmap (0 to 1)
+  const normalizedHeat = useMemo(() => Math.min(1, region.revenue / (maxRevenue || 1)), [region.revenue, maxRevenue]);
+  
+  // Determine color based on normalized heat
+  const heatColor = useMemo(() => {
+    if (normalizedHeat > 0.7) return HEAT_COLORS.high;
+    if (normalizedHeat > 0.35) return HEAT_COLORS.medium;
+    return HEAT_COLORS.low;
+  }, [normalizedHeat]);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    const pulse = 1 + Math.sin(time * 2.5) * 0.15 * intensity;
-    if (mesh.current) mesh.current.scale.setScalar(pulse);
-    if (glowMesh.current) glowMesh.current.scale.setScalar(pulse * 3);
+    const pulse = 1 + Math.sin(time * 2) * 0.1;
+    const heatScale = 0.8 + normalizedHeat * 0.5;
+    
+    if (mesh.current) mesh.current.scale.setScalar(pulse * heatScale);
+    if (glowMesh.current) glowMesh.current.scale.setScalar(pulse * 3.5 * heatScale);
   });
 
   return (
     <group position={pos}>
       <mesh ref={mesh} onClick={(e) => { e.stopPropagation(); onClick(region.id); }} cursor="pointer">
         <sphereGeometry args={[0.035, 16, 16]} />
-        <meshBasicMaterial color={isSelected ? "#60A5FA" : "#3B82F6"} />
+        <meshBasicMaterial color={isSelected ? "#FFFFFF" : heatColor} />
       </mesh>
-      {/* Dynamic Aura */}
+      
+      {/* Outer Heat Aura */}
       <mesh ref={glowMesh}>
         <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial color="#3B82F6" transparent opacity={0.25 * intensity} />
+        <meshBasicMaterial color={heatColor} transparent opacity={0.2 + normalizedHeat * 0.2} />
       </mesh>
       
       <Html distanceFactor={10}>
@@ -97,14 +134,14 @@ function HubPoint({
               <div className="w-52 bg-[#111113]/95 backdrop-blur-2xl border border-white/10 p-6 shadow-2xl space-y-4">
                 <div className="flex justify-between items-start border-b border-white/5 pb-3">
                   <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">{region.id.toUpperCase()} Hub</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: heatColor }}>{region.id.toUpperCase()} Hub</p>
                     <h4 className="text-sm font-headline font-bold italic text-white leading-none">{region.name}</h4>
                   </div>
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: heatColor }} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[7px] font-bold text-white/30 uppercase tracking-[0.2em]">Live Yield</p>
+                    <p className="text-[7px] font-bold text-white/30 uppercase tracking-[0.2em]">Yield</p>
                     <p className="text-[11px] font-bold text-white">${(region.revenue / 1000).toFixed(1)}k</p>
                   </div>
                   <div className="space-y-1">
@@ -113,7 +150,7 @@ function HubPoint({
                   </div>
                 </div>
               </div>
-              <div className="w-px h-16 bg-gradient-to-b from-blue-500/40 to-transparent mx-auto mt-2" />
+              <div className="w-px h-16 bg-gradient-to-b from-white/20 to-transparent mx-auto mt-2" />
             </div>
           ) : (
             <div className="bg-black/40 backdrop-blur-md px-2 py-1 border border-white/5 -translate-y-8 whitespace-nowrap">
@@ -159,19 +196,25 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
   const groupRef = useRef<THREE.Group>(null!);
 
+  // Find max revenue for normalization
+  const maxRevenue = useMemo(() => 
+    Math.max(...Object.values(regions).map(r => r.revenue), 1), 
+  [regions]);
+
   const arcs = useMemo(() => {
     if (!regions.in || !regions.us || !regions.uk || !regions.ae || !regions.sg) return [];
     
-    // Focused Jurisdictional Arcs
-    const pairs = [
+    // Configurable Flow Pairs
+    const flows = [
       { s: regions.in, e: regions.us },
       { s: regions.uk, e: regions.ae },
       { s: regions.sg, e: regions.in }
     ];
 
-    return pairs.map(p => ({
-      start: latLngToVector3(p.s.lat, p.s.lng, 2),
-      end: latLngToVector3(p.e.lat, p.e.lng, 2)
+    return flows.map(f => ({
+      start: latLngToVector3(f.s.lat, f.s.lng, 2),
+      end: latLngToVector3(f.e.lat, f.e.lng, 2),
+      intensity: (f.s.activeUsers + f.e.activeUsers) / 1000
     }));
   }, [regions]);
 
@@ -193,19 +236,20 @@ function GlobeScene({ regions, onRegionClick }: { regions: Record<string, Region
         <GlobeSphere />
       </Suspense>
 
-      {/* Hub Nodes */}
+      {/* Hub Points with Heatmap logic */}
       {Object.values(regions).map(region => (
         <HubPoint 
           key={region.id} 
           region={region} 
+          maxRevenue={maxRevenue}
           onClick={handleHubClick} 
           isSelected={selectedHub === region.id}
         />
       ))}
 
-      {/* Synchronized Data Arcs */}
+      {/* User Flow Arcs */}
       {arcs.map((arc, idx) => (
-        <DataArc key={idx} start={arc.start} end={arc.end} />
+        <DataArc key={idx} start={arc.start} end={arc.end} intensity={arc.intensity} />
       ))}
     </group>
   );
@@ -237,17 +281,32 @@ export function IntelligenceGlobe({
         />
       </Canvas>
 
-      {/* Focused Network Legend */}
-      <div className="absolute bottom-8 left-10 space-y-3 pointer-events-none">
-        <div className="flex items-center space-x-3 opacity-30">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.8)]" />
-          <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white">Active Maison Hub</span>
+      {/* Institutional Network Legend */}
+      <div className="absolute bottom-8 left-10 space-y-4 pointer-events-none">
+        <div className="space-y-2">
+          <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Revenue Heatmap</p>
+          <LegendItem color={HEAT_COLORS.high} label="Optimal Yield" />
+          <LegendItem color={HEAT_COLORS.medium} label="Strategic Flow" />
+          <LegendItem color={HEAT_COLORS.low} label="Initial Resonance" />
         </div>
-        <div className="flex items-center space-x-3 opacity-30">
-          <div className="w-6 h-px bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0" />
-          <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white">Registry Sync Path</span>
+        
+        <div className="pt-4 border-t border-white/5 space-y-2">
+          <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Active Protocols</p>
+          <div className="flex items-center space-x-3 opacity-30">
+            <div className="w-6 h-px bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0" />
+            <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white">Registry Sync Path</span>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LegendItem({ color, label }: { color: string, label: string }) {
+  return (
+    <div className="flex items-center space-x-3 opacity-60">
+      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
+      <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white">{label}</span>
     </div>
   );
 }
