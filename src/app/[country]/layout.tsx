@@ -53,15 +53,15 @@ export default function CountryLayout({
               <div className="space-y-4 pt-6">
                 <div className="flex items-center space-x-3 text-black group">
                   <Phone className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Phone: <span className="font-normal normal-case ml-2 text-gray-600">+1 (888) 623-2832</span></span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Phone: <span className="font-normal normal-case ml-2 text-gray-600">+91 8951284770</span></span>
                 </div>
                 <div className="flex items-center space-x-3 text-black group">
                   <Mail className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Email: <span className="font-normal normal-case ml-2 text-gray-600">info@madisonavenuecouture.com</span></span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Email: <span className="font-normal normal-case ml-2 text-gray-600">info@amarisemaisonavenue.com</span></span>
                 </div>
                 <div className="flex items-center space-x-3 text-black group">
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Whatsapp: <span className="font-normal normal-case ml-2 text-gray-600">+1 (917) 831-6040</span></span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Whatsapp: <span className="font-normal normal-case ml-2 text-gray-600">+91 8951284770</span></span>
                 </div>
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function CountryLayout({
             <div className="flex items-center space-x-4 mb-4 md:mb-0">
               <span className="font-headline text-lg font-bold text-black tracking-tighter">MC</span>
               <span className="uppercase tracking-[0.1em] text-[9px] border-l border-gray-200 pl-4">
-                © 2025 Madison Avenue Couture. All Rights Reserved. MAC Madison Avenue Couture is a registered Trademark of Madison Avenue Couture Inc.
+                © 2025 Amarisé Maison Avenue. All Rights Reserved.
               </span>
             </div>
             <div className="flex space-x-8 uppercase tracking-widest text-[9px] font-bold">
