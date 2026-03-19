@@ -66,6 +66,15 @@ export interface ProductMedia {
   alt: string;
 }
 
+export interface ArtifactVersion {
+  id: string;
+  version: number;
+  data: any;
+  editedBy: string;
+  timestamp: string;
+  changeSummary: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -95,6 +104,17 @@ export interface Product {
   currentBid?: number;
   auctionEndsAt?: string;
   isSubscriptionOnly?: boolean;
+  // Versioning & Conflict Control
+  versionHistory: ArtifactVersion[];
+  currentVersion: number;
+  conflictStrategy: 'global-priority' | 'regional-priority';
+  lastSyncedAt?: string;
+  lastEditedRegion: CountryCode | 'global';
+  editingLock?: {
+    userId: string;
+    userName: string;
+    expiresAt: string;
+  };
 }
 
 export interface CartItem extends Product {
@@ -154,8 +174,6 @@ export interface BuyingGuide {
   investmentOutlook?: string;
   provenanceChecklist?: string[];
 }
-
-// --- SALES & CRM EXTENSIONS ---
 
 export interface ProductExtended extends Product {
   collectorValue: string;
@@ -230,7 +248,7 @@ export interface SalesScript {
   triggerKeywords?: string[];
   template: string;
   brandId: string;
-  countryCode?: CountryCode; // Specific override
+  countryCode?: CountryCode; 
 }
 
 export interface AutomationRule {
@@ -262,12 +280,10 @@ export interface CMSSection {
   description?: string;
   visible: boolean;
   featured: boolean;
-  contentId?: string; // Links to a specific entity
+  contentId?: string; 
   brandId: string;
   countryCode?: CountryCode;
 }
-
-// --- GLOBAL INFRASTRUCTURE ---
 
 export interface CountryConfig {
   code: CountryCode;
@@ -293,8 +309,6 @@ export interface BrandConfig {
   };
   enabled: boolean;
 }
-
-// --- AI AUTOPILOT SYSTEM ---
 
 export type AIAutomationLevel = 'manual' | 'assisted' | 'auto';
 
@@ -326,8 +340,6 @@ export interface AISuggestion {
   status: 'pending' | 'approved' | 'rejected';
   timestamp: string;
 }
-
-// --- OPERATIONS & WORKFLOW ---
 
 export interface MaisonNotification {
   id: string;
@@ -371,8 +383,6 @@ export interface AnalyticsMetric {
   aiScore: number;
 }
 
-// --- COMPLIANCE & AUDIT ---
-
 export interface AuditLogEntry {
   id: string;
   actorId: string;
@@ -385,8 +395,6 @@ export interface AuditLogEntry {
   severity: 'low' | 'medium' | 'high';
   brandId?: string;
 }
-
-// --- QA & TESTING ---
 
 export interface QALogEntry {
   id: string;
@@ -405,8 +413,6 @@ export interface QATestCase {
   brandId: string;
 }
 
-// --- ERROR HANDLING ---
-
 export interface MaisonError {
   id: string;
   module: 'AI Autopilot' | 'Finance' | 'Onboarding' | 'Content' | 'System' | 'CMS' | 'Sales';
@@ -419,8 +425,6 @@ export interface MaisonError {
   severity: 'low' | 'medium' | 'high';
   brandId?: string;
 }
-
-// --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {
   likes: number;
@@ -463,7 +467,7 @@ export interface AdminAccount {
   lastActive: string;
   avatar?: string;
   twoFactorEnabled: boolean;
-  brandId?: string; // Null if Super Admin
+  brandId?: string; 
 }
 
 export interface Vendor {

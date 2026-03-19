@@ -49,7 +49,8 @@ import {
   AnalyticsMetric,
   AuditLogEntry,
   QATestCase,
-  MaisonError
+  MaisonError,
+  ArtifactVersion
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -81,7 +82,6 @@ import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 import { MOCK_SESSION_USER } from './rbac/mock-session';
 import { MaisonUser } from './rbac/mock-users';
-import { sendEmailMock } from './notifications/mock-engine';
 
 interface AppContextType {
   // --- Global Infrastructure ---
@@ -173,7 +173,10 @@ interface AppContextType {
   
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
-  upsertProduct: (product: Product) => void;
+  upsertProduct: (product: Product, changeSummary?: string) => void;
+  rollbackProductVersion: (productId: string, versionId: string) => void;
+  lockProductForEditing: (productId: string) => boolean;
+  unlockProduct: (productId: string) => void;
   deleteProduct: (id: string) => void;
   upsertCollection: (collection: Collection) => void;
   upsertEditorial: (editorial: Editorial) => void;
@@ -260,7 +263,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     isGlobal: true, 
     scope: 'global', 
     regions: ['us', 'uk', 'ae', 'in', 'sg'],
-    status: 'published' 
+    status: 'published',
+    versionHistory: [],
+    currentVersion: 1,
+    conflictStrategy: 'global-priority',
+    lastEditedRegion: 'global'
   })));
   const [collections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
   const [categories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
@@ -369,7 +376,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
 
-  // --- Scoped Views (Enforcing Jurisdictional Isolation) ---
+  // --- Scoped Views ---
   const scopedProducts = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return products;
     return products.filter(p => p.regions.includes(currentUser.country as any) || p.isGlobal);
@@ -448,7 +455,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       brandId: activeBrandId
     };
     setAuditRegistry(prev => [entry, ...prev]);
-    console.log(`[INSTITUTIONAL AUDIT] ${action} on ${entity} by ${currentUser.name}`);
   };
 
   const logMaisonError = (err: Omit<MaisonError, 'id' | 'timestamp' | 'resolved'>) => {
@@ -456,7 +462,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setMaisonErrors(prev => [error, ...prev]);
     logAction(`Logged System Error: ${err.type}`, err.module, err.country, 'high');
     sendNotification('super_admin', `Critical Error in ${err.module}: ${err.type}`, err.country, 'alert');
-    console.error(`[MAISON ERROR] ${err.module} | ${err.message}`);
   };
 
   const resolveMaisonError = (id: string) => {
@@ -479,35 +484,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const runWorkflowTask = (id: string) => {
     const task = workflows.find(w => w.id === id);
     if (!task) return;
-
     setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'running', lastRun: new Date().toISOString() } : w));
-    
-    // Automation Logic for Batch Jobs
-    if (task.taskName === 'Batch Generate SEO Metadata') {
-      setTimeout(() => {
-        setProducts(prev => prev.map(p => ({ ...p, status: 'verified' })));
-        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete' } : w));
-        logAction('AI Batch Metadata Completion', 'Products Registry');
-      }, 3000);
-      return;
-    }
-
     setTimeout(() => {
-      const failed = Math.random() < 0.05;
-      if (failed) {
-        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'failed' } : w));
-        logMaisonError({
-          module: 'AI Autopilot',
-          type: 'CycleFailure',
-          country: task.country,
-          message: `Cycle "${task.taskName}" failed during execution.`,
-          severity: 'high',
-          brandId: activeBrandId
-        });
-      } else {
-        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
-        logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
-      }
+      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
+      logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
     }, 2000);
   };
 
@@ -519,166 +499,109 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const syncGlobalProducts = (regions: CountryCode[] = ['us', 'uk', 'ae', 'in', 'sg']) => {
-    setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions } : p));
+    setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions, lastSyncedAt: new Date().toISOString() } : p));
     logAction('Master Product Hub Sync', `${regions.length} Countries`);
   };
-
-  const submitApproval = (contentType: ApprovalRequest['contentType'], contentId: string, country = 'global') => {
-    if (!currentUser) return;
-    const req: ApprovalRequest = { id: `a-${Date.now()}`, userId: currentUser.id, userName: currentUser.name, contentType, contentId, country, status: 'pending', timestamp: new Date().toISOString() };
-    setApprovalRequests(prev => [req, ...prev]);
-    logAction(`Submitted ${contentType} for Approval`, contentId, country.toLowerCase());
-  };
-
-  const handleApprovalAction = (requestId: string, approve: boolean, comments?: string) => {
-    setApprovalRequests(prev => prev.map(a => {
-      if (a.id === requestId) {
-        const status = approve ? 'approved' : 'rejected';
-        if (approve && a.contentType === 'listing') {
-          setProducts(prevP => prevP.map(p => p.id === a.contentId ? { ...p, status: 'verified' } : p));
-        }
-        logAction(`${approve ? 'Approved' : 'Rejected'} Submission`, a.contentId, a.country, approve ? 'low' : 'medium');
-        return { ...a, status, comments, approvedBy: currentUser?.name };
-      }
-      return a;
-    }));
-  };
-
-  const registerVendor = (data: Partial<Vendor>) => {
-    const newVendor: Vendor = {
-      id: `vend-${Date.now()}`,
-      name: data.name || 'Anonymous Atelier',
-      category: data.category || 'Luxury Goods',
-      performance: 100,
-      productCount: 0,
-      salesTotal: 0,
-      status: 'pending',
-      payoutSchedule: 'weekly',
-      joinedDate: new Date().toISOString(),
-      kpis: { returnRate: 0, fulfillmentSpeed: 'N/A', rating: 5.0 },
-      brandId: activeBrandId,
-      ...data
-    };
-    setVendors(prev => [...prev, newVendor]);
-    logAction('Partner Atelier Registered', newVendor.name);
-  };
-
-  const approveVendor = (id: string) => {
-    setVendors(prev => prev.map(v => {
-      if (v.id === id) {
-        logAction('Approved Partner Atelier', v.name);
-        return { ...v, status: 'active' };
-      }
-      return v;
-    }));
-  };
-
-  const registerClient = (data: Partial<VipClient>) => {
-    const newClient: VipClient = {
-      id: `vip-${Date.now()}`,
-      name: data.name || 'Discovery Client',
-      email: data.email || '',
-      tier: 'Silver',
-      loyaltyPoints: 0,
-      totalSpend: 0,
-      isSubscriber: false,
-      brandId: activeBrandId,
-      status: 'pending',
-      ...data
-    };
-    setVipClients(prev => [...prev, newClient]);
-    logAction('Connoisseur Registered', newClient.name);
-  };
-
-  const verifyClient = (id: string) => {
-    setVipClients(prev => prev.map(c => {
-      if (c.id === id) {
-        logAction('Verified Connoisseur', c.name);
-        return { ...c, status: 'verified' };
-      }
-      return c;
-    }));
-  };
-
-  const runQATest = (id: string) => {
-    setQaTests(prev => prev.map(t => t.id === id ? { 
-      ...t, 
-      status: 'running', 
-      logs: [{ id: `l-${Date.now()}`, message: 'Test cycle initiated...', timestamp: new Date().toISOString() }] 
-    } : t));
-    
-    setTimeout(() => {
-      const passed = Math.random() > 0.05;
-      setQaTests(prev => prev.map(t => t.id === id ? { 
-        ...t, 
-        status: passed ? 'passed' : 'failed', 
-        lastRun: new Date().toISOString(),
-        logs: [
-          ...t.logs,
-          { id: `l-${Date.now()}-2`, message: passed ? 'Institutional integrity verified.' : 'Module integrity validation failure.', timestamp: new Date().toISOString() }
-        ]
-      } : t));
-      
-      if (!passed) {
-        logMaisonError({ module: 'System', type: 'QAFailure', country: 'global', message: `Test "${id}" failed validation.`, severity: 'medium', brandId: activeBrandId });
-      }
-      logAction(`Executed QA Test: ${id}`, 'QA System', 'global', passed ? 'low' : 'high');
-    }, 1500);
-  };
-
-  const runAllQATests = () => {
-    qaTests.forEach((t, i) => {
-      setTimeout(() => runQATest(t.id), i * 500);
-    });
-  };
-
-  const toggleEmergencyMode = () => {
-    setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
-    logAction('Toggled Emergency Fallback Mode', 'System Core', 'global', 'high');
-  };
-  
-  const triggerReindex = (type: string) => {
-    setIndexingStatus(prev => ({ ...prev, sitemapStatus: 'Regenerating' }));
-    setTimeout(() => {
-      setIndexingStatus(prev => ({ ...prev, sitemapStatus: 'Up to date' }));
-      logAction(`Triggered Re-indexing: ${type}`, 'Search Engine');
-    }, 3000);
-  };
-
-  const setCountryEnabled = (code: CountryCode, enabled: boolean) => {
-    setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
-    logAction(`${enabled ? 'Enabled' : 'Disabled'} Market Hub: ${code}`, 'Global Config');
-  };
-  const updateCountryConfig = (config: CountryConfig) => setCountryConfigs(prev => prev.map(c => c.code === config.code ? config : c));
-  const setActiveBrand = (id: string) => setActiveBrandId(id);
 
   const upsertCMSSection = (s: CMSSection) => setCmsSections(prev => {
     const idx = prev.findIndex(item => item.id === s.id);
     return idx > -1 ? prev.map(item => item.id === s.id ? s : item) : [...prev, s];
   });
-  const upsertProduct = (p: Product) => setProducts(prev => {
-    const idx = prev.findIndex(item => item.id === p.id);
-    return idx > -1 ? prev.map(item => item.id === p.id ? p : item) : [p, ...prev];
-  });
+
+  const upsertProduct = (p: Product, changeSummary: string = 'Institutional registry update') => {
+    setProducts(prev => {
+      const idx = prev.findIndex(item => item.id === p.id);
+      if (idx > -1) {
+        const existing = prev[idx];
+        
+        // Conflict Logic Enforcement
+        if (existing.scope === 'global' && existing.conflictStrategy === 'global-priority' && currentUser?.country !== 'GLOBAL') {
+          console.warn("Global Registry Overwrite Prevented by Conflict Strategy");
+          return prev;
+        }
+
+        const newVersion: ArtifactVersion = {
+          id: `v-${Date.now()}`,
+          version: existing.currentVersion + 1,
+          data: JSON.parse(JSON.stringify(existing)),
+          editedBy: currentUser?.name || 'System',
+          timestamp: new Date().toISOString(),
+          changeSummary
+        };
+
+        const updatedProduct: Product = {
+          ...p,
+          currentVersion: existing.currentVersion + 1,
+          versionHistory: [newVersion, ...existing.versionHistory].slice(0, 50),
+          lastSyncedAt: new Date().toISOString(),
+          lastEditedRegion: (currentUser?.country as any) || 'global'
+        };
+
+        logAction('Updated Artifact Registry', p.name, updatedProduct.lastEditedRegion);
+        return prev.map(item => item.id === p.id ? updatedProduct : item);
+      } else {
+        const newProduct: Product = {
+          ...p,
+          versionHistory: [],
+          currentVersion: 1,
+          lastEditedRegion: (currentUser?.country as any) || 'global'
+        };
+        logAction('Registered New Artifact', p.name, newProduct.lastEditedRegion);
+        return [newProduct, ...prev];
+      }
+    });
+  };
+
+  const rollbackProductVersion = (productId: string, versionId: string) => {
+    setProducts(prev => prev.map(p => {
+      if (p.id === productId) {
+        const version = p.versionHistory.find(v => v.id === versionId);
+        if (version) {
+          logAction('Rollback Execution', p.name, currentUser?.country);
+          return {
+            ...version.data,
+            versionHistory: p.versionHistory,
+            currentVersion: p.currentVersion, // Keep the sequence
+            lastSyncedAt: new Date().toISOString()
+          };
+        }
+      }
+      return p;
+    }));
+  };
+
+  const lockProductForEditing = (productId: string) => {
+    const p = products.find(prod => prod.id === productId);
+    if (p?.editingLock && p.editingLock.userId !== currentUser?.id && new Date(p.editingLock.expiresAt) > new Date()) {
+      return false;
+    }
+    
+    setProducts(prev => prev.map(prod => prod.id === productId ? {
+      ...prod,
+      editingLock: {
+        userId: currentUser?.id || 'sys',
+        userName: currentUser?.name || 'System',
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 min lock
+      }
+    } : prod));
+    return true;
+  };
+
+  const unlockProduct = (productId: string) => {
+    setProducts(prev => prev.map(prod => prod.id === productId ? { ...prod, editingLock: undefined } : prod));
+  };
+
   const deleteProduct = (id: string) => setProducts(prev => prev.filter(p => p.id !== id));
   const upsertCollection = (c: Collection) => console.log('Update collection', c);
   const upsertEditorial = (e: Editorial) => console.log('Update editorial', e);
 
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
-    // Automated Lead Tiering Logic
     const leadTier = inquiry.budgetRange === 'Tier 1' || inquiry.intent === 'Collector' ? 1 : 
                      inquiry.budgetRange === 'Tier 2' ? 2 : 3;
-    
     const enrichedInquiry = { ...inquiry, leadTier };
-    
     setPrivateInquiries(prev => [enrichedInquiry, ...prev]);
     setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
-    
-    if (leadTier === 1) {
-      sendNotification('country_admin', `HIGH PRIORITY Lead: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'alert');
-    }
-    
-    logAction('Captured Acquisition Lead', inquiry.customerName, enrichedInquiry.country.toLowerCase(), leadTier === 1 ? 'medium' : 'low');
+    if (leadTier === 1) sendNotification('country_admin', `HIGH PRIORITY Lead: ${inquiry.customerName}`, enrichedInquiry.country.toLowerCase(), 'alert');
   };
   
   const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
@@ -688,7 +611,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateAIModule = (id: string, enabled: boolean, level: AIAutomationLevel) => {
     setAiModules(prev => prev.map(m => m.id === id ? { ...m, enabled, level } : m));
-    logAction(`Updated AI Module ${id}`, `Level: ${level}`, 'global');
   };
   const addAILog = (log: AIActionLog) => setAiLogs(prev => [log, ...prev].slice(0, 50));
   const upsertAISuggestion = (s: AISuggestion) => setAiSuggestions(prev => {
@@ -706,17 +628,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const createInvoice = (inv: Invoice) => {
     setInvoices(prev => [inv, ...prev]);
-    logAction('Generated Institutional Invoice', inv.orderId, inv.brandId);
   };
 
   const createTransaction = (tx: Transaction) => {
     setTransactions(prev => [tx, ...prev]);
-    logAction(`Logged Finance Transaction: ${tx.type}`, tx.id, tx.country);
   };
 
   const processPayment = (transactionId: string) => {
     setTransactions(prev => prev.map(t => t.id === transactionId ? { ...t, status: 'Completed' } : t));
-    logAction('Completed Institutional Payment', transactionId, 'global');
   };
 
   const upsertAppointment = (apt: Appointment) => setAppointments(prev => [apt, ...prev]);
@@ -740,6 +659,113 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, messages: [...t.messages, { id: `m-${Date.now()}`, sender, text, timestamp: new Date().toISOString() }], updatedAt: new Date().toISOString() } : t));
   };
 
+  const setCountryEnabled = (code: CountryCode, enabled: boolean) => {
+    setCountryConfigs(prev => prev.map(c => c.code === code ? { ...c, enabled } : c));
+  };
+
+  const updateCountryConfig = (config: CountryConfig) => {
+    setCountryConfigs(prev => prev.map(c => c.code === config.code ? config : c));
+  };
+
+  const setActiveBrand = (id: string) => setActiveBrandId(id);
+
+  const registerVendor = (data: Partial<Vendor>) => {
+    const id = `vend-${Date.now()}`;
+    const newVendor: Vendor = {
+      id,
+      name: data.name || 'New Atelier',
+      category: data.category || 'General',
+      performance: 100,
+      productCount: 0,
+      salesTotal: 0,
+      status: 'pending',
+      payoutSchedule: 'weekly',
+      joinedDate: new Date().toISOString(),
+      kpis: { returnRate: 0, fulfillmentSpeed: 'N/A', rating: 5.0 },
+      brandId: activeBrandId
+    };
+    setVendors(prev => [newVendor, ...prev]);
+    logAction('Registered New Partner Atelier', newVendor.name, 'global', 'low');
+  };
+
+  const approveVendor = (id: string) => {
+    setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'active' } : v));
+    logAction('Approved Institutional Partner', id, 'global', 'low');
+  };
+
+  const registerClient = (data: Partial<VipClient>) => {
+    const id = `vip-${Date.now()}`;
+    const newClient: VipClient = {
+      id,
+      name: data.name || 'Anonymous Connoisseur',
+      email: data.email || '',
+      tier: 'Silver',
+      loyaltyPoints: 0,
+      totalSpend: 0,
+      isSubscriber: false,
+      brandId: activeBrandId,
+      status: 'pending'
+    };
+    setVipClients(prev => [newClient, ...prev]);
+    logAction('New Connoisseur Registered', newClient.name, 'global', 'low');
+  };
+
+  const verifyClient = (id: string) => {
+    setVipClients(prev => prev.map(c => c.id === id ? { ...c, status: 'verified' } : c));
+    logAction('Verified Elite Client', id, 'global', 'low');
+  };
+
+  const toggleEmergencyMode = () => {
+    setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode }));
+    logAction('Emergency Mode Toggled', globalSettings.emergencyMode ? 'OFF' : 'ON', 'global', 'high');
+  };
+
+  const triggerReindex = (type: string) => {
+    setIndexingStatus(prev => ({ ...prev, searchEngineStatus: 'Syncing' }));
+    setTimeout(() => setIndexingStatus(prev => ({ ...prev, searchEngineStatus: 'Optimal' })), 2000);
+    logAction(`Triggered ${type} Re-index`, 'Search Engine');
+  };
+
+  const runQATest = (id: string) => {
+    setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'running' } : t));
+    setTimeout(() => {
+      setQaTests(prev => prev.map(t => t.id === id ? { 
+        ...t, 
+        status: 'passed', 
+        lastRun: new Date().toISOString(),
+        logs: [{ id: `l-${Date.now()}`, message: 'Integrity verified against Founding Charter.', timestamp: new Date().toISOString() }, ...t.logs]
+      } : t));
+    }, 1500);
+  };
+
+  const runAllQATests = () => {
+    qaTests.forEach(t => runQATest(t.id));
+  };
+
+  const handleApprovalAction = (requestId: string, approve: boolean, comments?: string) => {
+    setApprovalRequests(prev => prev.map(req => req.id === requestId ? { ...req, status: approve ? 'approved' : 'rejected', comments, approvedBy: currentUser?.name } : req));
+    const req = approvalRequests.find(r => r.id === requestId);
+    if (req && approve && req.contentType === 'listing') {
+      setProducts(prev => prev.map(p => p.id === req.contentId ? { ...p, status: 'published' } : p));
+    }
+    logAction(`${approve ? 'Approved' : 'Rejected'} Content Request`, requestId, req?.country, 'medium');
+  };
+
+  const submitApproval = (contentType: ApprovalRequest['contentType'], contentId: string, country: string = 'global') => {
+    const request: ApprovalRequest = {
+      id: `a-${Date.now()}`,
+      userId: currentUser?.id || 'sys',
+      userName: currentUser?.name || 'System',
+      contentType,
+      contentId,
+      country,
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+    setApprovalRequests(prev => [request, ...prev]);
+    logAction('Submitted Content for Audit', contentId, country, 'low');
+  };
+
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
@@ -751,7 +777,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
-    upsertCMSSection, upsertProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
@@ -769,7 +795,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
-    indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor
+    indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
+    upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
+    sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
+    toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
+    updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
+    runQATest, runAllQATests, logMaisonError, resolveMaisonError,
+    addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
+    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
+    updateTicketStatus, addTicketMessage
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
