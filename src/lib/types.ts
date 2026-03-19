@@ -400,6 +400,21 @@ export interface QATestCase {
   brandId: string;
 }
 
+// --- ERROR HANDLING ---
+
+export interface MaisonError {
+  id: string;
+  module: 'AI Autopilot' | 'Finance' | 'Onboarding' | 'Content' | 'System';
+  type: string;
+  country: string;
+  message: string;
+  stackTrace?: string;
+  resolved: boolean;
+  timestamp: string;
+  severity: 'low' | 'medium' | 'high';
+  brandId?: string;
+}
+
 // --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {

@@ -23,7 +23,8 @@ import {
   Crown,
   BrainCircuit,
   Bell,
-  FlaskConical
+  FlaskConical,
+  ShieldAlert
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export default function SuperAdminPanel() {
           <AdminNavItem icon={<LayoutDashboard />} label="Intelligence" active={true} href="/admin" />
           <AdminNavItem icon={<BrainCircuit />} label="AI Autopilot" active={false} href="/admin/ai-dashboard" />
           <AdminNavItem icon={<Bell />} label="Institutional Alerts" active={false} href="/admin/notifications" />
+          <AdminNavItem icon={<ShieldAlert />} label="Error Matrix" active={false} href="/admin/errors" />
           <AdminNavItem icon={<ShieldCheck />} label="Compliance" active={false} href="/admin/compliance" />
           <AdminNavItem icon={<LayoutTemplate />} label="Content (CMS)" active={false} href="/admin/content" />
           <AdminNavItem icon={<Target />} label="Sales (CRM)" active={false} href="/admin/sales" />

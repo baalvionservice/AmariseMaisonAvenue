@@ -48,7 +48,8 @@ import {
   ApprovalRequest,
   AnalyticsMetric,
   AuditLogEntry,
-  QATestCase
+  QATestCase,
+  MaisonError
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -101,6 +102,7 @@ interface AppContextType {
   scopedWorkflows: WorkflowTask[];
   scopedTransactions: Transaction[];
   scopedQATests: QATestCase[];
+  scopedErrors: MaisonError[];
   
   // Core Lists
   cmsSections: CMSSection[];
@@ -112,6 +114,7 @@ interface AppContextType {
   buyingGuides: BuyingGuide[];
   editorials: Editorial[];
   qaTests: QATestCase[];
+  maisonErrors: MaisonError[];
   
   // CRM State
   privateInquiries: PrivateInquiry[];
@@ -191,6 +194,10 @@ interface AppContextType {
   toggleEmergencyMode: () => void;
   triggerReindex: (type: string) => void;
   logAction: (action: string, entity: string, country?: string, severity?: AuditLogEntry['severity']) => void;
+
+  // Error Actions
+  logMaisonError: (error: Omit<MaisonError, 'id' | 'timestamp' | 'resolved'>) => void;
+  resolveMaisonError: (id: string) => void;
 
   // Onboarding Actions
   registerVendor: (data: Partial<Vendor>) => void;
@@ -302,6 +309,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'qa-5', name: 'RBAC Permission Enforcement', module: 'Security', status: 'pending', logs: [], country: 'uk', brandId: activeBrandId }
   ]);
 
+  // Error Handling state
+  const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([
+    { id: 'err-1', module: 'AI Autopilot', type: 'JobFailed', country: 'us', message: 'Predictive lead scoring cycle failed due to data drift.', stackTrace: 'ReferenceError: leadScore is not defined at analysis.ts:42', resolved: false, timestamp: new Date().toISOString(), severity: 'high', brandId: activeBrandId },
+    { id: 'err-2', module: 'Finance', type: 'PaymentError', country: 'uk', message: 'Mock transaction retrieval timed out.', resolved: false, timestamp: new Date().toISOString(), severity: 'medium', brandId: activeBrandId }
+  ]);
+
   // Admin & Logistics state
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
@@ -376,8 +389,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scopedQATests = useMemo(() => {
     if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return qaTests;
-    return qaTests.filter(t => t.country === currentUser.country || t.country === 'global');
+    return qaTests.filter(t => t.country === currentUser.country || t.global || t.country === 'global');
   }, [qaTests, currentUser]);
+
+  const scopedErrors = useMemo(() => {
+    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return maisonErrors;
+    return maisonErrors.filter(e => e.country === currentUser.country || e.country === 'global');
+  }, [maisonErrors, currentUser]);
 
   // --- Actions ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
@@ -396,6 +414,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     setAuditRegistry(prev => [entry, ...prev]);
     console.log(`[INSTITUTIONAL AUDIT] ${action} on ${entity} by ${currentUser.name}`);
+  };
+
+  const logMaisonError = (err: Omit<MaisonError, 'id' | 'timestamp' | 'resolved'>) => {
+    const error: MaisonError = { ...err, id: `err-${Date.now()}`, timestamp: new Date().toISOString(), resolved: false };
+    setMaisonErrors(prev => [error, ...prev]);
+    logAction(`Logged System Error: ${err.type}`, err.module, err.country, 'high');
+    sendNotification('super_admin', `Critical Error in ${err.module}: ${err.type}`, err.country, 'alert');
+    console.error(`[MAISON ERROR] ${err.module} | ${err.message}`);
+  };
+
+  const resolveMaisonError = (id: string) => {
+    setMaisonErrors(prev => prev.map(e => e.id === id ? { ...e, resolved: true } : e));
+    const err = maisonErrors.find(e => e.id === id);
+    if (err) logAction(`Resolved System Error: ${err.type}`, err.module, err.country, 'low');
   };
 
   const sendNotification = (toRole: string, message: string, country = 'global', type: MaisonNotification['type'] = 'info') => {
@@ -417,10 +449,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     console.log(`[AI AUTOPILOT MOCK] Running job: ${task.taskName} | Country: ${task.country}`);
 
     setTimeout(() => {
-      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
-      sendNotification('super_admin', `AI Job "${task.taskName}" completed`, task.country, 'success');
-      logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
-      console.log(`[AI AUTOPILOT MOCK] Completed job: ${task.taskName} | Country: ${task.country}`);
+      // Simulate 10% failure rate for Error Matrix demonstration
+      const failed = Math.random() < 0.1;
+      
+      if (failed) {
+        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'failed' } : w));
+        logMaisonError({
+          module: 'AI Autopilot',
+          type: 'CycleFailure',
+          country: task.country,
+          message: `Scheduled cycle "${task.taskName}" failed to terminate within designated timeout.`,
+          severity: 'high',
+          brandId: activeBrandId
+        });
+      } else {
+        setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: 'complete', nextRun: new Date(Date.now() + 86400000).toISOString() } : w));
+        sendNotification('super_admin', `AI Job "${task.taskName}" completed`, task.country, 'success');
+        logAction(`Completed AI Autopilot Job: ${task.taskName}`, 'Workflow System', task.country);
+      }
     }, 2000);
   };
 
@@ -436,8 +482,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!currentUser) return;
     const req: ApprovalRequest = { id: `a-${Date.now()}`, userId: currentUser.id, userName: currentUser.name, contentType, contentId, country, status: 'pending', timestamp: new Date().toISOString() };
     setApprovalRequests(prev => [req, ...prev]);
-    sendNotification('country_admin', `${currentUser.name} submitted ${contentType} for review`, country, 'info');
-    logAction(`Submitted ${contentType} for Approval`, contentId, country);
+    sendNotification('country_admin', `${currentUser.name} submitted ${contentType} for review`, country.toLowerCase(), 'info');
+    logAction(`Submitted ${contentType} for Approval`, contentId, country.toLowerCase());
   };
 
   const handleApprovalAction = (requestId: string, approve: boolean, comments?: string) => {
@@ -533,14 +579,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ]
       } : t));
       
+      if (!passed) {
+        logMaisonError({
+          module: 'System',
+          type: 'QAFailure',
+          country: 'global',
+          message: `Integrity test "${id}" failed validation during automated batch execution.`,
+          severity: 'medium',
+          brandId: activeBrandId
+        });
+      }
+
       logAction(`Executed QA Test: ${id}`, 'QA System', 'global', passed ? 'low' : 'high');
       sendNotification('super_admin', `QA Test "${id}" completed with status: ${passed ? 'PASSED' : 'FAILED'}`, 'global', passed ? 'success' : 'alert');
-      console.log(`[QA MOCK] Test completed: ${id} | Result: ${passed ? 'Passed' : 'Failed'}`);
     }, 1500);
   };
 
   const runAllQATests = () => {
-    console.log("[QA MOCK] Batch test execution triggered.");
     qaTests.forEach((t, i) => {
       setTimeout(() => runQATest(t.id), i * 500);
     });
@@ -621,7 +676,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const processPayment = (transactionId: string) => {
     setTransactions(prev => prev.map(t => t.id === transactionId ? { ...t, status: 'Completed' } : t));
     logAction('Completed Institutional Payment', transactionId, 'global');
-    console.log(`[FINANCE MOCK] Payment completed for Transaction ID: ${transactionId}`);
   };
 
   const upsertAppointment = (apt: Appointment) => setAppointments(prev => [apt, ...prev]);
@@ -647,8 +701,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
@@ -661,14 +715,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
     toggleEmergencyMode, triggerReindex, logAction, registerVendor, approveVendor, registerClient, verifyClient,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
-    runQATest, runAllQATests,
+    runQATest, runAllQATests, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, analyticsData, auditRegistry,
