@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -46,18 +47,18 @@ export default function AdminSalesHub() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   
-  const { privateInquiries, updateInquiryStatus } = useAppStore();
+  const { scopedInquiries, updateInquiryStatus, currentUser } = useAppStore();
 
   // Integrated Advanced Search
-  const filteredLeads = useSearch(privateInquiries, searchQuery, { status: statusFilter });
+  const filteredLeads = useSearch(scopedInquiries, searchQuery, { status: statusFilter });
 
   const sortedLeads = useMemo(() => {
     return [...filteredLeads].sort((a, b) => a.leadTier - b.leadTier);
   }, [filteredLeads]);
 
   const selectedLead = useMemo(() => 
-    privateInquiries.find(i => i.id === selectedLeadId), 
-    [privateInquiries, selectedLeadId]
+    scopedInquiries.find(i => i.id === selectedLeadId), 
+    [scopedInquiries, selectedLeadId]
   );
 
   return (
@@ -85,7 +86,7 @@ export default function AdminSalesHub() {
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/us">
+            <Link href={`/${currentUser?.country || 'us'}`}>
               <LogOut className="w-4 h-4 mr-3" /> Exit Hub
             </Link>
           </Button>
@@ -100,7 +101,7 @@ export default function AdminSalesHub() {
               {activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              High-Ticket Acquisition Oversight
+              High-Ticket Acquisition Oversight • {currentUser?.country.toUpperCase()} Market
             </p>
           </div>
           <div className="flex items-center space-x-6">
@@ -108,7 +109,7 @@ export default function AdminSalesHub() {
                <Crown className="w-4 h-4 text-plum" />
                <div className="flex flex-col">
                   <span className="text-[10px] font-bold uppercase tracking-widest">Elite Portfolio</span>
-                  <span className="text-[9px] text-gray-400">12 Pending T1 Leads</span>
+                  <span className="text-[9px] text-gray-400">{sortedLeads.filter(l => l.leadTier === 1).length} Tier 1 Leads Active</span>
                </div>
             </div>
             <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">AS</div>
@@ -123,7 +124,7 @@ export default function AdminSalesHub() {
                 <CardHeader className="border-b border-border flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
                   <div>
                     <CardTitle className="font-headline text-2xl">Active Acquisition Leads</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Global registry of private intent</CardDescription>
+                    <CardDescription className="text-[10px] uppercase tracking-widest">Market registry of private intent</CardDescription>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="relative">
@@ -209,7 +210,7 @@ export default function AdminSalesHub() {
                           <TableCell colSpan={4} className="py-20 text-center">
                             <div className="flex flex-col items-center space-y-4 opacity-20">
                               <Search className="w-12 h-12" />
-                              <p className="text-xs font-bold uppercase tracking-[0.2em]">No results found in current registry</p>
+                              <p className="text-xs font-bold uppercase tracking-[0.2em]">No results found in current market hub</p>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -229,7 +230,10 @@ export default function AdminSalesHub() {
                           <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">LEAD OVERVIEW</span>
                           <CardTitle className="font-headline text-xl uppercase tracking-tight">{selectedLead.customerName}</CardTitle>
                         </div>
-                        <Badge className="bg-plum text-white text-[8px] uppercase tracking-[0.2em]">TIER {selectedLead.leadTier}</Badge>
+                        <div className="flex flex-col items-end">
+                           <Badge className="bg-plum text-white text-[8px] uppercase tracking-[0.2em]">TIER {selectedLead.leadTier}</Badge>
+                           <span className="text-[7px] font-bold text-gray-400 uppercase mt-1">Assignment: AUTOMATIC</span>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-8 space-y-8">
@@ -259,7 +263,7 @@ export default function AdminSalesHub() {
                           <h4 className="text-[10px] font-bold uppercase tracking-widest">Active Dialogue</h4>
                         </div>
                         <p className="text-[11px] text-gray-500 font-light italic leading-relaxed">
-                          Review the latest curatorial transcript below to ensure strategic alignment.
+                          "Review the latest curatorial transcript to ensure strategic alignment with the Maison's 1924 principles."
                         </p>
                         <Button 
                           variant="outline" 
@@ -276,7 +280,7 @@ export default function AdminSalesHub() {
                 ) : (
                   <div className="h-64 border-2 border-dashed border-border flex flex-col items-center justify-center p-8 text-center space-y-4">
                     <Users className="w-8 h-8 text-gray-200" />
-                    <p className="text-xs text-gray-400 font-light italic uppercase tracking-widest">Select a lead to begin oversight</p>
+                    <p className="text-xs text-gray-400 font-light italic uppercase tracking-widest">Select a connoisseur to begin oversight</p>
                   </div>
                 )}
 
@@ -289,9 +293,9 @@ export default function AdminSalesHub() {
                       <h4 className="text-[10px] font-bold uppercase tracking-widest">Closing Matrix</h4>
                     </div>
                     <div className="space-y-4">
-                      <ClosingStat label="Pipeline Value" value="$2.4M" />
-                      <ClosingStat label="T1 Conversion" value="12%" />
-                      <ClosingStat label="Avg. Cycle" value="4.2 Days" />
+                      <ClosingStat label="Market Value" value="$2.4M" />
+                      <ClosingStat label="Conversion Rate" value="12%" />
+                      <ClosingStat label="Avg. Dialogue" value="4.2 Days" />
                     </div>
                   </div>
                 </Card>

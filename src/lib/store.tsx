@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -634,11 +635,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const upsertEditorial = (e: Editorial) => console.log('Update editorial', e);
 
   const upsertPrivateInquiry = (inquiry: PrivateInquiry) => {
-    setPrivateInquiries(prev => [inquiry, ...prev]);
+    // Audit-Driven Lead Tiering Logic
+    const leadTier = inquiry.budgetRange === 'Tier 1' || inquiry.intent === 'Collector' ? 1 : 
+                     inquiry.budgetRange === 'Tier 2' ? 2 : 3;
+    
+    const enrichedInquiry = { ...inquiry, leadTier };
+    
+    setPrivateInquiries(prev => [enrichedInquiry, ...prev]);
     setLeadConversations(prev => [...prev, { id: `conv-${inquiry.id}`, inquiryId: inquiry.id, messages: [], status: 'active', brandId: activeBrandId }]);
-    sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase());
-    logAction('Captured Acquisition Lead', inquiry.customerName, inquiry.country.toLowerCase());
+    
+    if (leadTier === 1) {
+      sendNotification('country_admin', `HIGH PRIORITY Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase(), 'alert');
+    } else {
+      sendNotification('country_admin', `New Acquisition Intent: ${inquiry.customerName}`, inquiry.country.toLowerCase(), 'info');
+    }
+    
+    logAction('Captured Acquisition Lead', inquiry.customerName, inquiry.country.toLowerCase(), leadTier === 1 ? 'medium' : 'low');
   };
+  
   const updateInquiryStatus = (id: string, status: PrivateInquiry['status']) => setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   const addLeadMessage = (inquiryId: string, text: string, sender: 'curator' | 'client') => {
     setLeadConversations(prev => prev.map(c => c.inquiryId === inquiryId ? { ...c, messages: [...c.messages, { id: `msg-${Date.now()}`, sender, text, timestamp: new Date().toISOString() }] } : c));

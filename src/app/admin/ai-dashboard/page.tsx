@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { 
   Zap, 
@@ -21,7 +22,8 @@ import {
   AlertCircle,
   Play,
   History,
-  FastForward
+  FastForward,
+  Plus
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,15 +41,25 @@ import {
   Tooltip,
   CartesianGrid
 } from 'recharts';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AIDashboard() {
   const { modules, logs, suggestions, jobs, runJob, runSequence, approveSuggestion, rejectSuggestion } = useAI();
   const { workflows, runWorkflowTask, currentUser } = useAppStore();
+  const { toast } = useToast();
 
   const stats = useMemo(() => {
     if (!currentUser) return null;
     return getAnalytics(currentUser.role, currentUser.country);
   }, [currentUser]);
+
+  const handleBatchGeneration = () => {
+    toast({
+      title: "Batch Generation Initiated",
+      description: "AI is currently drafting regional SEO metadata for 1,240 new archive arrivals.",
+    });
+    runSequence('SEO Metadata Cycle', currentUser?.country);
+  };
 
   if (!stats) return null;
 
@@ -78,9 +90,15 @@ export default function AIDashboard() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Intelligence Pulse</h1>
-            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Real-time Business Autopilot Status</p>
+            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Real-time Business Autopilot • {currentUser?.country.toUpperCase()} Hub</p>
           </div>
           <div className="flex items-center space-x-6">
+             <Button 
+              className="bg-black text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest"
+              onClick={handleBatchGeneration}
+             >
+               <Plus className="w-3.5 h-3.5 mr-2" /> BATCH GENERATE METADATA
+             </Button>
              <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-4 py-2 border border-green-100 rounded-sm">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Autopilot Active</span>
