@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { COUNTRIES, VIP_CLIENTS } from '@/lib/mock-data';
+import { COUNTRIES } from '@/lib/mock-data';
 import { users as RBAC_USERS } from '@/lib/rbac/mock-users';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,7 +17,17 @@ import {
   PieChart,
   X,
   UserCheck,
-  ShieldAlert
+  ShieldAlert,
+  BrainCircuit,
+  Target,
+  FileText,
+  ShieldCheck,
+  CreditCard,
+  Search,
+  FlaskConical,
+  Store,
+  LifeBuoy,
+  Bell
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -27,15 +37,14 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ShowcaseControls: Redesigned for Institutional Access & Multi-Persona Simulation.
+ * ShowcaseControls: The master diagnostic and navigation hub for the prototype.
+ * Provides rapid access to all administrative terminals and persona switching.
  */
 export function ShowcaseControls() {
   const { country } = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const { 
-    activeVip, 
-    setActiveVip, 
     isShowcaseMode, 
     setShowcaseMode, 
     currentUser, 
@@ -85,34 +94,34 @@ export function ShowcaseControls() {
             </span>
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-80 p-0 bg-white border-border shadow-luxury overflow-hidden">
+        <PopoverContent align="end" className="w-[400px] p-0 bg-white border-border shadow-luxury overflow-hidden">
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Access Controls</h3>
+                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Matrix</h3>
                 <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
              </div>
-             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Maison Amarisé | Institutional Node</p>
+             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Institutional Access Hub • v5.2.0-SECURE</p>
           </div>
 
-          <div className="p-6 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
             {/* Security Context: Persona Switching */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <UserCheck className="w-3 h-3" />
                 <span>Security Persona</span>
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
                 {RBAC_USERS.map(user => (
                   <button 
                     key={user.id}
                     onClick={() => handlePersonaSwitch(user.id)}
                     className={cn(
-                      "w-full p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex items-center justify-between transition-all",
+                      "p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex flex-col justify-between transition-all",
                       currentUser?.id === user.id ? "bg-plum text-white border-plum" : "bg-ivory border-border text-gray-400 hover:bg-plum/5 hover:text-plum"
                     )}
                   >
                     <span>{user.name}</span>
-                    <span className="opacity-60">[{user.role.split('_')[0]}]</span>
+                    <span className="opacity-60 text-[7px] mt-1">[{user.role.toUpperCase()}]</span>
                   </button>
                 ))}
               </div>
@@ -140,17 +149,39 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* Quick Experience Jumps */}
+            {/* Comprehensive Admin Registry */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Zap className="w-3 h-3" />
-                <span>Institutional Links</span>
+                <span>Administrative Registry</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <ActionLink href="/admin" icon={<LayoutDashboard />} label="Command Center" />
-                <ActionLink href="/admin/operations" icon={<PieChart />} label="Ops Hub" />
-                <ActionLink href="/admin/revenue" icon={<ShieldAlert />} label="Lead Matrix" />
-                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Public Journal" />
+                <ActionLink href="/admin/ai-dashboard" icon={<BrainCircuit />} label="AI Autopilot" />
+                <ActionLink href="/admin/sales" icon={<Target />} label="Sales CRM" />
+                <ActionLink href="/admin/content" icon={<FileText />} label="Atelier CMS" />
+                <ActionLink href="/admin/operations" icon={<PieChart />} label="Operations Hub" />
+                <ActionLink href="/admin/finance" icon={<CreditCard />} label="Finance Hub" />
+                <ActionLink href="/admin/seo" icon={<Search />} label="SEO Authority" />
+                <ActionLink href="/admin/errors" icon={<ShieldAlert />} label="Error Matrix" />
+                <ActionLink href="/admin/compliance" icon={<ShieldCheck />} label="Compliance" />
+                <ActionLink href="/admin/qa" icon={<FlaskConical />} label="QA Terminal" />
+                <ActionLink href="/admin/super" icon={<Crown />} label="Global Matrix" />
+                <ActionLink href="/admin/vendor" icon={<Store />} label="Vendor Portal" />
+                <ActionLink href="/admin/support" icon={<LifeBuoy />} label="Care Terminal" />
+                <ActionLink href="/admin/notifications" icon={<Bell />} label="Alerts Feed" />
+              </div>
+            </div>
+
+            {/* Public Experiences */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
+                <BookOpen className="w-3 h-3" />
+                <span>Public Experiences</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <ActionLink href={`/${currentCountry}`} icon={<Globe />} label="Homepage" />
+                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Maison Journal" />
               </div>
             </div>
           </div>
@@ -162,7 +193,7 @@ export function ShowcaseControls() {
              >
                Exit Super-Demo
              </button>
-             <span className="text-[8px] text-gray-300 tracking-widest uppercase">v5.2.0-SECURE</span>
+             <span className="text-[8px] text-gray-300 tracking-widest uppercase italic">Institutional Node Verified</span>
           </div>
         </PopoverContent>
       </Popover>
@@ -180,7 +211,7 @@ function ActionLink({ href, icon, label }: { href: string, icon: React.ReactNode
       <span className="text-gold group-hover:scale-110 transition-transform">
         {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4" })}
       </span>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-900">{label}</span>
+      <span className="text-[9px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-900 truncate">{label}</span>
     </button>
   );
 }
