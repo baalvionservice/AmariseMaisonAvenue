@@ -654,13 +654,15 @@ export interface Invoice {
   customerName: string;
   amount: number;
   currency: string;
-  status: 'issued' | 'paid' | 'overdue';
+  status: 'issued' | 'paid' | 'processing' | 'settled' | 'closed';
   date: string;
   taxAmount: number;
   taxRate: number;
   complianceCertified: boolean;
   brandId: string;
 }
+
+export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed';
 
 export interface Transaction {
   id: string;
@@ -670,8 +672,10 @@ export interface Transaction {
   vendorId?: string;
   amount: number;
   currency: string;
-  status: 'Pending' | 'Completed' | 'Failed';
+  status: TransactionStatus;
   timestamp: string;
   invoiceId?: string;
   brandId: string;
+  taxAmount?: number;
+  netAmount?: number;
 }

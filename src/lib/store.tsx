@@ -50,7 +50,8 @@ import {
   AuditLogEntry,
   QATestCase,
   MaisonError,
-  ArtifactVersion
+  ArtifactVersion,
+  TransactionStatus
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -232,6 +233,7 @@ interface AppContextType {
   createInvoice: (invoice: Invoice) => void;
   createTransaction: (transaction: Transaction) => void;
   processPayment: (transactionId: string) => void;
+  updateTransactionStatus: (id: string, status: TransactionStatus) => void;
   toggleLike: (articleId: string, country: string) => void;
   trackShare: (articleId: string, country: string) => void;
   upsertAppointment: (appointment: Appointment) => void;
@@ -352,8 +354,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS.map(a => ({ ...a, brandId: activeBrandId })));
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES.map(i => ({ ...i, brandId: activeBrandId })));
   const [transactions, setTransactions] = useState<Transaction[]>([
-    { id: 'tx-1', country: 'us', type: 'Sale', clientName: 'Julian Vandervilt', amount: 45000, currency: 'USD', status: 'Completed', timestamp: new Date().toISOString(), brandId: activeBrandId },
-    { id: 'tx-2', country: 'uk', type: 'Refund', clientName: 'Sophia Chen', amount: 9500, currency: 'GBP', status: 'Pending', timestamp: new Date().toISOString(), brandId: activeBrandId }
+    { id: 'tx-1', country: 'us', type: 'Sale', clientName: 'Julian Vandervilt', amount: 45000, currency: 'USD', status: 'Settled', timestamp: new Date().toISOString(), brandId: activeBrandId, taxAmount: 3600, netAmount: 41400 },
+    { id: 'tx-2', country: 'uk', type: 'Sale', clientName: 'Alexander Cross', amount: 12500, currency: 'GBP', status: 'Paid', timestamp: new Date().toISOString(), brandId: activeBrandId, taxAmount: 2500, netAmount: 10000 },
+    { id: 'tx-3', country: 'ae', type: 'Sale', clientName: 'Hamdan Al Maktoum', amount: 85000, currency: 'AED', status: 'Processing', timestamp: new Date().toISOString(), brandId: activeBrandId, taxAmount: 4250, netAmount: 80750 },
+    { id: 'tx-4', country: 'in', type: 'Sale', clientName: 'Aarav Sharma', amount: 750000, currency: 'INR', status: 'Settled', timestamp: new Date().toISOString(), brandId: activeBrandId, taxAmount: 135000, netAmount: 615000 }
   ]);
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   
@@ -635,7 +639,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const processPayment = (transactionId: string) => {
-    setTransactions(prev => prev.map(t => t.id === transactionId ? { ...t, status: 'Completed' } : t));
+    setTransactions(prev => prev.map(t => t.id === transactionId ? { ...t, status: 'Settled' } : t));
+  };
+
+  const updateTransactionStatus = (id: string, status: TransactionStatus) => {
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, status } : t));
+    logAction(`Transaction Status Update: ${status}`, `Transaction ${id}`);
   };
 
   const upsertAppointment = (apt: Appointment) => setAppointments(prev => [apt, ...prev]);
@@ -784,7 +793,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     runQATest, runAllQATests, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
-    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
+    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, 
@@ -804,7 +813,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
     runQATest, runAllQATests, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
-    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, toggleLike, trackShare, upsertAppointment,
+    setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage
   ]);
 

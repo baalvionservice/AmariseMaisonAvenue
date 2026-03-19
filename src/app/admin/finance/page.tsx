@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   CreditCard, 
@@ -23,7 +23,9 @@ import {
   ShieldCheck,
   Globe,
   Receipt,
-  Scale
+  Scale,
+  ArrowRight,
+  BadgeDollarSign
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,22 +42,56 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
+import { 
+  Bar, 
+  BarChart, 
+  ResponsiveContainer, 
+  XAxis, 
+  YAxis, 
+  Tooltip,
+  Cell,
+  CartesianGrid
+} from 'recharts';
 
-type FinanceTab = 'overview' | 'invoices' | 'payouts' | 'tax' | 'compliance' | 'reports';
+type FinanceTab = 'overview' | 'ledger' | 'settlements' | 'tax' | 'compliance' | 'reports';
 
 export default function FinanceHub() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('overview');
-  const { scopedTransactions, invoices, processPayment, currentUser } = useAppStore();
+  const { scopedTransactions, currentUser, updateTransactionStatus, countryConfigs } = useAppStore();
   const { toast } = useToast();
 
   const handleAction = (msg: string) => {
     toast({ title: "Finance Operation", description: msg });
   };
 
-  const handleCompletePayment = (id: string) => {
-    processPayment(id);
-    toast({ title: "Settlement Confirmed", description: `Transaction ${id} has been settled in the global ledger.` });
+  const handleStatusTransition = (id: string, nextStatus: any) => {
+    updateTransactionStatus(id, nextStatus);
+    toast({ 
+      title: "Ledger State Transition", 
+      description: `Transaction ${id} moved to ${nextStatus}.` 
+    });
   };
+
+  const stats = useMemo(() => {
+    const completed = scopedTransactions.filter(t => t.status === 'Settled' || t.status === 'Closed');
+    const pipeline = scopedTransactions.filter(t => t.status === 'Paid' || t.status === 'Processing');
+    
+    const revenueByCountry = countryConfigs.map(c => {
+      const countryTrans = completed.filter(t => t.country.toLowerCase() === c.code.toLowerCase());
+      return {
+        country: c.name,
+        value: countryTrans.reduce((acc, t) => acc + t.amount, 0),
+        code: c.code
+      };
+    });
+
+    return {
+      netRevenue: completed.reduce((acc, t) => acc + (t.netAmount || t.amount), 0),
+      totalTax: completed.reduce((acc, t) => acc + (t.taxAmount || 0), 0),
+      pipelineValue: pipeline.reduce((acc, t) => acc + t.amount, 0),
+      revenueByCountry
+    };
+  }, [scopedTransactions, countryConfigs]);
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -69,9 +105,9 @@ export default function FinanceHub() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <FinanceNavItem icon={<LayoutDashboard />} label="Ledger Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-          <FinanceNavItem icon={<Receipt />} label="Invoicing & Billing" active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
-          <FinanceNavItem icon={<Building2 />} label="Vendor Settlements" active={activeTab === 'payouts'} onClick={() => setActiveTab('payouts')} />
-          <FinanceNavItem icon={<Globe />} label="Tax & Customs" active={activeTab === 'tax'} onClick={() => setActiveTab('tax')} />
+          <FinanceNavItem icon={<Receipt />} label="Global Ledger" active={activeTab === 'ledger'} onClick={() => setActiveTab('ledger')} />
+          <FinanceNavItem icon={<Building2 />} label="Settlement Pipeline" active={activeTab === 'settlements'} onClick={() => setActiveTab('settlements')} />
+          <FinanceNavItem icon={<Globe />} label="Tax Jurisdictions" active={activeTab === 'tax'} onClick={() => setActiveTab('tax')} />
           <FinanceNavItem icon={<ShieldCheck />} label="Regulatory Audit" active={activeTab === 'compliance'} onClick={() => setActiveTab('compliance')} />
           <FinanceNavItem icon={<TrendingUp />} label="Financial Reports" active={activeTab === 'reports'} onClick={() => setActiveTab('reports')} />
         </nav>
@@ -92,12 +128,12 @@ export default function FinanceHub() {
               {activeTab} Hub
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              Global Treasury Oversight • {currentUser?.country.toUpperCase()} Jurisdiction
+              Treasury Settlement Engine • {currentUser?.country.toUpperCase()} Market
             </p>
           </div>
           <div className="flex items-center space-x-6">
-            <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest" onClick={() => handleAction("New manual invoice generated.")}>
-              <Plus className="w-3 h-3 mr-2" /> GENERATE BILLING
+            <Button className="bg-plum text-white hover:bg-gold h-10 px-6 rounded-none text-[9px] font-bold uppercase tracking-widest" onClick={() => handleAction("Internal reconciliation initiated.")}>
+              <BadgeDollarSign className="w-3.5 h-3.5 mr-2" /> RECONCILE LEDGER
             </Button>
             <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">AF</div>
           </div>
@@ -108,79 +144,126 @@ export default function FinanceHub() {
           {activeTab === 'overview' && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard icon={<DollarSign />} label="Net Revenue (Scoped)" value={`$${(scopedTransactions.filter(t => t.status === 'Completed').reduce((a, b) => a + b.amount, 0) / 1000).toFixed(1)}k`} trend="+12.4%" positive />
-                <StatCard icon={<Globe />} label="Tax Liability" value="$42k" trend="Compliance: 100%" positive />
-                <StatCard icon={<ShieldCheck />} label="Verified Settlements" value="98.2%" trend="Optimal" positive />
-                <StatCard icon={<Clock />} label="Pending Fund Release" value={`$${(scopedTransactions.filter(t => t.status === 'Pending').reduce((a, b) => a + b.amount, 0) / 1000).toFixed(1)}k`} trend="Scheduled" positive />
+                <StatCard icon={<DollarSign />} label="Settled Revenue" value={`$${(stats.netRevenue / 1000).toFixed(1)}k`} trend="+12.4%" positive />
+                <StatCard icon={<Globe />} label="Total Tax Liab." value={`$${(stats.totalTax / 1000).toFixed(1)}k`} trend="Compliance: 100%" positive />
+                <StatCard icon={<CheckCircle2 />} label="Settlement Velocity" value="98.2%" trend="Optimal" positive />
+                <StatCard icon={<Clock />} label="Pipeline Funds" value={`$${(stats.pipelineValue / 1000).toFixed(1)}k`} trend="Scheduled" positive />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <Card className="lg:col-span-2 bg-white border-border shadow-luxury overflow-hidden">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Ledger Registry</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time transactional stream for the {currentUser?.country.toUpperCase()} market</CardDescription>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <Card className="lg:col-span-8 bg-white border-border shadow-luxury overflow-hidden">
+                  <CardHeader className="border-b border-border flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="font-headline text-2xl">Revenue by Hub</CardTitle>
+                      <CardDescription className="text-[10px] uppercase tracking-widest">Market contribution index</CardDescription>
+                    </div>
                   </CardHeader>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader className="bg-ivory/50">
-                        <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">Entry ID</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Amount</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {scopedTransactions.map(tx => (
-                          <TableRow key={tx.id} className="hover:bg-ivory/30">
-                            <TableCell className="text-xs font-bold font-mono pl-8">{tx.id}</TableCell>
-                            <TableCell>
-                               <div className="flex flex-col">
-                                  <span className="text-xs font-bold uppercase tracking-tighter">{tx.type}</span>
-                                  <span className="text-[8px] text-gray-400 italic">{tx.clientName}</span>
-                               </div>
-                            </TableCell>
-                            <TableCell className="text-xs font-bold text-plum">{tx.currency} {tx.amount.toLocaleString()}</TableCell>
-                            <TableCell className="text-center">
-                              <Badge variant={tx.status === 'Completed' ? 'default' : 'outline'} className={cn("text-[8px] uppercase tracking-tighter", tx.status === 'Completed' ? "bg-green-500" : "text-orange-500 border-orange-200")}>
-                                {tx.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right pr-8">
-                              <div className="flex justify-end space-x-2">
-                                {tx.status === 'Pending' && (
-                                  <Button size="sm" variant="outline" className="h-8 border-plum text-plum text-[8px] font-bold uppercase hover:bg-plum hover:text-white" onClick={() => handleCompletePayment(tx.id)}>
-                                    Process Payment
-                                  </Button>
-                                )}
-                                <Button variant="ghost" size="icon" className="h-8 w-8"><FileText className="w-4 h-4" /></Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                  <CardContent className="p-10">
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={stats.revenueByCountry}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                          <XAxis dataKey="country" axisLine={false} tickLine={false} tick={{fontSize: 9, fontWeight: 700}} />
+                          <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9}} />
+                          <Tooltip 
+                            cursor={{fill: '#f9f7f9'}}
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="bg-white border border-border p-4 shadow-luxury">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-plum mb-1">{payload[0].payload.country}</p>
+                                    <p className="text-xl font-headline font-bold italic">${(payload[0].value as number).toLocaleString()}</p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar dataKey="value" radius={[2, 2, 0, 0]}>
+                            {stats.revenueByCountry.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#7E3F98' : '#D4AF37'} fillOpacity={0.8} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Settlement Velocity</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Global partner disbursement status</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-8">
-                    <ComplianceRow label="Europe Ateliers" status="Optimal" progress={100} />
-                    <ComplianceRow label="Americas Hub" status="Verified" progress={95} />
-                    <ComplianceRow label="Asia Pacific" status="In Sync" progress={100} />
-                    <ComplianceRow label="UAE Treasury" status="Reporting" progress={65} />
-                  </CardContent>
-                </Card>
+                <div className="lg:col-span-4 space-y-8">
+                  <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden h-full flex flex-col justify-center">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-plum/20 rounded-full blur-3xl" />
+                    <div className="relative z-10 space-y-6">
+                      <div className="flex items-center space-x-3 text-secondary">
+                        <Scale className="w-5 h-5" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest">Settlement Health</h4>
+                      </div>
+                      <div className="space-y-6 pt-4">
+                        <ComplianceRow label="Europe Settlements" status="CLEARED" progress={100} />
+                        <ComplianceRow label="UAE Treasury" status="TRANSIT" progress={65} />
+                        <ComplianceRow label="Asia Hub" status="CLEARED" progress={100} />
+                        <ComplianceRow label="USA Sales Tax" status="FILED" progress={100} />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
               </div>
             </>
           )}
 
-          {activeTab !== 'overview' && (
+          {activeTab === 'ledger' && (
+            <Card className="bg-white border-border shadow-luxury overflow-hidden">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="font-headline text-2xl">Institutional Ledger</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Full transaction lifecycle registry</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader className="bg-ivory/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] uppercase font-bold pl-8">Entry ID</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Market</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Gross</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Tax</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold">Net</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-center">Lifecycle Stage</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {scopedTransactions.map(tx => (
+                      <TableRow key={tx.id} className="hover:bg-ivory/30 transition-colors">
+                        <TableCell className="text-xs font-bold font-mono pl-8">{tx.id}</TableCell>
+                        <TableCell className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{tx.country}</TableCell>
+                        <TableCell className="text-xs font-bold">${tx.amount.toLocaleString()}</TableCell>
+                        <TableCell className="text-xs font-light text-red-500">-${(tx.taxAmount || 0).toLocaleString()}</TableCell>
+                        <TableCell className="text-xs font-bold text-plum">${(tx.netAmount || tx.amount).toLocaleString()}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge className={cn("text-[8px] uppercase tracking-tighter", 
+                            tx.status === 'Settled' ? "bg-green-50 text-green-600" : 
+                            tx.status === 'Processing' ? "bg-gold/10 text-gold" : 
+                            "bg-gray-50 text-gray-400"
+                          )}>
+                            {tx.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-8">
+                          <div className="flex justify-end space-x-2">
+                            {tx.status === 'Paid' && <Button size="sm" className="h-7 bg-black text-white text-[8px] font-bold uppercase rounded-none" onClick={() => handleStatusTransition(tx.id, 'Processing')}>Process</Button>}
+                            {tx.status === 'Processing' && <Button size="sm" className="h-7 bg-plum text-white text-[8px] font-bold uppercase rounded-none" onClick={() => handleStatusTransition(tx.id, 'Settled')}>Settle</Button>}
+                            {tx.status === 'Settled' && <Button size="sm" className="h-7 border-border text-gray-400 text-[8px] font-bold uppercase rounded-none" onClick={() => handleStatusTransition(tx.id, 'Closed')}>Archive</Button>}
+                            <Button variant="ghost" size="icon" className="h-7 w-7"><FileText className="w-3.5 h-3.5" /></Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+
+          {['settlements', 'tax', 'compliance', 'reports'].includes(activeTab) && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
@@ -188,7 +271,7 @@ export default function FinanceHub() {
                 </div>
               </div>
               <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} ledger is currently synchronizing with the Maison Treasury registry.
+                The {activeTab} terminal is currently processing regional data.
               </p>
             </div>
           )}
@@ -245,10 +328,10 @@ function ComplianceRow({ label, status, progress }: { label: string, status: str
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-        <span>{label}</span>
-        <span className="text-plum">{status}</span>
+        <span className="opacity-60">{label}</span>
+        <span className="text-secondary">{status}</span>
       </div>
-      <Progress value={progress} className="h-1 bg-ivory" />
+      <Progress value={progress} className="h-1 bg-white/10" />
     </div>
   );
 }
