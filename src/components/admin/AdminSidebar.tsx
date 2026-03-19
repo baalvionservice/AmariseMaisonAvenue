@@ -79,7 +79,7 @@ export function AdminSidebar() {
               {group.items.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <button className={cn(
-                    "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-xs group",
+                    "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-xs group border-none bg-transparent outline-none cursor-pointer",
                     pathname === item.href 
                       ? "bg-white/5 text-white border-l-2 border-blue-500" 
                       : "text-white/40 hover:text-white hover:bg-white/5"
@@ -102,12 +102,12 @@ export function AdminSidebar() {
 
       {/* Terminal Footer */}
       <div className="p-6 border-t border-white/5 space-y-2">
-        <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors">
+        <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors border-none bg-transparent outline-none cursor-pointer">
           <Settings size={16} />
           <span>Config</span>
         </button>
         <Link href="/us">
-          <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors">
+          <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors border-none bg-transparent outline-none cursor-pointer">
             <LogOut size={16} />
             <span>Exit Node</span>
           </button>

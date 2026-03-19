@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -109,9 +108,9 @@ export default function AdminDashboard() {
                 <p className="text-xs text-white/40 italic font-light leading-relaxed">
                   "Connoisseur intent in the {activeHubData.id.toUpperCase()} hub is currently trending toward high-complication horological assets. Recommend immediate allocation of Heritage Series 1924 artifacts."
                 </p>
-                <Button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-widest rounded-none">
+                <button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-widest rounded-none border-none">
                   Open Hub Terminal
-                </Button>
+                </button>
               </div>
             </motion.div>
           )}
@@ -181,7 +180,7 @@ export default function AdminDashboard() {
                       <span className="text-[11px] font-bold text-blue-400/80">{yieldIndex.toFixed(1)}%</span>
                     </div>
                     <div className="h-0.5 w-full bg-white/5 overflow-hidden">
-                      <div className="h-full bg-blue-500/30 group-hover:bg-blue-500 transition-all duration-1000" style={{ width: `${yieldIndex * 10}%` }} />
+                      <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${yieldIndex * 10}%` }} />
                     </div>
                   </div>
                 </div>

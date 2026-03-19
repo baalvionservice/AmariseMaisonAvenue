@@ -49,7 +49,7 @@ export function AdminTopBar() {
           <input 
             type="text" 
             placeholder="Registry Discovery..." 
-            className="w-full bg-white/5 h-11 pl-12 pr-4 rounded-none text-[11px] font-bold uppercase tracking-widest border-transparent focus:bg-white/10 focus:border-blue-500/30 transition-all outline-none text-white placeholder:text-white/10"
+            className="w-full bg-white/5 h-11 pl-12 pr-4 rounded-none text-[11px] font-bold uppercase tracking-widest border-none focus:bg-white/10 transition-all outline-none text-white placeholder:text-white/10"
           />
         </div>
 
@@ -82,7 +82,7 @@ export function AdminTopBar() {
         {/* Jurisdictional Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center space-x-4 px-4 py-2 hover:bg-white/5 transition-colors group">
+            <button className="flex items-center space-x-4 px-4 py-2 hover:bg-white/5 transition-colors group bg-transparent border-none outline-none cursor-pointer">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">{currentCountry.name}</span>
               </div>
@@ -109,7 +109,7 @@ export function AdminTopBar() {
 
         {/* Identity & Status */}
         <div className="flex items-center space-x-6">
-          <button className="relative p-2 text-white/20 hover:text-white transition-all group">
+          <button className="relative p-2 text-white/20 hover:text-white transition-all group bg-transparent border-none outline-none cursor-pointer">
             <Bell size={20} className="group-hover:rotate-12 transition-transform" />
             {scopedNotifications.some(n => !n.read) && (
               <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full" />
