@@ -39,19 +39,19 @@ import {
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/types';
 import { guardPage } from '@/lib/access/routeGuard';
+import { PERMISSIONS } from '@/lib/permissions/engine';
 
 type OpsTab = 'dashboard' | 'catalog' | 'inventory' | 'orders' | 'returns' | 'cms' | 'customers' | 'logistics';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { scopedProducts, scopedReturns, updateReturnStatus, deleteProduct, upsertProduct, currentUser } = useAppStore();
+  const { scopedProducts, scopedReturns, deleteProduct, upsertProduct, currentUser } = useAppStore();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Standard Route Guard Enforcement
-    if (!guardPage(currentUser, 'view_dashboard', currentUser?.country)) {
-      // In a real app, we'd redirect or show a 403 component
-      console.error("Institutional Access Violation Detected");
+    // Real-Time Access Validation
+    if (!guardPage(currentUser, PERMISSIONS.VIEW_DASHBOARD, currentUser?.country)) {
+      console.warn("Institutional Access Violation Detected");
     }
   }, [currentUser]);
 

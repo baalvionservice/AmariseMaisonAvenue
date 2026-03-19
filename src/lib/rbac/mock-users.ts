@@ -1,4 +1,4 @@
-import { Role, ROLES } from "./roles";
+import { Role, ROLES } from "../roles/system";
 
 /**
  * @fileOverview Mock user registry for RBAC testing.

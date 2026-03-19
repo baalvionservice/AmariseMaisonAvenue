@@ -43,6 +43,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { guardPage } from '@/lib/access/routeGuard';
+import { PERMISSIONS } from '@/lib/permissions/engine';
 
 export default function RevenueDashboard() {
   const { scopedInquiries, leadConversations, updateInquiryStatus, currentUser } = useAppStore();
@@ -52,8 +53,8 @@ export default function RevenueDashboard() {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Enforce isolation and RBAC at the route level
-    if (!guardPage(currentUser, 'view_revenue', currentUser?.country)) {
+    // Real-Time Access Validation
+    if (!guardPage(currentUser, PERMISSIONS.VIEW_REVENUE, currentUser?.country)) {
       console.warn("Security Alert: Scoped revenue access attempt blocked.");
     }
   }, [currentUser]);
