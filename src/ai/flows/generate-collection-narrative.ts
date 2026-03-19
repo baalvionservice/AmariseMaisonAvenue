@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating immersive luxury collection narratives.
@@ -25,10 +26,20 @@ export type GenerateCollectionNarrativeOutput = z.infer<
   typeof GenerateCollectionNarrativeOutputSchema
 >;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateCollectionNarrative(
   input: GenerateCollectionNarrativeInput
 ): Promise<GenerateCollectionNarrativeOutput> {
-  return generateCollectionNarrativeFlow(input);
+  try {
+    return await generateCollectionNarrativeFlow(input);
+  } catch (error) {
+    console.warn("AI Collection Narrative Quota Exceeded. Returning curated narrative.");
+    return {
+      narrative: `The ${input.collectionName} series at Maison Amarisé represents a profound dialogue between the archives of 1924 and the contemporary vision of our master artisans. ${input.baseDescription}. Each piece serves as a testament to the pursuit of perfection, hand-selected for the world's most discerning connoisseurs.`
+    };
+  }
 }
 
 const collectionNarrativePrompt = ai.definePrompt({

@@ -25,10 +25,28 @@ const GenerateCampaignCopyOutputSchema = z.object({
 });
 export type GenerateCampaignCopyOutput = z.infer<typeof GenerateCampaignCopyOutputSchema>;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateCampaignCopy(
   input: GenerateCampaignCopyInput
 ): Promise<GenerateCampaignCopyOutput> {
-  return generateCampaignCopyFlow(input);
+  try {
+    return await generateCampaignCopyFlow(input);
+  } catch (error) {
+    console.warn("AI Campaign Copy Quota Exceeded. Returning archive copy.");
+    if (input.campaignType === 'email') {
+      return {
+        subjectLine: `An Invitation to the ${input.category} Archive`,
+        bodyText: `The presence of the ${input.productName} in our ${input.country} atelier marks a significant moment for the Maison. We invite you to explore this artifact of human brilliance.`
+      };
+    } else {
+      return {
+        subjectLine: "Maison Alert",
+        bodyText: `The ${input.productName} has arrived in the ${input.country} registry. Discover the absolute standard.`
+      };
+    }
+  }
 }
 
 const campaignCopyPrompt = ai.definePrompt({

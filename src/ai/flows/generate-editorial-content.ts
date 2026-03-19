@@ -26,10 +26,22 @@ const GenerateEditorialContentOutputSchema = z.object({
 });
 export type GenerateEditorialContentOutput = z.infer<typeof GenerateEditorialContentOutputSchema>;
 
+/**
+ * Enhanced wrapper with fallback logic for quota resilience.
+ */
 export async function generateEditorialContent(
   input: GenerateEditorialContentInput
 ): Promise<GenerateEditorialContentOutput> {
-  return generateEditorialContentFlow(input);
+  try {
+    return await generateEditorialContentFlow(input);
+  } catch (error) {
+    console.warn("AI Editorial Content Quota Exceeded. Returning archive article.");
+    return {
+      title: `${input.topic}: The Maison Perspective`,
+      excerpt: `An exploration of ${input.topic} within the context of the ${input.country} hub.`,
+      content: `In the heart of our ${input.country} atelier, the dialogue between heritage and human brilliance remains our guiding light. The study of ${input.topic} reveals a deeper commitment to the artisanal standard that has defined the Maison since 1924. As we continue to curate the world's most significant artifacts, we find that rarity is not merely an attribute, but a philosophy. This volume of the AMARISÉ Journal serves as an invitation to the connoisseur seeking to master the art of acquisition.`
+    };
+  }
 }
 
 const editorialPrompt = ai.definePrompt({
