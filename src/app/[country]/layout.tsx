@@ -43,11 +43,11 @@ export default function CountryLayout({
             <div className="space-y-8">
               <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">Customer Care</h4>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
-                <li><Link href="#" className="hover:text-black transition-colors">Contact Us</Link></li>
+                <li><Link href={`/${countryCode}/contact`} className="hover:text-black transition-colors">Contact Us</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">My Account</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Shipping</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Returns</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">FAQ</Link></li>
+                <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Shipping</Link></li>
+                <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Returns</Link></li>
+                <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">FAQ</Link></li>
               </ul>
               <div className="space-y-4 pt-4 border-t border-gray-50">
                 <div className="flex items-center space-x-3 text-[11px] font-bold tracking-widest uppercase">
@@ -69,8 +69,8 @@ export default function CountryLayout({
             <div className="space-y-8">
               <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">About</h4>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
-                <li><Link href="#" className="hover:text-black transition-colors">About Us</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Visit Us</Link></li>
+                <li><Link href={`/${countryCode}/about`} className="hover:text-black transition-colors">About Us</Link></li>
+                <li><Link href={`/${countryCode}/contact`} className="hover:text-black transition-colors">Visit Us</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">Message From Our Founder</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">Affiliates</Link></li>
                 <li><Link href={`/${countryCode}/journal`} className="hover:text-black transition-colors">Blog</Link></li>
@@ -84,8 +84,8 @@ export default function CountryLayout({
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li><Link href="#" className="hover:text-black transition-colors">Authenticity Guarantee</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">Condition Descriptions</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">In-Home Services</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Concierge Services</Link></li>
+                <li><Link href={`/${countryCode}/services/concierge`} className="hover:text-black transition-colors">In-Home Services</Link></li>
+                <li><Link href={`/${countryCode}/services/concierge`} className="hover:text-black transition-colors">Concierge Services</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">Catalog</Link></li>
                 <li><Link href="#" className="hover:text-black transition-colors">MadAve Live</Link></li>
               </ul>
@@ -95,7 +95,7 @@ export default function CountryLayout({
             <div className="space-y-8">
               <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">Sell With Us</h4>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
-                <li><Link href="#" className="hover:text-black transition-colors">How to Sell or Consign</Link></li>
+                <li><Link href={`/${countryCode}/how-to-sell`} className="hover:text-black transition-colors">How to Sell or Consign</Link></li>
                 <li><Link href={`/${countryCode}/sell`} className="hover:text-black transition-colors">Submit an Item</Link></li>
               </ul>
               
