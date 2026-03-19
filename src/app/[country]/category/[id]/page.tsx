@@ -36,6 +36,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 
 /**
  * CategoryPage: Replicated for the Madison Avenue Couture archive view.
@@ -47,7 +48,7 @@ export default function CategoryPage() {
   const category = CATEGORIES.find(c => c.id === id) || { name: id === 'hermes' ? 'Hermès' : 'Department', subcategories: [] };
   
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [activeSort, setActiveSort] = useState('Featured');
+  const [priceRange, setPriceRange] = useState([0, 225000]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'handbags': true,
     'curations': false,
@@ -103,6 +104,14 @@ export default function CategoryPage() {
     { name: 'Ruthenium', count: 1 },
   ];
 
+  // Size Registry from reference image
+  const sizes = [
+    { name: 'Small', count: 153 },
+    { name: 'Medium', count: 225 },
+    { name: 'Large', count: 138 },
+    { name: 'Extra Large', count: 8 },
+  ];
+
   // Archival Birkin Sizes for the visual nav
   const birkinSizes = [
     { name: 'Birkin 25CM', id: '25cm' },
@@ -130,7 +139,7 @@ export default function CategoryPage() {
       id: 'birkin-white-30',
       name: 'Pre-owned Hermès Birkin 30 White Epsom Palladium Hardware',
       price: 15218.71,
-      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_30_White_Epsom_Palladium_Hardware_1.jpg?v=1691512345&width=1000'
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=400'
     }
   ];
 
@@ -159,7 +168,7 @@ export default function CategoryPage() {
               </button>
             </div>
 
-            <Accordion type="multiple" defaultValue={['COLOR', 'CONDITION', 'HARDWARE']} className="w-full">
+            <Accordion type="multiple" defaultValue={['COLOR', 'CONDITION', 'HARDWARE', 'SIZE', 'PRICE']} className="w-full">
               <AccordionItem value="COLOR" className="border-b border-gray-100 py-2">
                 <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
                   COLOR
@@ -222,18 +231,72 @@ export default function CategoryPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              {['SIZE', 'PRICE', 'SHOWROOM'].map((filter) => (
-                <AccordionItem key={filter} value={filter} className="border-b border-gray-100 py-2">
-                  <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
-                    {filter}
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2 pb-6">
-                    <div className="space-y-3 pl-2">
-                      <p className="text-xs text-gray-400 italic">Curating options...</p>
+              <AccordionItem value="SIZE" className="border-b border-gray-100 py-2">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
+                  SIZE
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-6">
+                  <div className="space-y-4 pl-1">
+                    {sizes.map((item) => (
+                      <div key={item.name} className="flex items-center space-x-4 group cursor-pointer">
+                        <Checkbox className="rounded-none border-gray-300 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                        <span className="text-xs font-light text-gray-700 tracking-wide flex-1">
+                          {item.name} <span className="text-gray-400 ml-1">({item.count})</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="PRICE" className="border-b border-gray-100 py-2">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
+                  PRICE
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-10">
+                  <div className="space-y-8 px-1">
+                    <Slider 
+                      defaultValue={[0, 225000]} 
+                      max={225000} 
+                      step={100} 
+                      value={priceRange}
+                      onValueChange={setPriceRange}
+                      className="my-8" 
+                    />
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 flex items-center border border-gray-200 h-14 px-4 bg-white">
+                        <span className="text-xs text-gray-400 font-bold">$</span>
+                        <input 
+                          type="text" 
+                          value={priceRange[0]} 
+                          readOnly
+                          className="w-full text-right text-xs bg-transparent outline-none pr-1 font-light" 
+                        />
+                      </div>
+                      <div className="flex-1 flex items-center border border-gray-200 h-14 px-4 bg-white">
+                        <span className="text-xs text-gray-400 font-bold">$</span>
+                        <input 
+                          type="text" 
+                          value={`${priceRange[1]}.00`} 
+                          readOnly
+                          className="w-full text-right text-xs bg-transparent outline-none pr-1 font-light" 
+                        />
+                      </div>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="SHOWROOM" className="border-b border-gray-100 py-2">
+                <AccordionTrigger className="text-[11px] font-bold tracking-[0.2em] text-gray-900 hover:no-underline py-4 uppercase">
+                  SHOWROOM
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-6">
+                  <div className="space-y-3 pl-2">
+                    <p className="text-xs text-gray-400 italic">Curating options...</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
 
