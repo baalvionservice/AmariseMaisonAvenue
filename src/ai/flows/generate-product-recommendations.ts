@@ -3,8 +3,8 @@
  * @fileOverview A Genkit flow for generating mock product recommendations.
  *
  * - generateProductRecommendations - A function that handles the generation of product recommendations.
- * - GenerateProductRecommendationsInput - The input type for the generateProductRecommendations function.
- * - GenerateProductRecommendationsOutput - The return type for the generateProductRecommendations function.
+ * - GenerateProductRecommendationsInput - The input type for the function.
+ * - GenerateProductRecommendationsOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -51,6 +51,7 @@ export type GenerateProductRecommendationsOutput = z.infer<
 
 /**
  * Enhanced wrapper with fallback logic for quota resilience.
+ * Uses existing registry IDs to ensure functional navigation.
  */
 export async function generateProductRecommendations(
   input: GenerateProductRecommendationsInput
@@ -58,29 +59,43 @@ export async function generateProductRecommendations(
   try {
     return await generateProductRecommendationsFlow(input);
   } catch (error) {
-    console.warn("AI Recommendation Quota Exceeded or API Error. Returning curated fallback selection.");
-    // Curated Fallback Selection for Maison Connoisseurs
+    console.warn("AI Recommendation Quota Exceeded. Returning curated registry fallback.");
     return {
       recommendations: [
         {
-          id: 'fallback-1',
+          id: 'prod-11',
+          name: 'Hermès Special Order Birkin 25',
+          description: 'A masterpiece of the archive in White and Etoupe Clemence.',
+          basePrice: 31741.89,
+          currency: 'EUR',
+          imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000',
+          category: 'Handbags',
+          departmentId: 'women',
+          categoryId: 'hermes',
+          subcategoryId: 'birkin-25cm',
+          isVip: true,
+          rating: 5.0,
+          reviewsCount: 12
+        },
+        {
+          id: 'prod-1',
           name: 'Amarisé Heritage Silk Scarf',
-          description: 'A masterpiece of hand-painted silk from our 1924 archive.',
+          description: 'Hand-painted archival silk from our 1924 collection.',
           basePrice: 1200,
           currency: 'USD',
           imageUrl: 'https://picsum.photos/seed/amarise-fallback-1/800/800',
           category: 'Accessories',
           departmentId: 'women',
-          categoryId: 'accessories',
+          categoryId: 'w-accessories',
           subcategoryId: 'silk-scarves',
-          isVip: true,
+          isVip: false,
           rating: 4.9,
-          reviewsCount: 124
+          reviewsCount: 42
         },
         {
-          id: 'fallback-2',
+          id: 'prod-10',
           name: 'Maison Grand Complication',
-          description: 'A Swiss-engineered marvel with hand-polished heritage movements.',
+          description: 'Swiss-engineered marvel with hand-polished heritage movements.',
           basePrice: 18500,
           currency: 'USD',
           imageUrl: 'https://picsum.photos/seed/amarise-fallback-2/800/800',
@@ -91,21 +106,6 @@ export async function generateProductRecommendations(
           isVip: true,
           rating: 5.0,
           reviewsCount: 18
-        },
-        {
-          id: 'fallback-3',
-          name: 'Nocturnal Allure Evening Gown',
-          description: 'Sculpted from midnight velvet and reclaimed gold thread.',
-          basePrice: 9400,
-          currency: 'USD',
-          imageUrl: 'https://picsum.photos/seed/amarise-fallback-3/800/800',
-          category: 'Apparel',
-          departmentId: 'women',
-          categoryId: 'w-couture',
-          subcategoryId: 'evening-gowns',
-          isVip: false,
-          rating: 4.8,
-          reviewsCount: 42
         }
       ]
     };
@@ -116,25 +116,25 @@ const productRecommendationPrompt = ai.definePrompt({
   name: 'productRecommendationPrompt',
   input: {schema: GenerateProductRecommendationsInputSchema},
   output: {schema: GenerateProductRecommendationsOutputSchema},
-  prompt: `You are an expert luxury product curator for AMARISÉ Luxe. Your task is to generate a list of personalized product recommendations based on the provided user scenario.
+  prompt: `You are an expert luxury product curator for AMARISÉ Luxe. Your task is to generate a list of personalized product recommendations.
 
 User Scenario: {{{scenario}}}
 {{#if currentProductId}}
-The user is currently viewing product with ID: {{{currentProductId}}}. Consider this in your recommendations.
+Currently viewing product ID: {{{currentProductId}}}. Consider this in your curation.
 {{/if}}
 
-Please recommend 3-5 luxury products. Ensure the recommendations are diverse yet relevant to the scenario and fit the AMARISÉ Luxe brand. 
+Please recommend 3 luxury products. Use sophisticated vocabulary.
 
-CRITICAL: You must provide the following fields exactly as named in the output schema:
+CRITICAL: You must provide the following fields exactly:
 - id: unique string starting with 'rec-'
 - name: concise product name
 - description: brief narrative
-- basePrice: a number between 500 and 100000
+- basePrice: a number (e.g. 15000)
 - currency: USD, GBP, or AED
 - imageUrl: https://picsum.photos/seed/<unique_id>/800/800
 - category: human-readable category name
-- departmentId: one of [women, men, jewelry, watches, accessories]
-- categoryId: e.g., w-bags, j-high, wa-complications
+- departmentId: one of [women, men, jewelry, watches]
+- categoryId: e.g., w-bags, wa-complications
 - subcategoryId: slug-style subcategory
 - isVip: boolean
 - rating: number between 4.0 and 5.0
