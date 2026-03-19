@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   TrendingUp, 
@@ -16,7 +16,13 @@ import {
   Activity,
   Cpu,
   RefreshCcw,
-  X
+  X,
+  ShoppingCart,
+  Heart,
+  Eye,
+  Target,
+  BarChart3,
+  AlertTriangle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,13 +35,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard() {
   const { products, privateInquiries } = useAppStore();
-  const { regions, globalTotal, globalUsers, totalOrders } = useSimulationData();
+  const { regions, globalTotal, globalUsers, totalOrders, globalCart, globalWishlist, conversionRate } = useSimulationData();
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
+  const [insights, setInsights] = useState<string[]>([]);
 
   const selectedRegion = useMemo(() => 
     selectedRegionId ? regions[selectedRegionId] : null, 
     [selectedRegionId, regions]
   );
+
+  // Autonomous Intelligence Insight Generator
+  useEffect(() => {
+    const generateInsights = () => {
+      const newInsights: string[] = [];
+      const regionalVals = Object.values(regions);
+      
+      const highCart = regionalVals.find(r => r.cart > 40);
+      if (highCart) newInsights.push(`High cart activity detected in ${highCart.name}. Recommend T1 outreach.`);
+      
+      const lowConv = regionalVals.find(r => (r.purchased / r.viewing) < 0.05);
+      if (lowConv) newInsights.push(`Conversion drift in ${lowConv.name} hub. Check local price logic.`);
+      
+      const revenueSpike = regionalVals.find(r => r.revenue > 1500000);
+      if (revenueSpike) newInsights.push(`Institutional goal exceeded in ${revenueSpike.name}.`);
+
+      setInsights(newInsights.slice(0, 3));
+    };
+
+    generateInsights();
+  }, [regions]);
 
   return (
     <div className="space-y-10">
@@ -62,7 +90,7 @@ export default function AdminDashboard() {
       </header>
 
       {/* Global Intelligence Globe */}
-      <section className="relative h-[500px] w-full bg-[#0A1A2F] rounded-xl overflow-hidden shadow-2xl border border-white/5">
+      <section className="relative h-[550px] w-full bg-[#0A1A2F] rounded-xl overflow-hidden shadow-2xl border border-white/5">
         <IntelligenceGlobe 
           regions={regions} 
           onRegionClick={(id) => setSelectedRegionId(id)} 
@@ -87,7 +115,7 @@ export default function AdminDashboard() {
               initial={{ x: 400, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 400, opacity: 0 }}
-              className="absolute right-0 top-0 h-full w-80 bg-slate-900/90 luxury-blur border-l border-white/10 z-30 p-8 flex flex-col"
+              className="absolute right-0 top-0 h-full w-80 bg-slate-900/95 luxury-blur border-l border-white/10 z-30 p-8 flex flex-col shadow-[-20px_0_50px_rgba(0,0,0,0.5)]"
             >
               <div className="flex justify-between items-start mb-8">
                 <div>
@@ -99,11 +127,21 @@ export default function AdminDashboard() {
                 </button>
               </div>
 
-              <div className="space-y-8 flex-1">
+              <div className="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
                 <MetricBlock label="Hub Yield" value={`$${selectedRegion.revenue.toLocaleString()}`} />
-                <MetricBlock label="Active Users" value={selectedRegion.activeUsers.toLocaleString()} />
-                <MetricBlock label="Daily Orders" value={selectedRegion.orders.toLocaleString()} />
-                <MetricBlock label="Market Momentum" value={`+${selectedRegion.growth}%`} positive />
+                
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                   <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Acquisition Funnel</p>
+                   <FunnelRow icon={<Eye className="w-3 h-3" />} label="Viewing" value={selectedRegion.viewing} color="text-slate-400" />
+                   <FunnelRow icon={<Heart className="w-3 h-3" />} label="Wishlist" value={selectedRegion.wishlist} color="text-blue-400" />
+                   <FunnelRow icon={<ShoppingCart className="w-3 h-3" />} label="Cart" value={selectedRegion.cart} color="text-amber-400" />
+                   <FunnelRow icon={<ShieldCheck className="w-3 h-3" />} label="Checkout" value={selectedRegion.checkout} color="text-purple-400" />
+                   <FunnelRow icon={<Target className="w-3 h-3" />} label="Purchased" value={selectedRegion.purchased} color="text-emerald-400" />
+                </div>
+
+                <div className="pt-4 border-t border-white/5">
+                   <MetricBlock label="Local Conversion" value={`${((selectedRegion.purchased / (selectedRegion.viewing || 1)) * 100).toFixed(2)}%`} positive />
+                </div>
               </div>
 
               <div className="pt-8 border-t border-white/10">
@@ -114,6 +152,15 @@ export default function AdminDashboard() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <div className="absolute bottom-8 left-8 z-10 flex flex-col items-start space-y-4">
+           {insights.map((insight, idx) => (
+             <div key={idx} className="flex items-center space-x-3 bg-plum/20 luxury-blur px-4 py-3 border border-plum/30 rounded-sm animate-fade-in">
+                <Zap className="w-3.5 h-3.5 text-plum" />
+                <p className="text-[10px] font-bold text-white/90 uppercase tracking-tight italic">{insight}</p>
+             </div>
+           ))}
+        </div>
 
         <div className="absolute bottom-8 right-8 z-10 flex flex-col items-end space-y-2">
           <div className="flex items-center space-x-2">
@@ -127,7 +174,7 @@ export default function AdminDashboard() {
       {/* Strategic KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <KPICard 
-          label="Total Global Yield" 
+          label="Global Yield (Est)" 
           value={`$${globalTotal.toLocaleString()}`} 
           trend="+14.2%" 
           trendUp={true} 
@@ -135,27 +182,27 @@ export default function AdminDashboard() {
           subtext="vs last sync"
         />
         <KPICard 
-          label="Archive Capacity" 
-          value={products.length.toString()} 
+          label="Conversion Index" 
+          value={`${conversionRate}%`} 
           trend="Steady" 
           trendUp={true} 
-          icon={<Package className="text-teal-500" />} 
-          subtext="Verified Artifacts"
+          icon={<Target className="text-teal-500" />} 
+          subtext="High Intent"
         />
         <KPICard 
-          label="Lead Resonance" 
-          value={privateInquiries.length.toString()} 
-          trend={`+${totalOrders % 5}`} 
+          label="Global Cart Volume" 
+          value={globalCart.toString()} 
+          trend={`+${Math.floor(globalCart * 0.1)}`} 
           trendUp={true} 
-          icon={<Users className="text-amber-500" />} 
-          subtext="Inquiry Velocity"
+          icon={<ShoppingCart className="text-amber-500" />} 
+          subtext="Unclosed Yield"
         />
         <KPICard 
-          label="Global Orders" 
+          label="Acquisition Success" 
           value={totalOrders.toString()} 
           trend="High" 
           trendUp={true} 
-          icon={<Activity className="text-emerald-500" />} 
+          icon={<ShieldCheck className="text-emerald-500" />} 
           subtext="Fulfillment Stream"
         />
       </div>
@@ -181,7 +228,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 divide-x divide-slate-100">
               <ActionBlock 
                 priority="CRITICAL"
-                count={3}
+                count={scopedErrors.filter(e => !e.resolved).length}
                 title="System Anomalies" 
                 desc="Jurisdictional sync drift detected." 
                 color="bg-red-500"
@@ -195,7 +242,7 @@ export default function AdminDashboard() {
               />
               <ActionBlock 
                 priority="NOMINAL"
-                count={12}
+                count={scopedProducts.filter(p => p.status === 'review').length}
                 title="SEO Audits" 
                 desc="Metadata generation cycles queued." 
                 color="bg-slate-400"
@@ -216,6 +263,18 @@ function MetricBlock({ label, value, positive }: { label: string, value: string,
         "text-xl font-headline font-bold italic",
         positive ? "text-emerald-400" : "text-white"
       )}>{value}</p>
+    </div>
+  );
+}
+
+function FunnelRow({ icon, label, value, color }: { icon: any, label: string, value: number, color: string }) {
+  return (
+    <div className="flex items-center justify-between group">
+       <div className="flex items-center space-x-3">
+          <div className={cn("p-1.5 rounded-sm bg-white/5", color)}>{icon}</div>
+          <span className="text-[10px] font-bold uppercase tracking-tight text-white/60">{label}</span>
+       </div>
+       <span className="text-xs font-bold text-white">{value.toLocaleString()}</span>
     </div>
   );
 }
