@@ -4,11 +4,12 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from '@/lib/store';
 
-// Optimize Font Loading
+// Optimize Font Loading with limited weights and display swap to prevent layout shift
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 const alegreya = Alegreya({
@@ -16,6 +17,7 @@ const alegreya = Alegreya({
   display: 'swap',
   variable: '--font-alegreya',
   style: ['normal', 'italic'],
+  weight: ['400', '500', '700', '900'],
 });
 
 export const viewport: Viewport = {
@@ -90,11 +92,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${alegreya.variable} light scroll-smooth`}>
       <head>
-        {/* Preconnect to critical assets */}
+        {/* Preconnect to critical assets to reduce LCP latency */}
         <link rel="preconnect" href="https://picsum.photos" />
         <link rel="preconnect" href="https://madisonavenuecouture.com" />
         
-        {/* Structured Data for SEO */}
+        {/* Structured Data for SEO Authority */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

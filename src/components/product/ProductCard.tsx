@@ -11,6 +11,7 @@ import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +19,7 @@ interface ProductCardProps {
 
 /**
  * ProductCard: Optimized for institutional trust and private acquisition.
- * Features Gated Pricing logic for Tier 1 artifacts.
+ * Uses semantic <article> tag and optimized Image delivery.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -55,11 +56,22 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   };
 
   return (
-    <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full">
+    <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full" aria-labelledby={`title-${product.id}`}>
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#f8f8f8]" aria-label={`View details for ${product.name}`}>
-        <div className="w-full h-full bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-[1.5s] group-hover:scale-105 group-hover:bg-ivory">
-          Atelier Archive Asset
+        {/* Loading placeholder optimized for CLS prevention */}
+        <div className="absolute inset-0 bg-muted flex items-center justify-center text-[9px] font-bold tracking-[0.5em] text-gray-300 uppercase italic transition-all duration-[1.5s] group-hover:scale-105 group-hover:bg-ivory" aria-hidden="true">
+          Archive Asset
         </div>
+        
+        {/* Main image using lazy loading for non-LCP content */}
+        <Image 
+          src={product.imageUrl} 
+          alt={`${product.name} - Atelier Archive View`}
+          fill
+          className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          loading="lazy"
+        />
         
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         
@@ -105,7 +117,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
       <div className="pt-8 pb-4 flex-1 flex flex-col space-y-3 bg-transparent text-center">
         <div className="space-y-1">
           <Link href={`/${countryCode}/product/${product.id}`} className="focus:outline-none focus:underline">
-            <h3 className="font-headline text-xl text-gray-900 group-hover:text-secondary transition-colors duration-700 leading-tight tracking-tight px-4 line-clamp-1 italic">
+            <h3 id={`title-${product.id}`} className="font-headline text-xl text-gray-900 group-hover:text-secondary transition-colors duration-700 leading-tight tracking-tight px-4 line-clamp-1 italic">
               {product.name}
             </h3>
           </Link>

@@ -101,7 +101,7 @@ export const Header = () => {
           <span className="opacity-90">Maison Registry Verified</span>
         </div>
         
-        <div className="flex items-center space-x-8">
+        <nav className="flex items-center space-x-8" aria-label="Utility Navigation">
           <Link href="#" className="hover:text-secondary transition-colors py-2">Consignment</Link>
           <Link href={`/${countryCode}/appointments`} className="hover:text-secondary transition-colors py-2">Atelier Viewings</Link>
           <Link href={`/${countryCode}/contact`} className="hover:text-secondary transition-colors py-2">Specialist Inquiry</Link>
@@ -113,7 +113,7 @@ export const Header = () => {
                 type="button"
                 aria-label={`Change Region (Current: ${currentCountry.name})`}
               >
-                <span className="text-sm leading-none grayscale brightness-200">{currentCountry.flag}</span>
+                <span className="text-sm leading-none grayscale brightness-200" aria-hidden="true">{currentCountry.flag}</span>
                 <span className="font-bold tracking-widest text-[10px] text-white uppercase">{currentCountry.name}</span>
               </button>
             </DropdownMenuTrigger>
@@ -129,7 +129,7 @@ export const Header = () => {
                   )}
                 >
                   <div className="flex items-center space-x-4">
-                    <span className="text-lg leading-none">{c.flag}</span>
+                    <span className="text-lg leading-none" aria-hidden="true">{c.flag}</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest">{c.name}</span>
                   </div>
                   <span className="text-[9px] font-medium opacity-40">{c.currency}</span>
@@ -137,7 +137,7 @@ export const Header = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </nav>
       </div>
 
       {/* Maison Brand Header */}
@@ -161,7 +161,7 @@ export const Header = () => {
             type="button"
             aria-label="Search Maison Intelligence"
           >
-            <Search className="w-5 h-5 stroke-[1.5px]" />
+            <Search className="w-5 h-5 stroke-[1.5px]" aria-hidden="true" />
             <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Intelligence</span>
           </button>
           
@@ -170,7 +170,7 @@ export const Header = () => {
             className="relative text-gray-400 hover:text-black transition-colors group min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={`View Wishlist (${wishlistCount} items)`}
           >
-            <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlistCount > 0 && "fill-black text-black")} />
+            <Heart className={cn("w-5 h-5 stroke-[1.5px]", wishlistCount > 0 && "fill-black text-black")} aria-hidden="true" />
             {wishlistCount > 0 && (
               <span className="absolute top-0 right-0 bg-black text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                 {wishlistCount}
@@ -183,7 +183,7 @@ export const Header = () => {
             className="relative text-gray-400 hover:text-black transition-colors group min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={`View Shopping Bag (${cartCount} items)`}
           >
-            <ShoppingBag className="w-5 h-5 stroke-[1.5px]" />
+            <ShoppingBag className="w-5 h-5 stroke-[1.5px]" aria-hidden="true" />
             {cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {cartCount}
@@ -223,7 +223,7 @@ export const Header = () => {
                 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-secondary transition-all relative py-2"
               >
                 {link.name}
-                <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-secondary transition-all group-hover:w-full group-hover:left-0" />
+                <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-secondary transition-all group-hover:w-full group-hover:left-0" aria-hidden="true" />
               </Link>
             )}
 
@@ -282,10 +282,10 @@ export const Header = () => {
           aria-expanded={isMenuOpen}
           aria-label="Toggle Navigation Menu"
         >
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
         </button>
         <span className="text-[10px] font-bold uppercase tracking-[0.5em] italic">Maison Menu</span>
-        <div className="w-10" />
+        <div className="w-10" aria-hidden="true" />
       </div>
     </header>
   );

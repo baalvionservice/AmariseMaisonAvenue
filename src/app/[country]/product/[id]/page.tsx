@@ -29,7 +29,12 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { InquiryModal } from '@/components/product/InquiryModal';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 
+/**
+ * ProductPage: Optimized for high-ticket acquisition.
+ * Features LCP optimization for the primary product image.
+ */
 export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -113,7 +118,7 @@ export default function ProductPage() {
         }}
       />
 
-      <div className="container mx-auto px-6 py-12 max-w-[1600px]">
+      <main className="container mx-auto px-6 py-12 max-w-[1600px]">
         <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] tracking-widest uppercase mb-12 text-muted-foreground font-bold">
           <Link href={`/${countryCode}`} className="hover:text-primary transition-colors">Maison</Link>
           <ChevronRight className="w-3 h-3" />
@@ -123,11 +128,18 @@ export default function ProductPage() {
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-24">
-          <div className="w-full lg:w-[55%] space-y-8">
+          <section className="w-full lg:w-[55%] space-y-8" aria-label="Product Gallery">
             <div className="group relative aspect-[4/5] overflow-hidden bg-white border border-border shadow-luxury">
-              <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase italic">
-                Atelier Perspective {activeMediaIndex + 1}
-              </div>
+              {/* LCP Optimized Product Image */}
+              <Image 
+                src={product.imageUrl} 
+                alt={`${product.name} - Heritage Perspective ${activeMediaIndex + 1}`}
+                fill
+                priority
+                fetchPriority="high"
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 55vw"
+              />
               
               {monetization.scarcityTag && (
                 <div className="absolute top-8 left-8 bg-black px-6 py-3 text-[10px] font-bold tracking-[0.4em] text-white uppercase shadow-2xl luxury-blur bg-opacity-80 border border-white/10">
@@ -140,6 +152,7 @@ export default function ProductPage() {
                    <button 
                     key={idx} 
                     onClick={() => setActiveMediaIndex(idx)}
+                    aria-label={`Switch to frame ${idx + 1}`}
                     className={cn(
                       "w-12 h-16 border transition-all overflow-hidden relative flex items-center justify-center text-[6px] font-bold uppercase tracking-tighter",
                       activeMediaIndex === idx ? "border-plum bg-ivory text-plum scale-110 shadow-lg" : "border-border bg-muted text-gray-400 opacity-60"
@@ -150,9 +163,9 @@ export default function ProductPage() {
                  ))}
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="w-full lg:w-[45%] space-y-12">
+          <section className="w-full lg:w-[45%] space-y-12" aria-label="Acquisition Details">
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 text-secondary">
@@ -161,7 +174,7 @@ export default function ProductPage() {
                      Private Acquisition Flow
                    </span>
                 </div>
-                <Button variant="ghost" size="icon" className="hover:text-primary transition-all" onClick={() => toggleWishlist(product)}>
+                <Button variant="ghost" size="icon" className="hover:text-primary transition-all min-w-[44px] min-h-[44px]" onClick={() => toggleWishlist(product)} aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}>
                   <Heart className={cn("w-5 h-5", isWishlisted && "fill-plum text-plum")} />
                 </Button>
               </div>
@@ -169,7 +182,7 @@ export default function ProductPage() {
               <div className="space-y-4">
                 <h1 className="text-6xl md:text-8xl font-headline font-bold leading-[0.9] text-gray-900 italic tracking-tighter">{product.name}</h1>
                 <div className="flex items-center space-x-6 pt-2">
-                   <div className="flex text-gold">
+                   <div className="flex text-gold" aria-label={`Rating: ${product.rating} stars`}>
                     {[...Array(5)].map((_, i) => <Star key={i} className={cn("w-4 h-4", i < Math.floor(product.rating) ? "fill-current" : "text-gray-200")} />)}
                    </div>
                    <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-bold border-l border-border pl-6">{product.reviewsCount} Archive Appreciations</span>
@@ -243,7 +256,7 @@ export default function ProductPage() {
 
               <TabsContent value="narrative" className="pt-12 animate-fade-in min-h-[300px]">
                 {loadingAi ? (
-                  <div className="space-y-6 animate-pulse">
+                  <div className="space-y-6 animate-pulse" aria-hidden="true">
                     <div className="h-6 bg-muted w-full" />
                     <div className="h-6 bg-muted w-5/6" />
                     <div className="h-6 bg-muted w-4/6" />
@@ -264,17 +277,17 @@ export default function ProductPage() {
                 </ul>
               </TabsContent>
             </Tabs>
-          </div>
+          </section>
         </div>
 
-        <section className="mt-60 border-t border-border pt-32">
+        <section className="mt-60 border-t border-border pt-32" aria-labelledby="related-title">
           <div className="flex items-end justify-between mb-24">
             <div className="space-y-6">
               <div className="flex items-center space-x-4 text-plum">
                  <Award className="w-8 h-8 text-gold" />
                  <span className="text-[11px] font-bold tracking-[0.6em] uppercase">Private Selection</span>
               </div>
-              <h2 className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Synergistic Artifacts</h2>
+              <h2 id="related-title" className="text-6xl font-headline font-bold italic text-gray-900 tracking-tight">Synergistic Artifacts</h2>
             </div>
             <Link href={`/${countryCode}/category/all`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-plum transition-colors border-b border-black pb-2 flex items-center">
                Explore Full Archive <ChevronRight className="w-3 h-3 ml-2" />
@@ -283,7 +296,7 @@ export default function ProductPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16">
             {loadingRecs ? (
-              [...Array(4)].map((_, i) => <div key={i} className="aspect-[4/5] bg-muted border border-border animate-pulse" />)
+              [...Array(4)].map((_, i) => <div key={i} className="aspect-[4/5] bg-muted border border-border animate-pulse" aria-hidden="true" />)
             ) : (
               recommendations.map(p => (
                 <ProductCard key={p.id} product={p} />
@@ -291,7 +304,7 @@ export default function ProductPage() {
             )}
           </div>
         </section>
-      </div>
+      </main>
     </div>
   );
 }
