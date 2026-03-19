@@ -213,12 +213,12 @@ export default function CityPage() {
               </div>
               <div className="pt-12 flex flex-col sm:flex-row gap-8">
                  <Link href={city.office.mapUrl} target="_blank" className="flex-1">
-                    <Button className="w-full h-20 rounded-none bg-black text-white hover:bg-secondary transition-all text-[10px] font-bold tracking-[0.5em] uppercase shadow-xl">
+                    <Button className="w-full h-20 rounded-none bg-black text-white hover:bg-secondary transition-all text-[10px] font-bold tracking-[0.5em] uppercase shadow-xl" aria-label="Request Directions">
                       Request Directions
                     </Button>
                  </Link>
                  <Link href={`/${countryCode}/appointments`} className="flex-1">
-                    <Button variant="outline" className="w-full h-20 rounded-none border-black text-[10px] font-bold tracking-[0.5em] uppercase hover:bg-black hover:text-white transition-all">
+                    <Button variant="outline" className="w-full h-20 rounded-none border-black text-[10px] font-bold tracking-[0.5em] uppercase hover:bg-black hover:text-white transition-all" aria-label="Book Private Salon">
                       Book Private Salon
                     </Button>
                  </Link>
