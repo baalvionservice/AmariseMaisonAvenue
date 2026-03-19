@@ -18,16 +18,20 @@ import {
   BrainCircuit,
   Bot,
   Lightbulb,
-  AlertCircle
+  AlertCircle,
+  Play,
+  History
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAI } from '@/hooks/use-ai';
+import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 export default function AIDashboard() {
   const { modules, logs, suggestions, approveSuggestion, rejectSuggestion } = useAI();
+  const { workflows, runWorkflowTask } = useAppStore();
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -68,12 +72,44 @@ export default function AIDashboard() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Top Level Pulse */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatCard icon={<BrainCircuit />} label="Active Modules" value={modules.filter(m => m.enabled).length.toString()} trend="Global" positive />
-            <StatCard icon={<Bot />} label="AI Actions (24h)" value={logs.length.toString()} trend="Simulated" positive />
-            <StatCard icon={<Lightbulb />} label="Pending Sug." value={suggestions.filter(s => s.status === 'pending').length.toString()} trend="Assisted" positive />
-            <StatCard icon={<TrendingUp />} label="Efficency Gain" value="74%" trend="+12%" positive />
+          {/* Workflow Tasks */}
+          <div className="space-y-6">
+            <div className="flex items-center space-x-2">
+              <History className="w-4 h-4 text-plum" />
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Scheduled Workflows</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {workflows.map(task => (
+                <Card key={task.id} className="bg-white border-border shadow-sm flex items-center p-6 space-x-6">
+                  <div className={cn(
+                    "p-3 rounded-full",
+                    task.status === 'running' ? "bg-plum/10 text-plum animate-spin" : "bg-ivory text-gray-400"
+                  )}>
+                    <RefreshCcw className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xs font-bold uppercase tracking-widest">{task.taskName}</h4>
+                    <p className="text-[9px] text-gray-400 uppercase">{task.frequency} Cycle • {task.country.toUpperCase()}</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge variant="outline" className={cn("text-[8px] uppercase", 
+                      task.status === 'complete' ? "text-green-600 bg-green-50 border-green-100" : ""
+                    )}>
+                      {task.status}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-plum hover:bg-plum/5"
+                      onClick={() => runWorkflowTask(task.id)}
+                      disabled={task.status === 'running'}
+                    >
+                      <Play className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -195,24 +231,5 @@ function AINavItem({ icon, label, active, href }: { icon: any, label: string, ac
         {active && <ChevronRight className="w-4 h-4 ml-auto" />}
       </button>
     </Link>
-  );
-}
-
-function StatCard({ icon, label, value, trend, positive }: { icon: any, label: string, value: string, trend: string, positive: boolean }) {
-  return (
-    <Card className="bg-white border-border shadow-luxury hover:border-gold transition-colors group">
-      <CardContent className="p-8 space-y-6">
-        <div className="flex justify-between items-start">
-          <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
-          <div className={cn("text-[10px] font-bold tracking-widest uppercase", positive ? "text-gold" : "text-red-500")}>
-            {trend}
-          </div>
-        </div>
-        <div>
-          <div className="text-gray-400 text-[10px] uppercase tracking-[0.4em] font-bold">{label}</div>
-          <div className="text-4xl font-headline font-bold italic mt-2 text-gray-900">{value}</div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

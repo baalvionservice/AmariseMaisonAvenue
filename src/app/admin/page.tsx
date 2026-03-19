@@ -21,17 +21,18 @@ import {
   ActivitySquare,
   DollarSign,
   Crown,
-  BrainCircuit
+  BrainCircuit,
+  Bell
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { Badge } from "@/components/ui/badge";
 
 export default function SuperAdminPanel() {
-  const { privateInquiries, socialMetrics, admins } = useAppStore();
+  const { privateInquiries, scopedNotifications, markNotificationRead } = useAppStore();
 
-  // Simple mock check for Super Admin
   const isSuperAdmin = true; 
 
   return (
@@ -80,10 +81,43 @@ export default function SuperAdminPanel() {
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Command Center</h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Platform Intelligence & Unit Economics</p>
           </div>
-          <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MC</div>
+          <div className="flex items-center space-x-6">
+            <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MC</div>
+          </div>
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
+          {/* Notifications Center */}
+          <div className="space-y-6">
+            <div className="flex items-center space-x-2">
+              <Bell className="w-4 h-4 text-plum" />
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Institutional Alerts</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {scopedNotifications.slice(0, 3).map(note => (
+                <Card key={note.id} className={cn(
+                  "border-l-4 p-6 bg-white shadow-sm flex flex-col justify-between h-40",
+                  note.type === 'alert' ? "border-l-red-500" : "border-l-green-500"
+                )}>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">{note.country.toUpperCase()} Market</span>
+                      <span className="text-[8px] text-gray-300">{new Date(note.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                    <p className="text-xs font-medium leading-relaxed">{note.message}</p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="self-end text-[9px] font-bold uppercase tracking-widest text-plum h-auto p-0"
+                    onClick={() => markNotificationRead(note.id)}
+                  >
+                    Dismiss
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard icon={<DollarSign />} label="Estimated Rev." value="$1.2M" trend="+12.4%" positive />
             <StatCard icon={<Users />} label="Active Leads" value={privateInquiries.length.toString()} trend="High Value" positive />
@@ -110,13 +144,13 @@ export default function SuperAdminPanel() {
               <div className="relative z-10 space-y-6">
                 <h3 className="text-3xl font-headline font-bold italic">Quick Actions</h3>
                 <div className="space-y-4">
-                  <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <Link href="/admin/ai-dashboard" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review AI Proposals</p>
                   </Link>
-                  <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <Link href="/admin/sales" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Review T1 Leads</p>
                   </Link>
-                  <Link href="/admin/super" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                  <Link href="/admin/super" className="block p-4 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-plum">Global Infrastructure</p>
                   </Link>
                 </div>

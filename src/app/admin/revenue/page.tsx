@@ -25,7 +25,8 @@ import {
   Crown,
   Clock,
   Send,
-  MoreVertical
+  MoreVertical,
+  LineChart
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,20 +42,18 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { guardPage } from '@/lib/access/routeGuard';
-import { PERMISSIONS } from '@/lib/permissions/engine';
 
 export default function RevenueDashboard() {
-  const { scopedInquiries, leadConversations, updateInquiryStatus, currentUser } = useAppStore();
+  const { scopedInquiries, leadConversations, updateInquiryStatus, currentUser, analyticsData } = useAppStore();
   const metrics = MOCK_REVENUE_METRICS;
   
   const [filterTier, setFilterTier] = useState<string>('all');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Real-Time Access Validation
-    if (!guardPage(currentUser, PERMISSIONS.VIEW_REVENUE, currentUser?.country)) {
+    if (!guardPage(currentUser, 'view_revenue', currentUser?.country)) {
       console.warn("Security Alert: Scoped revenue access attempt blocked.");
     }
   }, [currentUser]);
@@ -63,16 +62,6 @@ export default function RevenueDashboard() {
     if (filterTier === 'all') return scopedInquiries;
     return scopedInquiries.filter(i => i.leadTier.toString() === filterTier);
   }, [scopedInquiries, filterTier]);
-
-  const selectedLead = useMemo(() => 
-    scopedInquiries.find(i => i.id === selectedLeadId), 
-    [scopedInquiries, selectedLeadId]
-  );
-
-  const activeConversation = useMemo(() => 
-    leadConversations.find(c => c.inquiryId === selectedLeadId),
-    [leadConversations, selectedLeadId]
-  );
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -105,7 +94,7 @@ export default function RevenueDashboard() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">Acquisition Hub</h1>
-            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Lead Lifecycle & Scoped CRM ({currentUser?.country.toUpperCase()})</p>
+            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">Institutional Revenue Intelligence</p>
           </div>
           <div className="flex items-center space-x-6">
              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-gold bg-gold/5 px-4 py-2 border border-gold/10">
@@ -117,177 +106,109 @@ export default function RevenueDashboard() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Scoped Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatCard icon={<DollarSign />} label="Estimated Value" value={`$${(metrics.totalAcquisitionValue / 1000000).toFixed(1)}M`} trend="+12.4%" positive />
-            <StatCard icon={<Users />} label="Scoped Leads" value={scopedInquiries.length.toString()} trend="Local Focus" positive />
-            <StatCard icon={<ShieldCheck />} label="Verified Registry" value="100%" trend="Compliance" positive />
-            <StatCard icon={<Target />} label="Conv. Rate" value={`${metrics.conversionRate}%`} trend="Target: 5%" positive />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            
-            {/* Leads Table */}
-            <Card className="lg:col-span-8 bg-white border-border shadow-luxury overflow-hidden">
-              <CardHeader className="border-b border-border flex flex-row items-center justify-between">
+          {/* Analytics Summary */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <Card className="lg:col-span-8 bg-white border-border shadow-luxury">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-border">
                 <div>
-                  <CardTitle className="font-headline text-2xl">Acquisition Leads</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">{currentUser?.country.toUpperCase()} curatorial requests feed</CardDescription>
+                  <CardTitle className="font-headline text-2xl">Growth Trajectory</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Institutional performance metrics</CardDescription>
                 </div>
-                <div className="flex items-center space-x-4">
-                   <div className="relative group">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-300" />
-                      <input className="bg-ivory border border-border h-8 pl-8 pr-4 text-[9px] font-bold uppercase tracking-widest outline-none w-40" placeholder="SEARCH LEAD" />
-                   </div>
-                   <select 
-                    className="bg-white border border-border h-8 px-3 text-[9px] font-bold uppercase tracking-widest outline-none"
-                    value={filterTier}
-                    onChange={(e) => setFilterTier(e.target.value)}
-                   >
-                      <option value="all">All Tiers</option>
-                      <option value="1">Tier 1 (Elite)</option>
-                      <option value="2">Tier 2 (Strategic)</option>
-                      <option value="3">Tier 3 (Discovery)</option>
-                   </select>
+                <div className="flex space-x-2">
+                  <Badge className="bg-plum/5 text-plum border-plum/10 text-[8px] uppercase">Revenue</Badge>
+                  <Badge variant="outline" className="text-[8px] uppercase">Leads</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader className="bg-ivory/50">
-                    <TableRow>
-                      <TableHead className="text-[9px] uppercase font-bold pl-8">Connoisseur</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Market</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold">Intent</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Tier</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">View</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredInquiries.length > 0 ? filteredInquiries.map(inq => (
-                      <TableRow 
-                        key={inq.id} 
-                        className={cn("hover:bg-ivory/30 cursor-pointer transition-colors", selectedLeadId === inq.id && "bg-plum/5")}
-                        onClick={() => setSelectedLeadId(inq.id)}
-                      >
-                        <TableCell className="pl-8">
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold leading-tight uppercase tracking-tight">{inq.customerName}</span>
-                            <span className="text-[8px] text-gray-400 uppercase tracking-widest">{inq.email}</span>
+              <CardContent className="p-8">
+                <div className="h-64 flex items-end justify-between space-x-4">
+                  {analyticsData.map((d, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center group">
+                      <div className="relative w-full bg-ivory flex flex-col justify-end">
+                        <div 
+                          className="w-full bg-plum/20 group-hover:bg-plum/40 transition-all cursor-pointer relative" 
+                          style={{ height: `${(d.revenue / 200000) * 100}%` }}
+                        >
+                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-[9px] font-bold text-plum opacity-0 group-hover:opacity-100 transition-opacity">
+                            ${(d.revenue / 1000).toFixed(0)}k
                           </div>
-                        </TableCell>
-                        <TableCell className="text-[10px] uppercase tracking-widest font-bold">{inq.country}</TableCell>
-                        <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest border-border text-gray-500">{inq.intent}</Badge></TableCell>
-                        <TableCell className="text-center">
-                          <div className={cn(
-                            "inline-flex items-center justify-center w-6 h-6 rounded-full text-[9px] font-bold border",
-                            inq.leadTier === 1 ? "bg-gold/10 border-gold text-gold" : 
-                            inq.leadTier === 2 ? "bg-plum/5 border-plum text-plum" : 
-                            "bg-gray-50 border-border text-gray-400"
-                          )}>
-                            {inq.leadTier}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge className={cn("text-[8px] uppercase tracking-widest", 
-                            inq.status === 'new' ? 'bg-red-50 text-red-600' : 
-                            inq.status === 'contacted' ? 'bg-gold/10 text-gold' : 
-                            'bg-green-50 text-green-600'
-                          )}>
-                            {inq.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right pr-8">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><ChevronRight className="w-4 h-4" /></Button>
-                        </TableCell>
-                      </TableRow>
-                    )) : (
-                      <TableRow>
-                        <TableCell colSpan={6} className="py-32 text-center text-gray-400 italic text-sm">No scoped artifacts found in this acquisition cycle.</TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                        </div>
+                      </div>
+                      <span className="text-[8px] font-bold text-gray-400 mt-4 uppercase tracking-tighter">{d.date.split('-')[2]} Mar</span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
-            {/* Scoped Conversation Sidebar */}
-            <Card className="lg:col-span-4 bg-white border-border shadow-luxury h-[700px] flex flex-col">
-              {selectedLead ? (
-                <>
-                  <CardHeader className="border-b border-border bg-ivory/30">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                           <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">LEAD ID: {selectedLead.id}</span>
-                           <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        </div>
-                        <CardTitle className="font-headline text-xl">{selectedLead.customerName}</CardTitle>
-                      </div>
-                      <Badge className="bg-plum text-white text-[8px] uppercase tracking-[0.2em]">Tier {selectedLead.leadTier}</Badge>
-                    </div>
-                  </CardHeader>
-                  
-                  <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-ivory/10">
-                    <div className="p-4 bg-white border border-border space-y-2">
-                       <span className="text-[8px] font-bold uppercase tracking-widest text-plum">Primary Intent</span>
-                       <p className="text-xs italic font-light leading-relaxed">"{selectedLead.message}"</p>
-                    </div>
-
-                    <div className="space-y-4">
-                       <div className="flex items-center space-x-2 text-[9px] font-bold uppercase tracking-widest text-gray-400">
-                          <MessageSquare className="w-3 h-3" />
-                          <span>Curatorial Dialogue</span>
-                       </div>
-                       
-                       {activeConversation?.messages.map(m => (
-                         <div key={m.id} className={cn("flex flex-col space-y-1", m.sender === 'curator' ? 'items-end' : 'items-start')}>
-                            <div className={cn("max-w-[85%] p-4 text-[11px] leading-relaxed shadow-sm border", 
-                              m.sender === 'curator' ? 'bg-plum text-white border-plum' : 'bg-white text-gray-700 border-border'
-                            )}>
-                               {m.text}
-                            </div>
-                            <span className="text-[7px] text-gray-300 uppercase tracking-tighter">{new Date(m.timestamp).toLocaleTimeString()}</span>
-                         </div>
-                       ))}
-                    </div>
-                  </div>
-
-                  <div className="p-6 border-t border-border bg-white space-y-4">
-                    <div className="flex space-x-2">
-                       <Button 
-                        variant="outline" 
-                        className="flex-1 h-10 border-border text-[9px] font-bold uppercase tracking-widest hover:bg-gold hover:text-black transition-all"
-                        onClick={() => updateInquiryStatus(selectedLead.id, 'contacted')}
-                       >
-                         <Send className="w-3 h-3 mr-2" /> DISPATCH WHATSAPP
-                       </Button>
-                       <Button 
-                        variant="outline" 
-                        className="h-10 border-border text-gray-400"
-                        onClick={() => updateInquiryStatus(selectedLead.id, 'closed')}
-                       >
-                         <ShieldCheck className="w-4 h-4" />
-                       </Button>
-                    </div>
-                    <p className="text-[8px] text-center text-gray-400 italic">Discreet regional acquisition protocols enforced.</p>
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-6">
-                   <div className="p-8 bg-ivory border border-border rounded-full animate-pulse">
-                      <Users className="w-10 h-10 text-gold/30" />
-                   </div>
-                   <div className="space-y-2">
-                      <h3 className="font-headline text-2xl italic text-gray-900">Maison Select</h3>
-                      <p className="text-xs text-gray-400 font-light max-w-[200px] mx-auto">Select a regional lead from the registry to begin curatorial guidance.</p>
-                   </div>
-                </div>
-              )}
-            </Card>
+            <div className="lg:col-span-4 space-y-8">
+              <Card className="bg-white border-border shadow-luxury">
+                <CardHeader className="border-b border-border">
+                  <CardTitle className="font-headline text-xl">Conversion Loop</CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 space-y-8">
+                  <AnalyticsProgress label="Tier 1 Closing Rate" val={12} target={15} />
+                  <AnalyticsProgress label="Service Pull-Through" val={28} target={30} />
+                  <AnalyticsProgress label="AI-Assisted Wins" val={74} target={80} />
+                </CardContent>
+              </Card>
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <StatCard icon={<DollarSign />} label="Estimated Value" value={`$${(metrics.totalAcquisitionValue / 1000000).toFixed(1)}M`} trend="+12.4%" positive />
+            <StatCard icon={<Users />} label="Active Leads" value={scopedInquiries.length.toString()} trend="Local Scope" positive />
+            <StatCard icon={<ShieldCheck />} label="Verified Registry" value="100%" trend="Compliance" positive />
+            <StatCard icon={<LineChart />} label="Avg. Order" value="$42k" trend="High Intensity" positive />
+          </div>
+
+          <Card className="bg-white border-border shadow-luxury overflow-hidden">
+            <CardHeader className="border-b border-border flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-headline text-2xl">Market Distribution</CardTitle>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Global revenue breakdown</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader className="bg-ivory/50">
+                  <TableRow>
+                    <TableHead className="text-[9px] uppercase font-bold pl-8">Market Hub</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold">Contribution</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Trend</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {metrics.topRegions.map((region, idx) => (
+                    <TableRow key={idx} className="hover:bg-ivory/30 transition-colors">
+                      <TableCell className="pl-8 font-bold text-xs uppercase tracking-widest">{region.name}</TableCell>
+                      <TableCell className="text-xs font-bold text-plum">${(region.value / 1000000).toFixed(1)}M</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-[8px] uppercase border-plum/30 text-plum">Primary Market</Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-8">
+                        <ArrowUpRight className="w-4 h-4 ml-auto text-gold" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </main>
+    </div>
+  );
+}
+
+function AnalyticsProgress({ label, val, target }: { label: string, val: number, target: number }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+        <span className="text-gray-400">{label}</span>
+        <span className="text-plum">{val}% / {target}%</span>
+      </div>
+      <Progress value={(val / target) * 100} className="h-1 bg-ivory" />
     </div>
   );
 }
@@ -314,7 +235,7 @@ function StatCard({ icon, label, value, trend, positive }: { icon: any, label: s
         <div className="flex justify-between items-start">
           <div className="p-4 bg-ivory rounded-full group-hover:bg-gold/10 transition-colors text-plum">{icon}</div>
           <div className={cn("text-[10px] font-bold tracking-widest uppercase", positive ? "text-gold" : "text-red-500")}>
-            {trend} {positive && <ArrowUpRight className="ml-1 w-3 h-3 inline" />}
+            {trend}
           </div>
         </div>
         <div>

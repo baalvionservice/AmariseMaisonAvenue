@@ -323,6 +323,48 @@ export interface AISuggestion {
   timestamp: string;
 }
 
+// --- OPERATIONS & WORKFLOW ---
+
+export interface MaisonNotification {
+  id: string;
+  toRole: string;
+  country: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'info' | 'alert' | 'success';
+}
+
+export interface WorkflowTask {
+  id: string;
+  taskName: string;
+  frequency: 'hourly' | 'daily' | 'weekly';
+  country: string;
+  status: 'pending' | 'running' | 'complete' | 'failed';
+  lastRun?: string;
+}
+
+export interface ApprovalRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  contentType: 'listing' | 'editorial' | 'campaign';
+  contentId: string;
+  country: string;
+  status: 'pending' | 'approved' | 'rejected';
+  timestamp: string;
+  comments?: string;
+  approvedBy?: string;
+}
+
+export interface AnalyticsMetric {
+  date: string;
+  revenue: number;
+  leads: number;
+  conversionRate: number;
+  aiScore: number;
+}
+
 // --- LOGISTICS & ADMIN ---
 
 export interface SocialMetrics {

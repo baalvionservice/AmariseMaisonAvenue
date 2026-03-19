@@ -50,7 +50,7 @@ type VendorTab = 'dashboard' | 'catalog' | 'orders' | 'reports' | 'finances' | '
 
 export default function VendorAdminPanel() {
   const [activeTab, setActiveTab] = useState<VendorTab>('dashboard');
-  const { activeVendor, setActiveVendor, vendors, products, deleteProduct, currentUser } = useAppStore();
+  const { activeVendor, setActiveVendor, vendors, products, deleteProduct, currentUser, submitApproval } = useAppStore();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -68,6 +68,11 @@ export default function VendorAdminPanel() {
 
   const handleAction = (msg: string) => {
     toast({ title: "Atelier Action", description: msg });
+  };
+
+  const handleSubmission = (productId: string) => {
+    submitApproval('listing', productId, currentUser?.country);
+    toast({ title: "Submitted for Audit", description: "Maison curators will review your registry entry." });
   };
 
   const handleDelete = (id: string) => {
@@ -271,7 +276,8 @@ export default function VendorAdminPanel() {
                         <TableCell className="text-right text-xs font-light">${product.basePrice.toLocaleString()}</TableCell>
                         <TableCell className="text-right pr-8">
                           <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><Edit3 className="w-3.5 h-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum" title="Submit for Audit" onClick={() => handleSubmission(product.id)}><RotateCcw className="w-3.5 h-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gold"><Edit3 className="w-3.5 h-3.5" /></Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-destructive" onClick={() => handleDelete(product.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                           </div>
                         </TableCell>
@@ -282,20 +288,6 @@ export default function VendorAdminPanel() {
               </Card>
             </div>
           )}
-
-          {['reports', 'finances', 'profile'].includes(activeTab) && (
-            <div className="py-40 text-center space-y-6">
-              <div className="flex justify-center">
-                <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
-                  <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto" />
-                </div>
-              </div>
-              <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} workspace is currently synchronizing with the global Maison Brand registry.
-              </p>
-            </div>
-          )}
-
         </div>
       </main>
     </div>

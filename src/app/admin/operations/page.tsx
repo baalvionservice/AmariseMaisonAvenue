@@ -20,7 +20,11 @@ import {
   Boxes,
   Star,
   MapPin,
-  RefreshCcw
+  RefreshCcw,
+  CheckCircle2,
+  XCircle,
+  MessageSquare,
+  History
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,44 +43,19 @@ import {
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/types';
 import { guardPage } from '@/lib/access/routeGuard';
-import { PERMISSIONS } from '@/lib/permissions/engine';
 
-type OpsTab = 'dashboard' | 'catalog' | 'inventory' | 'orders' | 'returns' | 'cms' | 'customers' | 'logistics';
+type OpsTab = 'dashboard' | 'catalog' | 'approvals' | 'inventory' | 'orders' | 'returns';
 
 export default function OperationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<OpsTab>('dashboard');
-  const { scopedProducts, scopedReturns, deleteProduct, upsertProduct, currentUser } = useAppStore();
+  const { scopedProducts, scopedReturns, scopedApprovals, handleApprovalAction, deleteProduct, upsertProduct, currentUser, scopedNotifications } = useAppStore();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Real-Time Access Validation
-    if (!guardPage(currentUser, PERMISSIONS.VIEW_DASHBOARD, currentUser?.country)) {
+    if (!guardPage(currentUser, 'view_dashboard', currentUser?.country)) {
       console.warn("Institutional Access Violation Detected");
     }
   }, [currentUser]);
-
-  const handleAddMockProduct = () => {
-    const newProduct: Product = {
-      id: `prod-${Date.now()}`,
-      name: 'New Scoped Creation',
-      departmentId: 'women',
-      categoryId: 'w-couture',
-      subcategoryId: 'evening-gowns',
-      collectionId: 'spring-24',
-      basePrice: 4500,
-      imageUrl: '', 
-      isVip: false,
-      rating: 5.0,
-      reviewsCount: 0,
-      stock: 5,
-      vendorId: 'vend-1',
-      brandId: 'amarise-luxe',
-      countryCode: currentUser?.country as any || 'us',
-      isGlobal: false
-    };
-    upsertProduct(newProduct);
-    toast({ title: "Atelier Registry Updated", description: `Artifact added to the ${currentUser?.country.toUpperCase()} catalog.` });
-  };
 
   return (
     <div className="flex h-screen bg-ivory overflow-hidden font-body text-gray-900">
@@ -90,13 +69,11 @@ export default function OperationsAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <OpsNavItem icon={<LayoutDashboard />} label="Orchestration" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <OpsNavItem icon={<RotateCcw />} label="Approval Queue" active={activeTab === 'approvals'} onClick={() => setActiveTab('approvals')} />
           <OpsNavItem icon={<Package />} label="Ateliers Catalog" active={activeTab === 'catalog'} onClick={() => setActiveTab('catalog')} />
           <OpsNavItem icon={<Boxes />} label="Multi-Warehouse" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
           <OpsNavItem icon={<Truck />} label="Orders & Fulfillment" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
           <OpsNavItem icon={<RotateCcw />} label="Reverse Logistics" active={activeTab === 'returns'} onClick={() => setActiveTab('returns')} />
-          <OpsNavItem icon={<FileText />} label="Storytelling CMS" active={activeTab === 'cms'} onClick={() => setActiveTab('cms')} />
-          <OpsNavItem icon={<Users />} label="Connoisseur Registry" active={activeTab === 'customers'} onClick={() => setActiveTab('customers')} />
-          <OpsNavItem icon={<Settings />} label="Logistics Matrix" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
         </nav>
 
         <div className="pt-8 border-t border-border space-y-4">
@@ -105,28 +82,27 @@ export default function OperationsAdminPanel() {
               <RotateCcw className="w-4 h-4 mr-3" /> Master Control
             </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start text-gray-400 hover:text-plum group" asChild>
-            <Link href="/us">
-              <LogOut className="w-4 h-4 mr-3" /> Exit Ops
-            </Link>
-          </Button>
         </div>
       </aside>
 
       <main className="flex-1 overflow-y-auto bg-ivory relative">
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
-            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              {activeTab}
-            </h1>
-            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
-              {currentUser?.country.toUpperCase()} Market • Artisanal Logistics Terminal
-            </p>
+            <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">{activeTab}</h1>
+            <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">{currentUser?.country.toUpperCase()} Market Hub</p>
           </div>
+          
           <div className="flex items-center space-x-6">
-            <div className="relative group">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-plum transition-colors" />
-               <input className="bg-ivory border border-border h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-gold w-64 transition-all" placeholder="SEARCH PIECE / ORDER" />
+            {/* Notification Badge */}
+            <div className="relative group cursor-pointer">
+               <div className="p-2 bg-ivory border border-border rounded-full hover:border-plum transition-colors">
+                  <Star className="w-4 h-4 text-plum" />
+               </div>
+               {scopedNotifications.filter(n => !n.read).length > 0 && (
+                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                   {scopedNotifications.filter(n => !n.read).length}
+                 </span>
+               )}
             </div>
             <div className="w-10 h-10 bg-ivory border border-border rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-plum">OP</div>
           </div>
@@ -134,53 +110,118 @@ export default function OperationsAdminPanel() {
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           {activeTab === 'dashboard' && (
-            <div className="space-y-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
-                <StatCard icon={<RotateCcw />} label="Active Returns" value={scopedReturns.length.toString()} trend="Inspect Now" positive={false} />
-                <StatCard icon={<Boxes />} label="Low Stock Alerts" value="12" trend="Replenish" positive={false} />
-                <StatCard icon={<Star />} label="VIP Inquiries" value="08" trend="Immediate" positive={false} />
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <div className="lg:col-span-8 space-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <StatCard icon={<Clock />} label="Pending Shipments" value="24" trend="Action Required" positive={false} />
+                  <StatCard icon={<RotateCcw />} label="Approvals" value={scopedApprovals.filter(a => a.status === 'pending').length.toString()} trend="Review Required" positive={false} />
+                  <StatCard icon={<Boxes />} label="Low Stock" value="12" trend="Replenish" positive={false} />
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Regional Fulfillment velocity</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time status of artisanal hubs</CardDescription>
+                <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                  <CardHeader className="border-b border-border bg-ivory/10">
+                    <CardTitle className="font-headline text-xl uppercase tracking-widest">Recent System Alerts</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <Table>
-                      <TableHeader className="bg-ivory/50">
-                        <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">Atelier Hub</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Region</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Operational Load</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell className="pl-8 text-xs font-bold">{currentUser?.country.toUpperCase()} Central Hub</TableCell>
-                          <TableCell><Badge variant="outline" className="text-[8px] uppercase">{currentUser?.country.toUpperCase()} Market</Badge></TableCell>
-                          <TableCell className="text-center text-green-600 font-bold text-[9px] uppercase">Optimal</TableCell>
-                          <TableCell className="text-right pr-8"><Progress value={45} className="h-1 bg-ivory" /></TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
+                    <div className="divide-y divide-border">
+                      {scopedNotifications.slice(0, 5).map(note => (
+                        <div key={note.id} className="p-6 flex items-start space-x-4 hover:bg-ivory/30 transition-colors">
+                          <div className={cn("p-2 rounded-full", 
+                            note.type === 'alert' ? "bg-red-50 text-red-500" : "bg-green-50 text-green-500"
+                          )}>
+                            {note.type === 'alert' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-medium text-gray-900">{note.message}</p>
+                            <span className="text-[8px] text-gray-400 uppercase font-bold">{new Date(note.timestamp).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
+              </div>
 
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Reverse Logistics analysis</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Global return sentiment & velocity</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-8">
-                    <PerformanceRow label="Avg. Return Rate" val={1.8} />
-                    <PerformanceRow label="Inspection Velocity" val={92} />
-                    <PerformanceRow label="Refund Latency" val={12} />
-                  </CardContent>
+              <div className="lg:col-span-4 space-y-8">
+                <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden">
+                  <div className="relative z-10 space-y-4">
+                    <div className="flex items-center space-x-3 text-secondary">
+                      <LayoutDashboard className="w-5 h-5" />
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest">Atelier KPIs</h4>
+                    </div>
+                    <div className="space-y-4 pt-4">
+                      <PerformanceRow label="Fulfillment" val={94} />
+                      <PerformanceRow label="QC Accuracy" val={99} />
+                      <PerformanceRow label="Returns" val={1.2} />
+                    </div>
+                  </div>
                 </Card>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'approvals' && (
+            <div className="space-y-12">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-headline font-bold italic">Editorial & Listing Registry</h2>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400">Review artisanal submissions before global allocation</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-8">
+                {scopedApprovals.map(req => (
+                  <Card key={req.id} className="bg-white border-border shadow-sm overflow-hidden flex flex-col md:flex-row">
+                    <div className="md:w-64 bg-ivory/50 p-8 border-r border-border flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest">{req.contentType}</Badge>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest">ID: {req.contentId}</p>
+                          <p className="text-[9px] text-gray-400 font-bold uppercase">Submitted: {new Date(req.timestamp).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 pt-4 border-t border-border mt-4">
+                        <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center font-headline text-xs text-gold">{req.userName.charAt(0)}</div>
+                        <p className="text-[10px] font-bold uppercase text-gray-600 truncate">{req.userName}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 p-8 flex flex-col justify-between">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-2">
+                          <h3 className="text-xl font-headline font-bold italic">Institutional Review Required</h3>
+                          <p className="text-xs text-gray-500 italic">"The submitted piece requires verification of provenance and material quality compliance."</p>
+                        </div>
+                        <Badge variant={req.status === 'pending' ? 'outline' : 'default'} className="uppercase text-[8px]">
+                          {req.status}
+                        </Badge>
+                      </div>
+
+                      {req.status === 'pending' && (
+                        <div className="pt-8 flex space-x-4">
+                          <Button 
+                            className="bg-black text-white hover:bg-plum h-10 px-8 rounded-none text-[9px] font-bold uppercase tracking-widest"
+                            onClick={() => handleApprovalAction(req.id, true)}
+                          >
+                            <CheckCircle2 className="w-3 h-3 mr-2" /> APPROVE ENTRY
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            className="border-border text-gray-400 h-10 px-8 rounded-none text-[9px] font-bold uppercase tracking-widest"
+                            onClick={() => handleApprovalAction(req.id, false, "Provenance documentation insufficient.")}
+                          >
+                            <XCircle className="w-3 h-3 mr-2" /> REJECT
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+                
+                {scopedApprovals.length === 0 && (
+                  <div className="py-40 text-center opacity-20">
+                    <CheckCircle2 className="w-16 h-16 mx-auto mb-4" />
+                    <p className="text-xl font-headline italic">Approval Queue Clear</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -192,7 +233,7 @@ export default function OperationsAdminPanel() {
                   <h2 className="text-2xl font-headline font-bold italic">Artifact Management</h2>
                   <p className="text-[10px] uppercase tracking-widest text-gray-400">Add, edit, or archive the {currentUser?.country.toUpperCase()} atelier creations</p>
                 </div>
-                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase" onClick={handleAddMockProduct}>
+                <Button className="bg-plum text-white hover:bg-gold h-12 px-8 rounded-none text-[10px] font-bold tracking-widest uppercase">
                   <Plus className="w-4 h-4 mr-2" /> CREATE NEW ARCHIVE ENTRY
                 </Button>
               </div>
@@ -204,7 +245,7 @@ export default function OperationsAdminPanel() {
                       <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold">Department</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-center">Market Stock</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right">Acquisition Value</TableHead>
+                      <TableHead className="text-[9px] uppercase font-bold text-right">Value</TableHead>
                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -242,19 +283,6 @@ export default function OperationsAdminPanel() {
                   </TableBody>
                 </Table>
               </Card>
-            </div>
-          )}
-
-          {['inventory', 'orders', 'returns', 'cms', 'customers', 'logistics'].includes(activeTab) && (
-            <div className="py-40 text-center space-y-6">
-              <div className="flex justify-center">
-                <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">
-                  <RefreshCcw className="w-12 h-12 text-gold/30 mx-auto" />
-                </div>
-              </div>
-              <p className="text-2xl text-muted-foreground font-light italic font-headline">
-                The {activeTab} workspace is currently synchronizing with regional {currentUser?.country.toUpperCase()} registries.
-              </p>
             </div>
           )}
         </div>
@@ -309,10 +337,10 @@ function PerformanceRow({ label, val }: { label: string, val: number }) {
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-        <span>{label}</span>
-        <span className="text-plum">{val}%</span>
+        <span className="opacity-60">{label}</span>
+        <span className="text-secondary">{val}%</span>
       </div>
-      <Progress value={val} className="h-1 bg-ivory" />
+      <Progress value={val} className="h-1 bg-white/10" />
     </div>
   );
 }
