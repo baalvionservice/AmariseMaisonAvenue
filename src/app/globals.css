@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,34 +6,40 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 222.2 84% 4.9%;
     
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 222.2 84% 4.9%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 222.2 84% 4.9%;
     
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
     
-    --secondary: 45 64% 52%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
     
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
     
-    --accent: 45 64% 95%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
     
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 45 64% 52%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
     
-    --radius: 0rem;
+    --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  .tab-trigger-modern {
+    @apply relative h-14 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-0 pt-0 text-[11px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:text-slate-900 data-[state=active]:border-blue-600 data-[state=active]:text-slate-900 data-[state=active]:shadow-none;
   }
 }
 
@@ -43,18 +50,18 @@
   body {
     @apply bg-background text-foreground font-body antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline tracking-tight;
-  }
 }
 
-.cinematic-gradient {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 60%, rgba(255, 255, 255, 1) 100%);
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
 }
 
-.luxury-blur {
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.85);
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
 }
 
 @keyframes fadeIn {
@@ -62,53 +69,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slowZoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.animate-slow-zoom {
-  animation: slowZoom 20s ease-in-out infinite alternate;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-white;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-primary/20 hover:bg-gold transition-colors;
-}
-
-.shadow-luxury {
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-gold-glow {
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
-}
-
-.serif {
-  font-family: 'Alegreya', serif;
-}
-
-.logo-text {
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.tab-trigger {
-  @apply text-[10px] font-bold uppercase tracking-[0.3em] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary transition-all pb-4 rounded-none h-auto bg-transparent;
-}
-
-button, .button {
-  @apply rounded-none transition-all duration-500;
+  animation: fadeIn 0.5s ease-out forwards;
 }
