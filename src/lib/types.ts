@@ -715,3 +715,27 @@ export interface GlobalSyncSession {
   actorName: string;
   status: 'applied' | 'rolled_back';
 }
+
+export interface RevenueMetric {
+  id: string;
+  date: string;
+  daily: number;
+  weekly: number;
+  monthly: number;
+  country: string;
+}
+
+export interface ConversionFunnel {
+  visitors: number;
+  leads: number;
+  buyers: number;
+}
+
+export interface RevenueAlert {
+  id: string;
+  type: 'drop' | 'opportunity' | 'threshold';
+  message: string;
+  timestamp: string;
+  severity: 'low' | 'medium' | 'high';
+  resolved: boolean;
+}

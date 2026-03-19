@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Institutional Analytics Registry
  * Centralized store for Maison KPIs and multi-market metrics.
@@ -38,6 +39,12 @@ export const analytics = {
     { topic: "Bespoke UAE", views: 2100, resonance: 95 },
     { topic: "Mumbai Ateliers", views: 1600, resonance: 84 },
     { topic: "Singapore Gems", views: 900, resonance: 78 }
+  ],
+  revenueTrends: [
+    { date: '2024-03-01', us: 45000, ae: 32000, uk: 21000 },
+    { date: '2024-03-08', us: 52000, ae: 38000, uk: 25000 },
+    { date: '2024-03-15', us: 68000, ae: 45000, uk: 31000 },
+    { date: '2024-03-22', us: 72000, ae: 55000, uk: 38000 },
   ]
 };
 
@@ -56,7 +63,8 @@ export function getAnalytics(role: string, country?: string, filters?: any) {
       leads: analytics.leads.filter(i => i.code === target),
       regionalAiPerformance: analytics.regionalAiPerformance.filter(i => i.code === target),
       contentEngagement: analytics.contentEngagement, // Content is globally visible but filterable
-      aiPerformance: analytics.aiPerformance
+      aiPerformance: analytics.aiPerformance,
+      revenueTrends: analytics.revenueTrends
     };
   }
 
