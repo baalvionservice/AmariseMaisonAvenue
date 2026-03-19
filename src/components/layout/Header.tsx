@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -18,6 +18,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+
+interface NavLink {
+  name: string;
+  href: string;
+  mega?: boolean;
+  services?: boolean;
+  megaContent?: {
+    title: string;
+    links: string[];
+    image: string;
+    tagline: string;
+    desc: string;
+  };
+}
 
 export const Header = () => {
   const [mounted, setMounted] = useState(false);
@@ -54,11 +68,44 @@ export const Header = () => {
     router.push(`/${code}`);
   };
 
-  const navLinks = [
-    { name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals`, mega: true },
+  const navLinks: NavLink[] = [
+    { 
+      name: 'NEW ARRIVALS', 
+      href: `/${countryCode}/category/new-arrivals`, 
+      mega: true,
+      megaContent: {
+        title: 'Atelier Edits',
+        links: ['The 1924 Series', 'Mediterranean Dawn', 'Resort Curations', 'Evening Registry'],
+        image: 'https://picsum.photos/seed/amarise-arrivals-bags/1200/800',
+        tagline: 'Spring Summer 2024',
+        desc: 'Exploring the latest heritage releases from our Parisian atelier.'
+      }
+    },
     { name: 'COLLECTIONS', href: `/${countryCode}/collections` },
-    { name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
-    { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
+    { 
+      name: 'HERMÈS', 
+      href: `/${countryCode}/category/hermes`,
+      mega: true,
+      megaContent: {
+        title: 'Hermès Archives',
+        links: ['Birkin & Kelly', 'Silk Scarves', 'Leather Accessories', 'Atelier Homme'],
+        image: 'https://madisonavenuecouture.com/cdn/shop/files/Birkin_30_Gold_Togo_Gold_Hardware_1.jpg?v=1691512345&width=1200',
+        tagline: 'Timeless Icons',
+        desc: 'The absolute standard of leather mastery and equestrian heritage.'
+      }
+    },
+    { 
+      name: 'CHANEL', 
+      href: `/${countryCode}/category/chanel`,
+      mega: true,
+      megaContent: {
+        title: 'Chanel Heritage',
+        links: ['Classic Flap Bags', 'Ready-to-Wear', 'Vintage Jewelry', 'Boy Chanel'],
+        image: 'https://picsum.photos/seed/chanel-mega/1200/800',
+        tagline: 'The Spirit of Rue Cambon',
+        desc: 'A dialogue between avant-garde vision and timeless elegance.'
+      }
+    },
     { name: 'ACCESSORIES', href: `/${countryCode}/category/accessories` },
     { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
     { name: 'PRIVATE ADVISORY', href: '#', services: true },
@@ -227,13 +274,13 @@ export const Header = () => {
               </Link>
             )}
 
-            {link.mega && (
-              <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50">
+            {link.mega && link.megaContent && (
+              <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 z-50 pt-20 pb-24 border-t border-gray-50 translate-y-4 group-hover:translate-y-0">
                 <div className="container mx-auto px-20 flex gap-40 max-w-[1600px]">
                   <div className="w-72 space-y-10">
-                    <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">Atelier Edits</h3>
-                    <nav className="flex flex-col space-y-6" aria-label="Mega Menu Navigation">
-                      {['Hermès Heritage', 'Chanel Seasonal', 'Maison Accessories', 'Artisanal Jewelry'].map((sub) => (
+                    <h3 className="text-[10px] font-bold tracking-[0.5em] text-secondary uppercase border-b border-gray-100 pb-4">{link.megaContent.title}</h3>
+                    <nav className="flex flex-col space-y-6" aria-label={`${link.name} Mega Menu`}>
+                      {link.megaContent.links.map((sub) => (
                         <Link 
                           key={sub} 
                           href="#" 
@@ -248,8 +295,8 @@ export const Header = () => {
                   <div className="flex-1 space-y-10">
                     <div className="aspect-[21/9] w-full bg-muted border border-gray-100 flex items-center justify-center group/img relative overflow-hidden shadow-sm">
                       <Image 
-                        src="https://picsum.photos/seed/amarise-arrivals-bags/1200/800" 
-                        alt="New Arrivals Heritage Showcase" 
+                        src={link.megaContent.image} 
+                        alt={`${link.name} Showcase`} 
                         fill 
                         className="object-cover transition-transform duration-[3s] group-hover/img:scale-105"
                         sizes="50vw"
@@ -258,11 +305,11 @@ export const Header = () => {
                     </div>
                     <div className="flex justify-between items-end border-l-2 border-secondary/20 pl-10">
                       <div className="space-y-2">
-                        <h4 className="text-5xl font-headline font-medium text-black uppercase tracking-tight">The 1924 Series</h4>
-                        <p className="text-lg font-light text-gray-400 italic">Exploring the heritage of global craft.</p>
+                        <h4 className="text-5xl font-headline font-medium text-black uppercase tracking-tight">{link.megaContent.tagline}</h4>
+                        <p className="text-lg font-light text-gray-400 italic">{link.megaContent.desc}</p>
                       </div>
                       <Button variant="outline" className="rounded-none border-black text-[9px] font-bold tracking-[0.4em] uppercase h-12 px-10 hover:bg-black hover:text-white transition-all">
-                        Discover More
+                        Explore Collection
                       </Button>
                     </div>
                   </div>
