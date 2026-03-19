@@ -8,7 +8,6 @@ import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldC
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
-import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -34,6 +33,7 @@ interface NavLink {
     columns: MegaColumn[];
     image: string;
     caption: string;
+    subCaption?: string;
   };
 }
 
@@ -118,12 +118,25 @@ export const Header = () => {
       megaContent: {
         columns: [
           {
-            title: 'CHANEL HERITAGE',
-            links: ['Classic Flap Bags', 'Ready-to-Wear', 'Vintage Jewelry', 'Boy Chanel']
+            title: 'HANDBAGS',
+            links: ['Classic Flap Bags', 'Chanel 22 Bags', 'Chanel 25 Bags', 'Totes', 'Boy Bags', 'Wallet on Chains', 'Fashion & Runway Bags', 'All Chanel Bags']
+          },
+          {
+            title: 'ACCESSORIES',
+            links: ['Wallets', 'Shoes']
+          },
+          {
+            title: 'JEWELRY',
+            links: ['Vintage', 'Contemporary']
+          },
+          {
+            title: 'CURATIONS',
+            links: ['Vintage Handbags', 'Pre-Owned Handbags']
           }
         ],
-        image: 'https://picsum.photos/seed/chanel-mega/1200/800',
-        caption: 'The Spirit of Rue Cambon'
+        image: 'https://madisonavenuecouture.com/cdn/shop/files/Chanel_Classic_Flap_Small_Black_Caviar_Gold_Hardware_1.jpg?v=1691512345&width=1200',
+        caption: 'CHANEL CLASSIC BAGS',
+        subCaption: 'Discover the Beauty of Chanel'
       }
     },
     { name: 'GOYARD', href: `/${countryCode}/category/goyard` },
@@ -326,8 +339,11 @@ export const Header = () => {
                       />
                       <div className="absolute inset-0 bg-black/5 group-hover/img:bg-transparent transition-colors" />
                     </div>
-                    <div className="text-left">
-                      <h4 className="text-2xl font-headline font-medium text-gray-900 italic leading-none">{link.megaContent.caption}</h4>
+                    <div className="text-left space-y-1">
+                      <h4 className="text-xl font-body font-bold text-gray-900 uppercase tracking-widest leading-tight">{link.megaContent.caption}</h4>
+                      {link.megaContent.subCaption && (
+                        <p className="text-sm text-gray-500 font-light italic">{link.megaContent.subCaption}</p>
+                      )}
                     </div>
                   </div>
                 </div>
