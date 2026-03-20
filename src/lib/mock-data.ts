@@ -37,15 +37,15 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const COLLECTIONS: Collection[] = [
-  { id: 'heritage', name: 'The Heritage Line', description: 'Founding Year 1924.', imageUrl: '' },
-  { id: 'spring-24', name: 'Spring Summer 2024', description: 'Mediterranean Dawn.', imageUrl: '' },
-  { id: 'prive', name: 'Maison Privé', description: 'VIP Exclusive artifacts.', imageUrl: '' },
-  { id: 'resort-24', name: 'Resort 2024', description: 'Coastal elegance.', imageUrl: '' },
-  { id: 'bridal', name: 'Couture Bridal', description: 'Forever heritage.', imageUrl: '' },
-  { id: 'mens-bespoke', name: 'Bespoke Tailoring', description: 'Architectural cuts.', imageUrl: '' },
-  { id: 'high-jewelry', name: 'Atelier Diamonds', description: 'Celestial light.', imageUrl: '' },
-  { id: 'accessories-24', name: 'The Silk Edit', description: 'Hand-painted archives.', imageUrl: '' },
-  { id: 'watches-collection', name: 'Horological Secrets', description: 'Eternal precision.', imageUrl: '' },
+  { id: 'heritage', name: 'The Heritage Line', description: 'Founding Year 1924.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'spring-24', name: 'Spring Summer 2024', description: 'Mediterranean Dawn.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'prive', name: 'Maison Privé', description: 'VIP Exclusive artifacts.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'resort-24', name: 'Resort 2024', description: 'Coastal elegance.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'bridal', name: 'Couture Bridal', description: 'Forever heritage.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'mens-bespoke', name: 'Bespoke Tailoring', description: 'Architectural cuts.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'high-jewelry', name: 'Atelier Diamonds', description: 'Celestial light.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'accessories-24', name: 'The Silk Edit', description: 'Hand-painted archives.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
+  { id: 'watches-collection', name: 'Horological Secrets', description: 'Eternal precision.', imageUrl: '', brandId: 'amarise-luxe', isGlobal: true },
 ];
 
 export const COLORS = ['Ivory', 'Gold', 'Plum', 'Midnight', 'Emerald', 'Sapphire', 'Onyx'];
@@ -157,7 +157,9 @@ const generateSEOContent = () => {
       featuredProducts: [`prod-${i}`, `prod-${i+1}`],
       targetKeyword: topic.keyword,
       metaDescription: `Discover the expert perspective on ${topic.keyword} at Maison Amarisé. Local context for ${COUNTRIES[country].name}.`,
-      contentOutline: ['The Heritage of Craft', 'Modern Market Dynamics', 'The Collector Perspective']
+      contentOutline: ['The Heritage of Craft', 'Modern Market Dynamics', 'The Collector Perspective'],
+      brandId: 'amarise-luxe',
+      isGlobal: false
     });
 
     if (i <= 25) {
@@ -176,7 +178,9 @@ const generateSEOContent = () => {
         author: 'Elena Vance',
         targetKeyword: `${topic.keyword} buying guide`,
         metaDescription: `Expert advice on ${topic.keyword} acquisition from the senior curators at Maison Amarisé.`,
-        investmentOutlook: `Steady 12-15% annual appreciation observed in this category over the last decade.`
+        investmentOutlook: `Steady 12-15% annual appreciation observed in this category over the last decade.`,
+        brandId: 'amarise-luxe',
+        isGlobal: false
       });
     }
   }
@@ -255,6 +259,57 @@ export const INVOICES: Invoice[] = [
 export const AUDIT_LOGS: AuditLog[] = [
   { id: 'log-1', adminId: 'adm-1', adminName: 'Maison CEO', action: 'Approved Vendor Geneva Horology', module: 'Vendor Management', timestamp: '2024-03-15T08:00:00Z', ipAddress: 'Institutional Node Alpha', severity: 'low' },
   { id: 'log-2', adminId: 'adm-2', adminName: 'Operations Lead', action: 'Updated Global Tax Rules (UAE)', module: 'Website Settings', timestamp: '2024-03-15T07:45:00Z', ipAddress: 'Institutional Node Beta', severity: 'medium' }
+];
+
+export const SUPPORT_TICKETS: SupportTicket[] = [
+  {
+    id: 't-1',
+    customerId: 'vip-1',
+    customerName: 'Julian Vandervilt',
+    customerTier: 'Diamond',
+    subject: 'Provenance inquiry regarding Heritage series',
+    status: 'open',
+    priority: 'urgent',
+    category: 'Product Query',
+    lastMessage: 'I am seeking archival documentation for the 1924 series.',
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    messages: [
+      { id: 'm-1', sender: 'customer', text: 'I am seeking archival documentation for the 1924 series.', timestamp: new Date().toISOString() }
+    ],
+    brandId: 'amarise-luxe'
+  }
+];
+
+export const SUPPORT_STATS: SupportStats = {
+  openTickets: 12,
+  resolvedToday: 8,
+  avgResponseTime: '12m',
+  csatScore: 4.9,
+  activeChats: 4
+};
+
+export const INTEGRATIONS: MaisonIntegration[] = [
+  { id: 'i-1', name: 'Global Payment Node', type: 'Payment', provider: 'Stripe Institutional', status: 'Connected', lastSync: new Date().toISOString(), uptime: 99.9, brandId: 'amarise-luxe' },
+  { id: 'i-2', name: 'White-Glove Logistics', type: 'Logistics', provider: 'FedEx Custom Critical', status: 'Connected', lastSync: new Date().toISOString(), uptime: 99.8, brandId: 'amarise-luxe' }
+];
+
+export const API_LOGS: ApiLog[] = [
+  { id: 'log-1', timestamp: new Date().toISOString(), endpoint: '/v1/authorize', method: 'POST', status: 200, latency: '42ms', integrationId: 'i-1' },
+  { id: 'log-2', timestamp: new Date().toISOString(), endpoint: '/v1/shipping/quote', method: 'GET', status: 200, latency: '124ms', integrationId: 'i-2' }
+];
+
+export const INDEXING_STATUS: IndexingStatus = {
+  catalogItems: 1240,
+  indexedItems: 1240,
+  lastFullScan: new Date().toISOString(),
+  searchEngineStatus: 'Optimal',
+  sitemapStatus: 'Up to date',
+  autoSyncEnabled: true
+};
+
+export const INDEXING_LOGS: IndexingLog[] = [
+  { id: 'idx-1', timestamp: new Date().toISOString(), action: 'Catalog Re-index', itemsAffected: 1240, duration: '1.2s', status: 'Success' }
 ];
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {
