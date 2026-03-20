@@ -27,7 +27,10 @@ import {
   FlaskConical,
   Store,
   LifeBuoy,
-  Bell
+  Bell,
+  Eye,
+  Lock,
+  Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -94,7 +97,7 @@ export function ShowcaseControls() {
             </span>
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-[400px] p-0 bg-white border-border shadow-luxury overflow-hidden">
+        <PopoverContent align="end" className="w-[440px] p-0 bg-white border-border shadow-luxury overflow-hidden">
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
                 <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Matrix</h3>
@@ -104,6 +107,40 @@ export function ShowcaseControls() {
           </div>
 
           <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            {/* Design Lab: Template Auditing */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
+                <FlaskConical className="w-3 h-3" />
+                <span>Design Lab: Template Auditing</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <button 
+                  onClick={() => { router.push(`/${currentCountry}/product/prod-11`); setIsOpen(false); }}
+                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-black transition-all bg-white group"
+                >
+                  <Eye className="w-4 h-4 text-gray-300 group-hover:text-black mb-2" />
+                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design A</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Archive</span>
+                </button>
+                <button 
+                  onClick={() => { router.push(`/${currentCountry}/private-order/prod-11`); setIsOpen(false); }}
+                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-plum transition-all bg-white group"
+                >
+                  <Lock className="w-4 h-4 text-gray-300 group-hover:text-plum mb-2" />
+                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design B</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Private</span>
+                </button>
+                <button 
+                  onClick={() => { router.push(`/${currentCountry}/special-archive/prod-11`); setIsOpen(false); }}
+                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-gold transition-all bg-white group"
+                >
+                  <Star className="w-4 h-4 text-gray-300 group-hover:text-gold mb-2" />
+                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design C</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Classic</span>
+                </button>
+              </div>
+            </div>
+
             {/* Security Context: Persona Switching */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
