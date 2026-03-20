@@ -8,7 +8,6 @@ import { users as RBAC_USERS } from '@/lib/rbac/mock-users';
 import { Button } from '@/components/ui/button';
 import { 
   Globe, 
-  Crown, 
   LayoutDashboard, 
   Settings2,
   PlayCircle,
@@ -30,7 +29,7 @@ import {
   Bell,
   Eye,
   Lock,
-  Star
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -40,8 +39,8 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ShowcaseControls: The master diagnostic and navigation hub for the prototype.
- * Provides rapid access to all administrative terminals and persona switching.
+ * ShowcaseControls: The master diagnostic hub for the prototype.
+ * Standardized to only show the two kept curatorial designs (A & B).
  */
 export function ShowcaseControls() {
   const { country } = useParams();
@@ -69,7 +68,6 @@ export function ShowcaseControls() {
       setCurrentUser(user);
       recordLog(`Security Persona Switched to ${user.name}`, 'System');
       setIsOpen(false);
-      // Redirect to home if current page is restricted for new persona
       if (pathname.includes('/admin')) {
         router.push(`/${user.country === 'GLOBAL' ? 'us' : user.country}`);
       }
@@ -107,41 +105,33 @@ export function ShowcaseControls() {
           </div>
 
           <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-            {/* Design Lab: Template Auditing */}
+            {/* Design Lab: Standardized Curatorial Templates */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <FlaskConical className="w-3 h-3" />
-                <span>Design Lab: Template Auditing</span>
+                <span>Curatorial Templates</span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button 
                   onClick={() => { router.push(`/${currentCountry}/product/prod-11`); setIsOpen(false); }}
-                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-black transition-all bg-white group"
+                  className="flex flex-col items-center justify-center p-4 border border-border hover:border-black transition-all bg-white group"
                 >
-                  <Eye className="w-4 h-4 text-gray-300 group-hover:text-black mb-2" />
-                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design A</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Archive</span>
+                  <Eye className="w-5 h-5 text-gray-300 group-hover:text-black mb-2" />
+                  <span className="text-[9px] font-bold uppercase tracking-tighter">Design A</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Archival Registry</span>
                 </button>
                 <button 
                   onClick={() => { router.push(`/${currentCountry}/private-order/prod-11`); setIsOpen(false); }}
-                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-plum transition-all bg-white group"
+                  className="flex flex-col items-center justify-center p-4 border border-border hover:border-plum transition-all bg-white group"
                 >
-                  <Lock className="w-4 h-4 text-gray-300 group-hover:text-plum mb-2" />
-                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design B</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Private</span>
-                </button>
-                <button 
-                  onClick={() => { router.push(`/${currentCountry}/special-archive/prod-11`); setIsOpen(false); }}
-                  className="flex flex-col items-center justify-center p-3 border border-border hover:border-gold transition-all bg-white group"
-                >
-                  <Star className="w-4 h-4 text-gray-300 group-hover:text-gold mb-2" />
-                  <span className="text-[8px] font-bold uppercase tracking-tighter">Design C</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Classic</span>
+                  <Lock className="w-5 h-5 text-gray-300 group-hover:text-plum mb-2" />
+                  <span className="text-[9px] font-bold uppercase tracking-tighter">Design B</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Private Salon</span>
                 </button>
               </div>
             </div>
 
-            {/* Security Context: Persona Switching */}
+            {/* Security Context */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <UserCheck className="w-3 h-3" />
@@ -186,7 +176,7 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* Comprehensive Admin Registry */}
+            {/* Admin Registry */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Zap className="w-3 h-3" />
@@ -194,31 +184,11 @@ export function ShowcaseControls() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <ActionLink href="/admin" icon={<LayoutDashboard />} label="Command Center" />
-                <ActionLink href="/admin/ai-dashboard" icon={<BrainCircuit />} label="AI Autopilot" />
                 <ActionLink href="/admin/sales" icon={<Target />} label="Sales CRM" />
                 <ActionLink href="/admin/content" icon={<FileText />} label="Atelier CMS" />
-                <ActionLink href="/admin/operations" icon={<PieChart />} label="Operations Hub" />
                 <ActionLink href="/admin/finance" icon={<CreditCard />} label="Finance Hub" />
-                <ActionLink href="/admin/seo" icon={<Search />} label="SEO Authority" />
-                <ActionLink href="/admin/errors" icon={<ShieldAlert />} label="Error Matrix" />
-                <ActionLink href="/admin/compliance" icon={<ShieldCheck />} label="Compliance" />
-                <ActionLink href="/admin/qa" icon={<FlaskConical />} label="QA Terminal" />
-                <ActionLink href="/admin/super" icon={<Crown />} label="Global Matrix" />
-                <ActionLink href="/admin/vendor" icon={<Store />} label="Vendor Portal" />
-                <ActionLink href="/admin/support" icon={<LifeBuoy />} label="Care Terminal" />
-                <ActionLink href="/admin/notifications" icon={<Bell />} label="Alerts Feed" />
-              </div>
-            </div>
-
-            {/* Public Experiences */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
-                <BookOpen className="w-3 h-3" />
-                <span>Public Experiences</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <ActionLink href={`/${currentCountry}`} icon={<Globe />} label="Homepage" />
-                <ActionLink href={`/${currentCountry}/journal`} icon={<BookOpen />} label="Maison Journal" />
+                <ActionLink href="/admin/super" icon={<Globe />} label="Global Matrix" />
+                <ActionLink href="/admin/ai-dashboard" icon={<BrainCircuit />} label="AI Autopilot" />
               </div>
             </div>
           </div>

@@ -7,13 +7,10 @@ import { COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
-  ChevronRight,
-  Sparkles,
   Zap,
   FlaskConical,
   Lock,
-  Eye,
-  Star
+  Eye
 } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
@@ -128,7 +125,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Institutional Audit Portal */}
+      {/* Institutional Audit Portal: The Two Kept Designs */}
       <section className="bg-[#f8f8f8] py-32 border-y border-gray-100">
         <div className="container mx-auto px-12 max-w-6xl text-center space-y-12">
           <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-sm">
@@ -137,7 +134,7 @@ export default function HomePage() {
           <div className="space-y-4">
             <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight">Institutional Design Lab</h3>
             <p className="text-sm text-gray-500 font-light italic max-w-2xl mx-auto">
-              Comparing the distinct curatorial templates implemented for standard registry management and private acquisition.
+              We have standardized our digital presence around two core curatorial templates optimized for transparency and narrative exclusivity.
             </p>
           </div>
           
@@ -149,7 +146,7 @@ export default function HomePage() {
               </div>
               <h4 className="text-lg font-headline font-bold italic text-gray-900">The Archival Registry</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Modern 3-column layout optimized for transparency and technical trust. Standard for bulk catalog.
+                Modern 3-column layout optimized for transparency and technical trust. Standard for bulk catalog artifacts.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
                 TEST REGISTRY VIEW <ArrowRight className="w-3 h-3 ml-2" />
@@ -163,7 +160,7 @@ export default function HomePage() {
               </div>
               <h4 className="text-lg font-headline font-bold italic text-gray-900">The Private Salon</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Cinematic, narrative-first design reserved for exclusive artifacts and private commissions.
+                Cinematic, narrative-first design reserved exclusively for high-value artifacts and private curatorial commissions.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
                 TEST SALON FLOW <ArrowRight className="w-3 h-3 ml-2" />
@@ -177,7 +174,7 @@ export default function HomePage() {
       <section className="bg-white py-48 text-center border-t border-gray-100">
         <div className="max-w-3xl mx-auto space-y-16 px-12">
            <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
-              <Sparkles className="w-6 h-6 text-secondary" />
+              <ArrowRight className="w-6 h-6 text-secondary" />
            </div>
            <div className="space-y-6">
               <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Institutional Registry</h3>
