@@ -19,8 +19,7 @@ interface ProductCardProps {
 }
 
 /**
- * ProductCard: Optimized for institutional trust and private acquisition.
- * Updated to use the Lens Opening Placeholder for artifact visuals.
+ * ProductCard: Segregated paths for Normal vs Private Acquisitions.
  */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
@@ -58,8 +57,8 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
 
   return (
     <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full" aria-labelledby={`title-${product.id}`}>
+      {/* NORMAL PATH: Clicking image/title goes to Archive View */}
       <Link href={`/${countryCode}/product/${product.id}`} className="block relative aspect-[3/4] overflow-hidden" aria-label={`View details for ${product.name}`}>
-        {/* Institutional Placeholder Replacement */}
         <PlaceholderImage className="absolute inset-0 w-full h-full transition-transform duration-[1.5s] group-hover:scale-105" />
         
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
@@ -76,12 +75,15 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
-          <Button 
-            className="w-full h-14 rounded-none bg-plum text-white hover:bg-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
-            aria-label={`Request Acquisition for ${product.name}`}
-          >
-            <Lock className="w-3.5 h-3.5 mr-2" /> Request Acquisition
-          </Button>
+          {/* PRIVATE PATH: Lock icon routes to the "Older" Private Order design */}
+          <Link href={`/${countryCode}/private-order/${product.id}`} className="w-full" onClick={(e) => e.stopPropagation()}>
+            <Button 
+              className="w-full h-14 rounded-none bg-plum text-white hover:bg-black transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl"
+              aria-label={`Request Acquisition for ${product.name}`}
+            >
+              <Lock className="w-3.5 h-3.5 mr-2" /> Request Acquisition
+            </Button>
+          </Link>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
