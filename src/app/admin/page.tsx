@@ -15,7 +15,9 @@ import {
   Crown,
   Eye,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
@@ -26,19 +28,21 @@ import { Badge } from '@/components/ui/badge';
 /**
  * Institutional Dashboard: Level 3 Tactical Command Center
  * Features 3D Global Intelligence and real-time behavioral signals.
+ * Finalized for manual audit of the 1 Super + 5 Hub Lead architecture.
  */
 export default function AdminDashboard() {
-  const { regions, globalTotal, globalUsers, conversionRate } = useSimulationData();
-  const { scopedErrors, scopedProducts, transactions } = useAppStore();
+  const { regions, globalTotal, globalUsers } = useSimulationData();
+  const { scopedErrors, currentUser, adminJurisdiction } = useAppStore();
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
 
   const activeHubData = useMemo(() => 
     selectedHub ? regions[selectedHub] : null, 
   [selectedHub, regions]);
 
-  // Tactical Signals (Mocked Live Intelligence)
   const highIntentUsers = useMemo(() => Object.values(regions).reduce((acc, r) => acc + r.cart + r.checkout, 0), [regions]);
   const activeNegotiations = useMemo(() => Math.floor(highIntentUsers * 0.15), [highIntentUsers]);
+
+  const jurisdictionLabel = adminJurisdiction === 'global' ? 'Global Core' : adminJurisdiction.toUpperCase() + ' HUB';
 
   return (
     <motion.div 
@@ -58,7 +62,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col items-end space-y-3">
           <div className="flex items-center space-x-4">
             <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30">Registry Synchronized</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30">Registry Synchronized: {jurisdictionLabel}</span>
           </div>
           <Badge variant="outline" className="bg-plum/10 text-plum border-plum/20 text-[8px] uppercase tracking-widest px-3 py-1">
             Institutional v5.2 Active
@@ -109,7 +113,7 @@ export default function AdminDashboard() {
                   <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-blue-500">Jurisdictional Node</span>
                   <h3 className="text-4xl font-headline font-bold italic text-white leading-none">{activeHubData.name}</h3>
                 </div>
-                <button onClick={() => setSelectedHub(null)} className="p-3 hover:bg-white/5 transition-colors rounded-full text-white/40 hover:text-white">
+                <button onClick={() => setSelectedHub(null)} className="p-3 hover:bg-white/5 transition-colors rounded-full text-white/40 hover:text-white border-none bg-transparent">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -135,7 +139,7 @@ export default function AdminDashboard() {
                       <span>SOURCE: AI Autopilot</span>
                    </div>
                 </div>
-                <button className="w-full h-16 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[10px] font-bold uppercase tracking-[0.4em] rounded-none border-none shadow-xl">
+                <button className="w-full h-16 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[10px] font-bold uppercase tracking-[0.4em] rounded-none border-none shadow-xl cursor-pointer">
                   OPEN HUB TERMINAL <ArrowRight className="ml-3 w-4 h-4 inline" />
                 </button>
               </div>
@@ -208,26 +212,26 @@ export default function AdminDashboard() {
              <CardHeader className="border-b border-white/5 bg-plum/5">
                 <div className="flex items-center space-x-3 text-plum">
                    <Zap className="w-4 h-4" />
-                   <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] text-white">AI Mitigation Sugestions</CardTitle>
+                   <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] text-white">AI Mitigation</CardTitle>
                 </div>
              </CardHeader>
              <CardContent className="p-8 space-y-6">
                 <MitigationItem 
                   hub="India" 
                   issue="Yield Lag" 
-                  suggestion="Dispatch Bespoke Sari Narrative" 
+                  suggestion="Dispatch Artisanal Narratives" 
                   status="PENDING"
                 />
                 <MitigationItem 
                   hub="UAE" 
                   issue="Lead Surge" 
-                  suggestion="Authorize Private Salon Overflow" 
+                  suggestion="Authorize Salon Overflow" 
                   status="ACTIVE"
                 />
                 <MitigationItem 
                   hub="USA" 
                   issue="High Friction" 
-                  suggestion="Optimize Fifth Ave Condition Slider" 
+                  suggestion="Optimize Fifth Ave Slider" 
                   status="QUEUED"
                 />
              </CardContent>
@@ -287,7 +291,7 @@ function MitigationItem({ hub, issue, suggestion, status }: { hub: string, issue
   return (
     <div className="p-5 border border-white/5 bg-white/[0.02] space-y-3 hover:bg-white/5 transition-all cursor-pointer group">
        <div className="flex justify-between items-center">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-white/40">{hub} Hub Anomaly</span>
+          <span className="text-[9px] font-bold uppercase tracking-widest text-white/40">{hub} Node Anomaly</span>
           <Badge variant="outline" className={cn(
             "text-[7px] uppercase border-none",
             status === 'ACTIVE' ? "bg-emerald-500/10 text-emerald-400" : "bg-white/10 text-white/40"
@@ -295,7 +299,7 @@ function MitigationItem({ hub, issue, suggestion, status }: { hub: string, issue
        </div>
        <div className="space-y-1">
           <p className="text-[10px] font-bold uppercase text-white/80">{issue}</p>
-          <p className="text-xs text-white/40 italic font-light">"{suggestion}"</p>
+          <p className="text-xs text-white/40 italic font-light leading-snug">"{suggestion}"</p>
        </div>
        <div className="pt-2 border-t border-white/5 flex items-center text-[8px] font-bold uppercase text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
           EXECUTE MITIGATION <ArrowUpRight className="ml-2 w-2 h-2" />
@@ -316,4 +320,28 @@ function PerformanceRow({ label, val }: { label: string, val: number }) {
       </div>
     </div>
   );
+}
+
+function Card({ children, className }: { children: React.ReactNode, className?: string }) {
+  return (
+    <div className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}>
+      {children}
+    </div>
+  );
+}
+
+function CardHeader({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <div className={cn("flex flex-col space-y-1.5 p-6", className)}>{children}</div>;
+}
+
+function CardTitle({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <h3 className={cn("text-2xl font-semibold leading-none tracking-tight", className)}>{children}</h3>;
+}
+
+function CardDescription({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <p className={cn("text-sm text-muted-foreground", className)}>{children}</p>;
+}
+
+function CardContent({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <div className={cn("p-6 pt-0", className)}>{children}</div>;
 }

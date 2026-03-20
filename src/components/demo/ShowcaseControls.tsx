@@ -19,7 +19,10 @@ import {
   CreditCard,
   FlaskConical,
   Eye,
-  Lock
+  Lock,
+  Search,
+  Activity,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -30,7 +33,7 @@ import {
 
 /**
  * ShowcaseControls: The master diagnostic hub.
- * Refined to emphasize the Normal vs Private Client distinction.
+ * Refined for manual audit of the 1 Super Admin, 5 Hub Admins, and Dual-Persona Designs.
  */
 export function ShowcaseControls() {
   const { country } = useParams();
@@ -82,7 +85,7 @@ export function ShowcaseControls() {
             </span>
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-[440px] p-0 bg-white border-border shadow-luxury overflow-hidden">
+        <PopoverContent align="end" className="w-[480px] p-0 bg-white border-border shadow-luxury overflow-hidden">
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
                 <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Hub</h3>
@@ -91,38 +94,38 @@ export function ShowcaseControls() {
              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Institutional Access • v5.2.0-SECURE</p>
           </div>
 
-          <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-            {/* Design Matrix: Normal vs Private */}
+          <div className="p-6 space-y-10 max-h-[75vh] overflow-y-auto custom-scrollbar">
+            {/* 1. Design Matrix: Normal vs Private */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <FlaskConical className="w-3 h-3" />
-                <span>Client Experience Matrix</span>
+                <span>Audit Designs (Normal vs Private)</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <button 
                   onClick={() => { router.push(`/${currentCountry}/product/prod-11`); setIsOpen(false); }}
-                  className="flex flex-col items-center justify-center p-4 border border-border hover:border-black transition-all bg-white group"
+                  className="flex flex-col items-center justify-center p-5 border border-border hover:border-black transition-all bg-white group shadow-sm"
                 >
-                  <Eye className="w-5 h-5 text-gray-300 group-hover:text-black mb-2" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter">Normal Flow</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Registry (A)</span>
+                  <Eye className="w-6 h-6 text-gray-300 group-hover:text-black mb-2" />
+                  <span className="text-[10px] font-bold uppercase tracking-tighter">Normal Design (A)</span>
+                  <span className="text-[8px] text-gray-400 uppercase mt-1">Institutional Registry</span>
                 </button>
                 <button 
                   onClick={() => { router.push(`/${currentCountry}/private-order/prod-11`); setIsOpen(false); }}
-                  className="flex flex-col items-center justify-center p-4 border border-border hover:border-plum transition-all bg-white group"
+                  className="flex flex-col items-center justify-center p-5 border border-border hover:border-plum transition-all bg-white group shadow-sm"
                 >
-                  <Lock className="w-5 h-5 text-gray-300 group-hover:text-plum mb-2" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter">Private Flow</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Salon (B)</span>
+                  <Lock className="w-6 h-6 text-gray-300 group-hover:text-plum mb-2" />
+                  <span className="text-[10px] font-bold uppercase tracking-tighter">Private Design (B)</span>
+                  <span className="text-[8px] text-gray-400 uppercase mt-1">Maison Salon</span>
                 </button>
               </div>
             </div>
 
-            {/* Persona Switcher */}
+            {/* 2. Admin Permissions (Super vs 5 Hub Leads) */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <UserCheck className="w-3 h-3" />
-                <span>Identity Context</span>
+                <span>Audit Hierarchy (1 Super + 5 Hub Leads)</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {RBAC_USERS.map(user => (
@@ -130,22 +133,36 @@ export function ShowcaseControls() {
                     key={user.id}
                     onClick={() => handlePersonaSwitch(user.id)}
                     className={cn(
-                      "p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex flex-col justify-between transition-all",
-                      currentUser?.id === user.id ? "bg-plum text-white border-plum" : "bg-ivory border-border text-gray-400 hover:bg-plum/5 hover:text-plum"
+                      "p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex flex-col justify-between transition-all rounded-none",
+                      currentUser?.id === user.id ? "bg-plum text-white border-plum shadow-md" : "bg-ivory border-border text-gray-400 hover:bg-plum/5 hover:text-plum"
                     )}
                   >
-                    <span>{user.name}</span>
-                    <span className="opacity-60 text-[7px] mt-1">{user.role.toUpperCase()}</span>
+                    <span className="truncate">{user.name}</span>
+                    <span className="opacity-60 text-[7px] mt-1">{user.role.replace('_', ' ').toUpperCase()}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Market Hubs */}
+            {/* 3. High Volume & Integrity Terminals */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
+                <Activity className="w-3 h-3" />
+                <span>Audit High-Volume & Stress Lab</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <ActionLink href="/admin/qa" icon={<FlaskConical />} label="QA Stress Lab" sub="10k Item Test" />
+                <ActionLink href="/admin/ai-dashboard" icon={<Zap />} label="AI Autopilot" sub="Batch Metadata" />
+                <ActionLink href="/admin/content" icon={<FileText />} label="Atelier CMS" sub="Registry Sync" />
+                <ActionLink href="/admin/seo" icon={<Search />} label="SEO Authority" sub="Keyword Matrix" />
+              </div>
+            </div>
+
+            {/* 4. Multi-Market Jurisdictions */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Globe className="w-3 h-3" />
-                <span>Regional Jurisdiction</span>
+                <span>Audit Market Jurisdictions</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {Object.keys(COUNTRIES).map(code => (
@@ -162,27 +179,16 @@ export function ShowcaseControls() {
                 ))}
               </div>
             </div>
-
-            {/* Management Terminals */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
-                <Zap className="w-3 h-3" />
-                <span>Administrative Nodes</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <ActionLink href="/admin" icon={<LayoutDashboard />} label="Command Center" />
-                <ActionLink href="/admin/sales" icon={<Target />} label="Sales CRM" />
-                <ActionLink href="/admin/content" icon={<FileText />} label="Atelier CMS" />
-                <ActionLink href="/admin/finance" icon={<CreditCard />} label="Finance Matrix" />
-              </div>
-            </div>
           </div>
 
-          <div className="bg-ivory p-4 border-t border-border flex justify-between items-center">
-             <button onClick={() => setShowcaseMode(false)} className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-destructive font-bold">
-               Exit Audit Suite
+          <div className="bg-ivory p-6 border-t border-border flex justify-between items-center">
+             <button onClick={() => setShowcaseMode(false)} className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-destructive font-black transition-colors">
+               EXIT AUDIT SUITE
              </button>
-             <span className="text-[8px] text-gray-300 tracking-widest uppercase italic">Node Secured</span>
+             <div className="flex items-center space-x-2 text-emerald-500">
+                <ShieldCheck className="w-3 h-3" />
+                <span className="text-[8px] text-gray-400 tracking-widest uppercase italic">Node Secured</span>
+             </div>
           </div>
         </PopoverContent>
       </Popover>
@@ -190,17 +196,20 @@ export function ShowcaseControls() {
   );
 }
 
-function ActionLink({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) {
+function ActionLink({ href, icon, label, sub }: { href: string, icon: React.ReactNode, label: string, sub?: string }) {
   const router = useRouter();
   return (
     <button 
-      onClick={() => router.push(href)}
-      className="flex items-center space-x-3 p-3 bg-white border border-border hover:border-gold hover:shadow-luxury group transition-all w-full text-left"
+      onClick={() => { router.push(href); }}
+      className="flex items-center space-x-4 p-4 bg-white border border-border hover:border-gold hover:shadow-luxury group transition-all w-full text-left"
     >
       <span className="text-gold group-hover:scale-110 transition-transform">
-        {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4" })}
+        {React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" })}
       </span>
-      <span className="text-[9px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-900 truncate">{label}</span>
+      <div className="flex flex-col">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-gray-900 truncate">{label}</span>
+        {sub && <span className="text-[7px] text-gray-400 uppercase font-bold tracking-tighter">{sub}</span>}
+      </div>
     </button>
   );
 }
