@@ -16,6 +16,10 @@ import { generateProductRecommendations } from '@/ai/flows/generate-product-reco
 import { useAppStore } from '@/lib/store';
 import Image from 'next/image';
 
+/**
+ * Maison Homepage: The Institutional Front Door.
+ * Highlights the Dual-Persona Acquisition Strategy.
+ */
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -29,13 +33,13 @@ export default function HomePage() {
     async function loadRecs() {
       try {
         const scenario = activeVip 
-          ? `Private curation for elite client ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on high-value institutional artifacts based on intent: ${activeVip.subscriptionPlan || 'Heritage'}.`
-          : `Luxury discovery for a new connoisseur in ${currentCountry.name}. Seasonal heritage pieces with high market resonance.`;
+          ? `Private curation for elite client ${activeVip.name} in ${currentCountry.name}. Market: ${countryCode}. Focus on high-value institutional artifacts.`
+          : `Luxury discovery for a new connoisseur in ${currentCountry.name}. Seasonal heritage pieces.`;
 
         const res = await generateProductRecommendations({ scenario });
         setRecommendations(res.recommendations.slice(0, 3));
       } catch (e) {
-        console.error("Personalization error:", e);
+        console.error("Personalization drift:", e);
       } finally {
         setLoadingRecs(false);
       }
@@ -49,11 +53,10 @@ export default function HomePage() {
       <section className="relative h-[90vh] w-full flex items-end overflow-hidden" aria-label="Heritage Registry Hero">
         <Image 
           src="https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440" 
-          alt="Maison Amarisé Heritage Auction - Elite Birkin Collection"
+          alt="Maison Amarisé Heritage Auction"
           fill
           className="object-cover animate-slow-zoom"
           priority
-          fetchPriority="high"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -72,7 +75,7 @@ export default function HomePage() {
             </p>
             <div className="pt-6">
               <Link href={`/${countryCode}/buying-guide`}>
-                <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all shadow-2xl uppercase" aria-label="Enter the Heritage Registry">
+                <Button className="bg-white text-black hover:bg-ivory px-16 h-16 rounded-none text-[10px] font-bold tracking-[0.4em] transition-all shadow-2xl uppercase">
                   ENTER THE REGISTRY
                 </Button>
               </Link>
@@ -100,7 +103,7 @@ export default function HomePage() {
           <div className="lg:w-1/2 relative aspect-[4/5] w-full overflow-hidden shadow-luxury group">
             <Image 
               src="https://picsum.photos/seed/amarise-mastery/1200/1500" 
-              alt="Artisanal Mastery at Maison Amarisé" 
+              alt="Artisanal Mastery" 
               fill 
               className="object-cover transition-transform duration-[3s] group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -108,13 +111,13 @@ export default function HomePage() {
           </div>
           <div className="lg:w-1/2 space-y-10 text-center lg:text-left">
             <div className="space-y-4">
-              <span className="text-secondary text-[10px] font-bold tracking-[0.5em] uppercase">The Maison Intelligence</span>
+              <span className="text-secondary text-[10px] font-bold tracking-[0.5em] uppercase">Maison Intelligence</span>
               <h2 className="text-5xl md:text-7xl font-headline font-medium italic text-gray-900 tracking-tight leading-tight">
                 The Standard <br /> of the Absolute
               </h2>
             </div>
             <p className="text-xl text-gray-500 font-light leading-relaxed italic max-w-xl border-l-2 border-secondary/20 pl-10">
-              "Beyond the artifact lies the provenance. As an institutional acquisition house, our dialogue is between the master's legacy and the discerning collector's soul."
+              "Beyond the artifact lies the provenance. Our dialogue is between the master's legacy and the discerning collector's soul."
             </p>
             <div className="pt-6">
               <Link href={`/${countryCode}/about`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2">
@@ -125,7 +128,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Institutional Audit Portal: The Two Kept Designs */}
+      {/* Dual-Persona Audit Portal: Normal vs Private Clients */}
       <section className="bg-[#f8f8f8] py-32 border-y border-gray-100">
         <div className="container mx-auto px-12 max-w-6xl text-center space-y-12">
           <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-sm">
@@ -134,7 +137,7 @@ export default function HomePage() {
           <div className="space-y-4">
             <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight">Institutional Design Lab</h3>
             <p className="text-sm text-gray-500 font-light italic max-w-2xl mx-auto">
-              We have standardized our digital presence around two core curatorial templates optimized for transparency and narrative exclusivity.
+              We have standardized our digital presence around two core persona flows optimized for transparency and narrative exclusivity.
             </p>
           </div>
           
@@ -142,53 +145,52 @@ export default function HomePage() {
             <Link href={`/${countryCode}/product/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-black transition-all text-left space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <Eye className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
-                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design A</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Environment A</span>
               </div>
-              <h4 className="text-lg font-headline font-bold italic text-gray-900">The Archival Registry</h4>
+              <h4 className="text-lg font-headline font-bold italic text-gray-900">The Institutional Registry</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Modern 3-column layout optimized for transparency and technical trust. Standard for bulk catalog artifacts.
+                Normal Client Flow: Modern 3-column layout optimized for transparency and technical trust.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
-                TEST REGISTRY VIEW <ArrowRight className="w-3 h-3 ml-2" />
+                AUDIT REGISTRY VIEW <ArrowRight className="w-3 h-3 ml-2" />
               </div>
             </Link>
 
             <Link href={`/${countryCode}/private-order/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-plum transition-all text-left space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <Lock className="w-5 h-5 text-gray-400 group-hover:text-plum transition-colors" />
-                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design B</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Environment B</span>
               </div>
               <h4 className="text-lg font-headline font-bold italic text-gray-900">The Private Salon</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Cinematic, narrative-first design reserved exclusively for high-value artifacts and private curatorial commissions.
+                Private Client Flow: Cinematic, narrative-first design reserved for VIP artifacts and curatorial commissions.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
-                TEST SALON FLOW <ArrowRight className="w-3 h-3 ml-2" />
+                AUDIT SALON VIEW <ArrowRight className="w-3 h-3 ml-2" />
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Global Ateliers signup */}
+      {/* Enrollment */}
       <section className="bg-white py-48 text-center border-t border-gray-100">
         <div className="max-w-3xl mx-auto space-y-16 px-12">
            <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
               <ArrowRight className="w-6 h-6 text-secondary" />
            </div>
            <div className="space-y-6">
-              <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Institutional Registry</h3>
+              <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Heritage Registry</h3>
               <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
-                Join our verified collector network for private acquisition invitations and digital previews of the Maison archives.
+                Join our verified collector network for private acquisition invitations and digital previews.
               </p>
            </div>
-           <form className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors" aria-label="Institutional Registry Signup">
+           <form className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors">
               <input 
                 type="email" 
-                placeholder="ACQUISITION EMAIL" 
+                placeholder="COLLECTOR EMAIL" 
                 className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
                 required
-                aria-label="Collector Email Address"
               />
               <button type="submit" className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
                 SUBMIT

@@ -12,24 +12,14 @@ import {
   Settings2,
   PlayCircle,
   Zap,
-  BookOpen,
-  PieChart,
   X,
   UserCheck,
-  ShieldAlert,
-  BrainCircuit,
   Target,
   FileText,
-  ShieldCheck,
   CreditCard,
-  Search,
   FlaskConical,
-  Store,
-  LifeBuoy,
-  Bell,
   Eye,
-  Lock,
-  ArrowRight
+  Lock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -39,8 +29,8 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ShowcaseControls: The master diagnostic hub for the prototype.
- * Standardized to only show the two kept curatorial designs (A & B).
+ * ShowcaseControls: The master diagnostic hub.
+ * Refined to emphasize the Normal vs Private Client distinction.
  */
 export function ShowcaseControls() {
   const { country } = useParams();
@@ -66,11 +56,8 @@ export function ShowcaseControls() {
     const user = RBAC_USERS.find(u => u.id === userId);
     if (user) {
       setCurrentUser(user);
-      recordLog(`Security Persona Switched to ${user.name}`, 'System');
+      recordLog(`Persona Switched: ${user.name}`, 'System');
       setIsOpen(false);
-      if (pathname.includes('/admin')) {
-        router.push(`/${user.country === 'GLOBAL' ? 'us' : user.country}`);
-      }
     }
   };
 
@@ -79,7 +66,7 @@ export function ShowcaseControls() {
       onClick={() => setShowcaseMode(true)}
       className="fixed bottom-6 right-6 z-[100] bg-white border-gold text-gold hover:bg-gold hover:text-white rounded-full shadow-luxury h-12 px-6"
     >
-      <PlayCircle className="w-4 h-4 mr-2" /> Enter Showcase
+      <PlayCircle className="w-4 h-4 mr-2" /> Activate Audit Mode
     </Button>
   );
 
@@ -98,18 +85,18 @@ export function ShowcaseControls() {
         <PopoverContent align="end" className="w-[440px] p-0 bg-white border-border shadow-luxury overflow-hidden">
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
-                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Matrix</h3>
+                <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Hub</h3>
                 <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
              </div>
-             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Institutional Access Hub • v5.2.0-SECURE</p>
+             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Institutional Access • v5.2.0-SECURE</p>
           </div>
 
           <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-            {/* Design Lab: Standardized Curatorial Templates */}
+            {/* Design Matrix: Normal vs Private */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <FlaskConical className="w-3 h-3" />
-                <span>Curatorial Templates</span>
+                <span>Client Experience Matrix</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button 
@@ -117,25 +104,25 @@ export function ShowcaseControls() {
                   className="flex flex-col items-center justify-center p-4 border border-border hover:border-black transition-all bg-white group"
                 >
                   <Eye className="w-5 h-5 text-gray-300 group-hover:text-black mb-2" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter">Design A</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Archival Registry</span>
+                  <span className="text-[9px] font-bold uppercase tracking-tighter">Normal Flow</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Registry (A)</span>
                 </button>
                 <button 
                   onClick={() => { router.push(`/${currentCountry}/private-order/prod-11`); setIsOpen(false); }}
                   className="flex flex-col items-center justify-center p-4 border border-border hover:border-plum transition-all bg-white group"
                 >
                   <Lock className="w-5 h-5 text-gray-300 group-hover:text-plum mb-2" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter">Design B</span>
-                  <span className="text-[7px] text-gray-400 uppercase mt-1">Private Salon</span>
+                  <span className="text-[9px] font-bold uppercase tracking-tighter">Private Flow</span>
+                  <span className="text-[7px] text-gray-400 uppercase mt-1">Salon (B)</span>
                 </button>
               </div>
             </div>
 
-            {/* Security Context */}
+            {/* Persona Switcher */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <UserCheck className="w-3 h-3" />
-                <span>Security Persona</span>
+                <span>Identity Context</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {RBAC_USERS.map(user => (
@@ -148,17 +135,17 @@ export function ShowcaseControls() {
                     )}
                   >
                     <span>{user.name}</span>
-                    <span className="opacity-60 text-[7px] mt-1">[{user.role.toUpperCase()}]</span>
+                    <span className="opacity-60 text-[7px] mt-1">{user.role.toUpperCase()}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Market Context */}
+            {/* Market Hubs */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Globe className="w-3 h-3" />
-                <span>Regional Hub</span>
+                <span>Regional Jurisdiction</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {Object.keys(COUNTRIES).map(code => (
@@ -176,31 +163,26 @@ export function ShowcaseControls() {
               </div>
             </div>
 
-            {/* Admin Registry */}
+            {/* Management Terminals */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-plum">
                 <Zap className="w-3 h-3" />
-                <span>Administrative Registry</span>
+                <span>Administrative Nodes</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <ActionLink href="/admin" icon={<LayoutDashboard />} label="Command Center" />
                 <ActionLink href="/admin/sales" icon={<Target />} label="Sales CRM" />
                 <ActionLink href="/admin/content" icon={<FileText />} label="Atelier CMS" />
-                <ActionLink href="/admin/finance" icon={<CreditCard />} label="Finance Hub" />
-                <ActionLink href="/admin/super" icon={<Globe />} label="Global Matrix" />
-                <ActionLink href="/admin/ai-dashboard" icon={<BrainCircuit />} label="AI Autopilot" />
+                <ActionLink href="/admin/finance" icon={<CreditCard />} label="Finance Matrix" />
               </div>
             </div>
           </div>
 
           <div className="bg-ivory p-4 border-t border-border flex justify-between items-center">
-             <button 
-              onClick={() => setShowcaseMode(false)}
-              className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-destructive font-bold"
-             >
-               Exit Super-Demo
+             <button onClick={() => setShowcaseMode(false)} className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-destructive font-bold">
+               Exit Audit Suite
              </button>
-             <span className="text-[8px] text-gray-300 tracking-widest uppercase italic">Institutional Node Verified</span>
+             <span className="text-[8px] text-gray-300 tracking-widest uppercase italic">Node Secured</span>
           </div>
         </PopoverContent>
       </Popover>
