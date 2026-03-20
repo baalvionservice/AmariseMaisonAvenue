@@ -548,6 +548,7 @@ export interface ReturnRequest {
   warehouseId: string;
   requestedAt: string;
   brandId: string;
+  country?: CountryCode;
 }
 
 export interface AuditLog {

@@ -1,4 +1,3 @@
-
 import { 
   Country, Product, Category, Department, Collection, City, BuyingGuide, 
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
@@ -219,7 +218,7 @@ export const AFFILIATES: Affiliate[] = [
 ];
 
 export const RETURNS: ReturnRequest[] = [
-  { id: 'ret-1', orderId: 'AM-1001', productId: 'prod-1', reason: 'Size mismatch', status: 'pending', warehouseId: 'wh-ny', requestedAt: '2024-03-15T10:00:00Z', brandId: 'amarise-luxe' }
+  { id: 'ret-1', orderId: 'AM-1001', productId: 'prod-1', reason: 'Size mismatch', status: 'pending', warehouseId: 'wh-ny', requestedAt: '2024-03-15T10:00:00Z', brandId: 'amarise-luxe', country: 'us' }
 ];
 
 export const ADMIN_ACCOUNTS: AdminAccount[] = [
