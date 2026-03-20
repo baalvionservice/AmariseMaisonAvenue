@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -17,13 +18,17 @@ import {
   FlaskConical,
   ChevronRight,
   LogOut,
-  Settings
+  Settings,
+  Briefcase,
+  Bell,
+  MessageSquare,
+  LifeBuoy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
- * AdminSidebar: Minimal Dark Navigation
- * Redesigned for high-ticket curatorial oversight.
+ * AdminSidebar: Institutional Navigation Matrix
+ * Standardized for the Maison dark operating system.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -34,27 +39,32 @@ export function AdminSidebar() {
       items: [
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
+        { icon: <Zap />, label: "AI Autopilot", href: "/admin/ai-dashboard" },
       ]
     },
     {
       title: "Inventory",
       items: [
-        { icon: <Package />, label: "Registry", href: "/admin/content" },
-        { icon: <Zap />, label: "AI Autopilot", href: "/admin/ai-dashboard" },
+        { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
+        { icon: <Briefcase />, label: "Partners", href: "/admin/operations" },
+        { icon: <Search />, label: "SEO Authority", href: "/admin/seo" },
       ]
     },
     {
       title: "Acquisition",
       items: [
-        { icon: <Target />, label: "CRM", href: "/admin/sales" },
+        { icon: <Target />, label: "Sales CRM", href: "/admin/sales" },
+        { icon: <MessageSquare />, label: "Messaging", href: "/admin/messaging" },
         { icon: <CreditCard />, label: "Treasury", href: "/admin/finance" },
       ]
     },
     {
       title: "Infrastructure",
       items: [
+        { icon: <Bell />, label: "Alerts", href: "/admin/notifications" },
+        { icon: <LifeBuoy />, label: "Support", href: "/admin/support" },
         { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
-        { icon: <ShieldCheck />, label: "Audit", href: "/admin/compliance" },
+        { icon: <ShieldCheck />, label: "Audit Log", href: "/admin/compliance" },
       ]
     }
   ];
@@ -65,7 +75,7 @@ export function AdminSidebar() {
       <div className="p-10 border-b border-white/5">
         <Link href="/admin">
           <div className="font-headline text-3xl font-bold tracking-tighter text-white flex items-center group">
-            AMARISÉ <span className="text-blue-500 text-[10px] font-bold tracking-[0.4em] ml-2 opacity-60">CORE</span>
+            AMARISÉ <span className="text-plum text-[10px] font-bold tracking-[0.4em] ml-2 opacity-60">CORE</span>
           </div>
         </Link>
       </div>
@@ -81,17 +91,17 @@ export function AdminSidebar() {
                   <button className={cn(
                     "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-xs group border-none bg-transparent outline-none cursor-pointer",
                     pathname === item.href 
-                      ? "bg-white/5 text-white border-l-2 border-blue-500" 
+                      ? "bg-white/5 text-white border-l-2 border-plum" 
                       : "text-white/40 hover:text-white hover:bg-white/5"
                   )}>
                     <span className={cn(
                       "transition-transform duration-500 group-hover:scale-110",
-                      pathname === item.href ? "text-blue-500" : "text-white/20 group-hover:text-white/60"
+                      pathname === item.href ? "text-plum" : "text-white/20 group-hover:text-white/60"
                     )}>
                       {React.cloneElement(item.icon as React.ReactElement, { size: 16 })}
                     </span>
                     <span className="flex-1 text-left tracking-widest uppercase">{item.label}</span>
-                    {pathname === item.href && <ChevronRight className="w-3 h-3 text-blue-500" />}
+                    {pathname === item.href && <ChevronRight className="w-3 h-3 text-plum" />}
                   </button>
                 </Link>
               ))}

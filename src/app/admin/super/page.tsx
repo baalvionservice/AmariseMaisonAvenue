@@ -32,7 +32,9 @@ import {
   Download,
   Filter,
   Cpu,
-  Database
+  Database,
+  FlaskConical,
+  Palette
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +64,7 @@ import { SyncCategory, CountryCode } from '@/lib/types';
 
 /**
  * Global Matrix: Institutional Master Control
- * Tab 1: Global Pulse, Tab 2: Safe Sync, Tab 3: Infrastructure Overrides
+ * Tab 1: Global Pulse, Tab 2: Safe Sync, Tab 3: Infrastructure Matrix
  */
 export default function SuperAdminHub() {
   const { 
@@ -75,11 +77,11 @@ export default function SuperAdminHub() {
     rollbackGlobalSync,
     currentUser,
     privateInquiries,
-    invoices
+    invoices,
+    globalSettings
   } = useAppStore();
 
   const [isSyncModalOpen, setIsSyncOpen] = useState(false);
-  const [syncStep, setSyncStep] = useState(1);
   const [selectedCats, setSyncCats] = useState<SyncCategory[]>(['products']);
   const [selectedTargets, setSyncTargets] = useState<CountryCode[]>(['us', 'uk', 'ae', 'in', 'sg']);
 
@@ -89,7 +91,6 @@ export default function SuperAdminHub() {
   const handleStartSync = () => {
     executeSafeSync(selectedCats, selectedTargets);
     setIsSyncOpen(false);
-    setSyncStep(1);
   };
 
   return (
@@ -107,7 +108,7 @@ export default function SuperAdminHub() {
               </p>
               <div className="pt-8 flex justify-end space-x-4">
                  <Button variant="ghost" onClick={() => setIsSyncOpen(false)}>Cancel</Button>
-                 <Button className="bg-black text-white hover:bg-plum rounded-none h-12 px-10 font-bold uppercase tracking-widest" onClick={handleStartSync}>
+                 <Button className="bg-black text-white hover:bg-plum rounded-none h-12 px-10 font-bold uppercase tracking-widest transition-all" onClick={handleStartSync}>
                     AUTHORIZE MASTER OVERRIDE
                  </Button>
               </div>
@@ -117,11 +118,14 @@ export default function SuperAdminHub() {
 
       <header className="flex justify-between items-end">
         <div className="space-y-2">
-          <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center space-x-2">
-             <Link href="/admin">Dashboard</Link>
-             <ChevronRight className="w-2.5 h-2.5" />
-             <span className="text-plum">Global Orchestration</span>
-          </nav>
+          <div className="flex items-center space-x-3 mb-2">
+             <div className="p-2 bg-plum/5 rounded-none text-plum"><Globe className="w-5 h-5" /></div>
+             <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center space-x-2">
+                <Link href="/admin">Dashboard</Link>
+                <ChevronRight className="w-2.5 h-2.5" />
+                <span className="text-plum">Global Orchestration</span>
+             </nav>
+          </div>
           <h1 className="text-4xl font-headline font-bold italic tracking-tight text-gray-900 uppercase">Global Matrix</h1>
           <p className="text-sm text-gray-500 font-light italic">Master control for multi-brand and multi-market architecture.</p>
         </div>
@@ -135,8 +139,8 @@ export default function SuperAdminHub() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-white border-b border-border h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
           <TabsTrigger value="overview" className="tab-trigger">Global Pulse</TabsTrigger>
-          <TabsTrigger value="registry" className="tab-trigger">Master Registry</TabsTrigger>
-          <TabsTrigger value="advanced" className="tab-trigger">Infrastructure Matrix</TabsTrigger>
+          <TabsTrigger value="strategy" className="tab-trigger">Maison Strategy</TabsTrigger>
+          <TabsTrigger value="infrastructure" className="tab-trigger">Infrastructure Matrix</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-12 animate-fade-in">
@@ -147,7 +151,7 @@ export default function SuperAdminHub() {
               <StatsTile label="System Integrity" value="100%" trend="Verified" />
            </div>
 
-           <Card className="bg-white border-border shadow-luxury overflow-hidden">
+           <Card className="bg-white border-border shadow-luxury overflow-hidden rounded-none">
               <CardHeader className="border-b border-border bg-ivory/10">
                  <CardTitle className="font-headline text-2xl">Regional Hub Distribution</CardTitle>
                  <CardDescription className="text-[10px] uppercase tracking-widest">Market status and jurisdictional logic</CardDescription>
@@ -163,7 +167,7 @@ export default function SuperAdminHub() {
                 </TableHeader>
                 <TableBody>
                   {countryConfigs.map(c => (
-                    <TableRow key={c.code} className="hover:bg-ivory/30 transition-colors">
+                    <TableRow key={c.code} className="hover:bg-ivory/30 transition-colors border-border">
                       <TableCell className="pl-8 font-bold text-xs uppercase tracking-widest">{c.name} ({c.code.toUpperCase()})</TableCell>
                       <TableCell className="text-[10px] font-bold text-gray-400">{c.taxType} ({c.taxRate}%)</TableCell>
                       <TableCell className="text-xs font-light">{c.currency}</TableCell>
@@ -177,57 +181,51 @@ export default function SuperAdminHub() {
            </Card>
         </TabsContent>
 
-        <TabsContent value="registry" className="animate-fade-in space-y-8">
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <Card className="lg:col-span-2 bg-white border-border shadow-luxury overflow-hidden">
-                 <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-xl">Sync History Ledger</CardTitle>
-                 </CardHeader>
-                 <Table>
-                    <TableHeader className="bg-ivory/50">
-                       <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">ID</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Timestamp</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Actor</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
-                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                       {globalSyncHistory.map(log => (
-                         <TableRow key={log.id} className="hover:bg-ivory/30 transition-colors">
-                            <TableCell className="pl-8 text-[10px] font-mono text-gray-400">{log.id}</TableCell>
-                            <TableCell className="text-xs font-light">{new Date(log.timestamp).toLocaleString()}</TableCell>
-                            <TableCell className="text-[10px] font-bold uppercase">{log.actorName}</TableCell>
-                            <TableCell className="text-right pr-8">
-                               <Button variant="outline" size="sm" className="h-8 border-red-200 text-red-600 text-[8px] font-bold uppercase hover:bg-red-50" onClick={() => rollbackGlobalSync(log.id)}>ROLLBACK</Button>
-                            </TableCell>
-                         </TableRow>
-                       ))}
-                    </TableBody>
-                 </Table>
+        <TabsContent value="strategy" className="animate-fade-in space-y-12">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 rounded-none border-l-4 border-l-gold">
+                 <div className="flex items-center space-x-4 text-gold">
+                    <FlaskConical className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Institutional Persona Flow</h3>
+                 </div>
+                 <p className="text-sm text-gray-500 font-light italic leading-relaxed">
+                   Determine the primary routing logic for the Maison. When active, VIP artifacts bypass the standard registry and route directly to the Private Salon environment.
+                 </p>
+                 <div className="flex items-center justify-between pt-6 border-t border-border">
+                    <div className="space-y-1">
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900">Dual-Persona Routing</span>
+                       <p className="text-[9px] text-gray-400 italic">Enable Salon (Design B) for VIP status artifacts.</p>
+                    </div>
+                    <Switch defaultChecked className="data-[state=checked]:bg-gold" />
+                 </div>
               </Card>
 
-              <aside className="space-y-8">
-                 <Card className="bg-black text-white p-8 space-y-6 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Cpu className="w-32 h-32" /></div>
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-gold">Master Sync Logic</h4>
-                    <p className="text-xs font-light italic opacity-60 leading-relaxed">
-                       "A master sync enforces the global artifact schema across all jurisdictional nodes."
-                    </p>
-                    <div className="space-y-4 pt-4 border-t border-white/10">
-                       <SyncCategory label="Products" active />
-                       <SyncCategory label="SEO Metadata" active />
-                       <SyncCategory label="Roles" />
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 rounded-none border-l-4 border-l-plum">
+                 <div className="flex items-center space-x-4 text-plum">
+                    <Palette className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Brand Visuals Matrix</h3>
+                 </div>
+                 <p className="text-sm text-gray-500 font-light italic leading-relaxed">
+                   Global override for the primary action palette. Currently locked to **Maison Plum (#7E3F98)** with **Golden Yellow hover**.
+                 </p>
+                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                    <div className="p-4 border border-border flex items-center space-x-4">
+                       <div className="w-6 h-6 bg-plum shadow-sm" />
+                       <span className="text-[9px] font-bold uppercase tracking-widest">PLUM (PRIMARY)</span>
                     </div>
-                 </Card>
-              </aside>
+                    <div className="p-4 border border-border flex items-center space-x-4">
+                       <div className="w-6 h-6 bg-gold shadow-sm" />
+                       <span className="text-[9px] font-bold uppercase tracking-widest">GOLD (HOVER)</span>
+                    </div>
+                 </div>
+              </Card>
            </div>
         </TabsContent>
 
-        <TabsContent value="advanced" className="animate-fade-in space-y-12">
+        <TabsContent value="infrastructure" className="animate-fade-in space-y-12">
            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 border-l-4 border-l-gold">
-                 <div className="flex items-center space-x-4 text-gold">
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 rounded-none border-l-4 border-l-gray-900">
+                 <div className="flex items-center space-x-4 text-gray-900">
                     <Database className="w-6 h-6" />
                     <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Brand Registry</h3>
                  </div>
@@ -238,21 +236,23 @@ export default function SuperAdminHub() {
                     {brandConfigs.map(b => (
                       <div key={b.id} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                          <span className="text-gray-400">{b.name}</span>
-                         <Badge variant={b.enabled ? 'default' : 'outline'}>{b.enabled ? 'Live' : 'Dormant'}</Badge>
+                         <Badge variant={b.enabled ? 'default' : 'outline'} className="rounded-none border-none bg-emerald-50 text-emerald-600">
+                            {b.enabled ? 'ACTIVE' : 'DORMANT'}
+                         </Badge>
                       </div>
                     ))}
                  </div>
               </Card>
 
-              <Card className="bg-white border-border shadow-luxury p-10 space-y-8">
-                 <div className="flex items-center space-x-4 text-plum">
+              <Card className="bg-white border-border shadow-luxury p-10 space-y-8 rounded-none border-l-4 border-l-red-500">
+                 <div className="flex items-center space-x-4 text-red-500">
                     <ShieldAlert className="w-6 h-6" />
                     <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest">Master Kill Switch</h3>
                  </div>
                  <p className="text-sm text-gray-500 font-light italic leading-relaxed">
-                   Emergency platform oversight. Activating this will immediately switch all market hubs to read-only mode.
+                   Emergency platform oversight. Activating this will immediately switch all market hubs to read-only mode and activate the Institutional Maintenance Overlay.
                  </p>
-                 <Button variant="outline" className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 text-[9px] font-bold uppercase tracking-widest">
+                 <Button variant="outline" className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 text-[9px] font-bold uppercase tracking-widest rounded-none transition-all">
                     ACTIVATE EMERGENCY OVERRIDE
                  </Button>
               </Card>
@@ -265,21 +265,12 @@ export default function SuperAdminHub() {
 
 function StatsTile({ label, value, trend }: { label: string, value: string, trend: string }) {
   return (
-    <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all">
+    <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all rounded-none">
        <div className="flex justify-between items-start">
           <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 group-hover:text-plum transition-colors">{label}</span>
-          <Badge variant="outline" className="text-[8px] uppercase">{trend}</Badge>
+          <Badge variant="outline" className="text-[8px] uppercase border-plum/20 text-plum rounded-none">{trend}</Badge>
        </div>
        <div className="text-4xl font-headline font-bold italic text-gray-900">{value}</div>
     </Card>
-  );
-}
-
-function SyncCategory({ label, active = false }: { label: string, active?: boolean }) {
-  return (
-    <div className="flex items-center space-x-3">
-       <div className={cn("w-2 h-2 rounded-full", active ? "bg-gold" : "bg-white/10")} />
-       <span className={cn("text-[9px] font-bold uppercase tracking-widest", active ? "text-white" : "text-white/30")}>{label}</span>
-    </div>
   );
 }

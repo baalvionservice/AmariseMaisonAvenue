@@ -185,6 +185,7 @@ interface AppContextType {
   // CMS Actions
   upsertCMSSection: (section: CMSSection) => void;
   upsertProduct: (product: Product, changeSummary?: string) => void;
+  toggleProductVipStatus: (productId: string) => void;
   rollbackProductVersion: (productId: string, versionId: string) => void;
   lockProductForEditing: (productId: string) => boolean;
   unlockProduct: (productId: string) => void;
@@ -625,6 +626,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const toggleProductVipStatus = (productId: string) => {
+    setProducts(prev => prev.map(p => p.id === productId ? { ...p, isVip: !p.isVip } : p));
+    const p = products.find(prod => prod.id === productId);
+    logAction(`Toggled Acquisition Strategy: ${!p?.isVip ? 'Private' : 'Normal'}`, p?.name || productId);
+  };
+
   const rollbackProductVersion = (productId: string, versionId: string) => {
     setProducts(prev => prev.map(p => {
       if (p.id === productId) {
@@ -914,7 +921,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setGuideMode, setAdminViewMode,
-    upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    upsertCMSSection, upsertProduct, toggleProductVipStatus, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
@@ -935,7 +942,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
-    upsertCMSSection, upsertProduct, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
+    upsertCMSSection, upsertProduct, toggleProductVipStatus, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead, scheduleWorkflow, runWorkflowTask, runWorkflowSequence, submitApproval, handleApprovalAction,
