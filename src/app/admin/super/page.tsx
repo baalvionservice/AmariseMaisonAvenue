@@ -33,7 +33,9 @@ import {
   Cpu,
   Database,
   FlaskConical,
-  Palette
+  Palette,
+  Eye,
+  Type
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,6 +61,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { SyncCategory, CountryCode } from '@/lib/types';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 /**
  * Global Matrix: Institutional Master Control
@@ -76,7 +80,8 @@ export default function SuperAdminHub() {
     currentUser,
     privateInquiries,
     invoices,
-    globalSettings
+    globalSettings,
+    updateGlobalSettings
   } = useAppStore();
 
   const [isSyncModalOpen, setIsSyncOpen] = useState(false);
@@ -150,6 +155,7 @@ export default function SuperAdminHub() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-transparent border-b border-white/5 h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
           <TabsTrigger value="overview" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Global Hub Status</TabsTrigger>
+          <TabsTrigger value="brand" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Brand Identity</TabsTrigger>
           <TabsTrigger value="strategy" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Maison Principles</TabsTrigger>
           <TabsTrigger value="infrastructure" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Security Layers</TabsTrigger>
         </TabsList>
@@ -194,6 +200,60 @@ export default function SuperAdminHub() {
            </Card>
         </TabsContent>
 
+        <TabsContent value="brand" className="space-y-12 animate-fade-in">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <Card className="bg-[#111113] border-white/5 p-10 space-y-10 rounded-none">
+                 <div className="flex items-center space-x-4 text-plum">
+                    <Palette className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic text-white uppercase tracking-widest">Brand Action Palette</h3>
+                 </div>
+                 <div className="grid grid-cols-1 gap-8">
+                    <div className="space-y-3">
+                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Primary Maison Color (Plum)</Label>
+                       <div className="flex space-x-4">
+                          <Input className="bg-white/5 border-white/10 h-12 text-white font-mono" value={globalSettings.theme.primary} onChange={e => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, primary: e.target.value}})} />
+                          <div className="w-12 h-12 shrink-0 border border-white/10" style={{ backgroundColor: globalSettings.theme.primary }} />
+                       </div>
+                    </div>
+                    <div className="space-y-3">
+                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Maison Accent Color (Gold)</Label>
+                       <div className="flex space-x-4">
+                          <Input className="bg-white/5 border-white/10 h-12 text-white font-mono" value={globalSettings.theme.accent} onChange={e => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, accent: e.target.value}})} />
+                          <div className="w-12 h-12 shrink-0 border border-white/10" style={{ backgroundColor: globalSettings.theme.accent }} />
+                       </div>
+                    </div>
+                 </div>
+              </Card>
+
+              <Card className="bg-[#111113] border-white/5 p-10 space-y-10 rounded-none">
+                 <div className="flex items-center space-x-4 text-white/60">
+                    <Type className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic text-white uppercase tracking-widest">Typography & Voice</h3>
+                 </div>
+                 <div className="space-y-8">
+                    <div className="space-y-3">
+                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Global Font Family</Label>
+                       <Select value={globalSettings.theme.fontFamily} onValueChange={v => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, fontFamily: v}})}>
+                          <SelectTrigger className="bg-white/5 border-white/10 h-12 text-white rounded-none">
+                             <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#111113] border-white/10 text-white">
+                             <SelectItem value="Alegreya">Alegreya (Institutional Heritage)</SelectItem>
+                             <SelectItem value="Inter">Inter (Technical Precision)</SelectItem>
+                             <SelectItem value="Playfair">Playfair (Classic Opulence)</SelectItem>
+                          </SelectContent>
+                       </Select>
+                    </div>
+                    <div className="p-6 bg-white/[0.02] border border-white/5 text-center">
+                       <p className={cn("text-2xl font-light italic leading-relaxed text-white/80", `font-${globalSettings.theme.fontFamily.toLowerCase()}`)}>
+                         "Luxury is a dialogue between human brilliance and the absolute standard of the archive."
+                       </p>
+                    </div>
+                 </div>
+              </Card>
+           </div>
+        </TabsContent>
+
         <TabsContent value="strategy" className="animate-fade-in space-y-12">
            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-blue-600">
@@ -209,27 +269,21 @@ export default function SuperAdminHub() {
                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Salon Routing Protocol</span>
                        <p className="text-[9px] text-white/20 italic">Global enforcement for all 5 jurisdictions.</p>
                     </div>
-                    <Switch defaultChecked className="data-[state=checked]:bg-blue-600" />
+                    <Switch checked={globalSettings.adminViewMode === 'advanced'} onCheckedChange={v => setAdminViewMode(v ? 'advanced' : 'simple')} className="data-[state=checked]:bg-blue-600" />
                  </div>
               </Card>
 
               <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-plum">
                  <div className="flex items-center space-x-4 text-plum">
-                    <Palette className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Global Aesthetic Overlay</h3>
+                    <Eye className="w-6 h-6" />
+                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Maison Guide Mode</h3>
                  </div>
                  <p className="text-sm text-white/40 font-light italic leading-relaxed">
-                   Master override for the primary action palette. Unified brand coherence ensures consistent luxury recognition across international borders.
+                   Internal curatorial overlay for the public storefront. Displays registry scores, metadata audits, and acquisition signals directly on the artifact pages for internal review.
                  </p>
-                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                    <div className="p-4 border border-white/5 flex items-center space-x-4 bg-white/5">
-                       <div className="w-6 h-6 bg-plum shadow-sm" />
-                       <span className="text-[9px] font-bold uppercase tracking-widest text-white/60">PLUM CORE</span>
-                    </div>
-                    <div className="p-4 border border-white/5 flex items-center space-x-4 bg-white/5">
-                       <div className="w-6 h-6 bg-gold shadow-sm" />
-                       <span className="text-[9px] font-bold uppercase tracking-widest text-white/60">GOLD ACCENT</span>
-                    </div>
+                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Audit Overlay Enabled</span>
+                    <Switch checked={globalSettings.isGuideMode} onCheckedChange={setGuideMode} className="data-[state=checked]:bg-plum" />
                  </div>
               </Card>
            </div>

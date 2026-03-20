@@ -262,11 +262,12 @@ export interface SalesScript {
 export interface AutomationRule {
   id: string;
   name: string;
-  trigger: 'inquiry_submitted' | 'keyword_match' | 'tier_assigned';
-  action: 'send_script' | 'notify_admin' | 'change_status';
+  trigger: 'inquiry_submitted' | 'keyword_match' | 'tier_assigned' | 'revenue_drop' | 'lead_surge';
+  action: 'send_script' | 'notify_admin' | 'change_status' | 'trigger_campaign' | 'suggest_mitigation';
   params?: any;
   enabled: boolean;
   brandId: string;
+  country?: string;
 }
 
 export interface SEOMetadata {

@@ -259,6 +259,10 @@ interface AppContextType {
   
   // Marketing Actions
   upsertCampaign: (campaign: Campaign) => void;
+  
+  // Automation Actions
+  toggleRule: (id: string) => void;
+  upsertRule: (rule: AutomationRule) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -320,7 +324,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
   const [aiLogs, setAiLogs] = useState<AIActionLog[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
-  const [automationRules] = useState<AutomationRule[]>([]);
+  const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
+    { id: 'r1', name: 'India Hub Yield Mitigation', trigger: 'revenue_drop', action: 'suggest_mitigation', enabled: true, brandId: activeBrandId, country: 'in' },
+    { id: 'r2', name: 'T1 Lead Urgent Routing', trigger: 'lead_surge', action: 'notify_admin', enabled: true, brandId: activeBrandId }
+  ]);
 
   // Operational state
   const [notifications, setNotifications] = useState<MaisonNotification[]>([
@@ -331,9 +338,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'w1', taskName: 'Global AI Sentiment Loop', frequency: 'hourly', country: 'global', status: 'complete', lastRun: new Date().toISOString(), nextRun: new Date(Date.now() + 3600000).toISOString() },
     { id: 'w2', taskName: 'Catalog Search Index Sync', frequency: 'daily', country: 'us', status: 'pending', nextRun: new Date(Date.now() + 86400000).toISOString() },
     { id: 'w3', taskName: 'Daily Content Update', frequency: 'daily', country: 'us', status: 'pending', nextRun: new Date(Date.now() + 3600000).toISOString() },
-    { id: 'w4', taskName: 'SEO Audit Cycle', frequency: 'daily', country: 'ae', status: 'pending', dependencyId: 'w3', nextRun: new Date(Date.now() + 10800000).toISOString() },
-    { id: 'rev-1', taskName: 'Automated Retargeting Cycle', frequency: 'daily', country: 'global', status: 'pending', nextRun: new Date().toISOString() },
-    { id: 'rev-2', taskName: 'Daily Artifact Promotion', frequency: 'daily', country: 'global', status: 'pending', nextRun: new Date().toISOString() }
+    { id: 'w4', taskName: 'SEO Audit Cycle', frequency: 'daily', country: 'ae', status: 'pending', dependencyId: 'w3', nextRun: new Date(Date.now() + 10800000).toISOString() }
   ]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([
     { id: 'a1', userId: 'u-4', userName: 'Lumière Atelier', contentType: 'listing', contentId: 'prod-50', country: 'ae', status: 'pending', timestamp: new Date().toISOString() }
@@ -933,6 +938,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const toggleRule = (id: string) => setAutomationRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
+  const upsertRule = (r: AutomationRule) => setAutomationRules(prev => {
+    const idx = prev.findIndex(item => item.id === r.id);
+    return idx > -1 ? prev.map(item => item.id === r.id ? r : item) : [...prev, r];
+  });
+
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
@@ -953,7 +964,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
-    updateTicketStatus, addTicketMessage, upsertCampaign
+    updateTicketStatus, addTicketMessage, upsertCampaign, toggleRule, upsertRule
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
@@ -974,7 +985,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
-    updateTicketStatus, addTicketMessage, upsertCampaign
+    updateTicketStatus, addTicketMessage, upsertCampaign, toggleRule, upsertRule
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
