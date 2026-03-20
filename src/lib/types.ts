@@ -738,6 +738,17 @@ export interface RevenueMetric {
   country: string;
 }
 
+export interface CustomerSegment {
+  id: string;
+  name: string;
+  description: string;
+  userCount: number;
+  avgOrderValue: number;
+  tags: string[];
+  predictedChurn: number;
+  brandId: string;
+}
+
 export interface ConversionFunnel {
   visitors: number;
   leads: number;
