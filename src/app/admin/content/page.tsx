@@ -19,7 +19,11 @@ import {
   Crown,
   X,
   Save,
-  Tag
+  Tag,
+  Globe,
+  Zap,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,19 +51,25 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Product } from '@/lib/types';
+import { useAISEO } from '@/hooks/use-ai';
 
 /**
  * Atelier CMS: Multi-Market Registry Terminal
  * Control artifact template strategy (Normal vs Private) and regional visibility.
+ * Enhanced with SEO Authority suite.
  */
 export default function ContentAdminHub() {
-  const { products, deleteProduct, updateProduct } = useCMS();
-  const { globalSettings, lockProductForEditing, toggleProductVipStatus, upsertProduct } = useAppStore();
+  const { products, deleteProduct } = useCMS();
+  const { lockProductForEditing, toggleProductVipStatus, upsertProduct } = useAppStore();
+  const { auditPageSEO, optimizeMetadata } = useAISEO();
   const { toast } = useToast();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [seoAudit, setSeoAudit] = useState<{ score: number, missingKeywords: string[], suggestion: string } | null>(null);
 
   const filteredProducts = useSearch(products, searchQuery);
 
@@ -68,6 +78,7 @@ export default function ContentAdminHub() {
     if (locked) {
       setEditingProduct({ ...product });
       setIsEditorOpen(true);
+      setSeoAudit(null);
     } else {
       toast({ variant: "destructive", title: "Conflict Blocked", description: "Refined by another hub." });
     }
@@ -86,6 +97,30 @@ export default function ContentAdminHub() {
   const handleToggleTemplate = (productId: string) => {
     toggleProductVipStatus(productId);
     toast({ title: "Acquisition Strategy Updated", description: "The artifact template has been re-routed." });
+  };
+
+  const runSEOAudit = () => {
+    if (!editingProduct) return;
+    const res = auditPageSEO(
+      `${editingProduct.name} ${editingProduct.specialNotes || ''}`, 
+      editingProduct.targetKeyword ? [editingProduct.targetKeyword] : ['luxury', 'heritage']
+    );
+    setSeoAudit(res);
+    toast({ title: "SEO Audit Complete", description: `Registry entry scored ${res.score}% for Google relevance.` });
+  };
+
+  const generateAISEO = () => {
+    if (!editingProduct) return;
+    const suggested = optimizeMetadata(editingProduct.name, 'Global');
+    if (suggested) {
+      setEditingProduct({
+        ...editingProduct,
+        seoTitle: suggested.metaTitle,
+        seoDescription: suggested.metaDesc,
+        targetKeyword: suggested.keywords.split(',')[0]
+      });
+      toast({ title: "AI SEO Suggestions Applied", description: "Metadata has been optimized for Google search." });
+    }
   };
 
   return (
@@ -127,7 +162,10 @@ export default function ContentAdminHub() {
                 versionHistory: [],
                 currentVersion: 1,
                 conflictStrategy: 'global-priority',
-                lastEditedRegion: 'global'
+                lastEditedRegion: 'global',
+                seoTitle: '',
+                seoDescription: '',
+                targetKeyword: ''
               });
               setIsEditorOpen(true);
             }}
@@ -139,73 +177,157 @@ export default function ContentAdminHub() {
 
       {/* Editor Drawer */}
       <Sheet open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <SheetContent className="w-full sm:max-w-[540px] bg-white p-0 border-none rounded-none shadow-2xl">
+        <SheetContent className="w-full sm:max-w-[640px] bg-white p-0 border-none rounded-none shadow-2xl">
           <form onSubmit={handleSaveProduct} className="flex flex-col h-full">
             <SheetHeader className="p-10 bg-slate-50 border-b border-slate-100">
               <SheetTitle className="font-headline text-3xl uppercase italic tracking-tighter">Edit Registry Artifact</SheetTitle>
               <SheetDescription className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Master Metadata Control</SheetDescription>
             </SheetHeader>
 
-            <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Artifact Name</Label>
-                <Input 
-                  value={editingProduct?.name} 
-                  onChange={e => setEditingProduct(prev => prev ? {...prev, name: e.target.value} : null)}
-                  className="rounded-none border-slate-200 h-12 text-sm italic font-light"
-                />
-              </div>
+            <Tabs defaultValue="core" className="flex-1 flex flex-col overflow-hidden">
+              <TabsList className="bg-white border-b border-slate-100 h-14 w-full justify-start p-0 px-10 rounded-none space-x-8">
+                <TabsTrigger value="core" className="tab-trigger-modern !h-14">Core Details</TabsTrigger>
+                <TabsTrigger value="seo" className="tab-trigger-modern !h-14">SEO Authority</TabsTrigger>
+              </TabsList>
 
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Base Price (Global)</Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-300">$</span>
+              <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+                <TabsContent value="core" className="m-0 space-y-8 animate-fade-in">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Artifact Name</Label>
                     <Input 
-                      type="number"
-                      value={editingProduct?.basePrice} 
-                      onChange={e => setEditingProduct(prev => prev ? {...prev, basePrice: parseFloat(e.target.value)} : null)}
-                      className="rounded-none border-slate-200 h-12 pl-8 text-sm font-bold"
+                      value={editingProduct?.name} 
+                      onChange={e => setEditingProduct(prev => prev ? {...prev, name: e.target.value} : null)}
+                      className="rounded-none border-slate-200 h-12 text-sm italic font-light"
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Current Stock</Label>
-                  <Input 
-                    type="number"
-                    value={editingProduct?.stock} 
-                    onChange={e => setEditingProduct(prev => prev ? {...prev, stock: parseInt(e.target.value)} : null)}
-                    className="rounded-none border-slate-200 h-12 text-sm font-bold"
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-4 pt-4 border-t border-slate-50">
-                <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-plum">Acquisition Protocol</p>
-                <div className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 group cursor-pointer" onClick={() => editingProduct && setEditingProduct({...editingProduct, isVip: !editingProduct.isVip})}>
-                  <div className="flex items-center space-x-4">
-                    {editingProduct?.isVip ? <Lock className="w-5 h-5 text-plum" /> : <Eye className="w-5 h-5 text-slate-400" />}
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-tight text-slate-900">{editingProduct?.isVip ? 'Private Salon Flow' : 'Normal Registry Flow'}</p>
-                      <p className="text-[10px] text-slate-400 italic">Toggle to switch acquisition persona.</p>
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Base Price (Global)</Label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-300">$</span>
+                        <Input 
+                          type="number"
+                          value={editingProduct?.basePrice} 
+                          onChange={e => setEditingProduct(prev => prev ? {...prev, basePrice: parseFloat(e.target.value)} : null)}
+                          className="rounded-none border-slate-200 h-12 pl-8 text-sm font-bold"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Current Stock</Label>
+                      <Input 
+                        type="number"
+                        value={editingProduct?.stock} 
+                        onChange={e => setEditingProduct(prev => prev ? {...prev, stock: parseInt(e.target.value)} : null)}
+                        className="rounded-none border-slate-200 h-12 text-sm font-bold"
+                      />
                     </div>
                   </div>
-                  <div className={cn("w-10 h-5 rounded-full p-1 transition-colors", editingProduct?.isVip ? "bg-plum" : "bg-slate-200")}>
-                    <div className={cn("w-3 h-3 bg-white rounded-full transition-transform", editingProduct?.isVip ? "translate-x-5" : "translate-x-0")} />
-                  </div>
-                </div>
-              </div>
 
-              <div className="space-y-2 pt-4">
-                <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Condition Description</Label>
-                <Input 
-                  value={editingProduct?.condition} 
-                  onChange={e => setEditingProduct(prev => prev ? {...prev, condition: e.target.value} : null)}
-                  className="rounded-none border-slate-200 h-12 text-xs italic"
-                  placeholder="e.g. PRISTINE / UNWORN"
-                />
+                  <div className="space-y-4 pt-4 border-t border-slate-50">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-plum">Acquisition Protocol</p>
+                    <div className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 group cursor-pointer" onClick={() => editingProduct && setEditingProduct({...editingProduct, isVip: !editingProduct.isVip})}>
+                      <div className="flex items-center space-x-4">
+                        {editingProduct?.isVip ? <Lock className="w-5 h-5 text-plum" /> : <Eye className="w-5 h-5 text-slate-400" />}
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-tight text-slate-900">{editingProduct?.isVip ? 'Private Salon Flow' : 'Normal Registry Flow'}</p>
+                          <p className="text-[10px] text-slate-400 italic">Toggle to switch acquisition persona.</p>
+                        </div>
+                      </div>
+                      <div className={cn("w-10 h-5 rounded-full p-1 transition-colors", editingProduct?.isVip ? "bg-plum" : "bg-slate-200")}>
+                        <div className={cn("w-3 h-3 bg-white rounded-full transition-transform", editingProduct?.isVip ? "translate-x-5" : "translate-x-0")} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Curatorial Notes</Label>
+                    <Textarea 
+                      value={editingProduct?.specialNotes} 
+                      onChange={e => setEditingProduct(prev => prev ? {...prev, specialNotes: e.target.value} : null)}
+                      className="rounded-none border-slate-200 min-h-[120px] text-xs italic font-light leading-relaxed"
+                      placeholder="Detail the provenance and rarity..."
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="seo" className="m-0 space-y-10 animate-fade-in">
+                  <div className="bg-plum/5 p-6 border border-plum/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 text-plum">
+                        <Zap className="w-4 h-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">AI SEO Optimization</span>
+                      </div>
+                      <Button type="button" variant="outline" size="sm" className="h-8 text-[8px] font-bold uppercase border-plum/20 text-plum hover:bg-plum hover:text-white" onClick={generateAISEO}>
+                        GENERATE METADATA
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-slate-500 italic">"Automate the crafting of market-specific descriptors for Google indexing."</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">SEO Title (Google Display)</Label>
+                      <Input 
+                        value={editingProduct?.seoTitle} 
+                        onChange={e => setEditingProduct(prev => prev ? {...prev, seoTitle: e.target.value} : null)}
+                        className="rounded-none border-slate-200 h-12 text-xs font-bold"
+                        placeholder="Ex: Hermes Birkin 25 Gold | Maison Amarisé Global Registry"
+                      />
+                      <p className="text-[8px] text-slate-400 text-right uppercase font-bold">Limit: 60 Characters</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Meta Description</Label>
+                      <Textarea 
+                        value={editingProduct?.seoDescription} 
+                        onChange={e => setEditingProduct(prev => prev ? {...prev, seoDescription: e.target.value} : null)}
+                        className="rounded-none border-slate-200 h-24 text-xs italic"
+                        placeholder="Detail the acquisition value for search results..."
+                      />
+                      <p className="text-[8px] text-slate-400 text-right uppercase font-bold">Limit: 160 Characters</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Target SEO Keyword</Label>
+                      <Input 
+                        value={editingProduct?.targetKeyword} 
+                        onChange={e => setEditingProduct(prev => prev ? {...prev, targetKeyword: e.target.value} : null)}
+                        className="rounded-none border-slate-200 h-12 text-xs font-mono"
+                        placeholder="Ex: hermes birkin investment"
+                      />
+                    </div>
+                  </div>
+
+                  {/* SEO Audit Result */}
+                  {seoAudit ? (
+                    <div className={cn(
+                      "p-8 border space-y-6",
+                      seoAudit.score > 80 ? "bg-green-50 border-green-100" : "bg-orange-50 border-orange-100"
+                    )}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                          <ShieldCheck className={cn("w-5 h-5", seoAudit.score > 80 ? "text-green-600" : "text-orange-600")} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Authority Audit Score</span>
+                        </div>
+                        <span className={cn("text-2xl font-headline font-bold italic", seoAudit.score > 80 ? "text-green-600" : "text-orange-600")}>
+                          {seoAudit.score}%
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Specialist Suggestion</p>
+                        <p className="text-xs italic leading-relaxed text-slate-700">"{seoAudit.suggestion}"</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button type="button" variant="outline" className="w-full h-14 border-dashed border-slate-200 text-[10px] font-bold uppercase tracking-widest hover:border-plum hover:text-plum" onClick={runSEOAudit}>
+                      <Globe className="w-4 h-4 mr-2" /> AUDIT FOR SEARCH AUTHORITY
+                    </Button>
+                  )}
+                </TabsContent>
               </div>
-            </div>
+            </Tabs>
 
             <div className="p-10 bg-slate-50 border-t border-slate-100 flex justify-end space-x-4">
               <Button type="button" variant="outline" className="rounded-none border-slate-200 text-[10px] font-bold uppercase h-12 px-8" onClick={() => setIsEditorOpen(false)}>Cancel</Button>

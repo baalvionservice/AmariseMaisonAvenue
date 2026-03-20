@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -31,6 +32,7 @@ import Image from 'next/image';
 /**
  * Normal Client Experience (Design A: The Institutional Registry).
  * Optimized for technical trust, transparency, and data-dense archival browsing.
+ * Enhanced with dynamic SEO Authority metadata.
  */
 export default function ProductPage() {
   const { id, country } = useParams();
@@ -47,7 +49,12 @@ export default function ProductPage() {
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
-      {/* SEO Schema */}
+      {/* Dynamic SEO Title & Meta Tags */}
+      <title>{product.seoTitle || `${product.name} | Amarisé Maison Registry`}</title>
+      <meta name="description" content={product.seoDescription || product.specialNotes || product.name} />
+      {product.targetKeyword && <meta name="keywords" content={product.targetKeyword} />}
+
+      {/* Institutional JSON-LD Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -55,14 +62,22 @@ export default function ProductPage() {
             "@context": "https://schema.org/",
             "@type": "Product",
             "name": product.name,
-            "image": product.imageUrl,
-            "description": product.specialNotes || product.name,
+            "image": [product.imageUrl],
+            "description": product.seoDescription || product.specialNotes || product.name,
+            "sku": product.id,
             "brand": { "@type": "Brand", "name": "AMARISÉ MAISON AVENUE" },
             "offers": {
               "@type": "Offer",
-              "priceCurrency": "USD",
+              "url": `https://amarise-maison-avenue.com/${countryCode}/product/${product.id}`,
+              "priceCurrency": COUNTRIES[countryCode]?.currency || "USD",
               "price": product.basePrice,
-              "availability": "https://schema.org/InStock"
+              "availability": "https://schema.org/InStock",
+              "itemCondition": "https://schema.org/NewCondition"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating,
+              "reviewCount": product.reviewsCount
             }
           })
         }}

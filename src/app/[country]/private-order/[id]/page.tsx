@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -31,6 +32,7 @@ import Link from 'next/link';
 /**
  * Private Client Experience (Design B: The Private Salon).
  * Reserved for VIP artifacts and high-value acquisitions. Focuses on narrative and discretion.
+ * Enhanced with dynamic SEO Authority metadata.
  */
 export default function PrivateOrderPage() {
   const { id, country } = useParams();
@@ -77,6 +79,35 @@ export default function PrivateOrderPage() {
 
   return (
     <div className="bg-ivory min-h-screen pb-40">
+      {/* Dynamic SEO Title & Meta Tags */}
+      <title>{product.seoTitle || `Private Acquisition: ${product.name} | Amarisé Salon`}</title>
+      <meta name="description" content={product.seoDescription || `Discreet acquisition flow for the rare ${product.name} artifact.`} />
+      {product.targetKeyword && <meta name="keywords" content={`${product.targetKeyword}, private luxury acquisition`} />}
+
+      {/* Institutional JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": [product.imageUrl],
+            "description": product.seoDescription || product.specialNotes || product.name,
+            "sku": product.id,
+            "brand": { "@type": "Brand", "name": "AMARISÉ MAISON AVENUE" },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://amarise-maison-avenue.com/${countryCode}/private-order/${product.id}`,
+              "priceCurrency": COUNTRIES[countryCode]?.currency || "USD",
+              "price": product.basePrice,
+              "availability": "https://schema.org/InStock",
+              "itemCondition": "https://schema.org/NewCondition"
+            }
+          })
+        }}
+      />
+
       {/* Cinematic Hero Header */}
       <section className="relative h-[55vh] w-full flex items-center justify-center overflow-hidden border-b border-border">
         <Image 
@@ -125,7 +156,7 @@ export default function PrivateOrderPage() {
               </TabsList>
               <TabsContent value="narrative" className="pt-12">
                 <p className="text-gray-600 font-light leading-[1.8] text-2xl italic first-letter:text-9xl first-letter:font-headline first-letter:text-gray-900 first-letter:float-left first-letter:mr-6 first-letter:mt-4">
-                  This artifact represents the absolute pinnacle of the Maison's craftsmanship. Hand-finished in our central atelier, it serves as a testament to human brilliance and the pursuit of the absolute standard. Every stitch and material selection has been audited for heritage compliance, ensuring its position as a primary pillar of any elite collection.
+                  {product.specialNotes || "This artifact represents the absolute pinnacle of the Maison's craftsmanship. Hand-finished in our central atelier, it serves as a testament to human brilliance and the pursuit of the absolute standard. Every stitch and material selection has been audited for heritage compliance, ensuring its position as a primary pillar of any elite collection."}
                 </p>
               </TabsContent>
               <TabsContent value="provenance" className="pt-12">

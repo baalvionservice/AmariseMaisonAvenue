@@ -119,6 +119,10 @@ export interface Product {
   condition?: string;
   conditionDetails?: string;
   specialNotes?: string;
+  // SEO Authority Fields
+  seoTitle?: string;
+  seoDescription?: string;
+  targetKeyword?: string;
 }
 
 export interface CartItem extends Product {
