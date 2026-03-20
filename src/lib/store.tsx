@@ -229,6 +229,8 @@ interface AppContextType {
   upsertCampaign: (campaign: Campaign) => void;
   toggleRule: (id: string) => void;
   upsertRule: (rule: AutomationRule) => void;
+  verifyClient: (id: string) => void;
+  approveVendor: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -373,7 +375,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return transactions.filter(t => t.country.toLowerCase() === activeHub.toLowerCase());
   }, [transactions, activeHub, currentUser]);
   const scopedQATests = useMemo(() => activeHub === 'global' ? qaTests : qaTests.filter(t => t.country === activeHub || t.country === 'global'), [qaTests, activeHub]);
-  const scopedErrors = useMemo(() => activeHub === 'global' ? maisonErrors : maisonErrors.filter(e => e.country === activeHub || e.country === 'global'), [maisonErrors, activeHub]);
+  const scopedErrors = useMemo(() => activeHub === 'global' ? maisonErrors : maisonErrors.filter(e => e.country === activeHub), [maisonErrors, activeHub]);
   const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(t => t.country === activeHub || t.country === 'global'), [stressTests, activeHub]);
 
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
@@ -482,6 +484,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCampaign: (c: Campaign) => setCampaigns(prev => prev.some(i => i.id === c.id) ? prev.map(i => i.id === c.id ? c : i) : [c, ...prev]),
     toggleRule: (id: string) => setAutomationRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r)),
     upsertRule: (r: AutomationRule) => setAutomationRules(prev => prev.some(i => i.id === r.id) ? prev.map(i => i.id === r.id ? r : i) : [...prev, r]),
+    verifyClient: (id: string) => setVipClients(prev => prev.map(v => v.id === id ? { ...v, status: 'verified' } : v)),
+    approveVendor: (id: string) => setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'active' } : v)),
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
