@@ -1,4 +1,3 @@
-
 export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
 
 export interface Office {

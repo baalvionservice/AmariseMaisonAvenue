@@ -212,7 +212,7 @@ export default function QADashboard() {
                     </div>
                   </Card>
 
-                  <Card className="bg-white border-border p-8 space-y-6 shadow-sm">
+                  <Card className="bg-white border-border shadow-sm p-8 space-y-6">
                     <div className="flex items-center space-x-3 text-plum">
                       <History className="w-5 h-5" />
                       <h4 className="text-[10px] font-bold uppercase tracking-widest">Recent Activity</h4>
