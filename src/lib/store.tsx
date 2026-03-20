@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -712,7 +713,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const idx = prev.findIndex(item => item.id === s.id);
     return idx > -1 ? prev.map(item => item.id === s.id ? s : item) : [s, ...prev];
   });
-  const updateSuggestionStatus = (id: string, status: AISuggestion['status']) => prev => prev.map(s => s.id === id ? { ...s, status } : s);
+  const updateSuggestionStatus = (id: string, status: AISuggestion['status']) => setAiSuggestions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
 
   const recordLog = (action: string, module: string, severity: AuditLog['severity'] = 'low') => setAuditLogs(prev => [{ id: `log-${Date.now()}`, adminId: 'adm-current', adminName: currentUser?.name || 'System', action, module, timestamp: new Date().toISOString(), ipAddress: 'Institutional Registry', severity, brandId: activeBrandId }, ...prev]);
   const addToCart = (product: Product) => setCart(prev => prev.find(item => item.id === product.id) ? prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item) : [...prev, { ...product, quantity: 1 }]);
