@@ -22,13 +22,21 @@ import {
   Briefcase,
   Bell,
   MessageSquare,
-  LifeBuoy
+  LifeBuoy,
+  BarChart3,
+  Cpu,
+  Settings2,
+  PlayCircle,
+  Database,
+  Megaphone,
+  UserCircle,
+  Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Standardized for the Maison dark operating system.
+ * Updated to include all 20 specialized nodes for total platform control.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -39,21 +47,27 @@ export function AdminSidebar() {
       items: [
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
-        { icon: <Zap />, label: "AI Autopilot", href: "/admin/ai-dashboard" },
+        { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
+        { icon: <Settings2 />, label: "AI Control Hub", href: "/admin/ai-control" },
+        { icon: <PlayCircle />, label: "Automation", href: "/admin/automation" },
       ]
     },
     {
-      title: "Inventory",
+      title: "Inventory & SEO",
       items: [
         { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
-        { icon: <Briefcase />, label: "Partners", href: "/admin/operations" },
+        { icon: <Briefcase />, label: "Operations", href: "/admin/operations" },
+        { icon: <UserCircle />, label: "Vendor Portal", href: "/admin/vendor" },
         { icon: <Search />, label: "SEO Authority", href: "/admin/seo" },
+        { icon: <Database />, label: "Integrations", href: "/admin/integrations" },
       ]
     },
     {
       title: "Acquisition",
       items: [
         { icon: <Target />, label: "Sales CRM", href: "/admin/sales" },
+        { icon: <BarChart3 />, label: "Revenue Matrix", href: "/admin/revenue" },
+        { icon: <Megaphone />, label: "Marketing Hub", href: "/admin/marketing" },
         { icon: <MessageSquare />, label: "Messaging", href: "/admin/messaging" },
         { icon: <CreditCard />, label: "Treasury", href: "/admin/finance" },
       ]
@@ -61,6 +75,7 @@ export function AdminSidebar() {
     {
       title: "Infrastructure",
       items: [
+        { icon: <FlaskConical />, label: "QA Laboratory", href: "/admin/qa" },
         { icon: <Bell />, label: "Alerts", href: "/admin/notifications" },
         { icon: <LifeBuoy />, label: "Support", href: "/admin/support" },
         { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
@@ -89,7 +104,7 @@ export function AdminSidebar() {
               {group.items.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <button className={cn(
-                    "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-xs group border-none bg-transparent outline-none cursor-pointer",
+                    "w-full flex items-center space-x-4 px-4 py-3 rounded-none transition-all duration-500 text-[11px] group border-none bg-transparent outline-none cursor-pointer",
                     pathname === item.href 
                       ? "bg-white/5 text-white border-l-2 border-plum" 
                       : "text-white/40 hover:text-white hover:bg-white/5"
@@ -100,7 +115,7 @@ export function AdminSidebar() {
                     )}>
                       {React.cloneElement(item.icon as React.ReactElement, { size: 16 })}
                     </span>
-                    <span className="flex-1 text-left tracking-widest uppercase">{item.label}</span>
+                    <span className="flex-1 text-left tracking-widest uppercase font-bold">{item.label}</span>
                     {pathname === item.href && <ChevronRight className="w-3 h-3 text-plum" />}
                   </button>
                 </Link>
