@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -129,31 +128,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Institutional Testing Portal - Comprehensive Audit Section */}
+      {/* Institutional Audit Portal */}
       <section className="bg-[#f8f8f8] py-32 border-y border-gray-100">
         <div className="container mx-auto px-12 max-w-6xl text-center space-y-12">
           <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-sm">
             <FlaskConical className="w-8 h-8 text-plum" />
           </div>
           <div className="space-y-4">
-            <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight">Institutional Testing Portal</h3>
+            <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight">Institutional Design Lab</h3>
             <p className="text-sm text-gray-500 font-light italic max-w-2xl mx-auto">
-              Evaluate the distinct curatorial templates implemented for global registry management and private acquisition.
+              Comparing the distinct curatorial templates implemented for standard registry management and private acquisition.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
             <Link href={`/${countryCode}/product/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-black transition-all text-left space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <Eye className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
                 <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design A</span>
               </div>
-              <h4 className="text-lg font-headline font-bold italic text-gray-900">Standard Archive View</h4>
+              <h4 className="text-lg font-headline font-bold italic text-gray-900">The Archival Registry</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Modern 3-column layout with vertical thumbnails and condition metrics.
+                Modern 3-column layout optimized for transparency and technical trust. Standard for bulk catalog.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
-                TEST ARCHIVE <ArrowRight className="w-3 h-3 ml-2" />
+                TEST REGISTRY VIEW <ArrowRight className="w-3 h-3 ml-2" />
               </div>
             </Link>
 
@@ -162,26 +161,12 @@ export default function HomePage() {
                 <Lock className="w-5 h-5 text-gray-400 group-hover:text-plum transition-colors" />
                 <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design B</span>
               </div>
-              <h4 className="text-lg font-headline font-bold italic text-gray-900">Private Order Flow</h4>
+              <h4 className="text-lg font-headline font-bold italic text-gray-900">The Private Salon</h4>
               <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                Cinematic narrative view with integrated acquisition briefing.
+                Cinematic, narrative-first design reserved for exclusive artifacts and private commissions.
               </p>
               <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
-                TEST PRIVATE FLOW <ArrowRight className="w-3 h-3 ml-2" />
-              </div>
-            </Link>
-
-            <Link href={`/${countryCode}/special-archive/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-gold transition-all text-left space-y-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <Star className="w-5 h-5 text-gray-400 group-hover:text-gold transition-colors" />
-                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design C</span>
-              </div>
-              <h4 className="text-lg font-headline font-bold italic text-gray-900">Original Maison View</h4>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                The classic 2-column minimalist template featuring the plum signature.
-              </p>
-              <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
-                TEST SPECIAL VIEW <ArrowRight className="w-3 h-3 ml-2" />
+                TEST SALON FLOW <ArrowRight className="w-3 h-3 ml-2" />
               </div>
             </Link>
           </div>
