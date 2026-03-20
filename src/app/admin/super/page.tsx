@@ -52,7 +52,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/checkbox";
 import {
   Dialog,
   DialogContent,
