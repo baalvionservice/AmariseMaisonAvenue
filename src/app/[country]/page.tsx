@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { COLLECTIONS, COUNTRIES } from '@/lib/mock-data';
+import { COUNTRIES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
@@ -13,9 +13,11 @@ import {
   Shirt,
   Gem,
   Watch,
-  Award,
   Zap,
-  Target
+  Target,
+  FlaskConical,
+  Lock,
+  Eye
 } from 'lucide-react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { useAppStore } from '@/lib/store';
@@ -26,7 +28,7 @@ export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const { activeVip, editorials } = useAppStore();
+  const { activeVip } = useAppStore();
   
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(true);
@@ -87,7 +89,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Autonomous Ticker: Real-time Engagement */}
+      {/* Autonomous Ticker */}
       <section className="bg-primary py-5 text-center border-b border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
            <Zap className="w-64 h-64 text-white" />
@@ -100,7 +102,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* Narrative: Institutional Voice */}
+      {/* Narrative Section */}
       <section className="container mx-auto px-12 py-48 max-w-[1600px]">
         <div className="flex flex-col lg:flex-row items-center gap-24 lg:gap-40">
           <div className="lg:w-1/2 relative aspect-[4/5] w-full overflow-hidden shadow-luxury group">
@@ -131,112 +133,80 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="space-y-48">
-        {/* Departments: Professional Categorization */}
-        <section className="container mx-auto px-12 max-w-[1600px]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-            <DepartmentCard 
-              icon={<Shirt className="w-6 h-6" />} 
-              title="Haute Couture" 
-              desc="Archival runway assets and bespoke tailoring."
-              href={`/${countryCode}/category/apparel`}
-            />
-            <DepartmentCard 
-              icon={<Gem className="w-6 h-6" />} 
-              title="High Jewelry" 
-              desc="Ethically audited rare gems and hand-sculpted gold."
-              href={`/${countryCode}/category/jewelry`}
-            />
-            <DepartmentCard 
-              icon={<Watch className="w-6 h-6" />} 
-              title="Heritage Complications" 
-              desc="Swiss-certified horological artifacts for collectors."
-              href={`/${countryCode}/category/watches`}
-            />
+      {/* Product & Design Testing Portal - Discreet Audit Section */}
+      <section className="bg-[#f8f8f8] py-32 border-y border-gray-100">
+        <div className="container mx-auto px-12 max-w-4xl text-center space-y-12">
+          <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-sm">
+            <FlaskConical className="w-8 h-8 text-plum" />
           </div>
-        </section>
-
-        {/* Private Salon: High Intent Recs (Behavior Driven) */}
-        <section className="container mx-auto px-12 py-24 max-w-[1600px]">
-          <div className="flex flex-col lg:flex-row items-end justify-between mb-24 gap-8">
-            <div className="space-y-4">
-               <div className="flex items-center space-x-3">
-                  <Crown className="w-5 h-5 text-secondary" />
-                  <span className="text-[10px] font-bold tracking-[0.5em] uppercase text-gray-400">Personalized Acquisition Salon</span>
-               </div>
-               <h2 className="text-5xl font-headline font-medium text-gray-900 tracking-tight">
-                 {activeVip ? `Curated for ${activeVip.name}` : "Discreet Allocation Only"}
-               </h2>
-               <p className="text-gray-400 text-[9px] uppercase tracking-[0.5em] font-bold">
-                 {activeVip ? "AI-Optimized based on historical intent" : `Curatorial Verification Required for ${currentCountry.name} Market`}
-               </p>
-            </div>
-            <Link href={`/${countryCode}/wishlist`}>
-              <Button variant="ghost" className="text-[10px] font-bold tracking-[0.3em] uppercase hover:text-secondary transition-colors" aria-label="View Personal Registry">
-                View Personal Registry <ArrowRight className="ml-2 w-3 h-3" />
-              </Button>
-            </Link>
+          <div className="space-y-4">
+            <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight">Institutional Testing Portal</h3>
+            <p className="text-sm text-gray-500 font-light italic leading-relaxed max-w-2xl mx-auto">
+              Verify the segregation between our high-fidelity archival registry and our cinematic private acquisition flows.
+            </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20">
-            {loadingRecs ? (
-              [...Array(3)].map((_, i) => <div key={i} className="aspect-[3/4] bg-muted animate-pulse border border-gray-50" />)
-            ) : (
-              recommendations.map(rec => (
-                <ProductCard key={rec.id} product={rec} />
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Automated Retargeting Moment */}
-        <section className="bg-plum/5 py-32 border-y border-border">
-           <div className="container mx-auto px-12 max-w-4xl text-center space-y-12">
-              <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-lg">
-                 <Target className="w-8 h-8 text-plum" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto pt-8">
+            <Link href={`/${countryCode}/product/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-black transition-all text-left space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <Eye className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
+                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design A</span>
               </div>
-              <h3 className="text-4xl md:text-5xl font-headline font-bold italic tracking-tight">The Heritage Intelligence</h3>
-              <p className="text-xl text-gray-600 font-light leading-relaxed italic max-w-2xl mx-auto">
-                "Our curatorial AI monitors global market resonance to invite you into the world's most significant collection events before they reach the public hub."
+              <h4 className="text-lg font-headline font-bold italic text-gray-900">Normal Archive View</h4>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                3-column layout, condition slider, and vertical thumbnails.
               </p>
-              <Link href={`/${countryCode}/journal`}>
-                 <Button className="bg-black text-white hover:bg-gold px-12 h-14 rounded-none text-[9px] font-bold uppercase tracking-widest">
-                    EXPLORE THE INTELLIGENCE HUB
-                 </Button>
-              </Link>
-           </div>
-        </section>
+              <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
+                TEST ARCHIVE <ArrowRight className="w-3 h-3 ml-2" />
+              </div>
+            </Link>
 
-        {/* Final Registry Invitation */}
-        <section className="bg-white py-48 text-center border-t border-gray-100">
-          <div className="max-w-3xl mx-auto space-y-16 px-12">
-             <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
-                <Sparkles className="w-6 h-6 text-secondary" />
-             </div>
-             <div className="space-y-6">
-                <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Institutional Registry</h3>
-                <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
-                  Join our verified collector network for private acquisition invitations and digital previews of the Maison archives.
-                </p>
-             </div>
-             <form className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors" aria-label="Institutional Registry Signup">
-                <input 
-                  type="email" 
-                  placeholder="ACQUISITION EMAIL" 
-                  className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
-                  required
-                  aria-label="Collector Email Address"
-                />
-                <button type="submit" className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
-                  SUBMIT
-                </button>
-             </form>
-             <p className="text-[8px] text-gray-300 uppercase tracking-[0.4em] font-medium">
-               Audited compliance with the Global Heritage Responsibility Charter.
-             </p>
+            <Link href={`/${countryCode}/private-order/prod-11`} className="group p-8 bg-white border border-gray-200 hover:border-plum transition-all text-left space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <Lock className="w-5 h-5 text-gray-400 group-hover:text-plum transition-colors" />
+                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-300">Design B</span>
+              </div>
+              <h4 className="text-lg font-headline font-bold italic text-gray-900">Private Order View</h4>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                Older cinematic layout with narrative-first storytelling.
+              </p>
+              <div className="pt-4 flex items-center text-[9px] font-bold tracking-widest uppercase text-plum group-hover:translate-x-2 transition-transform">
+                TEST PRIVATE FLOW <ArrowRight className="w-3 h-3 ml-2" />
+              </div>
+            </Link>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* Global Ateliers signup */}
+      <section className="bg-white py-48 text-center border-t border-gray-100">
+        <div className="max-w-3xl mx-auto space-y-16 px-12">
+           <div className="inline-flex items-center justify-center p-5 bg-[#f9f7f9] rounded-full">
+              <Sparkles className="w-6 h-6 text-secondary" />
+           </div>
+           <div className="space-y-6">
+              <h3 className="text-5xl md:text-6xl font-headline font-medium italic text-gray-900 tracking-tight">The Institutional Registry</h3>
+              <p className="text-gray-500 font-light leading-relaxed max-w-xl mx-auto italic text-lg">
+                Join our verified collector network for private acquisition invitations and digital previews of the Maison archives.
+              </p>
+           </div>
+           <form className="flex flex-col sm:flex-row items-center justify-center gap-0 border-b border-gray-900 pb-2 max-w-md mx-auto focus-within:border-secondary transition-colors" aria-label="Institutional Registry Signup">
+              <input 
+                type="email" 
+                placeholder="ACQUISITION EMAIL" 
+                className="bg-transparent w-full py-4 text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-gray-200"
+                required
+                aria-label="Collector Email Address"
+              />
+              <button type="submit" className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-colors py-4 px-4">
+                SUBMIT
+              </button>
+           </form>
+           <p className="text-[8px] text-gray-300 uppercase tracking-[0.4em] font-medium">
+             Audited compliance with the Global Heritage Responsibility Charter.
+           </p>
+        </div>
+      </section>
     </div>
   );
 }
