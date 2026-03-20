@@ -16,7 +16,10 @@ import {
   CheckCircle2,
   Lock,
   Eye,
-  Crown
+  Crown,
+  X,
+  Save,
+  Tag
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,25 +38,48 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Product } from '@/lib/types';
 
 /**
  * Atelier CMS: Multi-Market Registry Terminal
  * Control artifact template strategy (Normal vs Private) and regional visibility.
  */
 export default function ContentAdminHub() {
-  const { products, deleteProduct } = useCMS();
-  const { globalSettings, lockProductForEditing, toggleProductVipStatus } = useAppStore();
+  const { products, deleteProduct, updateProduct } = useCMS();
+  const { globalSettings, lockProductForEditing, toggleProductVipStatus, upsertProduct } = useAppStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const filteredProducts = useSearch(products, searchQuery);
 
-  const handleEditArtifact = (productId: string) => {
-    const locked = lockProductForEditing(productId);
+  const handleEditArtifact = (product: Product) => {
+    const locked = lockProductForEditing(product.id);
     if (locked) {
-      toast({ title: "Session Secured", description: "You have exclusive edit rights for this artifact." });
+      setEditingProduct({ ...product });
+      setIsEditorOpen(true);
     } else {
       toast({ variant: "destructive", title: "Conflict Blocked", description: "Refined by another hub." });
+    }
+  };
+
+  const handleSaveProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingProduct) {
+      upsertProduct(editingProduct, `Modified Registry Entry: ${editingProduct.name}`);
+      setIsEditorOpen(false);
+      setEditingProduct(null);
+      toast({ title: "Registry Updated", description: "Artifact metadata synchronized across hubs." });
     }
   };
 
@@ -74,29 +100,122 @@ export default function ContentAdminHub() {
             <span className="text-plum">Atelier CMS</span>
           </nav>
           <h1 className="text-3xl font-headline font-bold text-slate-900 uppercase tracking-tight">Atelier Registry</h1>
-          <p className="text-sm text-slate-500 max-w-2xl">Manage the global master catalog and acquisition template strategy (Normal vs Private).</p>
+          <p className="text-sm text-slate-500 max-w-2xl">Manage the global master catalog, pricing, stock, and acquisition template strategy.</p>
         </div>
         <div className="flex items-center space-x-3">
-          <Button className="bg-plum hover:bg-black text-white font-bold uppercase tracking-widest text-[10px] h-11 px-8 rounded-none shadow-lg transition-all">
+          <Button 
+            className="bg-plum hover:bg-black text-white font-bold uppercase tracking-widest text-[10px] h-11 px-8 rounded-none shadow-lg transition-all"
+            onClick={() => {
+              setEditingProduct({
+                id: `prod-${Date.now()}`,
+                name: 'New Artifact Entry',
+                departmentId: 'women',
+                categoryId: 'w-bags',
+                subcategoryId: 'top-handle',
+                collectionId: 'heritage',
+                basePrice: 0,
+                imageUrl: 'https://picsum.photos/seed/new/800/1000',
+                isVip: false,
+                rating: 5.0,
+                reviewsCount: 0,
+                stock: 1,
+                brandId: 'amarise-luxe',
+                isGlobal: true,
+                scope: 'global',
+                regions: ['us', 'uk', 'ae', 'in', 'sg'],
+                status: 'draft',
+                versionHistory: [],
+                currentVersion: 1,
+                conflictStrategy: 'global-priority',
+                lastEditedRegion: 'global'
+              });
+              setIsEditorOpen(true);
+            }}
+          >
             <Plus className="w-4 h-4 mr-2" /> Register New Entry
           </Button>
         </div>
       </header>
 
-      {globalSettings.isGuideMode && (
-        <div className="p-6 bg-plum/5 border border-plum/10 rounded-none flex items-start space-x-4">
-          <div className="p-2 bg-plum rounded-none text-white">
-            <Database size={18} />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-plum mb-1 uppercase tracking-tight">Acquisition Strategy Control</h4>
-            <p className="text-xs text-slate-600 font-light leading-relaxed">
-              Use the "Strategy" toggle to route products between the **Institutional Registry (Normal)** 
-              and the **Private Salon (Exclusive)** templates.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Editor Drawer */}
+      <Sheet open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+        <SheetContent className="w-full sm:max-w-[540px] bg-white p-0 border-none rounded-none shadow-2xl">
+          <form onSubmit={handleSaveProduct} className="flex flex-col h-full">
+            <SheetHeader className="p-10 bg-slate-50 border-b border-slate-100">
+              <SheetTitle className="font-headline text-3xl uppercase italic tracking-tighter">Edit Registry Artifact</SheetTitle>
+              <SheetDescription className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Master Metadata Control</SheetDescription>
+            </SheetHeader>
+
+            <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Artifact Name</Label>
+                <Input 
+                  value={editingProduct?.name} 
+                  onChange={e => setEditingProduct(prev => prev ? {...prev, name: e.target.value} : null)}
+                  className="rounded-none border-slate-200 h-12 text-sm italic font-light"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Base Price (Global)</Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-300">$</span>
+                    <Input 
+                      type="number"
+                      value={editingProduct?.basePrice} 
+                      onChange={e => setEditingProduct(prev => prev ? {...prev, basePrice: parseFloat(e.target.value)} : null)}
+                      className="rounded-none border-slate-200 h-12 pl-8 text-sm font-bold"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Current Stock</Label>
+                  <Input 
+                    type="number"
+                    value={editingProduct?.stock} 
+                    onChange={e => setEditingProduct(prev => prev ? {...prev, stock: parseInt(e.target.value)} : null)}
+                    className="rounded-none border-slate-200 h-12 text-sm font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-slate-50">
+                <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-plum">Acquisition Protocol</p>
+                <div className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 group cursor-pointer" onClick={() => editingProduct && setEditingProduct({...editingProduct, isVip: !editingProduct.isVip})}>
+                  <div className="flex items-center space-x-4">
+                    {editingProduct?.isVip ? <Lock className="w-5 h-5 text-plum" /> : <Eye className="w-5 h-5 text-slate-400" />}
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-tight text-slate-900">{editingProduct?.isVip ? 'Private Salon Flow' : 'Normal Registry Flow'}</p>
+                      <p className="text-[10px] text-slate-400 italic">Toggle to switch acquisition persona.</p>
+                    </div>
+                  </div>
+                  <div className={cn("w-10 h-5 rounded-full p-1 transition-colors", editingProduct?.isVip ? "bg-plum" : "bg-slate-200")}>
+                    <div className={cn("w-3 h-3 bg-white rounded-full transition-transform", editingProduct?.isVip ? "translate-x-5" : "translate-x-0")} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-4">
+                <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Condition Description</Label>
+                <Input 
+                  value={editingProduct?.condition} 
+                  onChange={e => setEditingProduct(prev => prev ? {...prev, condition: e.target.value} : null)}
+                  className="rounded-none border-slate-200 h-12 text-xs italic"
+                  placeholder="e.g. PRISTINE / UNWORN"
+                />
+              </div>
+            </div>
+
+            <div className="p-10 bg-slate-50 border-t border-slate-100 flex justify-end space-x-4">
+              <Button type="button" variant="outline" className="rounded-none border-slate-200 text-[10px] font-bold uppercase h-12 px-8" onClick={() => setIsEditorOpen(false)}>Cancel</Button>
+              <Button type="submit" className="rounded-none bg-plum text-white hover:bg-black text-[10px] font-bold uppercase h-12 px-10 shadow-lg">
+                <Save className="w-4 h-4 mr-2" /> Sync to Registry
+              </Button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
 
       <Card className="bg-white border-slate-200 shadow-sm overflow-hidden rounded-none">
         <Tabs defaultValue="registry" className="w-full">
@@ -131,8 +250,8 @@ export default function ContentAdminHub() {
               <TableHeader className="bg-slate-50">
                 <TableRow className="border-slate-100">
                   <TableHead className="text-[10px] uppercase font-bold text-slate-400 pl-8">Artifact Information</TableHead>
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400">Stock & Price</TableHead>
                   <TableHead className="text-[10px] uppercase font-bold text-slate-400">Acquisition Strategy</TableHead>
-                  <TableHead className="text-[10px] uppercase font-bold text-slate-400">Jurisdiction</TableHead>
                   <TableHead className="text-[10px] uppercase font-bold text-slate-400 text-right pr-8">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -151,6 +270,14 @@ export default function ContentAdminHub() {
                       </div>
                     </TableCell>
                     <TableCell>
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-xs font-bold text-slate-900">${prod.basePrice.toLocaleString()}</span>
+                        <span className={cn("text-[9px] font-bold uppercase", prod.stock < 5 ? "text-red-500" : "text-slate-400")}>
+                          {prod.stock} IN STOCK
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <button 
                         onClick={() => handleToggleTemplate(prod.id)}
                         className="flex items-center space-x-3 group/strategy"
@@ -165,14 +292,9 @@ export default function ContentAdminHub() {
                         <span className="text-[8px] font-bold text-slate-300 group-hover/strategy:text-plum transition-colors uppercase tracking-widest opacity-0 group-hover/strategy:opacity-100">Switch</span>
                       </button>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-slate-200 text-slate-500 font-medium bg-white rounded-none">
-                        {prod.scope === 'global' ? 'Global Master' : 'Regional'}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="text-right pr-8">
                       <div className="flex justify-end space-x-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-plum hover:bg-plum/5" onClick={() => handleEditArtifact(prod.id)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-plum hover:bg-plum/5" onClick={() => handleEditArtifact(prod)}>
                           <Edit3 size={16} />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">

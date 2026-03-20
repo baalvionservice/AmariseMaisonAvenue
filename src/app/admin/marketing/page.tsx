@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -21,7 +22,11 @@ import {
   Network,
   UserCheck,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  Calendar,
+  Tag,
+  Save,
+  Clock
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,17 +41,57 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
+import { Campaign } from '@/lib/types';
 
 type MarketingTab = 'dashboard' | 'campaigns' | 'verification' | 'segments' | 'affiliates' | 'subscriptions' | 'communications' | 'loyalty' | 'analytics';
 
 export default function MarketingAdminPanel() {
   const [activeTab, setActiveTab] = useState<MarketingTab>('dashboard');
-  const { activeCampaigns, affiliates, vipClients, verifyClient } = useAppStore();
+  const { activeCampaigns, affiliates, vipClients, verifyClient, upsertCampaign } = useAppStore();
   const { toast } = useToast();
+  
+  const [isCampaignEditorOpen, setIsCampaignEditorOpen] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
 
-  const handleAction = (msg: string) => {
-    toast({ title: "Marketing Action", description: msg });
+  const handleCreateFlashSale = () => {
+    setEditingCampaign({
+      id: `camp-${Date.now()}`,
+      title: 'New Flash Sale Event',
+      type: 'Flash Sale',
+      status: 'scheduled',
+      discountValue: 15,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
+      market: 'global',
+      reach: 0,
+      conversions: 0,
+      roi: 0,
+      predictedRoi: 0,
+      abTestActive: false,
+      brandId: 'amarise-luxe'
+    });
+    setIsCampaignEditorOpen(true);
+  };
+
+  const handleSaveCampaign = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCampaign) {
+      upsertCampaign(editingCampaign);
+      setIsCampaignEditorOpen(false);
+      setEditingCampaign(null);
+      toast({ title: "Campaign Authorized", description: "The flash sale has been registered in the global engagement matrix." });
+    }
   };
 
   return (
@@ -91,87 +136,189 @@ export default function MarketingAdminPanel() {
             </p>
           </div>
           <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-4 bg-plum/5 px-4 py-2 border border-plum/10 rounded-sm">
-               <Users className="w-4 h-4 text-plum" />
-               <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Global Reach</span>
-                  <span className="text-[9px] text-gray-400">425,000 Global Connoisseurs</span>
-               </div>
-            </div>
-            <div className="w-10 h-10 bg-plum rounded-sm flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-md">MK</div>
+            <Button 
+              className="bg-plum hover:bg-black text-white h-11 px-8 rounded-none text-[10px] font-bold uppercase tracking-widest shadow-lg transition-all"
+              onClick={handleCreateFlashSale}
+            >
+              <Zap className="w-4 h-4 mr-2" /> NEW FLASH SALE
+            </Button>
           </div>
         </header>
 
+        {/* Campaign Editor Drawer */}
+        <Sheet open={isCampaignEditorOpen} onOpenChange={setIsCampaignEditorOpen}>
+          <SheetContent className="w-full sm:max-w-[540px] bg-white p-0 border-none rounded-none shadow-2xl">
+            <form onSubmit={handleSaveCampaign} className="flex flex-col h-full">
+              <SheetHeader className="p-10 bg-slate-50 border-b border-slate-100">
+                <SheetTitle className="font-headline text-3xl uppercase italic tracking-tighter">Campaign Orchestrator</SheetTitle>
+                <SheetDescription className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Flash Sale & Event Design</SheetDescription>
+              </SheetHeader>
+
+              <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+                <div className="space-y-2">
+                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Event Title</Label>
+                  <Input 
+                    value={editingCampaign?.title} 
+                    onChange={e => setEditingCampaign(prev => prev ? {...prev, title: e.target.value} : null)}
+                    className="rounded-none border-slate-200 h-12 text-sm italic font-light"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Event Type</Label>
+                    <Select value={editingCampaign?.type} onValueChange={v => setEditingCampaign(prev => prev ? {...prev, type: v as any} : null)}>
+                      <SelectTrigger className="rounded-none border-slate-200 h-12">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border-slate-100">
+                        <SelectItem value="Flash Sale" className="text-xs">Flash Sale</SelectItem>
+                        <SelectItem value="Launch" className="text-xs">Collection Launch</SelectItem>
+                        <SelectItem value="VIP Exclusive" className="text-xs">VIP Exclusive</SelectItem>
+                        <SelectItem value="Seasonal" className="text-xs">Seasonal Event</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Discount Logic (%)</Label>
+                    <Input 
+                      type="number"
+                      value={editingCampaign?.discountValue} 
+                      onChange={e => setEditingCampaign(prev => prev ? {...prev, discountValue: parseInt(e.target.value)} : null)}
+                      className="rounded-none border-slate-200 h-12 text-sm font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Start Horizon</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                      <Input 
+                        type="date"
+                        value={editingCampaign?.startDate} 
+                        onChange={e => setEditingCampaign(prev => prev ? {...prev, startDate: e.target.value} : null)}
+                        className="rounded-none border-slate-200 h-12 pl-12 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">End Horizon</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                      <Input 
+                        type="date"
+                        value={editingCampaign?.endDate} 
+                        onChange={e => setEditingCampaign(prev => prev ? {...prev, endDate: e.target.value} : null)}
+                        className="rounded-none border-slate-200 h-12 pl-12 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Jurisdiction</Label>
+                  <Select value={editingCampaign?.market} onValueChange={v => setEditingCampaign(prev => prev ? {...prev, market: v as any} : null)}>
+                    <SelectTrigger className="rounded-none border-slate-200 h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-slate-100">
+                      <SelectItem value="global" className="text-xs">Global Master</SelectItem>
+                      <SelectItem value="us" className="text-xs">USA Hub</SelectItem>
+                      <SelectItem value="ae" className="text-xs">UAE Hub</SelectItem>
+                      <SelectItem value="uk" className="text-xs">UK Hub</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="p-10 bg-slate-50 border-t border-slate-100 flex justify-end space-x-4">
+                <Button type="button" variant="outline" className="rounded-none border-slate-200 text-[10px] font-bold uppercase h-12 px-8" onClick={() => setIsCampaignEditorOpen(false)}>Cancel</Button>
+                <Button type="submit" className="rounded-none bg-plum text-white hover:bg-black text-[10px] font-bold uppercase h-12 px-10 shadow-lg">
+                  <Save className="w-4 h-4 mr-2" /> Authorize Campaign
+                </Button>
+              </div>
+            </form>
+          </SheetContent>
+        </Sheet>
+
         <div className="p-12 space-y-12 animate-fade-in pb-32">
           
-          {activeTab === 'dashboard' && (
+          {(activeTab === 'dashboard' || activeTab === 'campaigns') && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard icon={<TrendingUp />} label="Marketing Revenue" value="$1.2M" trend="+18.4%" positive={true} />
-                <StatCard icon={<Briefcase />} label="Partner Sales" value="$420k" trend="+12.2%" positive={true} />
-                <StatCard icon={<Crown />} label="Subscription Volume" value="1,240" trend="+5%" positive={true} />
-                <StatCard icon={<UserCheck />} label="Pending Verification" value={vipClients.filter(c => c.status === 'pending').length.toString()} trend="Action" positive={false} />
+                <StatCard icon={<Tag />} label="Avg. Discount" value="12%" trend="Controlled" positive={true} />
+                <StatCard icon={<Users />} label="Campaign Reach" value="425k" trend="+5.2%" positive={true} />
+                <StatCard icon={<Clock />} label="Scheduled Events" value="03" trend="Optimal" positive={true} />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <Card className="lg:col-span-2 bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Active Strategic Campaigns</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">Real-time engagement across markets</CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader className="bg-ivory/50">
-                        <TableRow>
-                          <TableHead className="text-[9px] uppercase font-bold pl-8">Campaign</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold">Market Reach</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {activeCampaigns.map(camp => (
-                          <TableRow key={camp.id} className="hover:bg-ivory/30 transition-colors">
-                            <TableCell className="pl-8">
-                              <div className="flex flex-col">
-                                <span className="text-xs font-bold leading-tight">{camp.title}</span>
-                                <span className="text-[8px] text-gray-400 uppercase tracking-widest">{camp.market} Market Hub</span>
-                              </div>
-                            </TableCell>
-                            <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{camp.type}</Badge></TableCell>
-                            <TableCell className="text-xs font-light">{(camp.reach || 0).toLocaleString()}</TableCell>
-                            <TableCell className="text-center">
-                              <Badge className={cn("text-[8px] uppercase tracking-widest", camp.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gold/10 text-gold')}>
-                                {camp.status}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white border-border shadow-luxury">
-                  <CardHeader className="border-b border-border">
-                    <CardTitle className="font-headline text-2xl">Client Loyalty Health</CardTitle>
-                    <CardDescription className="text-[10px] uppercase tracking-widest">VIP subscription tier metrics</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-8 space-y-6">
-                    <div className="flex justify-between items-center p-4 bg-plum/5 rounded-sm border border-plum/10">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-plum">Maison Privé</span>
-                       <span className="font-bold text-gray-900">842</span>
+              <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                <CardHeader className="border-b border-border bg-ivory/10">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="font-headline text-2xl">Active & Scheduled Events</CardTitle>
+                      <CardDescription className="text-[10px] uppercase tracking-widest">Global flash sale registry</CardDescription>
                     </div>
-                    <div className="flex justify-between items-center p-4 bg-gold/5 rounded-sm border border-gold/10">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-gold">Atelier Reserve</span>
-                       <span className="font-bold text-gray-900">398</span>
-                    </div>
-                    <Button variant="outline" className="w-full h-10 border-border text-[9px] font-bold uppercase tracking-widest" onClick={() => setActiveTab('subscriptions')}>
-                      Manage Subscription Plans
+                    <Button variant="outline" className="h-9 border-slate-200 text-[10px] font-bold uppercase tracking-widest rounded-none" onClick={handleCreateFlashSale}>
+                      <Plus className="w-3 h-3 mr-2" /> CREATE EVENT
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader className="bg-ivory/50">
+                      <TableRow>
+                        <TableHead className="text-[9px] uppercase font-bold pl-8">Campaign Title</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold">Type</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold">Discount</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold">Window</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+                        <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {activeCampaigns.map(camp => (
+                        <TableRow key={camp.id} className="hover:bg-ivory/30 transition-colors">
+                          <TableCell className="pl-8">
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold leading-tight uppercase tracking-tight">{camp.title}</span>
+                              <span className="text-[8px] text-gray-400 uppercase tracking-widest">{camp.market} Market Hub</span>
+                            </div>
+                          </TableCell>
+                          <TableCell><Badge variant="outline" className="text-[8px] uppercase tracking-widest">{camp.type}</Badge></TableCell>
+                          <TableCell><span className="text-xs font-bold text-plum">{camp.discountValue}%</span></TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2 text-[9px] font-bold uppercase text-slate-400">
+                              <span>{camp.startDate}</span>
+                              <ChevronRight className="w-2.5 h-2.5" />
+                              <span>{camp.endDate}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge className={cn("text-[8px] uppercase tracking-widest", 
+                              camp.status === 'active' ? 'bg-green-50 text-green-600' : 
+                              camp.status === 'scheduled' ? 'bg-gold/10 text-gold' : 
+                              'bg-slate-100 text-slate-400'
+                            )}>
+                              {camp.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right pr-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum" onClick={() => {
+                              setEditingCampaign({...camp});
+                              setIsCampaignEditorOpen(true);
+                            }}>
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             </div>
           )}
 
@@ -240,7 +387,7 @@ export default function MarketingAdminPanel() {
             </div>
           )}
 
-          {['campaigns', 'segments', 'affiliates', 'subscriptions', 'communications', 'loyalty', 'analytics'].includes(activeTab) && (
+          {['segments', 'affiliates', 'subscriptions', 'communications', 'loyalty', 'analytics'].includes(activeTab) && (
             <div className="py-40 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="p-12 bg-ivory border border-border rounded-full animate-pulse">

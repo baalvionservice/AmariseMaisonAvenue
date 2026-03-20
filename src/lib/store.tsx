@@ -255,6 +255,9 @@ interface AppContextType {
   upsertAppointment: (appointment: Appointment) => void;
   updateTicketStatus: (id: string, status: SupportTicket['status']) => void;
   addTicketMessage: (ticketId: string, text: string, sender: 'agent' | 'customer') => void;
+  
+  // Marketing Actions
+  upsertCampaign: (campaign: Campaign) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -910,6 +913,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     logAction('Submitted Content for Audit', contentId, country, 'low');
   };
 
+  const upsertCampaign = (c: Campaign) => {
+    setCampaigns(prev => {
+      const idx = prev.findIndex(item => item.id === c.id);
+      if (idx > -1) {
+        logAction('Updated Marketing Campaign', c.title, c.market);
+        return prev.map(item => item.id === c.id ? c : item);
+      } else {
+        logAction('Initialized New Campaign', c.title, c.market);
+        return [c, ...prev];
+      }
+    });
+  };
+
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
@@ -930,7 +946,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
-    updateTicketStatus, addTicketMessage
+    updateTicketStatus, addTicketMessage, upsertCampaign
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
@@ -951,7 +967,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runQATest, runAllQATests, runStressTest, logMaisonError, resolveMaisonError,
     addToCart, removeFromCart, toggleWishlist, clearCart, updateGlobalSettings,
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
-    updateTicketStatus, addTicketMessage
+    updateTicketStatus, addTicketMessage, upsertCampaign
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
