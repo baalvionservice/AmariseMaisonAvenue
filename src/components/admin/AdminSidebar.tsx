@@ -29,13 +29,14 @@ import {
   Database,
   Megaphone,
   UserCircle,
-  Activity
+  Activity,
+  Gauge
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Updated to include all 20 specialized nodes for total platform control.
+ * Features 20 specialized nodes for total platform control.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -84,7 +85,7 @@ export function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50">
+    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50 h-full">
       {/* Brand Signature */}
       <div className="p-10 border-b border-white/5">
         <Link href="/admin">
@@ -125,7 +126,7 @@ export function AdminSidebar() {
       </nav>
 
       {/* Terminal Footer */}
-      <div className="p-6 border-t border-white/5 space-y-2">
+      <div className="p-6 border-t border-white/5 space-y-2 bg-[#0A0A0B]">
         <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors border-none bg-transparent outline-none cursor-pointer">
           <Settings size={16} />
           <span>Config</span>
