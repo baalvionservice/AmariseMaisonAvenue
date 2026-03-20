@@ -223,9 +223,12 @@ export const RETURNS: ReturnRequest[] = [
 ];
 
 export const ADMIN_ACCOUNTS: AdminAccount[] = [
-  { id: 'adm-1', name: 'Maison CEO', email: 'ceo@amarise-luxe.com', role: 'CEO', permissions: ['all'], status: 'active', lastActive: '2024-03-15T10:00:00Z', twoFactorEnabled: true },
-  { id: 'adm-2', name: 'Operations Lead', email: 'ops@amarise-luxe.com', role: 'Ops', permissions: ['ops', 'marketing'], status: 'active', lastActive: '2024-03-15T09:30:00Z', twoFactorEnabled: true },
-  { id: 'adm-3', name: 'Head Concierge', email: 'concierge@amarise-luxe.com', role: 'Support', permissions: ['support'], status: 'active', lastActive: '2024-03-15T11:00:00Z', twoFactorEnabled: true }
+  { id: 'adm-super', name: 'Julian Vandervilt', email: 'julian@amarise-luxe.com', role: 'SUPER_ADMIN', permissions: ['*'], status: 'active', lastActive: '2024-03-15T10:00:00Z', twoFactorEnabled: true },
+  { id: 'adm-us', name: 'Hub Lead (USA)', email: 'admin.us@amarise-luxe.com', role: 'Manager', permissions: ['all'], status: 'active', lastActive: '2024-03-15T09:30:00Z', twoFactorEnabled: true },
+  { id: 'adm-uk', name: 'Hub Lead (UK)', email: 'admin.uk@amarise-luxe.com', role: 'Manager', permissions: ['all'], status: 'active', lastActive: '2024-03-15T11:00:00Z', twoFactorEnabled: true },
+  { id: 'adm-ae', name: 'Hub Lead (UAE)', email: 'admin.ae@amarise-luxe.com', role: 'Manager', permissions: ['all'], status: 'active', lastActive: '2024-03-15T11:00:00Z', twoFactorEnabled: true },
+  { id: 'adm-in', name: 'Hub Lead (India)', email: 'admin.in@amarise-luxe.com', role: 'Manager', permissions: ['all'], status: 'active', lastActive: '2024-03-15T11:00:00Z', twoFactorEnabled: true },
+  { id: 'adm-sg', name: 'Hub Lead (Singapore)', email: 'admin.sg@amarise-luxe.com', role: 'Manager', permissions: ['all'], status: 'active', lastActive: '2024-03-15T11:00:00Z', twoFactorEnabled: true }
 ];
 
 export const VENDORS: Vendor[] = [

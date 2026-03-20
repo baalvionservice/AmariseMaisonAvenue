@@ -2,7 +2,7 @@ import { Role, ROLES } from "../roles/system";
 
 /**
  * @fileOverview Mock user registry for RBAC testing.
- * Standardized with CountryCodes for geographic isolation.
+ * Formalized for 1 Super Admin and 5 Hub-specific Country Admins.
  */
 
 export interface MaisonUser {
@@ -15,31 +15,52 @@ export interface MaisonUser {
 
 export const users: MaisonUser[] = [
   {
-    id: "u-1",
-    name: "Julian Vandervilt (Super)",
+    id: "u-super",
+    name: "Julian Vandervilt",
     email: "julian@amarise-luxe.com",
     role: ROLES.SUPER_ADMIN,
     country: "GLOBAL",
   },
   {
-    id: "u-2",
-    name: "Aditi Sharma (India Admin)",
-    email: "aditi@amarise-luxe.com",
+    id: "u-admin-us",
+    name: "Hub Lead (USA)",
+    email: "admin.us@amarise-luxe.com",
+    role: ROLES.COUNTRY_ADMIN,
+    country: "us",
+  },
+  {
+    id: "u-admin-uk",
+    name: "Hub Lead (UK)",
+    email: "admin.uk@amarise-luxe.com",
+    role: ROLES.COUNTRY_ADMIN,
+    country: "uk",
+  },
+  {
+    id: "u-admin-ae",
+    name: "Hub Lead (UAE)",
+    email: "admin.ae@amarise-luxe.com",
+    role: ROLES.COUNTRY_ADMIN,
+    country: "ae",
+  },
+  {
+    id: "u-admin-in",
+    name: "Hub Lead (India)",
+    email: "admin.in@amarise-luxe.com",
     role: ROLES.COUNTRY_ADMIN,
     country: "in",
   },
   {
-    id: "u-3",
-    name: "John Smith (US Operator)",
-    email: "john@amarise-luxe.com",
-    role: ROLES.OPERATOR,
-    country: "us",
+    id: "u-admin-sg",
+    name: "Hub Lead (Singapore)",
+    email: "admin.sg@amarise-luxe.com",
+    role: ROLES.COUNTRY_ADMIN,
+    country: "sg",
   },
   {
-    id: "u-4",
-    name: "Lumière Atelier (AE Vendor)",
-    email: "contact@lumiere.com",
-    role: ROLES.VENDOR,
-    country: "ae",
+    id: "u-op-us",
+    name: "US Registry Operator",
+    email: "ops.us@amarise-luxe.com",
+    role: ROLES.OPERATOR,
+    country: "us",
   },
 ];
