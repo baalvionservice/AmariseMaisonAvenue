@@ -82,7 +82,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
             <Button 
               className={cn(
                 "w-full h-14 rounded-none transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl",
-                product.isVip ? "bg-plum text-white hover:bg-black" : "bg-black text-white hover:bg-gray-800"
+                product.isVip ? "bg-plum text-white hover:bg-gold hover:text-gray-900" : "bg-black text-white hover:bg-gold hover:text-gray-900"
               )}
             >
               {product.isVip ? <Lock className="w-3.5 h-3.5 mr-2" /> : <ArrowRight className="w-3.5 h-3.5 mr-2" />}

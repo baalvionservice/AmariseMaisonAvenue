@@ -168,9 +168,9 @@ export default function ProductPage() {
             <div className="flex gap-4">
               <Button 
                 onClick={() => addToCart(product)}
-                className="flex-[2] h-14 bg-black text-white hover:bg-gray-800 rounded-none text-[11px] font-bold tracking-[0.3em] uppercase shadow-lg"
+                className="flex-[2] h-14 bg-plum text-white hover:bg-gold hover:text-gray-900 rounded-none text-[11px] font-bold tracking-[0.3em] uppercase shadow-lg transition-all"
               >
-                ADD TO BAG
+                ADD TO SHOPPING BAG
               </Button>
               <Button 
                 variant="outline" 

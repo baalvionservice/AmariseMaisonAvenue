@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -177,7 +176,7 @@ export default function PrivateOrderPage() {
                   <Label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">Brief Notes</Label>
                   <Textarea className="rounded-none border-border bg-ivory/30 min-h-[100px] text-sm italic py-4" placeholder="Mention your heritage preferences or logistics requirements..." value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
                 </div>
-                <Button type="submit" className="w-full h-16 bg-plum text-white hover:bg-black rounded-none text-[10px] font-bold tracking-[0.4em] uppercase shadow-2xl transition-all">
+                <Button type="submit" className="w-full h-16 bg-plum text-white hover:bg-gold hover:text-gray-900 rounded-none text-[10px] font-bold tracking-[0.4em] uppercase shadow-2xl transition-all">
                   TRANSMIT PRIVATE BRIEF <ArrowRight className="ml-3 w-4 h-4" />
                 </Button>
               </form>
