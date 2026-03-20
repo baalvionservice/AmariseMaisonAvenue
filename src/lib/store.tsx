@@ -95,6 +95,7 @@ interface AppContextType {
   brandConfigs: BrandConfig[];
   activeBrandId: string;
   currentUser: MaisonUser | null;
+  adminJurisdiction: CountryCode | 'global';
   globalSyncHistory: GlobalSyncSession[];
   
   // Scoped Data Views
@@ -179,6 +180,7 @@ interface AppContextType {
   updateCountryConfig: (config: CountryConfig) => void;
   setActiveBrand: (id: string) => void;
   setCurrentUser: (user: MaisonUser | null) => void;
+  setAdminJurisdiction: (jurisdiction: CountryCode | 'global') => void;
   setGuideMode: (val: boolean) => void;
   setAdminViewMode: (val: AdminViewMode) => void;
   
@@ -272,6 +274,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [brandConfigs, setBrandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
+  const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
 
   // Content state
@@ -406,68 +409,73 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
 
-  // --- Scoped Views ---
+  // --- Scoped View Resolution Logic ---
+  const activeHub = useMemo(() => {
+    if (!currentUser) return 'global';
+    if (currentUser.role === 'super_admin') return adminJurisdiction;
+    return currentUser.country as CountryCode;
+  }, [currentUser, adminJurisdiction]);
+
   const scopedProducts = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return products;
-    return products.filter(p => p.regions.includes(currentUser.country as any) || p.isGlobal);
-  }, [products, currentUser]);
+    if (activeHub === 'global') return products;
+    return products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal);
+  }, [products, activeHub]);
 
   const scopedInquiries = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return privateInquiries;
-    return privateInquiries.filter(i => i.country.toLowerCase() === currentUser.country.toLowerCase());
-  }, [privateInquiries, currentUser]);
+    if (activeHub === 'global') return privateInquiries;
+    return privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase());
+  }, [privateInquiries, activeHub]);
 
   const scopedEditorials = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return editorials;
-    return editorials.filter(e => e.country === currentUser.country || e.isGlobal);
-  }, [editorials, currentUser]);
+    if (activeHub === 'global') return editorials;
+    return editorials.filter(e => e.country === activeHub || e.isGlobal);
+  }, [editorials, activeHub]);
 
   const scopedBuyingGuides = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return buyingGuides;
-    return buyingGuides.filter(g => g.country === currentUser.country || g.isGlobal);
-  }, [buyingGuides, currentUser]);
+    if (activeHub === 'global') return buyingGuides;
+    return buyingGuides.filter(g => g.country === activeHub || g.isGlobal);
+  }, [buyingGuides, activeHub]);
 
   const scopedReturns = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return returns;
     return returns.filter(r => r.brandId === activeBrandId);
-  }, [returns, currentUser, activeBrandId]);
+  }, [returns, activeBrandId]);
 
   const scopedTransactions = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return transactions;
-    if (currentUser.role === 'vendor') return transactions.filter(t => t.vendorId === currentUser.id);
-    return transactions.filter(t => t.country.toLowerCase() === currentUser.country.toLowerCase());
-  }, [transactions, currentUser]);
+    if (activeHub === 'global') return transactions;
+    if (currentUser?.role === 'vendor') return transactions.filter(t => t.vendorId === currentUser.id);
+    return transactions.filter(t => t.country.toLowerCase() === activeHub.toLowerCase());
+  }, [transactions, activeHub, currentUser]);
   
   const scopedNotifications = useMemo(() => {
     if (!currentUser) return [];
-    if (currentUser.role === 'super_admin') return notifications;
-    return notifications.filter(n => n.toRole === currentUser.role && (n.country === currentUser.country || n.country === 'global'));
-  }, [notifications, currentUser]);
+    if (currentUser.role === 'super_admin' && activeHub === 'global') return notifications;
+    return notifications.filter(n => (n.country === activeHub || n.country === 'global'));
+  }, [notifications, currentUser, activeHub]);
   
   const scopedApprovals = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin') return approvalRequests;
-    return approvalRequests.filter(a => a.country === currentUser.country || a.country === 'global');
-  }, [approvalRequests, currentUser]);
+    if (activeHub === 'global') return approvalRequests;
+    return approvalRequests.filter(a => a.country === activeHub || a.country === 'global');
+  }, [approvalRequests, activeHub]);
 
   const scopedAuditLogs = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin') return auditRegistry;
-    return auditRegistry.filter(log => log.country === currentUser.country || log.country === 'global');
-  }, [auditRegistry, currentUser]);
+    if (activeHub === 'global') return auditRegistry;
+    return auditRegistry.filter(log => log.country === activeHub || log.country === 'global');
+  }, [auditRegistry, activeHub]);
 
   const scopedWorkflows = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin') return workflows;
-    return workflows.filter(w => w.country === currentUser.country || w.country === 'global');
-  }, [workflows, currentUser]);
+    if (activeHub === 'global') return workflows;
+    return workflows.filter(w => w.country === activeHub || w.country === 'global');
+  }, [workflows, activeHub]);
 
   const scopedQATests = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return qaTests;
-    return qaTests.filter(t => t.country === currentUser.country || t.country === 'global');
-  }, [qaTests, currentUser]);
+    if (activeHub === 'global') return qaTests;
+    return qaTests.filter(t => t.country === activeHub || t.country === 'global');
+  }, [qaTests, activeHub]);
 
   const scopedErrors = useMemo(() => {
-    if (!currentUser || currentUser.role === 'super_admin' || currentUser.country === 'GLOBAL') return maisonErrors;
-    return maisonErrors.filter(e => e.country === currentUser.country || e.country === 'global');
-  }, [maisonErrors, currentUser]);
+    if (activeHub === 'global') return maisonErrors;
+    return maisonErrors.filter(e => e.country === activeHub || e.country === 'global');
+  }, [maisonErrors, activeHub]);
 
   const scopedStressTests = useMemo(() => {
     return stressTests;
@@ -593,7 +601,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const idx = prev.findIndex(item => item.id === p.id);
       if (idx > -1) {
         const existing = prev[idx];
-        if (existing.scope === 'global' && existing.conflictStrategy === 'global-priority' && currentUser?.country !== 'GLOBAL') {
+        if (existing.scope === 'global' && existing.conflictStrategy === 'global-priority' && activeHub !== 'global') {
           return prev;
         }
 
@@ -611,7 +619,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           currentVersion: existing.currentVersion + 1,
           versionHistory: [newVersion, ...existing.versionHistory].slice(0, 50),
           lastSyncedAt: new Date().toISOString(),
-          lastEditedRegion: (currentUser?.country as any) || 'global'
+          lastEditedRegion: (activeHub as any) || 'global'
         };
 
         logAction('Updated Artifact Registry', p.name, updatedProduct.lastEditedRegion);
@@ -621,7 +629,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           ...p,
           versionHistory: [],
           currentVersion: 1,
-          lastEditedRegion: (currentUser?.country as any) || 'global'
+          lastEditedRegion: (activeHub as any) || 'global'
         };
         logAction('Registered New Artifact', p.name, newProduct.lastEditedRegion);
         return [newProduct, ...prev];
@@ -640,7 +648,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (p.id === productId) {
         const version = p.versionHistory.find(v => v.id === versionId);
         if (version) {
-          logAction('Rollback Execution', p.name, currentUser?.country);
+          logAction('Rollback Execution', p.name, activeHub);
           return {
             ...version.data,
             versionHistory: p.versionHistory,
@@ -847,7 +855,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         failureCount: 0
       },
       logs: [{ id: `l-${Date.now()}`, message: `Initiating ${loadSize} iteration cycle for ${type} subsystem...`, timestamp: new Date().toISOString() }],
-      country: currentUser?.country || 'global'
+      country: activeHub
     };
 
     setStressTests(prev => [newTest, ...prev]);
@@ -927,7 +935,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
@@ -936,7 +944,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
-    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setGuideMode, setAdminViewMode,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setAdminJurisdiction, setGuideMode, setAdminViewMode,
     upsertCMSSection, upsertProduct, toggleProductVipStatus, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
@@ -948,7 +956,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setShowcaseMode, setActiveVip, setActiveVendor, recordLog, createInvoice, createTransaction, processPayment, updateTransactionStatus, toggleLike, trackShare, upsertAppointment,
     updateTicketStatus, addTicketMessage, upsertCampaign
   }), [
-    countryConfigs, brandConfigs, activeBrandId, currentUser, globalSyncHistory,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
     cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
@@ -957,7 +965,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     cart, wishlist, socialMetrics, admins, vendors, affiliates, returns, activeCampaigns, auditLogs,
     vipClients, customerSegments, globalSettings, supportTickets, supportStats, integrations, apiLogs,
     indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
-    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser,
+    setCountryEnabled, updateCountryConfig, setActiveBrand, setCurrentUser, setAdminJurisdiction,
     upsertCMSSection, upsertProduct, toggleProductVipStatus, rollbackProductVersion, lockProductForEditing, unlockProduct, deleteProduct, upsertCollection, upsertEditorial, syncGlobalProducts,
     executeSafeSync, rollbackGlobalSync,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,

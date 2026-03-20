@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -10,7 +11,9 @@ import {
   UserCircle, 
   ChevronDown,
   ShieldCheck,
-  RefreshCcw
+  RefreshCcw,
+  LayoutDashboard,
+  ArrowRight
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -19,7 +22,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuLabel
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { COUNTRIES } from '@/lib/mock-data';
@@ -27,18 +31,15 @@ import { useRouter, useParams } from 'next/navigation';
 
 /**
  * AdminTopBar: Global Command Matrix
- * Refined for the dark luxury operating system.
+ * Enhanced for Jurisdictional Hub switching for Super Admins.
  */
 export function AdminTopBar() {
-  const { currentUser, scopedNotifications } = useAppStore();
+  const { currentUser, scopedNotifications, adminJurisdiction, setAdminJurisdiction } = useAppStore();
   const router = useRouter();
   const { country } = useParams();
-  const countryCode = (country as string) || 'us';
-  const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-
-  const handleCountrySwitch = (code: string) => {
-    router.push(`/admin?market=${code}`);
-  };
+  
+  const currentJurisdiction = adminJurisdiction === 'global' ? 'Global Core' : COUNTRIES[adminJurisdiction]?.name + ' Hub';
+  const isSuper = currentUser?.role === 'super_admin';
 
   return (
     <header className="h-20 bg-[#0A0A0B]/80 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 z-40 shrink-0 backdrop-blur-xl">
@@ -54,12 +55,17 @@ export function AdminTopBar() {
         </div>
 
         <div className="flex items-center space-x-6 border-l border-white/5 pl-10">
-          <div className="flex items-center space-x-3 px-4 py-1.5 bg-blue-500/5 border border-blue-500/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-            </span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400">Node Synced</span>
+          <div className="flex flex-col">
+             <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/20">Active Jurisdiction</span>
+             <div className="flex items-center space-x-3 mt-1">
+                <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/5 border border-blue-500/20">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                  </span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400">{currentJurisdiction}</span>
+                </div>
+             </div>
           </div>
         </div>
       </div>
@@ -71,41 +77,46 @@ export function AdminTopBar() {
           >
             <Plus className="w-4 h-4 mr-2" /> Add Artifact
           </Button>
-          <Button 
-            variant="outline"
-            className="border-white/10 hover:bg-white/5 text-white/60 hover:text-white h-10 px-6 text-[10px] font-bold uppercase tracking-widest rounded-none"
-          >
-            <Zap className="w-4 h-4 mr-2 text-blue-500" /> Execute AI
-          </Button>
         </div>
 
-        {/* Jurisdictional Selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center space-x-4 px-4 py-2 hover:bg-white/5 transition-colors group bg-transparent border-none outline-none cursor-pointer">
-              <div className="flex flex-col items-end">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">{currentCountry.name}</span>
-              </div>
-              <span className="text-xl leading-none grayscale brightness-200 group-hover:grayscale-0 group-hover:brightness-100 transition-all">{currentCountry.flag}</span>
-              <ChevronDown className="w-3 h-3 text-white/20" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 p-2 bg-[#111113] border-white/5 rounded-none shadow-2xl">
-            <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.3em] text-white/20 px-4 py-3">Market Hubs</DropdownMenuLabel>
-            {Object.values(COUNTRIES).map((c) => (
-              <DropdownMenuItem 
-                key={c.code} 
-                onClick={() => handleCountrySwitch(c.code)}
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 rounded-none"
-              >
-                <div className="flex items-center space-x-4">
-                  <span className="text-lg">{c.flag}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white">{c.name}</span>
+        {/* Jurisdictional Selector (Super Admin Only) */}
+        {isSuper && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center space-x-4 px-4 py-2 hover:bg-white/5 transition-colors group bg-transparent border-none outline-none cursor-pointer">
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">Toggle Hub</span>
                 </div>
+                <Globe className="w-4 h-4 text-white/20 group-hover:text-blue-500 transition-colors" />
+                <ChevronDown className="w-3 h-3 text-white/20" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 p-2 bg-[#111113] border-white/5 rounded-none shadow-2xl">
+              <DropdownMenuLabel className="text-[8px] uppercase tracking-[0.3em] text-white/20 px-4 py-3">Market Hubs</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setAdminJurisdiction('global')} className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 rounded-none">
+                <div className="flex items-center space-x-4">
+                  <LayoutDashboard className="w-4 h-4 text-blue-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white">Global Core</span>
+                </div>
+                {adminJurisdiction === 'global' && <CheckCircle2 className="w-3 h-3 text-blue-500" />}
               </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuSeparator className="bg-white/5" />
+              {Object.values(COUNTRIES).map((c) => (
+                <DropdownMenuItem 
+                  key={c.code} 
+                  onClick={() => setAdminJurisdiction(c.code as any)}
+                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 rounded-none"
+                >
+                  <div className="flex items-center space-x-4">
+                    <span className="text-lg grayscale brightness-200 group-hover:grayscale-0">{c.flag}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white">{c.name} Hub</span>
+                  </div>
+                  {adminJurisdiction === c.code && <ShieldCheck className="w-3 h-3 text-blue-500" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {/* Identity & Status */}
         <div className="flex items-center space-x-6">
@@ -116,8 +127,14 @@ export function AdminTopBar() {
             )}
           </button>
           
-          <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-none flex items-center justify-center font-bold text-xs hover:border-blue-500 transition-colors cursor-pointer">
-            {currentUser?.name.charAt(0) || 'A'}
+          <div className="flex items-center space-x-4 pl-6 border-l border-white/5">
+             <div className="flex flex-col items-end">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white">{currentUser?.name}</span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">{currentUser?.role.replace('_', ' ')}</span>
+             </div>
+             <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-none flex items-center justify-center font-bold text-xs hover:border-blue-500 transition-colors cursor-pointer">
+               {currentUser?.name.charAt(0) || 'A'}
+             </div>
           </div>
         </div>
       </div>
