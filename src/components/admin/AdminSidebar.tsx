@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { 
   LayoutDashboard, 
   Globe, 
@@ -33,16 +33,19 @@ import {
   Gauge,
   Shield,
   Video,
-  Award
+  Award,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Expanded to include all 21 tactical nodes for full platform oversight.
+ * Optimized for clear storefront exits and technical node oversight.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { country } = useParams();
+  const countryCode = (country as string) || 'us';
 
   const menuGroups = [
     {
@@ -132,11 +135,13 @@ export function AdminSidebar() {
       </nav>
 
       <div className="p-6 border-t border-white/5 space-y-2 bg-[#0A0A0B]">
-        <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors border-none bg-transparent outline-none cursor-pointer">
-          <Settings size={16} />
-          <span>Config</span>
-        </button>
-        <Link href="/us">
+        <Link href={`/${countryCode}`}>
+          <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-blue-400/60 hover:text-blue-400 transition-colors border-none bg-transparent outline-none cursor-pointer">
+            <ExternalLink size={16} />
+            <span>Maison Storefront</span>
+          </button>
+        </Link>
+        <Link href={`/${countryCode}`}>
           <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors border-none bg-transparent outline-none cursor-pointer">
             <LogOut size={16} />
             <span>Exit Node</span>

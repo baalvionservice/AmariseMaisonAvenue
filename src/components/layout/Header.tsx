@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight, User, LayoutDashboard, ShieldAlert } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -70,6 +70,8 @@ export const Header = () => {
   const handleCountryChange = (code: string) => {
     router.push(`/${code}`);
   };
+
+  const isAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'country_admin';
 
   const navLinks: NavLink[] = [
     { 
@@ -235,9 +237,17 @@ export const Header = () => {
 
       {/* Authority Utility Bar */}
       <div className="bg-black text-white h-11 flex items-center justify-between px-12 text-[10px] tracking-[0.3em] font-bold uppercase">
-        <div className="flex items-center space-x-3">
-          <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
-          <span className="opacity-90">Maison Registry Verified</span>
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3">
+            <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+            <span className="opacity-90">Maison Registry Verified</span>
+          </div>
+          {isAdmin && (
+            <Link href="/admin" className="flex items-center space-x-2 text-blue-400 hover:text-white transition-colors border-l border-white/10 pl-6">
+               <LayoutDashboard className="w-3.5 h-3.5" />
+               <span className="tracking-[0.4em]">ADMIN TERMINAL</span>
+            </Link>
+          )}
         </div>
         
         <nav className="flex items-center space-x-8" aria-label="Utility Navigation">
@@ -282,10 +292,17 @@ export const Header = () => {
       {/* Maison Brand Header */}
       <div className="h-28 border-b border-gray-100 px-12 flex items-center justify-between relative bg-white">
         <div className="flex items-center space-x-6 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-          <Link href={currentUser?.role === 'client' ? `/${countryCode}/account` : `/${countryCode}/sell`} className="hover:text-black border-r border-gray-100 pr-6 py-2">
-            {currentUser?.role === 'client' ? 'Client Portal' : 'Login'}
-          </Link>
-          <Link href={`/${countryCode}/sell`} className="hover:text-black py-2">Join</Link>
+          {currentUser ? (
+            <Link href={`/${countryCode}/account`} className="hover:text-black border-r border-gray-100 pr-6 py-2 flex items-center space-x-2">
+              <User className="w-3.5 h-3.5" />
+              <span>PRIVATE PORTAL</span>
+            </Link>
+          ) : (
+            <Link href={`/${countryCode}/sell`} className="hover:text-black border-r border-gray-100 pr-6 py-2">
+              Login
+            </Link>
+          )}
+          <Link href={`/${countryCode}/sell`} className="hover:text-black py-2">Join the Maison</Link>
         </div>
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
