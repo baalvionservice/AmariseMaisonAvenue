@@ -146,6 +146,8 @@ interface AppContextType {
   maisonErrors: MaisonError[];
   stressTests: StressTest[];
   seoRegistry: SEOMetadata[];
+  affiliates: Affiliate[];
+  activeCampaigns: Campaign[];
 
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
@@ -208,7 +210,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const { country } = useParams();
+  const params = useParams();
 
   // --- 1. PRIMITIVE STATE (Declared first to avoid ReferenceErrors) ---
   const [activeBrandId] = useState<string>(BRANDS_CONFIG[0].id);
@@ -280,6 +282,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [seoRegistry] = useState<SEOMetadata[]>([]);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
+  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [messagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
@@ -291,7 +295,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return currentUser.country as CountryCode;
   }, [currentUser, adminJurisdiction]);
 
-  // --- 4. SCOPED DATA (useMemo logic using correctly initialized state) ---
+  // --- 4. SCOPED DATA (Memoized logic) ---
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
@@ -397,7 +401,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const actor = currentUser?.name || 'System';
     logAction('Global Sync Initiated', `Session: ${sessionId}`, 'global', 'medium');
     
-    // Simulate successful sync
     setTimeout(() => {
       setGlobalSyncHistory(prev => [{
         id: sessionId,
@@ -422,7 +425,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, isShowcaseMode, activeVip, activeVendor,
+    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor,
     setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(prev => ({...prev, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(prev => ({...prev, adminViewMode: v})),
     upsertProduct, deleteProduct, toggleProductVipStatus, lockProductForEditing: () => true,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
@@ -437,7 +440,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runWorkflowTask, runWorkflowSequence: () => {}
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, isShowcaseMode, activeVip, activeVendor
+    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
