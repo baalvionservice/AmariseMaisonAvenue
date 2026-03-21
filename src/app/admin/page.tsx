@@ -20,7 +20,9 @@ import {
   ShieldCheck,
   Cpu,
   BarChart3,
-  Server
+  Server,
+  TrendingDown,
+  Coins
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
@@ -30,19 +32,16 @@ import { Badge } from '@/components/ui/badge';
 
 /**
  * Bank-Grade Command Center: Level 3 Tactical Oversight.
- * Optimized for information density and technical trust.
+ * Optimized for information density and predictive revenue signals.
  */
 export default function AdminDashboard() {
-  const { regions, globalTotal, globalUsers } = useSimulationData();
+  const { regions, globalTotal, globalUsers, globalPredictedInflow } = useSimulationData();
   const { scopedErrors, adminJurisdiction } = useAppStore();
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
 
   const activeHubData = useMemo(() => 
     selectedHub ? regions[selectedHub] : null, 
   [selectedHub, regions]);
-
-  const highIntentUsers = useMemo(() => Object.values(regions).reduce((acc, r) => acc + r.cart + r.checkout, 0), [regions]);
-  const activeNegotiations = useMemo(() => Math.floor(highIntentUsers * 0.15), [highIntentUsers]);
 
   const jurisdictionLabel = adminJurisdiction === 'global' ? 'GLOBAL MASTER' : adminJurisdiction.toUpperCase() + ' NODE';
 
@@ -70,7 +69,12 @@ export default function AdminDashboard() {
       <header className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <SignalNode label="Aggregate Yield" value={`$${(globalTotal / 1000000).toFixed(2)}M`} trend="+12.4% MoM" />
         <SignalNode label="Network Pulse" value={globalUsers.toLocaleString()} trend="+5.2%" />
-        <SignalNode label="Active Negotiations" value={activeNegotiations} color="text-blue-400" />
+        <SignalNode 
+          label="Liquidity Pipeline (1h)" 
+          value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} 
+          color="text-blue-400" 
+          trend="Neural Confidence: 92%"
+        />
         <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" />
       </header>
 
@@ -119,17 +123,17 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-6">
                   <HubDetailRow label="Yield" value={`$${(activeHubData.revenue / 1000).toFixed(1)}k`} />
-                  <HubDetailRow label="Users" value={activeHubData.activeUsers} />
-                  <HubDetailRow label="Cart" value={activeHubData.cart} />
+                  <HubDetailRow label="1h Inflow" value={`$${(activeHubData.predictedInflow / 1000).toFixed(1)}k`} color="text-blue-400" />
+                  <HubDetailRow label="Cart Density" value={activeHubData.cart} />
                   <HubDetailRow label="Win Rate" value={`${((activeHubData.purchased / activeHubData.activeUsers) * 100).toFixed(1)}%`} />
                 </div>
 
                 <div className="pt-6 border-t border-white/5 space-y-6">
                   <div className="p-4 bg-white/5 border border-white/10 space-y-2">
                      <p className="text-[10px] text-white/60 italic leading-relaxed">
-                       "Strategic resonance high in {activeHubData.id.toUpperCase()}. Recommend immediate liquidity shift."
+                       "Strategic resonance high in {activeHubData.id.toUpperCase()}. Predicted inflow surge of ${activeHubData.predictedInflow.toLocaleString()} in the next horizon."
                      </p>
-                     <span className="text-[7px] font-bold uppercase text-blue-400">AI AGENT ALPHA</span>
+                     <span className="text-[7px] font-bold uppercase text-blue-400">AI PREDICTION AGENT</span>
                   </div>
                   <button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-[0.4em] rounded-none border-none cursor-pointer">
                     HUB TERMINAL
@@ -146,26 +150,26 @@ export default function AdminDashboard() {
              <CardHeader className="border-b border-white/5 bg-white/5 p-5 flex flex-row items-center justify-between">
                 <div className="flex items-center space-x-3 text-blue-400">
                    <Zap className="w-3.5 h-3.5" />
-                   <CardTitle className="text-[10px] font-bold uppercase tracking-[0.3em]">AI Mitigation</CardTitle>
+                   <CardTitle className="text-[10px] font-bold uppercase tracking-[0.3em]">Neural Pipeline</CardTitle>
                 </div>
-                <Badge variant="outline" className="text-[7px] text-white/40 border-white/10">3 ACTIVE</Badge>
+                <Badge variant="outline" className="text-[7px] text-white/40 border-white/10 uppercase">Incoming Liquidity</Badge>
              </CardHeader>
              <CardContent className="p-6 space-y-4">
-                <MitigationItem hub="IN" issue="Yield Lag" suggestion="Dispatch Narratives" status="PENDING" />
-                <MitigationItem hub="AE" issue="Lead Surge" suggestion="Authorize Salon" status="ACTIVE" />
-                <MitigationItem hub="UK" issue="Resonance" suggestion="Scale Complications" status="OPTIMIZED" />
+                <MitigationItem hub="IN" issue="Cart Surge" suggestion="Expected +$12k" status="MONITORING" />
+                <MitigationItem hub="AE" issue="VIP Intent" suggestion="Expected +$85k" status="ACTIVE" />
+                <MitigationItem hub="US" issue="Checkout Flow" suggestion="Expected +$42k" status="OPTIMIZED" />
              </CardContent>
           </Card>
 
           <Card className="bg-[#111113] border-white/5 rounded-none p-6 space-y-6">
              <div className="flex items-center space-x-3 text-white/20">
                 <BarChart3 className="w-4 h-4 text-blue-500" />
-                <h4 className="text-[9px] font-bold uppercase tracking-[0.4em]">Resonance KPIs</h4>
+                <h4 className="text-[9px] font-bold uppercase tracking-[0.4em]">Predictive accuracy</h4>
              </div>
              <div className="space-y-4">
-                <PerformanceRow label="GLOBAL SYNC" val={100} />
-                <PerformanceRow label="AI PREDICTION" val={94} />
-                <PerformanceRow label="VAULT SECURITY" val={99} />
+                <PerformanceRow label="1H FORECAST" val={96} />
+                <PerformanceRow label="USER INTENT" val={92} />
+                <PerformanceRow label="CART RESONANCE" val={99} />
              </div>
           </Card>
         </aside>
@@ -185,12 +189,12 @@ function StatusTick({ label, value, color }: { label: string, value: string, col
 
 function SignalNode({ label, value, trend, color = "text-white" }: { label: string, value: string | number, trend?: string, color?: string }) {
   return (
-    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none">
+    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl">
       <div className="flex justify-between items-start">
         <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/20">{label}</p>
-        {trend && <span className="text-[8px] font-bold text-emerald-400 tabular">{trend}</span>}
+        {trend && <span className="text-[8px] font-bold text-blue-400 tabular uppercase">{trend}</span>}
       </div>
-      <p className={cn("text-4xl font-body font-bold tracking-tighter italic tabular", color)}>{value}</p>
+      <p className={cn("text-4xl font-body font-bold tracking-tighter italic tabular leading-none", color)}>{value}</p>
     </Card>
   );
 }
@@ -207,11 +211,11 @@ function HUDMetric({ icon, label, value }: { icon: React.ReactNode, label: strin
   );
 }
 
-function HubDetailRow({ label, value }: { label: string, value: string | number }) {
+function HubDetailRow({ label, value, color = "text-white" }: { label: string, value: string | number, color?: string }) {
   return (
     <div className="flex flex-col space-y-1">
       <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</p>
-      <p className="text-xl font-body font-bold text-white italic tracking-tighter tabular">{value}</p>
+      <p className={cn("text-xl font-body font-bold italic tracking-tighter tabular", color)}>{value}</p>
     </div>
   );
 }
@@ -224,7 +228,7 @@ function MitigationItem({ hub, issue, suggestion, status }: { hub: string, issue
           <Badge variant="outline" className={cn(
             "text-[6px] uppercase border-none px-1.5 py-0",
             status === 'ACTIVE' ? "bg-emerald-500/10 text-emerald-400" : 
-            status === 'PENDING' ? "bg-blue-500/10 text-blue-400" :
+            status === 'MONITORING' ? "bg-blue-500/10 text-blue-400" :
             "bg-white/10 text-white/40"
           )}>{status}</Badge>
        </div>
