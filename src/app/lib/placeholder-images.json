@@ -20,40 +20,28 @@
       "imageHint": "london luxury"
     },
     {
-      "id": "editorial-city-dubai",
-      "description": "Dubai Gold Edit",
-      "imageUrl": "https://picsum.photos/seed/amarise-dubai-edit/1600/900",
-      "imageHint": "dubai gold"
-    },
-    {
-      "id": "collection-spring-summer",
-      "description": "Spring Summer 2024 Collection",
-      "imageUrl": "https://picsum.photos/seed/ss24-luxe/1920/1080",
-      "imageHint": "spring runway"
-    },
-    {
       "id": "collection-heritage",
       "description": "The Heritage Series",
       "imageUrl": "https://picsum.photos/seed/heritage-luxe/1920/1080",
       "imageHint": "vintage jewelry"
     },
     {
-      "id": "collection-prive",
-      "description": "VIP Private Collection",
-      "imageUrl": "https://picsum.photos/seed/prive-exclusive/1920/1080",
-      "imageHint": "exclusive watches"
+      "id": "home-hero-auction",
+      "description": "Maison Amarisé Heritage Auction Horizon",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440",
+      "imageHint": "luxury auction"
     },
     {
-      "id": "mega-menu-arrivals",
-      "description": "New Arrivals Luxury Handbags",
-      "imageUrl": "https://picsum.photos/seed/amarise-arrivals-bags/1200/800",
-      "imageHint": "luxury handbags"
+      "id": "home-mastery",
+      "description": "Artisanal Mastery Detail",
+      "imageUrl": "https://picsum.photos/seed/amarise-mastery/1200/1500",
+      "imageHint": "haute couture"
     },
     {
-      "id": "mega-menu-jewelry",
-      "description": "Van Cleef & Arpels Jewelry Showcase",
-      "imageUrl": "https://picsum.photos/seed/vca-jewelry/1200/800",
-      "imageHint": "luxury jewelry"
+      "id": "home-salon-invite",
+      "description": "Private Salon Environment",
+      "imageUrl": "https://picsum.photos/seed/amarise-salon-interior/1600/1000",
+      "imageHint": "exclusive interior"
     }
   ]
 }
