@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -7,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
+import { Card } from "@/components/ui/card";
 import { Trash2, ShoppingBag, ShieldCheck, Truck, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
