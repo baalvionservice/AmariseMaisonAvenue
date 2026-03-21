@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight, User, LayoutDashboard, ShieldAlert } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, User, LayoutDashboard } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -202,7 +203,7 @@ export const Header = () => {
         subCaption: 'NEW ARRIVALS'
       }
     },
-    { name: 'LIVE SHOP', href: '#', services: true },
+    { name: 'LIVE SHOP', href: `/${countryCode}/account/live`, services: true },
     { name: 'BLOG', href: `/${countryCode}/journal` },
   ];
 
@@ -399,7 +400,7 @@ export const Header = () => {
                         {col.links.map((sub) => (
                           <Link 
                             key={sub} 
-                            href={`/${countryCode}/category/${link.name.toLowerCase()}`} 
+                            href={`/${countryCode}/category/all`} 
                             className="text-[13px] font-light text-gray-600 hover:text-black transition-colors"
                           >
                             {sub}

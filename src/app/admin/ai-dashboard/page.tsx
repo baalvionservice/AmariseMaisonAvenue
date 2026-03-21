@@ -1,34 +1,21 @@
+
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Zap, 
   Activity, 
-  MessageSquare, 
-  FileText, 
-  Search, 
-  TrendingUp, 
   ChevronRight, 
   RefreshCcw,
   CheckCircle2,
   Clock,
-  LayoutDashboard,
+  BarChart,
+  Crown,
+  Cpu,
   Settings,
   BrainCircuit,
-  Bot,
-  Lightbulb,
-  AlertCircle,
-  Play,
-  History,
-  FastForward,
-  Plus,
-  Coins,
-  Target,
-  Database,
-  Cpu,
-  BarChart,
-  Crown
+  Database
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +26,14 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { getAnalytics } from '@/lib/analytics/mock-data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { 
   Line, 
   LineChart, 
@@ -54,8 +49,8 @@ import { useToast } from '@/hooks/use-toast';
  * AI Autopilot: High-Frequency Automation Terminal
  */
 export default function AIDashboard() {
-  const { modules, logs, suggestions, jobs, runJob, runSequence, approveSuggestion, rejectSuggestion } = useAI();
-  const { workflows, currentUser } = useAppStore();
+  const { modules, logs, runSequence } = useAI();
+  const { currentUser } = useAppStore();
   const { toast } = useToast();
 
   const stats = useMemo(() => {
@@ -148,7 +143,7 @@ export default function AIDashboard() {
                     ))}
                  </div>
                  <Link href="/admin/automation">
-                    <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white hover:text-black rounded-none h-12 text-[9px] font-bold uppercase tracking-widest mt-4">
+                    <Button variant="outline" className="w-full rounded-none border-white/20 text-white/60 hover:bg-white hover:text-black text-[9px] font-bold uppercase tracking-widest h-12 mt-4">
                       MANAGE LOGIC RULES
                     </Button>
                  </Link>
@@ -311,23 +306,4 @@ function StatsTile({ label, value, trend }: { label: string, value: string, tren
        <div className="text-4xl font-headline font-bold italic text-gray-900">{value}</div>
     </Card>
   );
-}
-
-function Table({ children }: { children: React.ReactNode }) {
-  return <table className="w-full text-left text-sm">{children}</table>;
-}
-function TableHeader({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <thead className={cn("border-b border-border", className)}>{children}</thead>;
-}
-function TableBody({ children }: { children: React.ReactNode }) {
-  return <tbody>{children}</tbody>;
-}
-function TableRow({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) {
-  return <tr className={cn("border-b border-border last:border-0", className)} onClick={onClick}>{children}</tr>;
-}
-function TableHead({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <th className={cn("h-12 px-4 align-middle", className)}>{children}</th>;
-}
-function TableCell({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <td className={cn("p-4 align-middle", className)}>{children}</td>;
 }

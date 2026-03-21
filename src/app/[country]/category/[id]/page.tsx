@@ -1,10 +1,9 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { 
-  PRODUCTS, 
   CATEGORIES, 
   formatPrice 
 } from '@/lib/mock-data';
@@ -15,10 +14,8 @@ import {
   ChevronUp,
   Filter, 
   Heart,
-  Sparkles,
   X,
   Plus,
-  Search as SearchIcon,
   SlidersHorizontal,
   Search
 } from 'lucide-react';
@@ -29,7 +26,6 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
@@ -40,6 +36,7 @@ import {
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { Sparkles } from 'lucide-react';
 
 /**
  * CategoryPage: Replicated for the Madison Avenue Couture archive view.
@@ -254,13 +251,13 @@ export default function CategoryPage() {
                   </div>
                 )}
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="ACCESSORIES" hasSub isOpen={openSections['accessories']} onClick={() => toggleSection('accessories')} />
+                <SidebarNavItem label="ACCESSORIES" hasSub isOpen={openSections['accessories']} onClick={() => toggleSection('accessories']} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry')} />
+                <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry']} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="SHOES" hasSub isOpen={openSections['shoes']} onClick={() => toggleSection('shoes')} />
+                <SidebarNavItem label="SHOES" hasSub isOpen={openSections['shoes']} onClick={() => toggleSection('shoes']} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations')} />
+                <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations']} />
               </nav>
             </div>
           </aside>
