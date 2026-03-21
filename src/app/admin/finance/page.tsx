@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -27,7 +26,8 @@ import {
   AlertCircle,
   Undo2,
   XCircle,
-  Info
+  Info,
+  BrainCircuit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -134,10 +134,9 @@ export default function FinanceHub() {
                  <Label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Archival Reason</Label>
                  <Textarea 
                   value={refundReason}
-                  onChange={(e) => setReplyText(e.target.value)} // fix var name
+                  onChange={(e) => setRefundReason(e.target.value)}
                   className="rounded-none border-border bg-ivory/30 min-h-[120px] text-xs italic font-light px-4 py-4"
                   placeholder="e.g., Client rejected provenance audit upon delivery..."
-                  onInput={(e: any) => setRefundReason(e.target.value)}
                  />
               </div>
 

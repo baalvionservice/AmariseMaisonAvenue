@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -14,7 +13,8 @@ import {
   Gem,
   Award,
   Lock,
-  Clock
+  Clock,
+  TrendingUp
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -99,7 +99,7 @@ export default function MembershipPage() {
                  <Progress value={84} className="h-1 bg-white" />
                  <p className="text-[10px] text-gray-400 italic">"Nearing absolute tier synchronization."</p>
               </div>
-              <Button className="w-full h-14 bg-black text-white hover:bg-plum rounded-none text-[9px] font-bold uppercase tracking-widest shadow-xl">
+              <Button className="w-full h-14 bg-black text-white hover:bg-plum rounded-none text-[9px] font-bold uppercase tracking-[0.4em] font-bold transition-all shadow-xl">
                  UPGRADE PLAN <ArrowRight className="w-3 h-3 ml-2" />
               </Button>
            </Card>
