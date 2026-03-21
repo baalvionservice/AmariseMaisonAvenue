@@ -4,7 +4,6 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingCart, 
-  Heart, 
   Activity, 
   Globe, 
   X, 
@@ -12,27 +11,25 @@ import {
   Lock, 
   Zap, 
   ArrowUpRight, 
-  Crown,
-  Eye,
-  MessageSquare,
-  AlertTriangle,
+  Cpu,
+  Server,
   ArrowRight,
   ShieldCheck,
-  Cpu,
-  BarChart3,
-  Server,
   TrendingDown,
-  Coins
+  Coins,
+  Clock,
+  ChevronRight
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 /**
  * Bank-Grade Command Center: Level 3 Tactical Oversight.
- * Optimized for information density and predictive revenue signals.
+ * Optimized for information density and 1-Hour Predictive Liquidity Pulse.
  */
 export default function AdminDashboard() {
   const { regions, globalTotal, globalUsers, globalPredictedInflow } = useSimulationData();
@@ -46,7 +43,7 @@ export default function AdminDashboard() {
   const jurisdictionLabel = adminJurisdiction === 'global' ? 'GLOBAL MASTER' : adminJurisdiction.toUpperCase() + ' NODE';
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in font-body">
       {/* 1. System Health Ticker: Bank-Grade Status Bar */}
       <div className="flex bg-[#111113] border border-white/5 p-1">
          <div className="flex-1 overflow-hidden flex items-center">
@@ -73,15 +70,16 @@ export default function AdminDashboard() {
           label="Liquidity Pipeline (1h)" 
           value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} 
           color="text-blue-400" 
-          trend="Neural Confidence: 92%"
+          trend="Incoming Yield"
+          icon={<Zap className="w-4 h-4" />}
         />
         <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" />
       </header>
 
-      {/* 3. Viewport & Local Intelligence */}
+      {/* 3. Global Viewport & Predictive Pulse */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Global Matrix Viewport */}
-        <section className="lg:col-span-8 relative h-[480px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl">
+        <section className="lg:col-span-8 relative h-[520px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent pointer-events-none" />
           
           <IntelligenceGlobe 
@@ -144,32 +142,52 @@ export default function AdminDashboard() {
           </AnimatePresence>
         </section>
 
-        {/* Tactical Mitigation & Alerts */}
+        {/* 4. Jurisdictional Predictive Pulse */}
         <aside className="lg:col-span-4 space-y-8">
-          <Card className="bg-[#111113] border-white/5 rounded-none">
+          <Card className="bg-[#111113] border-white/5 rounded-none shadow-2xl">
              <CardHeader className="border-b border-white/5 bg-white/5 p-5 flex flex-row items-center justify-between">
                 <div className="flex items-center space-x-3 text-blue-400">
-                   <Zap className="w-3.5 h-3.5" />
-                   <CardTitle className="text-[10px] font-bold uppercase tracking-[0.3em]">Neural Pipeline</CardTitle>
+                   <Clock className="w-3.5 h-3.5" />
+                   <CardTitle className="text-[10px] font-bold uppercase tracking-[0.3em]">1h Global Inflow Pulse</CardTitle>
                 </div>
-                <Badge variant="outline" className="text-[7px] text-white/40 border-white/10 uppercase">Incoming Liquidity</Badge>
+                <Zap className="w-3 h-3 text-blue-500 animate-pulse" />
              </CardHeader>
-             <CardContent className="p-6 space-y-4">
-                <MitigationItem hub="IN" issue="Cart Surge" suggestion="Expected +$12k" status="MONITORING" />
-                <MitigationItem hub="AE" issue="VIP Intent" suggestion="Expected +$85k" status="ACTIVE" />
-                <MitigationItem hub="US" issue="Checkout Flow" suggestion="Expected +$42k" status="OPTIMIZED" />
+             <CardContent className="p-0">
+                <div className="divide-y divide-white/5">
+                   {Object.values(regions).map(hub => (
+                     <div key={hub.id} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                        <div className="flex items-center space-x-4">
+                           <span className="text-[9px] font-bold text-white/20 uppercase w-6">{hub.id}</span>
+                           <div className="flex flex-col">
+                              <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">{hub.name}</span>
+                              <span className="text-[8px] text-white/20 uppercase tracking-tighter">{hub.cart} ACTIVE CARTS</span>
+                           </div>
+                        </div>
+                        <div className="text-right">
+                           <span className="text-xs font-bold text-blue-400 tabular">${hub.predictedInflow.toLocaleString()}</span>
+                           <p className="text-[7px] text-white/20 font-bold uppercase">Estimated Inflow</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+                <div className="p-4 bg-white/[0.01] border-t border-white/5">
+                   <Link href="/admin/revenue" className="flex items-center justify-center space-x-2 text-[8px] font-bold uppercase tracking-[0.4em] text-white/30 hover:text-blue-400 transition-colors">
+                      <span>VIEW REVENUE MATRIX</span>
+                      <ChevronRight className="w-3 h-3" />
+                   </Link>
+                </div>
              </CardContent>
           </Card>
 
           <Card className="bg-[#111113] border-white/5 rounded-none p-6 space-y-6">
              <div className="flex items-center space-x-3 text-white/20">
-                <BarChart3 className="w-4 h-4 text-blue-500" />
-                <h4 className="text-[9px] font-bold uppercase tracking-[0.4em]">Predictive accuracy</h4>
+                <Activity className="w-4 h-4 text-blue-500" />
+                <h4 className="text-[9px] font-bold uppercase tracking-[0.4em]">Strategic Resonance</h4>
              </div>
              <div className="space-y-4">
-                <PerformanceRow label="1H FORECAST" val={96} />
-                <PerformanceRow label="USER INTENT" val={92} />
-                <PerformanceRow label="CART RESONANCE" val={99} />
+                <PerformanceRow label="CONVERSION PROB." val={96} />
+                <PerformanceRow label="MARKET LIQUIDITY" val={92} />
+                <PerformanceRow label="AI PREDICTION CONF." val={99} />
              </div>
           </Card>
         </aside>
@@ -187,9 +205,10 @@ function StatusTick({ label, value, color }: { label: string, value: string, col
   );
 }
 
-function SignalNode({ label, value, trend, color = "text-white" }: { label: string, value: string | number, trend?: string, color?: string }) {
+function SignalNode({ label, value, trend, color = "text-white", icon }: { label: string, value: string | number, trend?: string, color?: string, icon?: React.ReactNode }) {
   return (
-    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl">
+    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl relative overflow-hidden">
+      {icon && <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-20 transition-opacity">{icon}</div>}
       <div className="flex justify-between items-start">
         <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/20">{label}</p>
         {trend && <span className="text-[8px] font-bold text-blue-400 tabular uppercase">{trend}</span>}
@@ -220,26 +239,6 @@ function HubDetailRow({ label, value, color = "text-white" }: { label: string, v
   );
 }
 
-function MitigationItem({ hub, issue, suggestion, status }: { hub: string, issue: string, suggestion: string, status: string }) {
-  return (
-    <div className="p-4 border border-white/5 bg-white/[0.02] space-y-2 hover:bg-white/5 transition-all cursor-pointer group">
-       <div className="flex justify-between items-center">
-          <span className="text-[8px] font-bold uppercase tracking-widest text-white/40">{hub} HUB</span>
-          <Badge variant="outline" className={cn(
-            "text-[6px] uppercase border-none px-1.5 py-0",
-            status === 'ACTIVE' ? "bg-emerald-500/10 text-emerald-400" : 
-            status === 'MONITORING' ? "bg-blue-500/10 text-blue-400" :
-            "bg-white/10 text-white/40"
-          )}>{status}</Badge>
-       </div>
-       <div className="space-y-0.5">
-          <p className="text-[9px] font-bold uppercase text-white/80">{issue}</p>
-          <p className="text-[10px] text-white/40 italic font-light line-clamp-1">"{suggestion}"</p>
-       </div>
-    </div>
-  );
-}
-
 function PerformanceRow({ label, val }: { label: string, val: number }) {
   return (
     <div className="space-y-1.5">
@@ -252,28 +251,4 @@ function PerformanceRow({ label, val }: { label: string, val: number }) {
       </div>
     </div>
   );
-}
-
-function Card({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <div className={cn("rounded-none border bg-card text-card-foreground shadow-sm", className)}>
-      {children}
-    </div>
-  );
-}
-
-function CardHeader({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <div className={cn("flex flex-col space-y-1 p-6", className)}>{children}</div>;
-}
-
-function CardTitle({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <h3 className={cn("text-xl font-semibold leading-none tracking-tight", className)}>{children}</h3>;
-}
-
-function CardDescription({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <p className={cn("text-xs text-muted-foreground", className)}>{children}</p>;
-}
-
-function CardContent({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <div className={cn("p-6 pt-0", className)}>{children}</div>;
 }

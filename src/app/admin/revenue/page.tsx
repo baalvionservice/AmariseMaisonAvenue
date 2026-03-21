@@ -1,40 +1,21 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
-  TrendingUp, 
-  Users, 
   DollarSign, 
   ArrowUpRight, 
-  ShieldCheck, 
   Activity, 
-  PieChart, 
-  Globe, 
   Zap, 
   ChevronRight, 
-  LogOut,
-  LayoutDashboard,
-  Target,
-  RefreshCcw,
-  BarChart3,
-  Search,
-  Eye,
-  MessageSquare,
-  Filter,
-  Crown,
-  Clock,
-  Send,
-  MoreVertical,
-  LineChart,
-  AlertTriangle,
-  ArrowDownRight,
-  TrendingDown,
-  BrainCircuit,
-  Scale,
-  Database,
-  ArrowRight,
-  Sparkles
+  TrendingUp, 
+  Clock, 
+  ArrowDownRight, 
+  BrainCircuit, 
+  Scale, 
+  ShieldCheck, 
+  Sparkles,
+  BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,17 +40,15 @@ import {
   XAxis, 
   YAxis, 
   Tooltip,
-  Cell,
-  Line,
-  LineChart as RechartsLineChart,
-  CartesianGrid,
   Area,
-  AreaChart
+  AreaChart,
+  Line,
+  CartesianGrid
 } from 'recharts';
 
 /**
  * Bank-Grade Revenue Matrix: Tactical Yield oversight.
- * Enhanced with 1-Hour Predictive Horizon.
+ * Enhanced with 1-Hour Predictive Horizon Node for Jurisdictional Liquidity Tracking.
  */
 export default function RevenueDashboard() {
   const { scopedInquiries, currentUser, transactions, countryConfigs } = useAppStore();
@@ -115,7 +94,7 @@ export default function RevenueDashboard() {
   if (!stats) return null;
 
   return (
-    <div className="space-y-10 animate-fade-in pb-20">
+    <div className="space-y-10 animate-fade-in pb-20 font-body">
       <header className="flex justify-between items-end border-b border-white/5 pb-10">
         <div className="space-y-2">
           <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30 flex items-center space-x-2">
@@ -207,7 +186,7 @@ export default function RevenueDashboard() {
              </CardContent>
            </Card>
 
-           {/* New: 1-Hour Predictive Horizon Node */}
+           {/* 1-Hour Forecast Horizon Node: Jurisdictional Liquidity Tracking */}
            <Card className="bg-[#111113] border-white/5 rounded-none overflow-hidden">
               <CardHeader className="border-b border-white/5 p-8 bg-white/[0.02] flex flex-row items-center justify-between">
                  <div className="space-y-1">
@@ -215,7 +194,7 @@ export default function RevenueDashboard() {
                        <Clock className="w-5 h-5" />
                        <CardTitle className="font-headline text-xl uppercase italic tracking-tight">1-Hour Forecast Horizon</CardTitle>
                     </div>
-                    <p className="text-[9px] uppercase tracking-widest text-white/20">Incoming liquidity based on active cart resonance</p>
+                    <p className="text-[9px] uppercase tracking-widest text-white/20">Incoming liquidity based on active cart resonance across all countries</p>
                  </div>
                  <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-none px-4 h-8 rounded-none text-[8px] font-bold uppercase tracking-widest">
                     Neural Flow Active
@@ -226,8 +205,8 @@ export default function RevenueDashboard() {
                     <TableHeader className="bg-white/[0.01]">
                        <TableRow className="border-white/5">
                           <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Market Hub</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-white/40">Active Carts</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-white/40">Conversion Prob.</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-white/40 text-center">Active Carts</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-white/40 text-center">Conversion Prob.</TableHead>
                           <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">Expected Inflow</TableHead>
                        </TableRow>
                     </TableHeader>
@@ -235,9 +214,9 @@ export default function RevenueDashboard() {
                        {Object.values(regions).map(hub => (
                          <TableRow key={hub.id} className="hover:bg-white/5 transition-colors border-white/5">
                             <TableCell className="pl-8 font-bold text-xs text-white/80 uppercase tracking-widest">{hub.name}</TableCell>
-                            <TableCell className="text-sm font-body font-bold text-white/60 tabular">{hub.cart}</TableCell>
+                            <TableCell className="text-sm font-body font-bold text-white/60 tabular text-center">{hub.cart}</TableCell>
                             <TableCell>
-                               <div className="flex items-center space-x-3">
+                               <div className="flex items-center justify-center space-x-3">
                                   <Progress value={((hub.purchased / (hub.activeUsers || 1)) * 100) * 2} className="h-0.5 w-16 bg-white/5" />
                                   <span className="text-[9px] font-bold text-blue-400 tabular">{((hub.purchased / (hub.activeUsers || 1)) * 100).toFixed(1)}%</span>
                                </div>
@@ -285,7 +264,7 @@ export default function RevenueDashboard() {
                 <h4 className="text-[10px] font-bold uppercase tracking-widest">Inflow Prediction</h4>
              </div>
              <p className="text-xs text-white/60 font-light italic leading-relaxed relative z-10">
-               "Significant cart activity detected in UAE Hub. Predictive inflow suggests a potential $85k yield surge in the next 60-minute window."
+               "High activity across all jurisdictional carts. Global predictive inflow suggests a potential $125k yield surge in the next 60-minute window."
              </p>
           </div>
         </aside>
