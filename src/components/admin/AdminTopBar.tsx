@@ -27,7 +27,7 @@ import { COUNTRIES } from '@/lib/mock-data';
 
 /**
  * AdminTopBar: Global Command Matrix
- * Re-architected with independent groups to prevent technical metadata and action overlaps.
+ * Re-architected with a stable 3-column grid to prevent visual overlaps between metadata and actions.
  */
 export function AdminTopBar() {
   const { currentUser, scopedNotifications, adminJurisdiction, setAdminJurisdiction } = useAppStore();
@@ -36,13 +36,14 @@ export function AdminTopBar() {
   const isSuper = currentUser?.role === 'super_admin';
 
   return (
-    <header className="h-20 bg-[#0A0A0B]/95 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 z-40 shrink-0 backdrop-blur-xl">
-      {/* 1. DISCOVERY GROUP (Left - Fixed Width) */}
-      <div className="flex items-center space-x-10 w-[320px] shrink-0">
-        <Link href="/admin" className="p-2 hover:bg-white/5 rounded-none transition-colors border border-white/5">
+    <header className="h-20 bg-[#0A0A0B]/95 border-b border-white/5 grid grid-cols-[1fr_auto_1fr] items-center px-10 sticky top-0 z-40 shrink-0 backdrop-blur-xl">
+      
+      {/* 1. DISCOVERY GROUP (Left) */}
+      <div className="flex items-center space-x-8">
+        <Link href="/admin" className="p-2 hover:bg-white/5 rounded-none transition-colors border border-white/5 shrink-0">
           <LayoutDashboard className="w-5 h-5 text-blue-500" />
         </Link>
-        <div className="relative w-full group">
+        <div className="relative w-full max-w-[280px] group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
@@ -52,27 +53,21 @@ export function AdminTopBar() {
         </div>
       </div>
 
-      {/* 2. JURISDICTION GROUP (Center - Flexible) */}
-      <div className="flex-1 flex justify-center px-6 min-w-0">
-        <div className="flex items-center space-x-6 px-10 border-x border-white/5 max-w-md overflow-hidden">
-          <div className="flex flex-col items-center">
-             <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/20 whitespace-nowrap">Active Jurisdiction</span>
-             <div className="flex items-center space-x-3 mt-1">
-                <div className="flex items-center space-x-2 px-4 py-1.5 bg-blue-500/5 border border-blue-500/20">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400 tabular truncate max-w-[120px]">{currentJurisdiction}</span>
-                </div>
-             </div>
-          </div>
-        </div>
+      {/* 2. JURISDICTION GROUP (Center - Absolute Center) */}
+      <div className="flex flex-col items-center px-8 border-x border-white/5 h-full justify-center">
+         <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/20 whitespace-nowrap mb-1">Active Jurisdiction</span>
+         <div className="flex items-center space-x-2 px-4 py-1.5 bg-blue-500/5 border border-blue-500/20">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400 tabular truncate max-w-[140px]">{currentJurisdiction}</span>
+         </div>
       </div>
 
-      {/* 3. ACTIONS & IDENTITY GROUP (Right - Fixed Width) */}
-      <div className="flex items-center space-x-8 w-[480px] shrink-0 justify-end">
-        <div className="flex items-center space-x-6 pr-8 border-r border-white/5">
+      {/* 3. ACTIONS & IDENTITY GROUP (Right) */}
+      <div className="flex items-center justify-end space-x-6">
+        <div className="flex items-center space-x-4 border-r border-white/5 pr-6">
           {/* Jurisdictional Selector (Super Admin Only) */}
           {isSuper && (
             <DropdownMenu>
@@ -118,7 +113,7 @@ export function AdminTopBar() {
         </div>
 
         {/* Identity & Alerts */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4">
           <button className="relative p-2 text-white/20 hover:text-white transition-all group bg-transparent border-none outline-none cursor-pointer">
             <Bell size={20} className="group-hover:rotate-12 transition-transform" />
             {scopedNotifications.some(n => !n.read) && (
@@ -126,7 +121,7 @@ export function AdminTopBar() {
             )}
           </button>
           
-          <div className="flex items-center space-x-4 pl-6 border-l border-white/5">
+          <div className="flex items-center space-x-4 pl-4 border-l border-white/5">
              <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white">{currentUser?.name}</span>
                 <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">{currentUser?.role.replace('_', ' ')}</span>
