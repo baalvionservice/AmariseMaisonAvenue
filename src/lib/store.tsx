@@ -242,18 +242,18 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // 1. Initial Identity & Config
+  // --- SECTION 1: CORE CONFIGURATION & IDENTITY ---
+  const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
+  const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
+  const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
     ...c,
     taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
     taxRate: c.code === 'uk' ? 20 : c.code === 'ae' ? 5 : c.code === 'in' ? 18 : c.code === 'sg' ? 9 : 8
   })));
   const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
-  const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
-  const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
-  const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
-  
-  // 2. Core State Entities
+
+  // --- SECTION 2: GLOBAL REGISTRY STATE (The "What") ---
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
     ...p, 
     brandId: activeBrandId, 
@@ -270,6 +270,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [editorials, setEditorials] = useState<Editorial[]>(EDITOR_INITIAL.map(e => ({ ...e, brandId: activeBrandId, isGlobal: false })));
   const [buyingGuides, setBuyingGuides] = useState<BuyingGuide[]>(INITIAL_GUIDES.map(g => ({ ...g, brandId: activeBrandId, isGlobal: false })));
   const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS.map(r => ({ ...r, brandId: activeBrandId, country: 'us' })));
+  const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
+  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
+  const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId, status: 'verified' })));
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
   const [workflows, setWorkflows] = useState<WorkflowTask[]>([]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([]);
@@ -279,12 +285,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
-  const [customerSegments, setCustomerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
-  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
-  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
-  const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   
-  // 3. Other initial state...
+  // Static/Semi-Static data
   const [collections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
   const [categories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
   const [departments] = useState<Department[]>(INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId })));
@@ -305,15 +307,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
-  const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
-  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId, status: 'verified' })));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
-  const [integrations, setIntegrations] = useState<MaisonIntegration[]>([]);
-  const [apiLogs, setApiLogs] = useState<ApiLog[]>([]);
-  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
-  const [indexingLogs, setIndexingLogs] = useState<IndexingLog[]>([]);
+  const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
+  const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
+  const [apiLogs] = useState<ApiLog[]>(API_LOGS);
+  const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
+  const [indexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
     seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
@@ -327,11 +327,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [activeVip, setActiveVip] = useState<VipClient | null>(null);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
-  const [cmsSections, setCmsSections] = useState<CMSSection[]>([
+  const [cmsSections] = useState<CMSSection[]>([
     { id: 'hero', title: 'The Heritage Registry', visible: true, featured: true, brandId: activeBrandId }
   ]);
 
-  // 4. Jurisdictional Scoping Logic
+  // --- SECTION 3: JURISDICTIONAL SCOPING ENGINE (The "Where") ---
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
@@ -357,7 +357,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(t => t.country === activeHub || t.country === 'global'), [stressTests, activeHub]);
   const scopedBrandIntegrity = useMemo(() => activeHub === 'global' ? brandIntegrityIssues : brandIntegrityIssues.filter(i => i.country === activeHub), [brandIntegrityIssues, activeHub]);
 
-  // 5. Shared Methods...
+  // --- SECTION 4: INSTITUTIONAL ACTION METHODS ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
     const entry: AuditLogEntry = { id: `aud-${Date.now()}`, actorId: currentUser.id, actorName: currentUser.name, actorRole: currentUser.role, country, action, entity, timestamp: new Date().toISOString(), severity, brandId: activeBrandId };
@@ -393,7 +393,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAdminJurisdiction,
     setGuideMode: (val: boolean) => setGlobalSettings(prev => ({ ...prev, isGuideMode: val })),
     setAdminViewMode: (val: AdminViewMode) => setGlobalSettings(prev => ({ ...prev, adminViewMode: val })),
-    upsertCMSSection: (s: CMSSection) => setCmsSections(prev => prev.some(i => i.id === s.id) ? prev.map(i => i.id === s.id ? s : i) : [...prev, s]),
+    upsertCMSSection: (s: CMSSection) => {},
     upsertProduct,
     toggleProductVipStatus: (productId: string) => setProducts(prev => prev.map(p => p.id === productId ? { ...p, isVip: !p.isVip } : p)),
     rollbackProductVersion: (productId: string, versionId: string) => {},
