@@ -32,6 +32,7 @@ function latLngToVector3(lat: number, lng: number, radius: number) {
 
 /**
  * HubPoint: The interactive marker node with Intelligence Overlay
+ * Optimized offset for compact viewport.
  */
 function HubPoint({ 
   region, 
@@ -59,10 +60,10 @@ function HubPoint({
 
   // Autonomous Insight Generation
   const aiInsight = useMemo(() => {
-    if (region.cart > region.purchased * 3) return "High checkout friction detected.";
-    if (region.purchased > 5) return "High conversion momentum.";
-    if (region.wishlist > 20) return "Strong collection interest.";
-    return "Market resonance stable.";
+    if (region.cart > region.purchased * 3) return "High checkout friction.";
+    if (region.purchased > 5) return "Conversion momentum.";
+    if (region.wishlist > 20) return "Strong resonance.";
+    return "Market stable.";
   }, [region.cart, region.purchased, region.wishlist]);
 
   useFrame((state) => {
@@ -91,52 +92,52 @@ function HubPoint({
         <meshBasicMaterial color={heatColor} transparent opacity={isSelected ? 0.5 : (0.2 + normalizedHeat * 0.3)} />
       </mesh>
       
-      <Html distanceFactor={isSelected ? 8 : 12} zIndexRange={[10, 0]}>
+      <Html distanceFactor={isSelected ? 10 : 15} zIndexRange={[10, 0]}>
         <div className="pointer-events-none select-none">
           {isSelected ? (
-            <div className="animate-fade-in -translate-y-56 -translate-x-1/2">
-              <div className="w-72 bg-[#111113]/95 backdrop-blur-2xl border border-white/10 p-8 shadow-[0_40px_80px_rgba(0,0,0,0.6)] space-y-6 relative">
+            <div className="animate-fade-in -translate-y-48 -translate-x-1/2">
+              <div className="w-64 bg-[#111113]/95 backdrop-blur-2xl border border-white/10 p-6 shadow-[0_40px_80px_rgba(0,0,0,0.6)] space-y-5 relative">
                 <div className="absolute top-0 left-0 w-full h-0.5 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
                 
-                <div className="flex justify-between items-start border-b border-white/5 pb-4">
-                  <div className="space-y-1">
-                    <p className="text-[8px] font-bold uppercase tracking-[0.4em] text-blue-400">Tactical Node {region.id.toUpperCase()}</p>
-                    <h4 className="text-xl font-headline font-bold italic text-white leading-none">{region.name}</h4>
+                <div className="flex justify-between items-start border-b border-white/10 pb-3">
+                  <div className="space-y-0.5">
+                    <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-blue-400">Tactical Hub {region.id.toUpperCase()}</p>
+                    <h4 className="text-lg font-headline font-bold italic text-white leading-none">{region.name}</h4>
                   </div>
-                  <Lock className="w-3.5 h-3.5 text-white/20" />
+                  <Lock className="w-3 h-3 text-white/20" />
                 </div>
 
-                <div className="space-y-5">
-                  <DetailItem label="Revenue Hub" value={`$${(region.revenue / 1000).toFixed(1)}k`} icon={<TrendingUp className="w-3.5 h-3.5 text-emerald-400" />} />
-                  <DetailItem label="Active Intent" value={region.activeUsers} icon={<Users className="w-3.5 h-3.5 text-blue-400" />} />
-                  <DetailItem label="Cart Density" value={region.cart} icon={<ShoppingCart className="w-3.5 h-3.5 text-amber-400" />} />
+                <div className="space-y-4">
+                  <DetailItem label="Yield" value={`$${(region.revenue / 1000).toFixed(1)}k`} icon={<TrendingUp className="w-3 h-3 text-emerald-400" />} />
+                  <DetailItem label="Intent" value={region.activeUsers} icon={<Users className="w-3 h-3 text-blue-400" />} />
+                  <DetailItem label="Density" value={region.cart} icon={<ShoppingCart className="w-3 h-3 text-amber-400" />} />
                 </div>
 
-                <div className="pt-4 border-t border-white/5 space-y-3">
+                <div className="pt-3 border-t border-white/10 space-y-2">
                   <div className="flex items-center space-x-2 text-blue-400">
-                    <Zap className="w-3 h-3" />
-                    <span className="text-[8px] font-bold uppercase tracking-widest">Curator Signal</span>
+                    <Zap className="w-2.5 h-2.5" />
+                    <span className="text-[7px] font-bold uppercase tracking-widest">Signal</span>
                   </div>
-                  <p className="text-[10px] text-white/60 font-light italic leading-relaxed">
+                  <p className="text-[9px] text-white/60 font-light italic leading-relaxed">
                     "{aiInsight}"
                   </p>
                 </div>
 
-                <div className="pt-2">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[7px] font-bold text-white/20 uppercase tracking-[0.3em]">Yield probability</span>
-                    <span className="text-[9px] font-bold text-blue-400">{((region.purchased / region.activeUsers) * 100).toFixed(1)}%</span>
+                <div className="pt-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[6px] font-bold text-white/20 uppercase tracking-[0.3em]">Prob.</span>
+                    <span className="text-[8px] font-bold text-blue-400">{((region.purchased / region.activeUsers) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="h-0.5 bg-white/5 w-full overflow-hidden">
                     <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(region.purchased / region.activeUsers) * 100}%` }} />
                   </div>
                 </div>
               </div>
-              <div className="w-px h-24 bg-gradient-to-b from-blue-500/50 to-transparent mx-auto mt-2" />
+              <div className="w-px h-16 bg-gradient-to-b from-blue-500/50 to-transparent mx-auto mt-1" />
             </div>
           ) : (
-            <div className="bg-black/60 backdrop-blur-md px-4 py-2 border border-white/5 -translate-y-10 whitespace-nowrap shadow-2xl transition-all">
-              <p className="text-[9px] font-bold text-white/80 uppercase tracking-[0.5em]">{region.id.toUpperCase()}</p>
+            <div className="bg-black/60 backdrop-blur-md px-3 py-1 border border-white/5 -translate-y-8 whitespace-nowrap shadow-2xl transition-all">
+              <p className="text-[8px] font-bold text-white/80 uppercase tracking-[0.5em]">{region.id.toUpperCase()}</p>
             </div>
           )}
         </div>
@@ -148,11 +149,11 @@ function HubPoint({
 function DetailItem({ label, value, icon }: { label: string, value: string | number, icon: React.ReactNode }) {
   return (
     <div className="flex justify-between items-center group">
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2">
         <div className="opacity-40 group-hover:opacity-100 transition-opacity">{icon}</div>
-        <span className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">{label}</span>
+        <span className="text-[8px] font-bold text-white/30 uppercase tracking-[0.2em]">{label}</span>
       </div>
-      <span className="text-[13px] font-bold text-white tracking-tighter">{value}</span>
+      <span className="text-[11px] font-bold text-white tracking-tighter">{value}</span>
     </div>
   );
 }
@@ -177,9 +178,9 @@ function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THR
         end={end}
         mid={mid}
         color="#3B82F6"
-        lineWidth={0.15}
+        lineWidth={0.1}
         transparent
-        opacity={0.08}
+        opacity={0.05}
       />
       <QuadraticBezierLine
         ref={lineRef}
@@ -187,9 +188,9 @@ function DataArc({ start, end, intensity = 1 }: { start: THREE.Vector3, end: THR
         end={end}
         mid={mid}
         color="#60A5FA"
-        lineWidth={0.5}
+        lineWidth={0.3}
         transparent
-        opacity={0.3}
+        opacity={0.2}
         dashed
         dashScale={50}
         dashSize={0.4}
@@ -246,17 +247,17 @@ function GlobeScene({
     Math.max(...Object.values(regions).map(r => r.revenue), 1), 
   [regions]);
 
-  const targetCamPos = useRef(new THREE.Vector3(0, 1, 5));
+  const targetCamPos = useRef(new THREE.Vector3(0, 1, 6.5)); // Zoomed out slightly more
   const targetFocus = useRef(new THREE.Vector3(0, 0, 0));
 
   useEffect(() => {
     if (selectedHubId && regions[selectedHubId]) {
       const reg = regions[selectedHubId];
       const pos = latLngToVector3(reg.lat, reg.lng, 2);
-      targetCamPos.current.copy(pos).normalize().multiplyScalar(3.4);
+      targetCamPos.current.copy(pos).normalize().multiplyScalar(3.8);
       targetFocus.current.copy(pos);
     } else {
-      targetCamPos.current.set(0, 1, 5);
+      targetCamPos.current.set(0, 1, 6.5);
       targetFocus.current.set(0, 0, 0);
     }
   }, [selectedHubId, regions]);
@@ -313,8 +314,8 @@ function GlobeScene({
         ref={controlsRef}
         enablePan={false} 
         enableZoom={true} 
-        minDistance={3.0} 
-        maxDistance={6.5} 
+        minDistance={3.5} 
+        maxDistance={8.0} 
         rotateSpeed={0.5}
         autoRotate={false}
         enableDamping={true}
@@ -346,7 +347,7 @@ export function IntelligenceGlobe({
 
   return (
     <div className="w-full h-full cursor-grab active:cursor-grabbing relative">
-      <Canvas camera={{ position: [0, 1, 5], fov: 40 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: [0, 1, 6.5], fov: 35 }} dpr={[1, 2]}>
         <ambientLight intensity={0.4} />
         <directionalLight position={[-5, 5, 5]} intensity={1.5} color="#FFFFFF" />
         <pointLight position={[0, -5, 2]} intensity={0.5} color="#3B82F6" />
@@ -359,49 +360,49 @@ export function IntelligenceGlobe({
         />
       </Canvas>
 
-      {/* Institutional Legend */}
-      <div className="absolute bottom-10 left-10 space-y-5 pointer-events-none">
-        <div className="space-y-2.5">
-          <p className="text-[8px] font-bold uppercase tracking-[0.5em] text-white/20 mb-3">Market Yield Matrix</p>
-          <LegendItem color={HUB_COLORS.high} label="Optimal Yield" />
-          <LegendItem color={HUB_COLORS.medium} label="Strategic Flow" />
-          <LegendItem color={HUB_COLORS.low} label="Base Resonance" />
+      {/* Institutional Legend - Smaller Scale */}
+      <div className="absolute bottom-8 left-8 space-y-3 pointer-events-none">
+        <div className="space-y-2">
+          <p className="text-[7px] font-bold uppercase tracking-[0.5em] text-white/20 mb-2">Hub Yield Matrix</p>
+          <LegendItem color={HUB_COLORS.high} label="Optimal" />
+          <LegendItem color={HUB_COLORS.medium} label="Strategic" />
+          <LegendItem color={HUB_COLORS.low} label="Base" />
         </div>
       </div>
 
-      {/* Tactical Hub Control Matrix */}
-      <div className="absolute bottom-10 right-10 flex flex-col space-y-3">
+      {/* Tactical Hub Control Matrix - Compact */}
+      <div className="absolute bottom-8 right-8 flex flex-col space-y-2">
         <button 
           onClick={() => onRegionClick(null)}
-          className="w-12 h-12 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl group"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl group"
           aria-label="Master Reset"
         >
-          <RefreshCcw size={16} className="group-hover:rotate-180 transition-transform duration-700" />
+          <RefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-700" />
         </button>
         <button 
           onClick={() => handleManualZoom('in')}
-          className="w-12 h-12 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
           aria-label="Inc. Zoom"
         >
-          <Plus size={18} />
+          <Plus size={16} />
         </button>
         <button 
           onClick={() => handleManualZoom('out')}
-          className="w-12 h-12 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
           aria-label="Dec. Zoom"
         >
-          <Minus size={18} />
+          <Minus size={16} />
         </button>
       </div>
 
-      <div className="absolute top-10 left-10 z-10 space-y-3 pointer-events-none">
-        <div className="flex items-center space-x-4">
-          <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
-            <Globe className="w-4 h-4 text-blue-500" />
+      <div className="absolute top-8 left-8 z-10 space-y-2 pointer-events-none">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
+            <Globe className="w-3.5 h-3.5 text-blue-500" />
           </div>
-          <div className="space-y-0.5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.6em] text-white/80">Global Matrix</span>
-            <p className="text-[8px] text-white/20 uppercase tracking-widest font-bold">Node sync: Active</p>
+          <div className="space-y-0">
+            <span className="text-[10px] font-bold uppercase tracking-[0.6em] text-white/80 leading-none">Global Matrix</span>
+            <p className="text-[7px] text-white/20 uppercase tracking-widest font-bold">Node sync: Active</p>
           </div>
         </div>
       </div>
@@ -411,9 +412,9 @@ export function IntelligenceGlobe({
 
 function LegendItem({ color, label }: { color: string, label: string }) {
   return (
-    <div className="flex items-center space-x-4 opacity-70">
-      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
-      <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/80">{label}</span>
+    <div className="flex items-center space-x-3 opacity-70">
+      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
+      <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/80">{label}</span>
     </div>
   );
 }
