@@ -22,40 +22,35 @@
       },
       "required": ["id", "name", "category", "basePrice"]
     },
-    "Collection": {
-      "title": "Collection",
-      "description": "A themed set of luxury products curated by the Maison.",
+    "Payment": {
+      "title": "Payment",
+      "description": "A financial transaction record within the Maison settlement layer.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "name": { "type": "string" },
-        "description": { "type": "string" },
-        "imageUrl": { "type": "string" }
-      }
+        "tenantId": { "type": "string" },
+        "subscriptionId": { "type": "string" },
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "gateway": { "type": "string", "enum": ["STRIPE", "RAZORPAY", "PAYU", "BANK_TRANSFER"] },
+        "gatewayPaymentId": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "SUCCESS", "FAILED", "REFUNDED"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "tenantId", "amount", "currency", "gateway"]
     },
-    "Affiliate": {
-      "title": "Affiliate",
-      "description": "A brand partner or influencer.",
+    "PaymentLog": {
+      "title": "PaymentLog",
+      "description": "Historical audit trace for a specific payment event.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "name": { "type": "string" },
-        "tier": { "type": "string", "enum": ["Silver", "Gold", "Diamond"] },
-        "referralCode": { "type": "string" },
-        "salesGenerated": { "type": "number" },
-        "commissionEarned": { "type": "number" }
-      }
-    },
-    "ReturnRequest": {
-      "title": "ReturnRequest",
-      "description": "Reverse logistics tracking for an artisanal artifact.",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "orderId": { "type": "string" },
-        "productId": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "received", "inspecting", "refunded", "rejected"] },
-        "warehouseId": { "type": "string" }
+        "paymentId": { "type": "string" },
+        "action": { "type": "string", "enum": ["INIT", "SUCCESS", "FAILURE", "REFUND", "RECONCILIATION"] },
+        "metadata": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
       }
     }
   },
@@ -64,8 +59,7 @@
   },
   "firestore": {
     "/products/{productId}": { "schema": "Product", "description": "Global catalog of luxury items." },
-    "/collections/{collectionId}": { "schema": "Collection", "description": "Seasonal curations." },
-    "/affiliates/{affiliateId}": { "schema": "Affiliate", "description": "Partner program management." },
-    "/returns/{returnId}": { "schema": "ReturnRequest", "description": "Reverse logistics terminal." }
+    "/payments/{paymentId}": { "schema": "Payment", "description": "Treasury settlement records." },
+    "/payments/{paymentId}/logs/{logId}": { "schema": "PaymentLog", "description": "Detailed transaction traces." }
   }
 }
