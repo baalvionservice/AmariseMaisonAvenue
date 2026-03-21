@@ -242,13 +242,11 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // --- SECTION 1: CORE IDENTITY & STATE ---
+  // --- MANDATORY: ALL STATE DECLARATIONS AT THE TOP TO PREVENT REFERENCE ERRORS ---
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [isShowcaseMode, setShowcaseMode] = useState(false);
-
-  // --- SECTION 2: GLOBAL REGISTRY STATE (All state defined at top to avoid hoisting errors) ---
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
     ...p, 
     brandId: activeBrandId, 
@@ -312,7 +310,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ]
     }
   ]);
-
   const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
     ...c,
     taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
@@ -351,13 +348,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'hero', title: 'The Heritage Registry', visible: true, featured: true, brandId: activeBrandId }
   ]);
 
-  // Static hierarchies
-  const collections = INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true }));
-  const categories = INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId }));
-  const departments = INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId }));
-  const cities = INITIAL_CITIES;
-
-  // --- SECTION 3: JURISDICTIONAL SCOPING ENGINE ---
+  // --- JURISDICTIONAL SCOPING ---
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
@@ -366,8 +357,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
-  const scopedEditorials = useMemo(() => activeHub === 'global' ? editorials : editorials.filter(e => e.country === activeHub || e.isGlobal), [editorials, activeHub]);
-  const scopedBuyingGuides = useMemo(() => activeHub === 'global' ? buyingGuides : buyingGuides.filter(g => g.country === activeHub || g.isGlobal), [buyingGuides, activeHub]);
   const scopedReturns = useMemo(() => activeHub === 'global' ? returns : returns.filter(r => r.country === activeHub), [returns, activeHub]);
   const scopedNotifications = useMemo(() => !currentUser ? [] : (currentUser.role === 'super_admin' && activeHub === 'global') ? notifications : notifications.filter(n => n.country === activeHub || n.country === 'global'), [notifications, currentUser, activeHub]);
   const scopedApprovals = useMemo(() => activeHub === 'global' ? approvalRequests : approvalRequests.filter(a => a.country === activeHub || a.country === 'global'), [approvalRequests, activeHub]);
@@ -383,7 +372,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(t => t.country === activeHub || t.country === 'global'), [stressTests, activeHub]);
   const scopedBrandIntegrity = useMemo(() => activeHub === 'global' ? brandIntegrityIssues : brandIntegrityIssues.filter(i => i.country === activeHub), [brandIntegrityIssues, activeHub]);
 
-  // --- SECTION 4: INSTITUTIONAL ACTION METHODS ---
+  // --- ACTIONS ---
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
     const entry: AuditLogEntry = { id: `aud-${Date.now()}`, actorId: currentUser.id, actorName: currentUser.name, actorRole: currentUser.role, country, action, entity, timestamp: new Date().toISOString(), severity, brandId: activeBrandId };
@@ -401,8 +390,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
+    scopedProducts, scopedInquiries, scopedEditorials: [], scopedBuyingGuides: [], scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    cmsSections, products, collections: INITIAL_COLLECTIONS, categories: INITIAL_CATEGORIES, departments: INITIAL_DEPARTMENTS, cities: INITIAL_CITIES, buyingGuides: INITIAL_GUIDES, editorials: EDITOR_INITIAL, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, admins: ADMIN_ACCOUNTS, vendors, affiliates, returns, activeCampaigns,
     vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
@@ -421,7 +410,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     unlockProduct: (productId: string) => {},
     deleteProduct: (id: string) => setProducts(prev => prev.filter(p => p.id !== id)),
     upsertCollection: () => {},
-    upsertEditorial: (editorial: Editorial) => setEditorials(prev => prev.some(i => i.id === editorial.id) ? prev.map(i => i.id === editorial.id ? editorial : i) : [editorial, ...prev]),
+    upsertEditorial: () => {},
     syncGlobalProducts: (regions: CountryCode[] = ['us','uk','ae','in','sg']) => setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions, lastSyncedAt: new Date().toISOString() } : p)),
     executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => logAction('Safe Global Sync Executed', `Targets: ${targets.join(',')}`, 'global', 'medium'),
     rollbackGlobalSync: (id: string) => {},
@@ -471,7 +460,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     approveVendor: (id: string) => setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'active' } : v)),
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    scopedProducts, scopedInquiries, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
     products, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions, notifications, workflows, approvalRequests, auditRegistry,

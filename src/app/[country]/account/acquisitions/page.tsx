@@ -8,19 +8,17 @@ import {
   Truck, 
   ChevronRight, 
   Search, 
-  Filter, 
   FileText,
-  History,
   CheckCircle2,
   Clock,
   ArrowRight,
   ShieldCheck,
   Zap,
-  Lock,
   Download,
-  Receipt
+  Receipt,
+  X
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -37,13 +35,11 @@ import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 
 /**
  * Acquisition Registry: High-Detail Transactional Ledger.
- * Features multi-stage fulfillment tracking and provenance detailing.
+ * Features multi-stage fulfillment tracking and financial detailing.
  */
 export default function AcquisitionsPage() {
   const { country } = useParams();
@@ -197,7 +193,6 @@ export default function AcquisitionsPage() {
                 <TableCell className="text-right pr-8">
                   <div className="flex justify-end space-x-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum" onClick={(e) => { e.stopPropagation(); setSelectedTxId(tx.id); }}><FileText className="w-3.5 h-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><History className="w-3.5 h-3.5" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -215,7 +210,7 @@ export default function AcquisitionsPage() {
       </Card>
 
       {/* Logistics Support CTA */}
-      <section className="bg-plum/5 py-12 px-10 border border-plum/10 rounded-sm flex flex-col md:row items-center justify-between gap-8">
+      <section className="bg-plum/5 py-12 px-10 border border-plum/10 rounded-sm flex flex-col md:flex-row items-center justify-between gap-8">
          <div className="flex items-center space-x-6">
             <div className="p-4 bg-white rounded-full text-plum"><Truck className="w-6 h-6" /></div>
             <div>
@@ -240,23 +235,3 @@ const defaultFulfillmentSteps = [
   { step: 'Institutional Dispatch', timestamp: '', completed: false },
   { step: 'White-Glove Delivery', timestamp: '', completed: false }
 ];
-
-function X(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
-}
