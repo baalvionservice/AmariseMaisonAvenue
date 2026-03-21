@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { 
   DollarSign, 
   ArrowUpRight, 
+  ArrowRight,
   Activity, 
   Zap, 
   ChevronRight, 
