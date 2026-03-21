@@ -29,7 +29,7 @@ import { COUNTRIES } from '@/lib/mock-data';
 import { useParams } from 'next/navigation';
 
 /**
- * AdminTopBar: Global Command Matrix
+ * AdminTopBar: Global Command Matrix.
  * Re-architected with a strict 3-track grid to permanently prevent visual overlaps.
  * Uses truncate and min-w-0 to ensure horizontal stability.
  */
@@ -59,7 +59,7 @@ export function AdminTopBar() {
         </div>
         <Link href={`/${countryCode}`} className="flex items-center space-x-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white/30 hover:text-white transition-colors shrink-0">
            <ExternalLink className="w-3.5 h-3.5" />
-           <span className="hidden xl:inline">Store</span>
+           <span className="hidden xl:inline">Storefront</span>
         </Link>
       </div>
 
