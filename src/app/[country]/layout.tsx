@@ -44,7 +44,7 @@ export default function CountryLayout({
               <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">Customer Care</h4>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li><Link href={`/${countryCode}/contact`} className="hover:text-black transition-colors">Contact Us</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">My Account</Link></li>
+                <li><Link href={`/${countryCode}/account`} className="hover:text-black transition-colors">My Account</Link></li>
                 <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Shipping</Link></li>
                 <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Returns</Link></li>
                 <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">FAQ</Link></li>
@@ -82,12 +82,12 @@ export default function CountryLayout({
             <div className="space-y-8">
               <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">Shop With Us</h4>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
-                <li><Link href="#" className="hover:text-black transition-colors">Authenticity Guarantee</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Condition Descriptions</Link></li>
+                <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Authenticity Guarantee</Link></li>
+                <li><Link href={`/${countryCode}/customer-service`} className="hover:text-black transition-colors">Condition Descriptions</Link></li>
                 <li><Link href={`/${countryCode}/services/concierge`} className="hover:text-black transition-colors">In-Home Services</Link></li>
                 <li><Link href={`/${countryCode}/services/concierge`} className="hover:text-black transition-colors">Concierge Services</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">Catalog</Link></li>
-                <li><Link href="#" className="hover:text-black transition-colors">MadAve Live</Link></li>
+                <li><Link href={`/${countryCode}/category/hermes`} className="hover:text-black transition-colors">Catalog</Link></li>
+                <li><Link href={`/${countryCode}/account/live`} className="hover:text-black transition-colors">MadAve Live</Link></li>
               </ul>
             </div>
 
@@ -122,7 +122,7 @@ export default function CountryLayout({
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 border-t border-gray-100 flex flex-col md:row items-center justify-between gap-6">
+          <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <span className="font-headline text-xl font-bold tracking-tight">MC <span className="text-[8px] font-bold uppercase tracking-widest opacity-60 ml-2">AMARISÉ MAISON AVENUE</span></span>
               <p className="text-[10px] text-gray-400 font-medium tracking-wide">
@@ -130,8 +130,8 @@ export default function CountryLayout({
               </p>
             </div>
             <div className="flex space-x-8 text-[10px] font-medium tracking-widest">
-              <Link href="#" className="text-gray-600 hover:text-black transition-colors underline underline-offset-4 decoration-gray-200">Our Privacy Policy</Link>
-              <Link href="#" className="text-gray-600 hover:text-black transition-colors underline underline-offset-4 decoration-gray-200">Terms & Conditions</Link>
+              <Link href={`/${countryCode}/customer-service`} className="text-gray-600 hover:text-black transition-colors underline underline-offset-4 decoration-gray-200">Our Privacy Policy</Link>
+              <Link href={`/${countryCode}/customer-service`} className="text-gray-600 hover:text-black transition-colors underline underline-offset-4 decoration-gray-200">Terms & Conditions</Link>
             </div>
           </div>
 

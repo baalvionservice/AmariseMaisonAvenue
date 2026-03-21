@@ -251,13 +251,13 @@ export default function CategoryPage() {
                   </div>
                 )}
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="ACCESSORIES" hasSub isOpen={openSections['accessories']} onClick={() => toggleSection('accessories']} />
+                <SidebarNavItem label="ACCESSORIES" hasSub isOpen={openSections['accessories']} onClick={() => toggleSection('accessories')} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry']} />
+                <SidebarNavItem label="JEWELRY" hasSub isOpen={openSections['jewelry']} onClick={() => toggleSection('jewelry')} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="SHOES" hasSub isOpen={openSections['shoes']} onClick={() => toggleSection('shoes']} />
+                <SidebarNavItem label="SHOES" hasSub isOpen={openSections['shoes']} onClick={() => toggleSection('shoes')} />
                 <div className="border-b border-gray-50 py-1" />
-                <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations']} />
+                <SidebarNavItem label="CURATIONS" hasSub isOpen={openSections['curations']} onClick={() => toggleSection('curations')} />
               </nav>
             </div>
           </aside>
