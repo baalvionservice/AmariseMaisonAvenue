@@ -1,6 +1,7 @@
+
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { 
   Package, 
@@ -12,7 +13,12 @@ import {
   History,
   CheckCircle2,
   Clock,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Lock,
+  Download,
+  Receipt
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,14 +32,113 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
+/**
+ * Acquisition Registry: High-Detail Transactional Ledger.
+ * Features multi-stage fulfillment tracking and provenance detailing.
+ */
 export default function AcquisitionsPage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const { transactions } = useAppStore();
+  const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
+
+  const selectedTx = transactions.find(t => t.id === selectedTxId);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 animate-fade-in">
+      {/* Detail View Modal */}
+      <Dialog open={!!selectedTxId} onOpenChange={() => setSelectedTxId(null)}>
+        <DialogContent className="max-w-4xl bg-white border-none shadow-2xl rounded-none p-0 overflow-hidden">
+          {selectedTx && (
+            <div className="flex flex-col md:flex-row h-full">
+              {/* Sidebar Info */}
+              <div className="md:w-1/3 bg-ivory p-10 border-r border-border space-y-10">
+                <div className="space-y-4">
+                  <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-plum/20 text-plum px-3 py-1">
+                    {selectedTx.status}
+                  </Badge>
+                  <h3 className="text-2xl font-headline font-bold italic leading-tight text-gray-900">{selectedTx.artifactName || 'Artifact Acquisition'}</h3>
+                  <p className="text-[9px] text-gray-400 font-mono uppercase tracking-widest">REF: {selectedTx.id}</p>
+                </div>
+
+                <div className="space-y-6">
+                   <div className="flex items-center space-x-3 text-secondary">
+                      <ShieldCheck className="w-5 h-5" />
+                      <span className="text-[9px] font-bold uppercase tracking-widest">Provenance Verified</span>
+                   </div>
+                   <div className="flex items-center space-x-3 text-secondary">
+                      <Zap className="w-5 h-5" />
+                      <span className="text-[9px] font-bold uppercase tracking-widest">Heritage Compliance OK</span>
+                   </div>
+                </div>
+
+                <div className="pt-8 border-t border-border space-y-4">
+                   <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">FINANCIAL LEDGER</p>
+                   <div className="space-y-2">
+                      <div className="flex justify-between text-xs font-light italic">
+                         <span>Base Price</span>
+                         <span>${(selectedTx.netAmount || selectedTx.amount * 0.92).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-xs font-light italic">
+                         <span>Regional Tax</span>
+                         <span>${(selectedTx.taxAmount || selectedTx.amount * 0.08).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-bold pt-2 border-t border-border">
+                         <span>Total Yield</span>
+                         <span>${selectedTx.amount.toLocaleString()}</span>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              {/* Main Content: Tracking */}
+              <div className="flex-1 p-12 space-y-12">
+                 <div className="flex justify-between items-center">
+                    <h4 className="text-sm font-bold uppercase tracking-[0.4em]">Fulfillment Protocol</h4>
+                    <Button variant="ghost" size="icon" onClick={() => setSelectedTxId(null)}><X className="w-4 h-4" /></Button>
+                 </div>
+
+                 <div className="space-y-10">
+                    {(selectedTx.fulfillmentSteps || defaultFulfillmentSteps).map((step, idx) => (
+                      <div key={idx} className="flex items-start space-x-6 relative">
+                         {idx < 4 && <div className={cn("absolute left-2.5 top-6 w-px h-10 bg-border", step.completed && "bg-plum")} />}
+                         <div className={cn(
+                           "w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-1000",
+                           step.completed ? "bg-plum border-plum text-white shadow-lg" : "bg-white border-border text-gray-200"
+                         )}>
+                            {step.completed ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                         </div>
+                         <div className="space-y-1">
+                            <p className={cn("text-xs font-bold uppercase tracking-tight", step.completed ? "text-gray-900" : "text-gray-300")}>{step.step}</p>
+                            <p className="text-[9px] text-gray-400 font-mono uppercase">{step.timestamp ? new Date(step.timestamp).toLocaleString() : 'PENDING'}</p>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+
+                 <div className="pt-12 border-t border-border flex justify-between gap-4">
+                    <Button className="flex-1 h-12 bg-black text-white hover:bg-plum rounded-none text-[9px] font-bold uppercase tracking-widest">
+                       <Download className="w-3.5 h-3.5 mr-2" /> DOWNLOAD INVOICE
+                    </Button>
+                    <Button variant="outline" className="flex-1 h-12 border-border rounded-none text-[9px] font-bold uppercase tracking-widest">
+                       <Receipt className="w-3.5 h-3.5 mr-2" /> REQUEST CERTIFICATE
+                    </Button>
+                 </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <header className="flex justify-between items-end">
         <div className="space-y-2">
           <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center space-x-2">
@@ -57,25 +162,30 @@ export default function AcquisitionsPage() {
           <TableHeader className="bg-ivory/50">
             <TableRow>
               <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
-              <TableHead className="text-[9px] uppercase font-bold">Region</TableHead>
-              <TableHead className="text-[9px] uppercase font-bold">Value</TableHead>
-              <TableHead className="text-[9px] uppercase font-bold text-center">Status</TableHead>
+              <TableHead className="text-[9px] uppercase font-bold">Provenance</TableHead>
+              <TableHead className="text-[9px] uppercase font-bold">Acquisition Value</TableHead>
+              <TableHead className="text-[9px] uppercase font-bold text-center">Protocol Status</TableHead>
               <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.map(tx => (
-              <TableRow key={tx.id} className="hover:bg-ivory/30 transition-colors">
+              <TableRow key={tx.id} className="hover:bg-ivory/30 transition-colors group cursor-pointer" onClick={() => setSelectedTxId(tx.id)}>
                 <TableCell className="pl-8">
                   <div className="flex items-center space-x-4">
                     <div className="w-10 h-12 bg-muted rounded-sm flex items-center justify-center text-[6px] font-bold text-gray-400 uppercase border border-border">Asset</div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold uppercase tracking-tight text-gray-900">Maison Heritage Transfer</span>
+                      <span className="text-xs font-bold uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{tx.artifactName || 'Heritage Transfer'}</span>
                       <span className="text-[8px] text-gray-400 uppercase font-mono">ID: {tx.id}</span>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell><span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{tx.country.toUpperCase()} Hub</span></TableCell>
+                <TableCell>
+                   <div className="flex items-center space-x-2">
+                      <ShieldCheck className={cn("w-3.5 h-3.5", tx.isProvenanceCertified ? "text-secondary" : "text-gray-200")} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{tx.country.toUpperCase()} Hub</span>
+                   </div>
+                </TableCell>
                 <TableCell><span className="text-sm font-bold text-gray-900">${tx.amount.toLocaleString()}</span></TableCell>
                 <TableCell className="text-center">
                   <Badge variant="outline" className={cn("text-[8px] uppercase tracking-tighter border-none", 
@@ -86,7 +196,7 @@ export default function AcquisitionsPage() {
                 </TableCell>
                 <TableCell className="text-right pr-8">
                   <div className="flex justify-end space-x-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><FileText className="w-3.5 h-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum" onClick={(e) => { e.stopPropagation(); setSelectedTxId(tx.id); }}><FileText className="w-3.5 h-3.5" /></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-plum"><History className="w-3.5 h-3.5" /></Button>
                   </div>
                 </TableCell>
@@ -123,5 +233,30 @@ export default function AcquisitionsPage() {
   );
 }
 
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
+const defaultFulfillmentSteps = [
+  { step: 'Registry Confirmed', timestamp: new Date().toISOString(), completed: true },
+  { step: 'Atelier Preparation', timestamp: '', completed: false },
+  { step: 'Heritage Audit', timestamp: '', completed: false },
+  { step: 'Institutional Dispatch', timestamp: '', completed: false },
+  { step: 'White-Glove Delivery', timestamp: '', completed: false }
+];
+
+function X(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
+}

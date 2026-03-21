@@ -600,7 +600,7 @@ export interface VipClient {
   id: string;
   name: string;
   email: string;
-  tier: 'Silver' | 'Gold' | 'Diamond';
+  tier: 'Standard' | 'Silver' | 'Gold' | 'Diamond';
   loyaltyPoints: number;
   totalSpend: number;
   lastPurchase?: string;
@@ -614,7 +614,7 @@ export interface SupportTicket {
   id: string;
   customerId: string;
   customerName: string;
-  customerTier: 'Silver' | 'Gold' | 'Diamond' | 'Guest';
+  customerTier: 'Standard' | 'Silver' | 'Gold' | 'Diamond' | 'Guest';
   subject: string;
   status: 'open' | 'pending' | 'resolved' | 'escalated';
   priority: 'low' | 'medium' | 'high' | 'urgent';
@@ -697,6 +697,8 @@ export interface Invoice {
 
 export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed';
 
+export type FulfillmentStep = 'Registry Confirmed' | 'Atelier Preparation' | 'Heritage Audit' | 'Institutional Dispatch' | 'White-Glove Delivery';
+
 export interface Transaction {
   id: string;
   country: string;
@@ -711,6 +713,15 @@ export interface Transaction {
   brandId: string;
   taxAmount?: number;
   netAmount?: number;
+  // Detail View Extensions
+  fulfillmentSteps?: {
+    step: FulfillmentStep;
+    timestamp: string;
+    completed: boolean;
+  }[];
+  artifactName?: string;
+  artifactSku?: string;
+  isProvenanceCertified?: boolean;
 }
 
 export type SyncCategory = 'products' | 'seo' | 'roles' | 'config';

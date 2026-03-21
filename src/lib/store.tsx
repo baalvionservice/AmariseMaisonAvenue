@@ -242,18 +242,13 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // --- SECTION 1: CORE CONFIGURATION & IDENTITY ---
+  // --- SECTION 1: CORE IDENTITY & STATE ---
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
-  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
-    ...c,
-    taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
-    taxRate: c.code === 'uk' ? 20 : c.code === 'ae' ? 5 : c.code === 'in' ? 18 : c.code === 'sg' ? 9 : 8
-  })));
-  const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
+  const [isShowcaseMode, setShowcaseMode] = useState(false);
 
-  // --- SECTION 2: GLOBAL REGISTRY STATE (The "What") ---
+  // --- SECTION 2: GLOBAL REGISTRY STATE (All state defined at top to avoid hoisting errors) ---
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
     ...p, 
     brandId: activeBrandId, 
@@ -283,14 +278,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [qaTests, setQaTests] = useState<QATestCase[]>([]);
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
-  
-  // Static/Semi-Static data
-  const [collections] = useState<Collection[]>(INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true })));
-  const [categories] = useState<Category[]>(INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId })));
-  const [departments] = useState<Department[]>(INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId })));
-  const [cities] = useState<City[]>(INITIAL_CITIES);
+  const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
+  const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
+  const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
+  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
+  const [indexingLogs, setIndexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
+  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
+  const [transactions, setTransactions] = useState<Transaction[]>([
+    {
+      id: 'tx-1001',
+      country: 'us',
+      type: 'Sale',
+      clientName: 'Julian Vandervilt',
+      amount: 31741.89,
+      currency: 'USD',
+      status: 'Settled',
+      timestamp: new Date().toISOString(),
+      invoiceId: 'inv-1001',
+      brandId: activeBrandId,
+      taxAmount: 2539.35,
+      netAmount: 29202.54,
+      artifactName: 'Hermès HSS Birkin 25 White/Etoupe',
+      artifactSku: 'prod-11',
+      isProvenanceCertified: true,
+      fulfillmentSteps: [
+        { step: 'Registry Confirmed', timestamp: '2024-03-10T10:00:00Z', completed: true },
+        { step: 'Atelier Preparation', timestamp: '2024-03-11T14:30:00Z', completed: true },
+        { step: 'Heritage Audit', timestamp: '2024-03-12T09:15:00Z', completed: true },
+        { step: 'Institutional Dispatch', timestamp: '2024-03-13T16:00:00Z', completed: true },
+        { step: 'White-Glove Delivery', timestamp: '2024-03-15T11:00:00Z', completed: true }
+      ]
+    }
+  ]);
+
+  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
+    ...c,
+    taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
+    taxRate: c.code === 'uk' ? 20 : c.code === 'ae' ? 5 : c.code === 'in' ? 18 : c.code === 'sg' ? 9 : 8
+  })));
+  const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
   const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS.map(c => ({ ...c, brandId: activeBrandId })));
   const [messagingTemplates, setMessagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
@@ -307,13 +335,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
-  const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
-  const [apiLogs] = useState<ApiLog[]>(API_LOGS);
-  const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
-  const [indexingLogs] = useState<IndexingLog[]>(INDEXING_LOGS);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
     theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
     seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
@@ -324,14 +345,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     isGuideMode: false,
     adminViewMode: 'advanced'
   });
-  const [isShowcaseMode, setShowcaseMode] = useState(false);
-  const [activeVip, setActiveVip] = useState<VipClient | null>(null);
+  const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [cmsSections] = useState<CMSSection[]>([
     { id: 'hero', title: 'The Heritage Registry', visible: true, featured: true, brandId: activeBrandId }
   ]);
 
-  // --- SECTION 3: JURISDICTIONAL SCOPING ENGINE (The "Where") ---
+  // Static hierarchies
+  const collections = INITIAL_COLLECTIONS.map(c => ({ ...c, brandId: activeBrandId, isGlobal: true }));
+  const categories = INITIAL_CATEGORIES.map(c => ({ ...c, brandId: activeBrandId }));
+  const departments = INITIAL_DEPARTMENTS.map(d => ({ ...d, brandId: activeBrandId }));
+  const cities = INITIAL_CITIES;
+
+  // --- SECTION 3: JURISDICTIONAL SCOPING ENGINE ---
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
@@ -367,16 +393,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const upsertProduct = (p: Product, changeSummary: string = 'Institutional update') => {
     setProducts(prev => {
       const idx = prev.findIndex(item => item.id === p.id);
-      if (idx > -1) {
-        return prev.map(item => item.id === p.id ? p : item);
-      }
+      if (idx > -1) return prev.map(item => item.id === p.id ? p : item);
       return [p, ...prev];
     });
     logAction('Registry Update', p.name, (activeHub as any) || 'global');
-  };
-
-  const executeSafeSync = (categories: SyncCategory[], targets: CountryCode[]) => {
-    logAction('Safe Global Sync Executed', `Targets: ${targets.join(',')}`, 'global', 'medium');
   };
 
   const value = useMemo(() => ({
@@ -403,7 +423,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertCollection: () => {},
     upsertEditorial: (editorial: Editorial) => setEditorials(prev => prev.some(i => i.id === editorial.id) ? prev.map(i => i.id === editorial.id ? editorial : i) : [editorial, ...prev]),
     syncGlobalProducts: (regions: CountryCode[] = ['us','uk','ae','in','sg']) => setProducts(prev => prev.map(p => p.scope === 'global' ? { ...p, regions, lastSyncedAt: new Date().toISOString() } : p)),
-    executeSafeSync,
+    executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => logAction('Safe Global Sync Executed', `Targets: ${targets.join(',')}`, 'global', 'medium'),
     rollbackGlobalSync: (id: string) => {},
     upsertPrivateInquiry: (inquiry: PrivateInquiry) => setPrivateInquiries(prev => [inquiry, ...prev]),
     updateInquiryStatus: (id: string, s: PrivateInquiry['status']) => setPrivateInquiries(prev => prev.map(i => i.id === id ? { ...i, status: s } : i)),
@@ -412,7 +432,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     markNotificationRead: (id: string) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n)),
     scheduleWorkflow: (name: string, freq: WorkflowTask['frequency'], country = 'global') => setWorkflows(prev => [{ id: `w-${Date.now()}`, taskName: name, frequency: freq, country, status: 'pending', nextRun: new Date().toISOString() }, ...prev]),
     runWorkflowTask: (id: string) => {},
-    runWorkflowSequence: (name: string, country = 'global') => {},
+    runWorkflowSequence: (workflowName: string, country = 'global') => {},
     submitApproval: (type: ApprovalRequest['contentType'], id: string, country = 'global') => {},
     handleApprovalAction: (id: string, a: boolean) => {},
     toggleEmergencyMode: () => setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode })),
@@ -452,7 +472,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
+    products, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions, notifications, workflows, approvalRequests, auditRegistry,
     cart, wishlist, socialMetrics, vendors, affiliates, returns, activeCampaigns,
