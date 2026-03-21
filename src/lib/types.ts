@@ -596,6 +596,25 @@ export interface GlobalSettings {
   adminViewMode: AdminViewMode;
 }
 
+export interface WalletTransaction {
+  id: string;
+  type: 'Deposit' | 'Acquisition' | 'Service Fee' | 'Refund';
+  amount: number;
+  description: string;
+  timestamp: string;
+  status: 'Settled' | 'Pending';
+}
+
+export interface LiveRequest {
+  id: string;
+  productId: string;
+  productName: string;
+  status: 'pending' | 'scheduled' | 'active' | 'completed';
+  scheduledAt?: string;
+  requestedAt: string;
+  fee: number;
+}
+
 export interface VipClient {
   id: string;
   name: string;
@@ -608,6 +627,10 @@ export interface VipClient {
   subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
   brandId: string;
   status?: 'pending' | 'verified' | 'rejected';
+  // Wallet Extension
+  walletBalance: number;
+  walletHistory: WalletTransaction[];
+  liveRequests: LiveRequest[];
 }
 
 export interface SupportTicket {

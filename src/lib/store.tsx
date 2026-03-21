@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -57,7 +56,9 @@ import {
   SyncCategory,
   StressTest,
   AdminViewMode,
-  BrandIntegrityIssue
+  BrandIntegrityIssue,
+  WalletTransaction,
+  LiveRequest
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -216,6 +217,11 @@ interface AppContextType {
 
   resolveBrandIntegrity: (id: string) => void;
 
+  // Wallet & Live Actions
+  topUpWallet: (amount: number) => void;
+  deductFromWallet: (amount: number, description: string) => boolean;
+  requestLiveSession: (productId: string, productName: string) => boolean;
+
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   toggleWishlist: (product: Product) => void;
@@ -242,7 +248,6 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // --- MANDATORY: ALL STATE DECLARATIONS AT THE TOP TO PREVENT REFERENCE ERRORS ---
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
@@ -268,7 +273,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
-  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId, status: 'verified' })));
+  
+  // Wallet and VIP State
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ 
+    ...v, 
+    brandId: activeBrandId, 
+    status: 'verified',
+    walletBalance: 12500.50,
+    walletHistory: [
+      { id: 'wt-1', type: 'Deposit', amount: 15000, description: 'Initial Treasury Funding', timestamp: '2024-03-01T10:00:00Z', status: 'Settled' },
+      { id: 'wt-2', type: 'Service Fee', amount: -250, description: 'Live Viewing: Birkin 25', timestamp: '2024-03-10T14:30:00Z', status: 'Settled' },
+      { id: 'wt-3', type: 'Acquisition', amount: -2249.50, description: 'Payment for Silk Scarf Series', timestamp: '2024-03-12T09:15:00Z', status: 'Settled' }
+    ],
+    liveRequests: [
+      { id: 'lr-1', productId: 'prod-11', productName: 'Hermès HSS Birkin 25', status: 'completed', scheduledAt: '2024-03-10T14:00:00Z', requestedAt: '2024-03-09T10:00:00Z', fee: 250 }
+    ]
+  })));
+
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
   const [workflows, setWorkflows] = useState<WorkflowTask[]>([]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([]);
@@ -388,6 +409,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     logAction('Registry Update', p.name, (activeHub as any) || 'global');
   };
 
+  const topUpWallet = (amount: number) => {
+    if (!activeVip) return;
+    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Deposit', amount, description: 'Maison Wallet Top-Up', timestamp: new Date().toISOString(), status: 'Settled' };
+    setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance + amount, walletHistory: [newTx, ...v.walletHistory] } : v));
+    setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance + amount, walletHistory: [newTx, ...prev.walletHistory] } : null);
+    logAction('Wallet Top-Up', `$${amount}`, 'global', 'low');
+  };
+
+  const deductFromWallet = (amount: number, description: string): boolean => {
+    if (!activeVip || activeVip.walletBalance < amount) return false;
+    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Service Fee', amount: -amount, description, timestamp: new Date().toISOString(), status: 'Settled' };
+    setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance - amount, walletHistory: [newTx, ...v.walletHistory] } : v));
+    setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance - amount, walletHistory: [newTx, ...prev.walletHistory] } : null);
+    return true;
+  };
+
+  const requestLiveSession = (productId: string, productName: string): boolean => {
+    const fee = 250;
+    const success = deductFromWallet(fee, `Live Request: ${productName}`);
+    if (success && activeVip) {
+      const newRequest: LiveRequest = { id: `lr-${Date.now()}`, productId, productName, status: 'pending', requestedAt: new Date().toISOString(), fee };
+      setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, liveRequests: [newRequest, ...v.liveRequests] } : v));
+      setActiveVip(prev => prev ? { ...prev, liveRequests: [newRequest, ...prev.liveRequests] } : null);
+      logAction('Live Viewing Request', productName, 'global', 'low');
+      return true;
+    }
+    return false;
+  };
+
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials: [], scopedBuyingGuides: [], scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
@@ -437,6 +487,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertAISuggestion: (suggestion: AISuggestion) => setAiSuggestions(prev => prev.some(i => i.id === suggestion.id) ? prev.map(i => i.id === suggestion.id ? suggestion : i) : [suggestion, ...prev]),
     updateSuggestionStatus: (id: string, s: AISuggestion['status']) => setAiSuggestions(prev => prev.map(i => i.id === id ? { ...i, status: s } : i)),
     resolveBrandIntegrity: (id: string) => setBrandIntegrityIssues(prev => prev.map(i => i.id === id ? { ...i, status: 'fixed' } : i)),
+    topUpWallet,
+    deductFromWallet,
+    requestLiveSession,
     addToCart: (p: Product) => setCart(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? { ...i, quantity: i.quantity + 1 } : i) : [...prev, { ...p, quantity: 1 }]),
     removeFromCart: (id: string) => setCart(prev => prev.filter(i => i.id !== id)),
     toggleWishlist: (p: Product) => setWishlist(prev => prev.some(i => i.id === p.id) ? prev.filter(i => i.id !== p.id) : [...prev, p]),

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -16,7 +15,9 @@ import {
   Sparkles,
   Search,
   LayoutDashboard,
-  Shield
+  Shield,
+  Wallet,
+  Video
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ import { cn } from '@/lib/utils';
 /**
  * Connoisseur Dashboard: Persona-Aware Environment.
  * Routes to "Private Salon" (Premium) or "Institutional Registry" (Normal) view logic.
+ * Integrated with Maison Treasury & Live Atelier.
  */
 export default function ConnoisseurDashboard() {
   const { country } = useParams();
@@ -45,20 +47,21 @@ export default function ConnoisseurDashboard() {
       nextTierAt: 15000,
       activeAcquisitions: transactions.filter(t => t.status !== 'Closed').length,
       curatorialSignals: privateInquiries.filter(i => i.status === 'closing').length,
+      walletBalance: activeVip?.walletBalance || 0
     };
   }, [transactions, privateInquiries, activeVip]);
 
   if (isPremium) {
-    return <PremiumSalonDashboard countryCode={countryCode} stats={stats} transactions={transactions} currentUser={currentUser} />;
+    return <PremiumSalonDashboard countryCode={countryCode} stats={stats} transactions={transactions} currentUser={currentUser} activeVip={activeVip} />;
   }
 
-  return <NormalRegistryDashboard countryCode={countryCode} stats={stats} transactions={transactions} currentUser={currentUser} />;
+  return <NormalRegistryDashboard countryCode={countryCode} stats={stats} transactions={transactions} currentUser={currentUser} activeVip={activeVip} />;
 }
 
 /**
  * Design B: The Private Salon (Premium)
  */
-function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser }: any) {
+function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, activeVip }: any) {
   return (
     <div className="space-y-12 animate-fade-in">
       <header className="flex justify-between items-end">
@@ -69,13 +72,19 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser }
         </div>
         <div className="flex items-center space-x-4">
            <Badge variant="outline" className="bg-plum/5 text-plum border-plum/20 h-10 px-6 rounded-none text-[10px] font-bold uppercase tracking-widest">
-             Diamond Connoisseur
+             {activeVip?.tier} Connoisseur
            </Badge>
         </div>
       </header>
 
       {/* Overview Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <DashboardCard label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-5 h-5 text-gold" />}>
+           <Link href={`/${countryCode}/account/wallet`}>
+              <Button variant="ghost" size="sm" className="p-0 h-auto text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold">MANAGE FUNDS <ArrowRight className="ml-2 w-3 h-3" /></Button>
+           </Link>
+        </DashboardCard>
+
         <DashboardCard label="Resonance Score" value={stats.loyaltyPoints.toLocaleString()} icon={<Star className="w-5 h-5 text-gold fill-gold" />}>
            <div className="space-y-2">
               <div className="flex justify-between text-[9px] font-bold uppercase">
@@ -84,10 +93,6 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser }
               </div>
               <Progress value={(stats.loyaltyPoints / stats.nextTierAt) * 100} className="h-1 bg-ivory" />
            </div>
-        </DashboardCard>
-
-        <DashboardCard label="Open Acquisitions" value={stats.activeAcquisitions} icon={<Package className="w-5 h-5 text-plum" />}>
-           <p className="text-[10px] text-gray-400 italic">Tracking artifacts in transit.</p>
         </DashboardCard>
 
         <DashboardCard label="Curator Signals" value={stats.curatorialSignals} icon={<Zap className="w-5 h-5 text-plum" />}>
@@ -123,16 +128,18 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser }
 
         <aside className="lg:col-span-4 space-y-8">
            <Card className="bg-black text-white p-10 space-y-8 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Crown className="w-32 h-32" /></div>
+              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Video className="w-32 h-32" /></div>
               <div className="space-y-4">
-                 <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold">VIP Insight</h4>
+                 <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold">Live Atelier</h4>
                  <p className="text-sm font-light italic leading-relaxed opacity-70">
-                   "Based on your recent interest in high-complication horology, the 1924 Heritage Complications have been added to your private preview list."
+                   "Request a private live viewing of any registry artifact. Experience artisanal detail through our high-fidelity curatorial lens."
                  </p>
               </div>
-              <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12 hover:bg-gold hover:text-black">
-                 ACCESS PREVIEW
-              </Button>
+              <Link href={`/${countryCode}/account/live`}>
+                <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12 hover:bg-gold hover:text-black">
+                   REQUEST LIVE VIEWING
+                </Button>
+              </Link>
            </Card>
         </aside>
       </div>
@@ -143,7 +150,7 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser }
 /**
  * Design A: The Institutional Registry (Normal)
  */
-function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser }: any) {
+function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser, activeVip }: any) {
   return (
     <div className="space-y-12 animate-fade-in">
       <header className="flex justify-between items-end border-b border-border pb-10">
@@ -155,15 +162,21 @@ function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser
           <h1 className="text-4xl font-headline font-bold text-gray-900 uppercase tracking-tight">Account Overview</h1>
           <p className="text-sm text-gray-500 font-light italic">Managing {currentUser?.name}'s collection registry.</p>
         </div>
-        <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 h-9 px-4 rounded-none text-[9px] font-bold uppercase tracking-widest">
-          Standard Collector
-        </Badge>
+        <div className="flex items-center space-x-4">
+           <div className="text-right mr-4">
+              <p className="text-[8px] font-bold uppercase text-gray-400">Balance</p>
+              <p className="text-sm font-bold text-gray-900">${stats.walletBalance.toLocaleString()}</p>
+           </div>
+           <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 h-9 px-4 rounded-none text-[9px] font-bold uppercase tracking-widest">
+             Standard Collector
+           </Badge>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         <RegistryStat label="Active Orders" value={stats.activeAcquisitions} icon={<Package className="w-4 h-4" />} />
+         <RegistryStat label="Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-4 h-4" />} />
          <RegistryStat label="Registry Points" value={stats.loyaltyPoints} icon={<Star className="w-4 h-4" />} />
-         <RegistryStat label="Open Tickets" value={0} icon={<MessageSquare className="w-4 h-4" />} />
+         <RegistryStat label="Live Requests" value={activeVip?.liveRequests?.length || 0} icon={<Video className="w-4 h-4" />} />
          <RegistryStat label="Compliance" value="Verified" icon={<ShieldCheck className="w-4 h-4" />} color="text-green-600" />
       </div>
 

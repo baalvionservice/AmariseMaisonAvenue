@@ -14,7 +14,9 @@ import {
   Crown,
   LayoutDashboard,
   LifeBuoy,
-  LogOut
+  LogOut,
+  Wallet,
+  Video
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -27,11 +29,13 @@ export default function AccountLayout({
   const pathname = usePathname();
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
-  const { currentUser } = useAppStore();
+  const { currentUser, activeVip } = useAppStore();
 
   const menuItems = [
     { icon: <LayoutDashboard />, label: "Dashboard", href: `/${countryCode}/account` },
+    { icon: <Wallet />, label: "Treasury", href: `/${countryCode}/account/wallet` },
     { icon: <ShoppingBag />, label: "Acquisitions", href: `/${countryCode}/account/acquisitions` },
+    { icon: <Video />, label: "Live Ateliers", href: `/${countryCode}/account/live` },
     { icon: <Heart />, label: "Private Archive", href: `/${countryCode}/account/wishlist` },
     { icon: <MessageSquare />, label: "Curation", href: `/${countryCode}/account/curation` },
     { icon: <LifeBuoy />, label: "Concierge", href: `/${countryCode}/account/concierge` },
@@ -51,7 +55,7 @@ export default function AccountLayout({
               <span className="text-sm font-bold uppercase tracking-tight text-gray-900">{currentUser?.name}</span>
               <div className="flex items-center space-x-2">
                 <Crown className="w-3 h-3 text-gold" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-plum">Diamond Member</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-plum">{activeVip?.tier || 'Member'}</span>
               </div>
             </div>
           </div>
