@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   Clock,
   ArrowRight,
-  Database
+  Database,
+  LayoutDashboard
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
@@ -183,7 +184,7 @@ export default function AdminDashboard() {
                 key={hub.id} 
                 className={cn(
                   "bg-[#111113] border-white/5 rounded-none p-6 space-y-6 hover:border-blue-500/40 transition-all group cursor-pointer",
-                  adminJurisdiction === hub.id && "border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]"
+                  adminJurisdiction === hub.id ? "border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]" : "border-white/5"
                 )}
                 onClick={() => setAdminJurisdiction(hub.id as any)}
               >

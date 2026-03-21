@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { 
   Plus, 
   Globe, 
@@ -38,6 +39,9 @@ export function AdminTopBar() {
     <header className="h-20 bg-[#0A0A0B]/95 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 z-40 shrink-0 backdrop-blur-xl">
       {/* 1. DISCOVERY GROUP (Left) */}
       <div className="flex items-center space-x-10 min-w-[300px]">
+        <Link href="/admin" className="p-2 hover:bg-white/5 rounded-none transition-colors border border-white/5">
+          <LayoutDashboard className="w-5 h-5 text-blue-500" />
+        </Link>
         <div className="relative w-64 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
           <input 
