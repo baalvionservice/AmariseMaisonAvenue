@@ -5,6 +5,17 @@ export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
 export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
 
+export interface PaymentPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: 'monthly' | 'yearly';
+  features: string[];
+  tier: 'Silver' | 'Gold' | 'Diamond';
+  isPopular?: boolean;
+}
+
 export interface Payment {
   id: string;
   tenantId: string;
@@ -34,7 +45,7 @@ export interface Subscription {
   id: string;
   tenantId: string;
   userId: string;
-  planId: 'silver' | 'gold' | 'diamond' | 'none';
+  planId: string;
   planName: string;
   status: SubscriptionStatus;
   currentPeriodEnd: string;
@@ -43,7 +54,7 @@ export interface Subscription {
   currency: string;
 }
 
-export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed';
+export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed' | 'Refunded';
 
 export type FulfillmentStep = 'Registry Confirmed' | 'Atelier Preparation' | 'Heritage Audit' | 'Institutional Dispatch' | 'White-Glove Delivery';
 
@@ -70,6 +81,8 @@ export interface Transaction {
   artifactName?: string;
   artifactSku?: string;
   isProvenanceCertified?: boolean;
+  refundReason?: string;
+  refundedAt?: string;
 }
 
 export interface Product {
@@ -293,11 +306,13 @@ export interface Invoice {
   taxRate: number;
   complianceCertified: boolean;
   brandId: string;
+  gateway?: PaymentGateway;
 }
 
 export interface PrivateInquiry {
   id: string;
   productId?: string;
+  serviceId?: string;
   customerName: string;
   email: string;
   country: string;
@@ -325,6 +340,7 @@ export interface SalesScript {
   stage: string;
   template: string;
   brandId: string;
+  triggerKeywords?: string[];
 }
 
 export interface AutomationRule {
@@ -384,6 +400,7 @@ export interface QATestCase {
   logs: any[];
   country: string;
   brandId: string;
+  lastRun?: string;
 }
 
 export interface MaisonError {
@@ -507,6 +524,8 @@ export interface MaisonCertificate {
   status: string;
   imageUrl: string;
   issueDate?: string;
+  clientName?: string;
+  country?: string;
 }
 
 export type AdminViewMode = 'simple' | 'advanced';

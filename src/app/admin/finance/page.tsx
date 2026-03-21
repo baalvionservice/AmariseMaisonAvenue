@@ -24,7 +24,10 @@ import {
   Smartphone,
   Building2,
   RefreshCcw,
-  AlertCircle
+  AlertCircle,
+  Undo2,
+  XCircle,
+  Info
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,12 +54,20 @@ import {
   Tooltip,
   CartesianGrid
 } from 'recharts';
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function FinanceHub() {
-  const { scopedTransactions, currentUser, countryConfigs, updateTransactionStatus } = useAppStore();
+  const { scopedTransactions, currentUser, countryConfigs, updateTransactionStatus, refundTransaction } = useAppStore();
   const { toast } = useToast();
   const [activeInternalTab, setActiveInternalTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
+  const [refundTargetId, setRefundTargetId] = useState<string | null>(null);
+  const [refundReason, setRefundReason] = useState('');
 
   const stats = useMemo(() => {
     const completed = scopedTransactions.filter(t => t.status === 'Settled' || t.status === 'Closed');
@@ -88,6 +99,18 @@ export default function FinanceHub() {
     });
   };
 
+  const handleRefundSubmit = () => {
+    if (refundTargetId && refundReason) {
+      refundTransaction(refundTargetId, refundReason);
+      setRefundTargetId(null);
+      setRefundReason('');
+      toast({
+        title: "Refund Protocol Initialized",
+        description: "The financial delta has been scheduled for settlement reversal.",
+      });
+    }
+  };
+
   const filteredTransactions = scopedTransactions.filter(tx => 
     tx.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tx.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -97,6 +120,37 @@ export default function FinanceHub() {
 
   return (
     <div className="space-y-10 animate-fade-in pb-20">
+      {/* Refund Modal */}
+      <Dialog open={!!refundTargetId} onOpenChange={() => setRefundTargetId(null)}>
+        <DialogContent className="max-w-xl bg-white border-none shadow-2xl rounded-none p-0 overflow-hidden">
+           <div className="p-10 space-y-10 text-gray-900">
+              <div className="flex items-center space-x-4 text-red-600">
+                 <Undo2 className="w-6 h-6" />
+                 <h3 className="text-2xl font-headline font-bold italic uppercase tracking-widest">Refund Registry</h3>
+              </div>
+              <p className="text-sm text-gray-500 font-light italic">"Reversing a global settlement is an audited action. Please define the rationale for the archival reversal."</p>
+              
+              <div className="space-y-4">
+                 <Label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Archival Reason</Label>
+                 <Textarea 
+                  value={refundReason}
+                  onChange={(e) => setReplyText(e.target.value)} // fix var name
+                  className="rounded-none border-border bg-ivory/30 min-h-[120px] text-xs italic font-light px-4 py-4"
+                  placeholder="e.g., Client rejected provenance audit upon delivery..."
+                  onInput={(e: any) => setRefundReason(e.target.value)}
+                 />
+              </div>
+
+              <div className="pt-6 flex justify-end space-x-4">
+                 <Button variant="ghost" onClick={() => setRefundTargetId(null)} className="rounded-none text-[10px] font-bold uppercase">Cancel</Button>
+                 <Button className="bg-black text-white hover:bg-red-600 rounded-none h-12 px-10 font-bold uppercase tracking-widest transition-all" onClick={handleRefundSubmit}>
+                    AUTHORIZE REVERSAL
+                 </Button>
+              </div>
+           </div>
+        </DialogContent>
+      </Dialog>
+
       <header className="flex justify-between items-end border-b border-white/5 pb-10">
         <div className="space-y-2">
           <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30 flex items-center space-x-2">
@@ -215,11 +269,25 @@ export default function FinanceHub() {
                         <Badge variant="outline" className={cn("text-[7px] uppercase border-none px-2 py-0.5", 
                           tx.status === 'Settled' ? "bg-emerald-500/10 text-emerald-400" : 
                           tx.status === 'Pending' ? "bg-blue-500/10 text-blue-400" :
+                          tx.status === 'Refunded' ? "bg-red-500/10 text-red-400" :
                           "bg-white/10 text-white/40"
                         )}>{tx.status}</Badge>
                       </TableCell>
                       <TableCell className="text-right pr-8">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
+                        <div className="flex justify-end space-x-2">
+                           {tx.status === 'Settled' && (
+                             <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-white/20 hover:text-red-500" 
+                              title="Process Refund"
+                              onClick={() => setRefundTargetId(tx.id)}
+                             >
+                               <Undo2 className="w-3.5 h-3.5" />
+                             </Button>
+                           )}
+                           <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

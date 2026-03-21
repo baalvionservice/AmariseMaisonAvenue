@@ -1,22 +1,23 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useMemo } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap, Smartphone, Building2 } from 'lucide-react';
+import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap, Smartphone, Building2, Ticket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { paymentService } from '@/lib/services/paymentService';
 import { PaymentGateway } from '@/lib/types';
 
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs } = useAppStore();
   const { country } = useParams();
+  const searchParams = useSearchParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
   const { toast } = useToast();
@@ -27,18 +28,30 @@ export default function CheckoutPage() {
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('STRIPE');
   const [isSettling, setIsSettling] = useState(false);
   
-  const subtotal = cart.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
+  const planId = searchParams.get('planId');
+  const selectedPlan = useMemo(() => paymentPlans.find(p => p.id === planId), [planId, paymentPlans]);
+  const currentCountryConfig = useMemo(() => countryConfigs.find(c => c.code === countryCode), [countryCode, countryConfigs]);
+
+  const itemsValue = cart.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
+  const planValue = selectedPlan?.price || 0;
+  const subtotal = itemsValue + planValue;
+  const taxAmount = subtotal * (currentCountryConfig?.taxRate || 0) / 100;
+  const totalYield = subtotal + taxAmount;
 
   const handlePlaceOrder = async () => {
     setIsSettling(true);
     
+    // Idempotency: Generating a unique key for this specific settlement session
+    const idempotencyKey = `maison_set_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+
     try {
       const response = await paymentService.createPaymentIntent({
-        amount: subtotal,
+        amount: totalYield,
         currency: countryCode.toUpperCase(),
         gateway: selectedGateway,
         userId: currentUser?.id || 'guest',
-        tenantId: activeBrandId
+        tenantId: activeBrandId,
+        idempotencyKey
       });
 
       if (response.success) {
@@ -50,28 +63,31 @@ export default function CheckoutPage() {
           id: invoiceId,
           orderId,
           customerName,
-          amount: subtotal,
+          amount: totalYield,
           currency: countryCode.toUpperCase(),
           status: selectedGateway === 'BANK_TRANSFER' ? 'pending' : 'paid',
           date: new Date().toISOString(),
-          taxAmount: subtotal * 0.08,
-          taxRate: 8,
+          taxAmount: taxAmount,
+          taxRate: currentCountryConfig?.taxRate || 0,
           complianceCertified: true,
-          brandId: activeBrandId
+          brandId: activeBrandId,
+          gateway: selectedGateway
         });
 
         createTransaction({
           id: `tx-${Date.now()}`,
           country: countryCode,
-          type: 'Sale',
+          type: selectedPlan ? 'Subscription' : 'Sale',
           clientName: customerName,
-          amount: subtotal,
+          amount: totalYield,
+          netAmount: subtotal,
+          taxAmount: taxAmount,
           currency: countryCode.toUpperCase(),
           status: selectedGateway === 'BANK_TRANSFER' ? 'Pending' : 'Settled',
           timestamp: new Date().toISOString(),
           invoiceId: invoiceId,
           brandId: activeBrandId,
-          artifactName: cart[0]?.name,
+          artifactName: selectedPlan ? selectedPlan.name : (cart[0]?.name || 'Atelier Bundle'),
           isProvenanceCertified: true,
           gateway: selectedGateway
         });
@@ -94,13 +110,13 @@ export default function CheckoutPage() {
     }
   };
 
-  if (cart.length === 0 && step !== 3) {
+  if (cart.length === 0 && !selectedPlan && step !== 3) {
     router.push(`/${countryCode}/cart`);
     return null;
   }
 
   return (
-    <div className="container mx-auto px-12 py-24 max-w-7xl animate-fade-in">
+    <div className="container mx-auto px-12 py-24 max-w-7xl animate-fade-in font-body">
       <div className="flex justify-center items-center space-x-12 mb-24">
         <ProtocolStep num={1} label="Logistics Registry" active={step === 1} completed={step > 1} />
         <div className={cn("w-20 h-px transition-colors duration-1000", step > 1 ? "bg-plum" : "bg-border")} />
@@ -205,7 +221,7 @@ export default function CheckoutPage() {
                       className="w-full h-24 bg-plum text-white hover:bg-black rounded-none text-[12px] font-bold tracking-[0.5em] uppercase transition-all shadow-2xl"
                       onClick={handlePlaceOrder}
                     >
-                      {isSettling ? 'PROCESSING SETTLEMENT...' : `AUTHORIZE SETTLEMENT — ${formatPrice(subtotal, countryCode)}`}
+                      {isSettling ? 'PROCESSING SETTLEMENT...' : `AUTHORIZE SETTLEMENT — ${formatPrice(totalYield, countryCode)}`}
                     </Button>
                     <button onClick={() => setStep(1)} className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 hover:text-black transition-colors self-center">
                       REVISE DISPATCH REGISTRY
@@ -220,6 +236,18 @@ export default function CheckoutPage() {
                 <h3 className="text-xl font-headline font-bold uppercase tracking-widest border-b border-border pb-6">Acquisition Context</h3>
                 
                 <div className="space-y-8 max-h-80 overflow-y-auto custom-scrollbar pr-4">
+                  {selectedPlan && (
+                    <div className="flex justify-between items-start group">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center space-x-2">
+                           <Ticket className="w-3.5 h-3.5 text-gold" />
+                           <span className="block font-bold text-sm uppercase tracking-tight text-gray-900">{selectedPlan.name}</span>
+                        </div>
+                        <span className="text-[9px] text-gray-400 font-bold uppercase">{selectedPlan.tier} Enrollment</span>
+                      </div>
+                      <span className="font-bold text-sm tabular pl-4">${selectedPlan.price.toLocaleString()}</span>
+                    </div>
+                  )}
                   {cart.map(item => (
                     <div key={item.id} className="flex justify-between items-start group">
                       <div className="space-y-1 flex-1">
@@ -236,9 +264,16 @@ export default function CheckoutPage() {
                     <span>Dispatch Protocol</span>
                     <span className="text-plum">Complimentary</span>
                   </div>
-                  <div className="flex justify-between items-end pt-6">
+                  <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    <span>{currentCountryConfig?.taxType || 'Jurisdictional Tax'} ({currentCountryConfig?.taxRate || 0}%)</span>
+                    <span className="text-gray-900 tabular">${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-6 border-t border-border/10">
                     <span className="text-xl font-headline font-bold italic tracking-tight">Aggregate Yield</span>
-                    <span className="text-3xl font-bold tabular">{formatPrice(subtotal, countryCode)}</span>
+                    <div className="text-right">
+                       <div className="text-3xl font-bold tabular leading-none">{formatPrice(totalYield, countryCode)}</div>
+                       <p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Total inclusive of all fees</p>
+                    </div>
                   </div>
                 </div>
               </div>

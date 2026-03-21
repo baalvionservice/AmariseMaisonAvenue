@@ -57,7 +57,8 @@ import {
   Subscription,
   SubscriptionStatus,
   CountryConfig,
-  BrandConfig
+  BrandConfig,
+  PaymentPlan
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -95,6 +96,7 @@ interface AppContextType {
   currentUser: MaisonUser | null;
   adminJurisdiction: CountryCode | 'global';
   globalSyncHistory: GlobalSyncSession[];
+  paymentPlans: PaymentPlan[];
   
   scopedProducts: Product[];
   scopedInquiries: PrivateInquiry[];
@@ -181,6 +183,7 @@ interface AppContextType {
   createInvoice: (invoice: Invoice) => void;
   createTransaction: (transaction: Transaction) => void;
   updateTransactionStatus: (id: string, status: TransactionStatus) => void;
+  refundTransaction: (id: string, reason: string) => void;
   toggleLike: (articleId: string, country: string) => void;
   trackShare: (articleId: string, country: string) => void;
   upsertAppointment: (appointment: Appointment) => void;
@@ -247,6 +250,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       { id: 'cert-1', productId: 'prod-11', artifactName: 'Hermès Special Order Birkin 25', issueDate: '2024-03-10', nfcSealId: 'MA-1924-X-001', provenanceScore: 100, status: 'verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000' }
     ] 
   })));
+
+  const [paymentPlans] = useState<PaymentPlan[]>([
+    { id: 'silver', name: 'Maison Discovery', price: 250, currency: 'USD', interval: 'monthly', features: ['Global Concierge Access', 'Provenance Previews', 'Heritage Newsletter'], tier: 'Silver' },
+    { id: 'gold', name: 'Atelier Reserve', price: 1200, currency: 'USD', interval: 'yearly', features: ['Priority Sourcing', 'Private Salon Invitations', 'Standard Logistics', 'NFC Authentication'], tier: 'Gold', isPopular: true },
+    { id: 'diamond', name: 'Maison Privé', price: 5000, currency: 'USD', interval: 'yearly', features: ['Unlimited Live Ateliers', 'Bespoke Commissions', 'White-Glove Global Dispatch', 'Investment Advisory'], tier: 'Diamond' }
+  ]);
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([
     { id: 'sub-1', tenantId: activeBrandId, userId: 'u-client-1', planId: 'diamond', planName: 'Maison Privé', status: 'ACTIVE', currentPeriodEnd: '2025-03-10', cancelAtPeriodEnd: false, amount: 1500, currency: 'USD' }
@@ -385,6 +394,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const createInvoice = (i: Invoice) => setInvoices(prev => [i, ...prev]);
   const createTransaction = (t: Transaction) => setTransactions(prev => [t, ...prev]);
   const updateTransactionStatus = (id: string, s: any) => setTransactions(prev => prev.map(t => t.id === id ? {...t, status: s} : t));
+  
+  const refundTransaction = (id: string, reason: string) => {
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: 'Refunded', refundReason: reason, refundedAt: new Date().toISOString() } : t));
+    logAction('Refund Processed', `TX: ${id}`, 'global', 'medium');
+  };
+
   const toggleLike = (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), likes: (prev[id]?.likes||0)+1}}));
   const trackShare = (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), shares: (prev[id]?.shares||0)+1}}));
   const upsertAppointment = (a: Appointment) => setAppointments(prev => [a, ...prev]);
@@ -426,7 +441,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
     products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor, subscriptions,
     setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(prev => ({...prev, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(prev => ({...prev, adminViewMode: v})),
@@ -434,7 +449,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
     sendNotification, markNotificationRead,
     topUpWallet, deductFromWallet, requestLiveSession, addToCart, removeFromCart, toggleWishlist, clearCart,
-    updateGlobalSettings: (s: GlobalSettings) => setGlobalSettings(s), setShowcaseMode, setActiveVip, setActiveVendor, createInvoice, createTransaction, updateTransactionStatus,
+    updateGlobalSettings: (s: GlobalSettings) => setGlobalSettings(s), setShowcaseMode, setActiveVip, setActiveVendor, createInvoice, createTransaction, updateTransactionStatus, refundTransaction,
     toggleLike, trackShare,
     upsertAppointment, updateTicketStatus, addTicketMessage,
     upsertCampaign: () => {}, toggleRule: () => {}, upsertRule: () => {}, verifyClient, approveVendor,
@@ -442,7 +457,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resolveBrandIntegrity, runQATest: () => {}, runAllQATests: () => {}, runStressTest: () => {}, executeSafeSync, logAction, triggerReindex: () => {}, toggleEmergencyMode,
     runWorkflowTask, runWorkflowSequence: () => {}
   }), [
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, 
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
     products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor, subscriptions
   ]);
