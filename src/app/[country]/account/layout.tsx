@@ -16,7 +16,8 @@ import {
   LifeBuoy,
   LogOut,
   Wallet,
-  Video
+  Video,
+  Award
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -35,6 +36,7 @@ export default function AccountLayout({
     { icon: <LayoutDashboard />, label: "Dashboard", href: `/${countryCode}/account` },
     { icon: <Wallet />, label: "Treasury", href: `/${countryCode}/account/wallet` },
     { icon: <ShoppingBag />, label: "Acquisitions", href: `/${countryCode}/account/acquisitions` },
+    { icon: <Award />, label: "Heritage Archive", href: `/${countryCode}/account/certificates` },
     { icon: <Video />, label: "Live Ateliers", href: `/${countryCode}/account/live` },
     { icon: <Heart />, label: "Private Archive", href: `/${countryCode}/account/wishlist` },
     { icon: <MessageSquare />, label: "Curation", href: `/${countryCode}/account/curation` },
@@ -62,7 +64,7 @@ export default function AccountLayout({
           <div className="h-px w-full bg-border" />
         </div>
 
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           {menuItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <button className={cn(
@@ -77,7 +79,7 @@ export default function AccountLayout({
                 )}>
                   {React.cloneElement(item.icon as React.ReactElement, { size: 16 })}
                 </span>
-                <span>{item.label}</span>
+                <span className="text-left">{item.label}</span>
                 {pathname === item.href && <ChevronRight className="w-3.5 h-3.5 ml-auto" />}
               </button>
             </Link>
@@ -94,7 +96,7 @@ export default function AccountLayout({
         </div>
       </aside>
 
-      <main className="flex-1 p-16 animate-fade-in">
+      <main className="flex-1 p-16 animate-fade-in overflow-x-hidden">
         <div className="max-w-6xl mx-auto">
           {children}
         </div>

@@ -58,7 +58,8 @@ import {
   AdminViewMode,
   BrandIntegrityIssue,
   WalletTransaction,
-  LiveRequest
+  LiveRequest,
+  MaisonCertificate
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -248,10 +249,23 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  // --- CORE STATE ---
   const [activeBrandId, setActiveBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [isShowcaseMode, setShowcaseMode] = useState(false);
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
+    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
+    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
+    payments: { cards: true, wallets: true, crypto: false },
+    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
+    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
+    emergencyMode: false,
+    isGuideMode: false,
+    adminViewMode: 'advanced'
+  });
+
+  // --- REGISTRY STATE ---
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
     ...p, 
     brandId: activeBrandId, 
@@ -273,23 +287,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES.map(a => ({ ...a, brandId: activeBrandId })));
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS.map(c => ({ ...c, brandId: activeBrandId })));
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
-  
-  // Wallet and VIP State
-  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ 
-    ...v, 
-    brandId: activeBrandId, 
-    status: 'verified',
-    walletBalance: 12500.50,
-    walletHistory: [
-      { id: 'wt-1', type: 'Deposit', amount: 15000, description: 'Initial Treasury Funding', timestamp: '2024-03-01T10:00:00Z', status: 'Settled' },
-      { id: 'wt-2', type: 'Service Fee', amount: -250, description: 'Live Viewing: Birkin 25', timestamp: '2024-03-10T14:30:00Z', status: 'Settled' },
-      { id: 'wt-3', type: 'Acquisition', amount: -2249.50, description: 'Payment for Silk Scarf Series', timestamp: '2024-03-12T09:15:00Z', status: 'Settled' }
-    ],
-    liveRequests: [
-      { id: 'lr-1', productId: 'prod-11', productName: 'Hermès HSS Birkin 25', status: 'completed', scheduledAt: '2024-03-10T14:00:00Z', requestedAt: '2024-03-09T10:00:00Z', fee: 250 }
-    ]
-  })));
-
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
   const [workflows, setWorkflows] = useState<WorkflowTask[]>([]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([]);
@@ -298,6 +295,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
+  
+  // --- CLIENT CARE & OPS ---
   const [supportStats, setSupportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations, setIntegrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
@@ -331,6 +330,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ]
     }
   ]);
+
+  // --- VIP & WALLET ---
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ 
+    ...v, 
+    brandId: activeBrandId, 
+    status: 'verified',
+    walletBalance: 12500.50,
+    walletHistory: [
+      { id: 'wt-1', type: 'Deposit', amount: 15000, description: 'Initial Treasury Funding', timestamp: '2024-03-01T10:00:00Z', status: 'Settled' },
+      { id: 'wt-2', type: 'Service Fee', amount: -250, description: 'Live Viewing: Birkin 25', timestamp: '2024-03-10T14:30:00Z', status: 'Settled' },
+      { id: 'wt-3', type: 'Acquisition', amount: -2249.50, description: 'Payment for Silk Scarf Series', timestamp: '2024-03-12T09:15:00Z', status: 'Settled' }
+    ],
+    liveRequests: [
+      { id: 'lr-1', productId: 'prod-11', productName: 'Hermès HSS Birkin 25', status: 'completed', scheduledAt: '2024-03-10T14:00:00Z', requestedAt: '2024-03-09T10:00:00Z', fee: 250 }
+    ],
+    certificates: [
+      { id: 'cert-1', productId: 'prod-11', artifactName: 'Hermès HSS Birkin 25', issueDate: '2024-03-15', nfcSealId: 'MA-1924-X99', provenanceScore: 100, status: 'verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=400' }
+    ]
+  })));
+
   const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
     ...c,
     taxType: c.code === 'us' ? 'Sales Tax' : c.code === 'uk' || c.code === 'ae' ? 'VAT' : 'GST',
@@ -353,16 +372,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
-  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
-    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
-    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
-    payments: { cards: true, wallets: true, crypto: false },
-    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
-    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
-    emergencyMode: false,
-    isGuideMode: false,
-    adminViewMode: 'advanced'
-  });
+  
   const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [cmsSections] = useState<CMSSection[]>([
@@ -513,7 +523,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     approveVendor: (id: string) => setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'active' } : v)),
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
     products, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions, notifications, workflows, approvalRequests, auditRegistry,

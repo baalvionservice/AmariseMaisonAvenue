@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -16,7 +15,8 @@ import {
   Zap,
   Download,
   Receipt,
-  X
+  X,
+  Award
 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +39,7 @@ import {
 
 /**
  * Acquisition Registry: High-Detail Transactional Ledger.
- * Features multi-stage fulfillment tracking and financial detailing.
+ * Features multi-stage fulfillment tracking and direct link to Heritage Archive.
  */
 export default function AcquisitionsPage() {
   const { country } = useParams();
@@ -97,7 +97,7 @@ export default function AcquisitionsPage() {
               </div>
 
               {/* Main Content: Tracking */}
-              <div className="flex-1 p-12 space-y-12">
+              <div className="flex-1 p-12 space-y-12 bg-white">
                  <div className="flex justify-between items-center">
                     <h4 className="text-sm font-bold uppercase tracking-[0.4em]">Fulfillment Protocol</h4>
                     <Button variant="ghost" size="icon" onClick={() => setSelectedTxId(null)}><X className="w-4 h-4" /></Button>
@@ -121,13 +121,15 @@ export default function AcquisitionsPage() {
                     ))}
                  </div>
 
-                 <div className="pt-12 border-t border-border flex justify-between gap-4">
+                 <div className="pt-12 border-t border-border flex flex-col sm:flex-row gap-4">
                     <Button className="flex-1 h-12 bg-black text-white hover:bg-plum rounded-none text-[9px] font-bold uppercase tracking-widest">
                        <Download className="w-3.5 h-3.5 mr-2" /> DOWNLOAD INVOICE
                     </Button>
-                    <Button variant="outline" className="flex-1 h-12 border-border rounded-none text-[9px] font-bold uppercase tracking-widest">
-                       <Receipt className="w-3.5 h-3.5 mr-2" /> REQUEST CERTIFICATE
-                    </Button>
+                    <Link href={`/${countryCode}/account/certificates`} className="flex-1">
+                       <Button variant="outline" className="w-full h-12 border-border rounded-none text-[9px] font-bold uppercase tracking-widest">
+                          <Award className="w-3.5 h-3.5 mr-2" /> HERITAGE ARCHIVE
+                       </Button>
+                    </Link>
                  </div>
               </div>
             </div>
@@ -153,7 +155,7 @@ export default function AcquisitionsPage() {
         </div>
       </header>
 
-      <Card className="bg-white border-border shadow-luxury overflow-hidden">
+      <Card className="bg-white border-border shadow-luxury overflow-hidden rounded-none">
         <Table>
           <TableHeader className="bg-ivory/50">
             <TableRow>
@@ -167,7 +169,7 @@ export default function AcquisitionsPage() {
           <TableBody>
             {transactions.map(tx => (
               <TableRow key={tx.id} className="hover:bg-ivory/30 transition-colors group cursor-pointer" onClick={() => setSelectedTxId(tx.id)}>
-                <TableCell className="pl-8">
+                <TableCell className="pl-8 py-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-10 h-12 bg-muted rounded-sm flex items-center justify-center text-[6px] font-bold text-gray-400 uppercase border border-border">Asset</div>
                     <div className="flex flex-col">

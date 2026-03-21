@@ -615,6 +615,17 @@ export interface LiveRequest {
   fee: number;
 }
 
+export interface MaisonCertificate {
+  id: string;
+  productId: string;
+  artifactName: string;
+  issueDate: string;
+  nfcSealId: string;
+  provenanceScore: number;
+  status: 'verified' | 'archived';
+  imageUrl: string;
+}
+
 export interface VipClient {
   id: string;
   name: string;
@@ -631,6 +642,8 @@ export interface VipClient {
   walletBalance: number;
   walletHistory: WalletTransaction[];
   liveRequests: LiveRequest[];
+  // Heritage Extension
+  certificates: MaisonCertificate[];
 }
 
 export interface SupportTicket {

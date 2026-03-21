@@ -17,7 +17,9 @@ import {
   LayoutDashboard,
   Shield,
   Wallet,
-  Video
+  Video,
+  LineChart,
+  Target
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,8 +31,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * Connoisseur Dashboard: Persona-Aware Environment.
- * Routes to "Private Salon" (Premium) or "Institutional Registry" (Normal) view logic.
- * Integrated with Maison Treasury & Live Atelier.
+ * Refined for Platform Owners with Strategic AI Signals & Collection Strategy.
  */
 export default function ConnoisseurDashboard() {
   const { country } = useParams();
@@ -47,7 +48,8 @@ export default function ConnoisseurDashboard() {
       nextTierAt: 15000,
       activeAcquisitions: transactions.filter(t => t.status !== 'Closed').length,
       curatorialSignals: privateInquiries.filter(i => i.status === 'closing').length,
-      walletBalance: activeVip?.walletBalance || 0
+      walletBalance: activeVip?.walletBalance || 0,
+      totalCollectionValue: transactions.reduce((acc, t) => acc + t.amount, 0) * 1.14 // Mocked 14% appreciation
     };
   }, [transactions, privateInquiries, activeVip]);
 
@@ -60,6 +62,7 @@ export default function ConnoisseurDashboard() {
 
 /**
  * Design B: The Private Salon (Premium)
+ * Features: Strategic Allocation, Collection Strategy, AI Signals.
  */
 function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, activeVip }: any) {
   return (
@@ -67,8 +70,8 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
       <header className="flex justify-between items-end">
         <div className="space-y-2">
           <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-plum">Maison Private Salon</span>
-          <h1 className="text-5xl font-headline font-bold italic text-gray-900 tracking-tight">Bonjour, {currentUser?.name.split(' ')[0]}</h1>
-          <p className="text-gray-500 font-light italic">"A testament to your pursuit of human brilliance."</p>
+          <h1 className="text-5xl font-headline font-bold italic text-gray-900 tracking-tight leading-none">Bonjour, {currentUser?.name.split(' ')[0]}</h1>
+          <p className="text-gray-500 font-light italic mt-2">"A testament to your pursuit of human brilliance."</p>
         </div>
         <div className="flex items-center space-x-4">
            <Badge variant="outline" className="bg-plum/5 text-plum border-plum/20 h-10 px-6 rounded-none text-[10px] font-bold uppercase tracking-widest">
@@ -77,21 +80,18 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
         </div>
       </header>
 
-      {/* Overview Matrix */}
+      {/* Strategic Overview Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <DashboardCard label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-5 h-5 text-gold" />}>
            <Link href={`/${countryCode}/account/wallet`}>
-              <Button variant="ghost" size="sm" className="p-0 h-auto text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold">MANAGE FUNDS <ArrowRight className="ml-2 w-3 h-3" /></Button>
+              <Button variant="ghost" size="sm" className="p-0 h-auto text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold">MANAGE LIQUIDITY <ArrowRight className="ml-2 w-3 h-3" /></Button>
            </Link>
         </DashboardCard>
 
-        <DashboardCard label="Resonance Score" value={stats.loyaltyPoints.toLocaleString()} icon={<Star className="w-5 h-5 text-gold fill-gold" />}>
-           <div className="space-y-2">
-              <div className="flex justify-between text-[9px] font-bold uppercase">
-                 <span className="text-gray-400">Next Plateau</span>
-                 <span className="text-plum">{stats.nextTierAt.toLocaleString()}</span>
-              </div>
-              <Progress value={(stats.loyaltyPoints / stats.nextTierAt) * 100} className="h-1 bg-ivory" />
+        <DashboardCard label="Collection Value" value={`$${stats.totalCollectionValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} icon={<TrendingUp className="w-5 h-5 text-gold" />}>
+           <div className="flex items-center space-x-2 text-[10px] font-bold uppercase text-green-600">
+              <Sparkles className="w-3 h-3" />
+              <span>+14.2% Appreciation</span>
            </div>
         </DashboardCard>
 
@@ -101,45 +101,83 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-8 space-y-8">
-           <div className="flex items-center justify-between border-b border-border pb-4">
-              <h3 className="text-sm font-headline font-bold uppercase tracking-widest">Acquisition Pulse</h3>
-              <Link href={`/${countryCode}/account/acquisitions`} className="text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold transition-colors">View All History</Link>
+        <div className="lg:col-span-8 space-y-12">
+           {/* Section: Collection Strategy (AI Driven Mock) */}
+           <div className="bg-ivory border border-border p-10 space-y-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-hover:opacity-10 transition-opacity">
+                 <Target className="w-64 h-64 text-black" />
+              </div>
+              <div className="space-y-2">
+                 <div className="flex items-center space-x-3 text-plum">
+                    <Sparkles className="w-4 h-4" />
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.4em]">Collection Strategy</h3>
+                 </div>
+                 <h4 className="text-3xl font-headline font-bold italic text-gray-900">Synergistic Allocation Suggestions</h4>
+              </div>
+              <p className="text-sm font-light italic text-gray-600 leading-relaxed max-w-xl">
+                "Based on your recent acquisition of the 1924 series, our AI curators suggest diversifying your archive with a structural horological piece to optimize long-term resonance."
+              </p>
+              <div className="flex flex-col sm:flex-row gap-6">
+                 <StrategySuggestion label="Watch Series" value="Grand Complication" price="$45k" />
+                 <StrategySuggestion label="Couture Piece" value="Atelier Reserve Gown" price="$12k" />
+              </div>
            </div>
-           
-           <div className="bg-white border border-border shadow-sm divide-y divide-border">
-              {transactions.slice(0, 4).map((tx: any) => (
-                <div key={tx.id} className="p-6 flex items-center justify-between hover:bg-ivory/30 transition-colors">
-                   <div className="flex items-center space-x-6">
-                      <div className="p-3 bg-plum/5 rounded-full text-plum"><Package className="w-4 h-4" /></div>
-                      <div>
-                         <p className="text-sm font-bold uppercase tracking-tight text-gray-900">{tx.artifactName || 'Maison Archive Transfer'}</p>
-                         <p className="text-[9px] text-gray-400 uppercase tracking-widest">ID: {tx.id}</p>
+
+           <div className="space-y-8">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                 <h3 className="text-sm font-headline font-bold uppercase tracking-widest">Acquisition Pulse</h3>
+                 <Link href={`/${countryCode}/account/acquisitions`} className="text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold transition-colors">Full History</Link>
+              </div>
+              
+              <div className="bg-white border border-border shadow-sm divide-y divide-border rounded-none overflow-hidden">
+                 {transactions.slice(0, 3).map((tx: any) => (
+                   <div key={tx.id} className="p-6 flex items-center justify-between hover:bg-ivory/30 transition-colors">
+                      <div className="flex items-center space-x-6">
+                         <div className="p-3 bg-plum/5 rounded-full text-plum"><Package className="w-4 h-4" /></div>
+                         <div>
+                            <p className="text-sm font-bold uppercase tracking-tight text-gray-900">{tx.artifactName || 'Archive Transfer'}</p>
+                            <p className="text-[9px] text-gray-400 uppercase tracking-widest">ID: {tx.id}</p>
+                         </div>
+                      </div>
+                      <div className="text-right">
+                         <p className="text-sm font-bold text-gray-900">${tx.amount.toLocaleString()}</p>
+                         <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-100 text-green-600 bg-green-50">{tx.status}</Badge>
                       </div>
                    </div>
-                   <div className="text-right">
-                      <p className="text-sm font-bold text-gray-900">${tx.amount.toLocaleString()}</p>
-                      <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-100 text-green-600 bg-green-50">{tx.status}</Badge>
-                   </div>
-                </div>
-              ))}
+                 ))}
+              </div>
            </div>
         </div>
 
         <aside className="lg:col-span-4 space-y-8">
-           <Card className="bg-black text-white p-10 space-y-8 shadow-2xl relative overflow-hidden">
+           <Card className="bg-black text-white p-10 space-y-8 shadow-2xl relative overflow-hidden rounded-none border-none">
               <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Video className="w-32 h-32" /></div>
               <div className="space-y-4">
                  <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold">Live Atelier</h4>
                  <p className="text-sm font-light italic leading-relaxed opacity-70">
-                   "Request a private live viewing of any registry artifact. Experience artisanal detail through our high-fidelity curatorial lens."
+                   "Experience artisanal detail through our high-fidelity curatorial lens. Private viewing sessions are active."
                  </p>
               </div>
               <Link href={`/${countryCode}/account/live`}>
                 <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12 hover:bg-gold hover:text-black">
-                   REQUEST LIVE VIEWING
+                   JOIN ATELIER
                 </Button>
               </Link>
+           </Card>
+
+           <Card className="bg-white border border-border p-8 space-y-6 shadow-sm rounded-none">
+              <div className="flex items-center space-x-3 text-plum">
+                 <Star className="w-5 h-5 text-gold fill-gold" />
+                 <h4 className="text-[10px] font-bold uppercase tracking-widest">Resonance</h4>
+              </div>
+              <div className="space-y-4">
+                 <div className="flex justify-between text-[9px] font-bold uppercase">
+                    <span className="text-gray-400">Next Plateau</span>
+                    <span className="text-plum">{stats.nextTierAt.toLocaleString()}</span>
+                 </div>
+                 <Progress value={(stats.loyaltyPoints / stats.nextTierAt) * 100} className="h-1 bg-ivory" />
+                 <p className="text-[9px] text-gray-400 italic">"Progressing toward Heritage Master tier."</p>
+              </div>
            </Card>
         </aside>
       </div>
@@ -160,11 +198,11 @@ function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser
              <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-slate-400">Institutional Registry</span>
           </div>
           <h1 className="text-4xl font-headline font-bold text-gray-900 uppercase tracking-tight">Account Overview</h1>
-          <p className="text-sm text-gray-500 font-light italic">Managing {currentUser?.name}'s collection registry.</p>
+          <p className="text-sm text-gray-500 font-light italic">Managing collection registry for {currentUser?.name}.</p>
         </div>
         <div className="flex items-center space-x-4">
            <div className="text-right mr-4">
-              <p className="text-[8px] font-bold uppercase text-gray-400">Balance</p>
+              <p className="text-[8px] font-bold uppercase text-gray-400">Treasury</p>
               <p className="text-sm font-bold text-gray-900">${stats.walletBalance.toLocaleString()}</p>
            </div>
            <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 h-9 px-4 rounded-none text-[9px] font-bold uppercase tracking-widest">
@@ -174,8 +212,8 @@ function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         <RegistryStat label="Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-4 h-4" />} />
-         <RegistryStat label="Registry Points" value={stats.loyaltyPoints} icon={<Star className="w-4 h-4" />} />
+         <RegistryStat label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-4 h-4" />} />
+         <RegistryStat label="Loyalty Points" value={stats.loyaltyPoints} icon={<Star className="w-4 h-4" />} />
          <RegistryStat label="Live Requests" value={activeVip?.liveRequests?.length || 0} icon={<Video className="w-4 h-4" />} />
          <RegistryStat label="Compliance" value="Verified" icon={<ShieldCheck className="w-4 h-4" />} color="text-green-600" />
       </div>
@@ -214,12 +252,12 @@ function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser
 
 function DashboardCard({ label, value, icon, children }: any) {
   return (
-    <Card className="bg-white border-border shadow-luxury p-8 space-y-6 group hover:border-plum transition-all">
+    <Card className="bg-white border-border shadow-luxury p-8 space-y-6 group hover:border-plum transition-all rounded-none">
        <div className="flex justify-between items-start">
           <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-plum transition-colors">{label}</span>
           {icon}
        </div>
-       <div className="text-4xl font-headline font-bold italic text-gray-900">{value}</div>
+       <div className="text-4xl font-headline font-bold italic text-gray-900 leading-none">{value}</div>
        {children}
     </Card>
   );
@@ -227,12 +265,24 @@ function DashboardCard({ label, value, icon, children }: any) {
 
 function RegistryStat({ label, value, icon, color = "text-gray-900" }: any) {
   return (
-    <Card className="bg-white border-border shadow-sm p-6 flex flex-col items-center justify-center space-y-3 hover:border-slate-900 transition-all">
+    <Card className="bg-white border-border shadow-sm p-6 flex flex-col items-center justify-center space-y-3 hover:border-slate-900 transition-all rounded-none">
        <div className="p-2 bg-slate-50 rounded-full text-slate-400">{icon}</div>
        <div className="text-center">
           <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-1">{label}</p>
           <p className={cn("text-xl font-headline font-bold", color)}>{value}</p>
        </div>
     </Card>
+  );
+}
+
+function StrategySuggestion({ label, value, price }: { label: string, value: string, price: string }) {
+  return (
+    <div className="p-4 bg-white border border-border flex-1 group hover:border-plum transition-all cursor-pointer">
+       <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">{label}</span>
+       <div className="flex justify-between items-end mt-1">
+          <p className="text-xs font-bold uppercase tracking-tight text-gray-900">{value}</p>
+          <span className="text-[10px] font-bold text-plum">{price}</span>
+       </div>
+    </div>
   );
 }
