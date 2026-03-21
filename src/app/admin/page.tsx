@@ -70,14 +70,14 @@ export default function AdminDashboard() {
       <header className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <SignalNode label="Aggregate Yield" value={`$${(globalTotal / 1000000).toFixed(2)}M`} trend="+12.4% MoM" />
         <SignalNode label="Network Pulse" value={globalUsers.toLocaleString()} trend="+5.2%" />
-        <SignalNode label="High Intent" value={highIntentUsers} color="text-blue-400" />
+        <SignalNode label="Active Negotiations" value={activeNegotiations} color="text-blue-400" />
         <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" />
       </header>
 
       {/* 3. Viewport & Local Intelligence */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Global Matrix Viewport */}
-        <section className="lg:col-span-8 relative h-[520px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl">
+        <section className="lg:col-span-8 relative h-[480px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent pointer-events-none" />
           
           <IntelligenceGlobe 

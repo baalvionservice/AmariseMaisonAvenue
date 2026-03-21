@@ -210,34 +210,22 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const params = useParams();
-
-  // --- 1. PRIMITIVE STATE (Declared first to avoid ReferenceErrors) ---
+  // --- 1. CORE STATE: DECLARE ALL FIRST ---
   const [activeBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
+  
   const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
     ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15
   })));
   const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   
-  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
-    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
-    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
-    payments: { cards: true, wallets: true, crypto: false },
-    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
-    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
-    emergencyMode: false,
-    isGuideMode: false,
-    adminViewMode: 'advanced'
-  });
-
-  // --- 2. DATA REGISTRIES ---
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
     ...p, brandId: activeBrandId, status: 'published', regions: ['us', 'uk', 'ae', 'in', 'sg'], currentVersion: 1, versionHistory: [] 
   })));
+  
   const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
   const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS.map(c => ({ ...c, brandId: activeBrandId })));
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
@@ -248,6 +236,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
+  
   const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ 
     ...v, 
     brandId: activeBrandId, 
@@ -259,6 +248,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       { id: 'cert-1', productId: 'prod-11', artifactName: 'Hermès Special Order Birkin 25', issueDate: '2024-03-10', nfcSealId: 'MA-1924-X-001', provenanceScore: 100, status: 'verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000' }
     ] 
   })));
+
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
@@ -270,6 +260,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
   const [automationRules] = useState<AutomationRule[]>([]);
+  
   const [aiModules, setAiModules] = useState<AIModuleStatus[]>([
     { id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' },
     { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' },
@@ -284,18 +275,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [seoRegistry] = useState<SEOMetadata[]>([]);
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
-  const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
-  const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [messagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
 
-  // --- 3. JURISDICTIONAL DETECTION ---
+  const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
+  const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
+
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
+    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
+    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
+    payments: { cards: true, wallets: true, crypto: false },
+    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
+    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
+    emergencyMode: false,
+    isGuideMode: false,
+    adminViewMode: 'advanced'
+  });
+
+  // --- 2. JURISDICTIONAL DETECTION ---
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
     return currentUser.country as CountryCode;
   }, [currentUser, adminJurisdiction]);
 
-  // --- 4. SCOPED DATA (Memoized logic) ---
+  // --- 3. SCOPED DATA (Memoized logic) ---
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
@@ -321,7 +324,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return activeHub === 'global' ? all : all.filter(c => c.country === activeHub);
   }, [vipClients, activeHub]);
 
-  // --- 5. ACTIONS ---
+  // --- 4. ACTIONS ---
   const logAction = (action: string, entity: string, countryCode = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
     const entry: AuditLogEntry = { 
@@ -439,7 +442,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resolveBrandIntegrity, runQATest: () => {}, runAllQATests: () => {}, runStressTest: () => {}, executeSafeSync, logAction, triggerReindex: () => {}, toggleEmergencyMode,
     runWorkflowTask, runWorkflowSequence: () => {}
   }), [
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, 
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
     products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor
   ]);
 

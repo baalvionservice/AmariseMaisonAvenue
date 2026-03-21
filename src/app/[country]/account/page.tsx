@@ -28,6 +28,15 @@ import { Progress } from "@/components/ui/progress";
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { 
+  Area, 
+  AreaChart, 
+  ResponsiveContainer, 
+  XAxis, 
+  YAxis, 
+  Tooltip,
+  CartesianGrid
+} from 'recharts';
 
 /**
  * Connoisseur Dashboard: Persona-Aware Environment.
@@ -62,9 +71,17 @@ export default function ConnoisseurDashboard() {
 
 /**
  * Design B: The Private Salon (Premium)
- * Features: Strategic Allocation, Collection Strategy, AI Signals.
  */
 function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, activeVip }: any) {
+  const appreciationData = [
+    { month: 'Oct', value: 124000 },
+    { month: 'Nov', value: 132000 },
+    { month: 'Dec', value: 145000 },
+    { month: 'Jan', value: 142000 },
+    { month: 'Feb', value: 158000 },
+    { month: 'Mar', value: 174000 },
+  ];
+
   return (
     <div className="space-y-12 animate-fade-in">
       <header className="flex justify-between items-end">
@@ -80,7 +97,6 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
         </div>
       </header>
 
-      {/* Strategic Overview Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <DashboardCard label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} icon={<Wallet className="w-5 h-5 text-gold" />}>
            <Link href={`/${countryCode}/account/wallet`}>
@@ -102,7 +118,42 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div className="lg:col-span-8 space-y-12">
-           {/* Section: Collection Strategy (AI Driven Mock) */}
+           {/* Section: Strategic Yield (Appreciation Chart) */}
+           <Card className="bg-white border-border shadow-luxury overflow-hidden rounded-none">
+              <CardHeader className="bg-ivory/30 border-b border-border p-8">
+                 <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                       <div className="flex items-center space-x-3 text-plum">
+                          <LineChart className="w-4 h-4" />
+                          <CardTitle className="text-[10px] font-bold uppercase tracking-[0.4em]">Strategic Yield</CardTitle>
+                       </div>
+                       <h4 className="text-2xl font-headline font-bold italic">Portfolio Appreciation</h4>
+                    </div>
+                    <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-100 text-green-600 bg-green-50">+14.2% 12M Yield</Badge>
+                 </div>
+              </CardHeader>
+              <CardContent className="p-10 h-[300px]">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={appreciationData}>
+                       <defs>
+                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                             <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.1}/>
+                             <stop offset="95%" stopColor="#7E3F98" stopOpacity={0}/>
+                          </linearGradient>
+                       </defs>
+                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                       <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#999', fontWeight: 700}} />
+                       <YAxis hide />
+                       <Tooltip 
+                          contentStyle={{ backgroundColor: '#fff', border: '1px solid #eee', borderRadius: '0px' }}
+                          labelStyle={{ fontWeight: 'bold', fontSize: '10px', textTransform: 'uppercase' }}
+                       />
+                       <Area type="monotone" dataKey="value" stroke="#7E3F98" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+                    </AreaChart>
+                 </ResponsiveContainer>
+              </CardContent>
+           </Card>
+
            <div className="bg-ivory border border-border p-10 space-y-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-hover:opacity-10 transition-opacity">
                  <Target className="w-64 h-64 text-black" />
@@ -112,39 +163,14 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
                     <Sparkles className="w-4 h-4" />
                     <h3 className="text-[10px] font-bold uppercase tracking-[0.4em]">Collection Strategy</h3>
                  </div>
-                 <h4 className="text-3xl font-headline font-bold italic text-gray-900">Synergistic Allocation Suggestions</h4>
+                 <h4 className="text-3xl font-headline font-bold italic text-gray-900">Synergistic Allocation</h4>
               </div>
               <p className="text-sm font-light italic text-gray-600 leading-relaxed max-w-xl">
-                "Based on your recent acquisition of the 1924 series, our AI curators suggest diversifying your archive with a structural horological piece to optimize long-term resonance."
+                "Our AI suggests diversifying your archive with a structural horological piece to optimize long-term resonance."
               </p>
               <div className="flex flex-col sm:flex-row gap-6">
                  <StrategySuggestion label="Watch Series" value="Grand Complication" price="$45k" />
                  <StrategySuggestion label="Couture Piece" value="Atelier Reserve Gown" price="$12k" />
-              </div>
-           </div>
-
-           <div className="space-y-8">
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                 <h3 className="text-sm font-headline font-bold uppercase tracking-widest">Acquisition Pulse</h3>
-                 <Link href={`/${countryCode}/account/acquisitions`} className="text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold transition-colors">Full History</Link>
-              </div>
-              
-              <div className="bg-white border border-border shadow-sm divide-y divide-border rounded-none overflow-hidden">
-                 {transactions.slice(0, 3).map((tx: any) => (
-                   <div key={tx.id} className="p-6 flex items-center justify-between hover:bg-ivory/30 transition-colors">
-                      <div className="flex items-center space-x-6">
-                         <div className="p-3 bg-plum/5 rounded-full text-plum"><Package className="w-4 h-4" /></div>
-                         <div>
-                            <p className="text-sm font-bold uppercase tracking-tight text-gray-900">{tx.artifactName || 'Archive Transfer'}</p>
-                            <p className="text-[9px] text-gray-400 uppercase tracking-widest font-mono">ID: {tx.id}</p>
-                         </div>
-                      </div>
-                      <div className="text-right">
-                         <p className="text-sm font-bold text-gray-900 tabular">${tx.amount.toLocaleString()}</p>
-                         <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-100 text-green-600 bg-green-50">{tx.status}</Badge>
-                      </div>
-                   </div>
-                 ))}
               </div>
            </div>
         </div>
