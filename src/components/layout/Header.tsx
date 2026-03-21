@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, ArrowRight, User } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -40,7 +40,7 @@ export const Header = () => {
   const [mounted, setMounted] = useState(false);
   const { country } = useParams();
   const router = useRouter();
-  const { cart, wishlist } = useAppStore();
+  const { cart, wishlist, currentUser } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   
@@ -282,8 +282,10 @@ export const Header = () => {
       {/* Maison Brand Header */}
       <div className="h-28 border-b border-gray-100 px-12 flex items-center justify-between relative bg-white">
         <div className="flex items-center space-x-6 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-          <Link href="#" className="hover:text-black border-r border-gray-100 pr-6 py-2">Client Portal</Link>
-          <Link href="#" className="hover:text-black py-2">Join</Link>
+          <Link href={currentUser?.role === 'client' ? `/${countryCode}/account` : `/${countryCode}/sell`} className="hover:text-black border-r border-gray-100 pr-6 py-2">
+            {currentUser?.role === 'client' ? 'Client Portal' : 'Login'}
+          </Link>
+          <Link href={`/${countryCode}/sell`} className="hover:text-black py-2">Join</Link>
         </div>
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">

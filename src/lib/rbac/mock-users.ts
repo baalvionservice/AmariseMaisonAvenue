@@ -2,7 +2,7 @@ import { Role, ROLES } from "../roles/system";
 
 /**
  * @fileOverview Mock user registry for RBAC testing.
- * Formalized for 1 Super Admin and 5 Hub-specific Country Admins.
+ * Formalized for 1 Super Admin, 5 Hub-specific Country Admins, and Elite Clients.
  */
 
 export interface MaisonUser {
@@ -55,6 +55,13 @@ export const users: MaisonUser[] = [
     email: "admin.sg@amarise-luxe.com",
     role: ROLES.COUNTRY_ADMIN,
     country: "sg",
+  },
+  {
+    id: "u-client-1",
+    name: "Julian Vandervilt",
+    email: "julian@vandervilt.com",
+    role: ROLES.CLIENT,
+    country: "us",
   },
   {
     id: "u-op-us",
