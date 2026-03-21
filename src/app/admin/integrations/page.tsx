@@ -29,7 +29,9 @@ import {
   DatabaseZap,
   FastForward,
   Gauge,
-  Power
+  Power,
+  RotateCw,
+  XCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,7 +49,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 
-type IntegrationTab = 'dashboard' | 'payments' | 'logistics' | 'indexing' | 'security' | 'health';
+type IntegrationTab = 'dashboard' | 'dlq' | 'indexing' | 'security' | 'health';
 
 export default function IntegrationsAdminPanel() {
   const [activeTab, setActiveTab] = useState<IntegrationTab>('dashboard');
@@ -70,10 +72,9 @@ export default function IntegrationsAdminPanel() {
         
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           <SyncNavItem icon={<LayoutDashboard />} label="Health Registry" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <SyncNavItem icon={<RotateCw />} label="Dead-Letter Queue" active={activeTab === 'dlq'} onClick={() => setActiveTab('dlq')} />
           <SyncNavItem icon={<Gauge />} label="System Performance" active={activeTab === 'health'} onClick={() => setActiveTab('health')} />
           <SyncNavItem icon={<FastForward />} label="Auto Indexing" active={activeTab === 'indexing'} onClick={() => setActiveTab('indexing')} />
-          <SyncNavItem icon={<CreditCard />} label="Payment Bridges" active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} />
-          <SyncNavItem icon={<Truck />} label="Logistics APIs" active={activeTab === 'logistics'} onClick={() => setActiveTab('logistics')} />
           <SyncNavItem icon={<Lock />} label="Keys & Security" active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
         </nav>
 
@@ -104,7 +105,7 @@ export default function IntegrationsAdminPanel() {
         <header className="flex justify-between items-center bg-white/80 luxury-blur p-8 border-b border-border sticky top-0 z-30">
           <div>
             <h1 className="text-3xl font-headline font-bold italic text-gray-900 uppercase tracking-widest">
-              {activeTab}
+              {activeTab === 'dlq' ? 'Dead-Letter Queue' : activeTab}
             </h1>
             <p className="text-gray-400 text-[10px] tracking-widest uppercase font-bold mt-1">
               Systems Integration • API Lifecycle Management
@@ -195,6 +196,53 @@ export default function IntegrationsAdminPanel() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'dlq' && (
+            <div className="space-y-12">
+               <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                  <CardHeader className="border-b border-border bg-red-50/30">
+                     <div className="flex items-center space-x-4">
+                        <RotateCw className="w-6 h-6 text-red-600" />
+                        <div>
+                           <CardTitle className="font-headline text-2xl uppercase">Webhook Dead-Letter Queue</CardTitle>
+                           <CardDescription className="text-[10px] uppercase tracking-widest text-red-400">Failed external events awaiting manual replay or audit</CardDescription>
+                        </div>
+                     </div>
+                  </CardHeader>
+                  <Table>
+                     <TableHeader className="bg-ivory/50">
+                        <TableRow>
+                           <TableHead className="text-[9px] uppercase font-bold pl-8">Event ID</TableHead>
+                           <TableHead className="text-[9px] uppercase font-bold">Provider</TableHead>
+                           <TableHead className="text-[9px] uppercase font-bold">Failure Reason</TableHead>
+                           <TableHead className="text-[9px] uppercase font-bold text-center">Attempts</TableHead>
+                           <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Actions</TableHead>
+                        </TableRow>
+                     </TableHeader>
+                     <TableBody>
+                        <TableRow className="hover:bg-red-50/10">
+                           <TableCell className="pl-8 font-mono text-[10px]">evt_stripe_12345</TableCell>
+                           <TableCell><Badge variant="outline" className="text-[8px] uppercase">Stripe</Badge></TableCell>
+                           <TableCell className="text-xs text-red-600 font-light italic">503 Service Unavailable (Internal API)</TableCell>
+                           <TableCell className="text-center font-bold">5 / 5</TableCell>
+                           <TableCell className="text-right pr-8">
+                              <Button size="sm" className="h-8 bg-black text-white hover:bg-plum text-[8px] font-bold uppercase rounded-none" onClick={() => handleAction("Webhook replay initiated.")}>RE-PLAY EVENT</Button>
+                           </TableCell>
+                        </TableRow>
+                        <TableRow className="hover:bg-red-50/10">
+                           <TableCell className="pl-8 font-mono text-[10px]">evt_razor_98765</TableCell>
+                           <TableCell><Badge variant="outline" className="text-[8px] uppercase">Razorpay</Badge></TableCell>
+                           <TableCell className="text-xs text-red-600 font-light italic">Signature Verification Failed</TableCell>
+                           <TableCell className="text-center font-bold">1 / 5</TableCell>
+                           <TableCell className="text-right pr-8">
+                              <Button variant="outline" size="sm" className="h-8 border-border text-[8px] font-bold uppercase rounded-none">AUDIT LOGS</Button>
+                           </TableCell>
+                        </TableRow>
+                     </TableBody>
+                  </Table>
+               </Card>
             </div>
           )}
 

@@ -24,7 +24,7 @@ export interface Payment {
 export interface PaymentLog {
   id: string;
   paymentId: string;
-  action: 'INIT' | 'WEBHOOK_RECEIVED' | 'SUCCESS' | 'FAILURE' | 'REFUND_INIT' | 'RECONCILED';
+  action: 'INIT' | 'WEBHOOK_RECEIVED' | 'SUCCESS' | 'FAILURE' | 'REFUND_INIT' | 'RECONCILIED';
   rawPayload?: any;
   metadata: Record<string, any>;
   timestamp: string;
@@ -33,10 +33,14 @@ export interface PaymentLog {
 export interface Subscription {
   id: string;
   tenantId: string;
-  planId: string;
+  userId: string;
+  planId: 'silver' | 'gold' | 'diamond' | 'none';
+  planName: string;
   status: SubscriptionStatus;
   currentPeriodEnd: string;
   cancelAtPeriodEnd: boolean;
+  amount: number;
+  currency: string;
 }
 
 export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed';
@@ -175,9 +179,9 @@ export interface VipClient {
   brandId: string;
   status?: 'pending' | 'verified' | 'rejected';
   walletBalance: number;
-  walletHistory: any[];
-  liveRequests: any[];
-  certificates: any[];
+  walletHistory: WalletTransaction[];
+  liveRequests: LiveRequest[];
+  certificates: MaisonCertificate[];
 }
 
 export interface GlobalSettings {
@@ -421,6 +425,10 @@ export interface Vendor {
   salesTotal: number;
   status: 'active' | 'pending' | 'rejected';
   brandId?: string;
+  joinedDate?: string;
+  payoutSchedule?: string;
+  productCount?: number;
+  kpis?: any;
 }
 
 export interface BrandConfig {
@@ -442,6 +450,7 @@ export interface CountryConfig {
   featuredCategories: string[];
   taxType: string;
   taxRate: number;
+  name: string;
 }
 
 export interface MaisonNotification {
@@ -459,6 +468,7 @@ export interface WorkflowTask {
   taskName: string;
   status: string;
   country: string;
+  lastRun?: string;
 }
 
 export interface ApprovalRequest {
@@ -496,6 +506,7 @@ export interface MaisonCertificate {
   provenanceScore: number;
   status: string;
   imageUrl: string;
+  issueDate?: string;
 }
 
 export type AdminViewMode = 'simple' | 'advanced';
@@ -550,4 +561,61 @@ export interface MaisonReport {
   isPremium: boolean;
   previewImage: string;
   brandId: string;
+}
+
+export interface Country {
+  code: string;
+  name: string;
+  currency: string;
+  symbol: string;
+  locale: string;
+  flag: string;
+  office: {
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    mapUrl: string;
+    image: string;
+  }
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  categories: string[];
+}
+
+export interface MaisonStory {
+  title: string;
+  subtitle: string;
+  history: { year: string; milestone: string; description: string }[];
+  philosophy: string;
+  craftsmanship: { title: string; description: string; imageUrl: string }[];
+  sustainability: string;
+  institutionalCharter: string;
+  brandId: string;
+}
+
+export interface CustomerServiceInfo {
+  shipping: string;
+  returns: string;
+  faqs: { question: string; answer: string }[];
+}
+
+export interface IndexingLog {
+  id: string;
+  timestamp: string;
+  action: string;
+  itemsAffected: number;
+  duration: string;
+  status: string;
+}
+
+export interface CMSSection {
+  id: string;
+  name: string;
+  visible: boolean;
 }

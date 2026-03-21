@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -34,6 +35,7 @@ export default function AccountLayout({
 
   const menuItems = [
     { icon: <LayoutDashboard />, label: "Dashboard", href: `/${countryCode}/account` },
+    { icon: <Crown />, label: "Membership", href: `/${countryCode}/account/membership` },
     { icon: <Wallet />, label: "Treasury", href: `/${countryCode}/account/wallet` },
     { icon: <ShoppingBag />, label: "Acquisitions", href: `/${countryCode}/account/acquisitions` },
     { icon: <Award />, label: "Heritage Archive", href: `/${countryCode}/account/certificates` },
@@ -88,7 +90,7 @@ export default function AccountLayout({
 
         <div className="pt-8 border-t border-border space-y-2">
           <Link href={`/${countryCode}`}>
-            <button className="w-full flex items-center space-x-4 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black border-none bg-transparent outline-none cursor-pointer">
+            <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black border-none bg-transparent outline-none cursor-pointer">
               <LogOut size={16} />
               <span>Back to Maison</span>
             </button>

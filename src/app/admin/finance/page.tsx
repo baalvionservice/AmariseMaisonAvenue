@@ -5,14 +5,11 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   DollarSign, 
-  FileText, 
-  RefreshCcw, 
   ChevronRight, 
   Receipt,
   Scale,
   ArrowRight,
   BadgeDollarSign,
-  Briefcase,
   ShieldCheck,
   TrendingUp,
   Download,
@@ -22,10 +19,12 @@ import {
   Database,
   Search,
   CheckCircle2,
-  XCircle,
-  Smartphone,
   CreditCard,
-  Globe
+  Globe,
+  Smartphone,
+  Building2,
+  RefreshCcw,
+  AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +41,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
+import { Progress } from "@/components/ui/progress";
 import { 
   Bar, 
   BarChart, 
@@ -71,20 +71,12 @@ export default function FinanceHub() {
       };
     });
 
-    const revenueByGateway = ['STRIPE', 'RAZORPAY', 'PAYU', 'BANK_TRANSFER'].map(gw => {
-      const gwTrans = completed.filter(t => t.gateway === gw);
-      return {
-        gateway: gw,
-        value: gwTrans.reduce((acc, t) => acc + t.amount, 0)
-      };
-    });
-
     return {
       netRevenue: completed.reduce((acc, t) => acc + (t.netAmount || t.amount), 0),
       totalTax: completed.reduce((acc, t) => acc + (t.taxAmount || 0), 0),
       pipelineValue: pipeline.reduce((acc, t) => acc + t.amount, 0),
       revenueByCountry,
-      revenueByGateway
+      pendingReconciliations: scopedTransactions.filter(t => t.status === 'Pending' && t.gateway === 'BANK_TRANSFER').length
     };
   }, [scopedTransactions, countryConfigs]);
 
@@ -100,6 +92,8 @@ export default function FinanceHub() {
     tx.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tx.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const reconciliationQueue = scopedTransactions.filter(t => t.status === 'Pending' && t.gateway === 'BANK_TRANSFER');
 
   return (
     <div className="space-y-10 animate-fade-in pb-20">
@@ -124,7 +118,9 @@ export default function FinanceHub() {
         <TabsList className="bg-[#111113] border border-white/5 h-14 w-full justify-start p-1 rounded-none space-x-2 mb-10">
           <TabsTrigger value="overview" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Strategic Yield</TabsTrigger>
           <TabsTrigger value="ledger" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Global Ledger</TabsTrigger>
-          <TabsTrigger value="gateways" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Gateway Resonance</TabsTrigger>
+          <TabsTrigger value="reconciliation" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">
+             Reconciliation {stats.pendingReconciliations > 0 && <span className="ml-2 w-2 h-2 bg-gold rounded-full" />}
+          </TabsTrigger>
           <TabsTrigger value="compliance" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Jurisdictional Matrix</TabsTrigger>
         </TabsList>
 
@@ -223,46 +219,84 @@ export default function FinanceHub() {
                         )}>{tx.status}</Badge>
                       </TableCell>
                       <TableCell className="text-right pr-8">
-                        {tx.status === 'Pending' && tx.gateway === 'BANK_TRANSFER' ? (
-                          <Button size="sm" className="h-7 bg-white text-black hover:bg-plum hover:text-white text-[8px] font-bold uppercase rounded-none" onClick={() => handleReconcile(tx.id)}>
-                             RECONCILE
-                          </Button>
-                        ) : (
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
-                        )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredTransactions.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="py-40 text-center opacity-20">
-                         <Receipt className="w-12 h-12 mx-auto mb-4" />
-                         <p className="text-[10px] font-bold uppercase tracking-widest italic">Ledger currently dormant.</p>
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
            </Card>
         </TabsContent>
 
-        <TabsContent value="gateways" className="animate-fade-in space-y-10">
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.revenueByGateway.map(gw => (
-                <Card key={gw.gateway} className="bg-[#111113] border-white/5 p-8 space-y-6 rounded-none group hover:border-plum transition-all">
-                   <div className="flex justify-between items-start">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 group-hover:text-plum">{gw.gateway}</span>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                   </div>
-                   <div className="text-3xl font-body font-bold text-white tabular">${(gw.value / 1000).toFixed(1)}k</div>
-                   <div className="pt-4 border-t border-white/5">
-                      <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-white/20">
-                         <span>API Health</span>
-                         <span className="text-emerald-500">OPTIMAL</span>
-                      </div>
-                   </div>
-                </Card>
-              ))}
+        <TabsContent value="reconciliation" className="animate-fade-in space-y-8">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              <div className="lg:col-span-8">
+                 <Card className="bg-[#111113] border-white/5 shadow-2xl rounded-none overflow-hidden">
+                    <CardHeader className="bg-gold/5 border-b border-white/5 p-8">
+                       <div className="flex items-center space-x-4">
+                          <Building2 className="w-6 h-6 text-gold" />
+                          <div>
+                             <CardTitle className="text-white font-headline text-2xl uppercase">Bank Reconciliation Queue</CardTitle>
+                             <CardDescription className="text-[10px] uppercase tracking-widest text-gold/60">Manual verification required for high-ticket bank transfers</CardDescription>
+                          </div>
+                       </div>
+                    </CardHeader>
+                    <Table>
+                       <TableHeader className="bg-white/[0.01]">
+                          <TableRow className="border-white/5">
+                             <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Reference</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold text-white/40">Connoisseur</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold text-white/40">Amount</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">Action</TableHead>
+                          </TableRow>
+                       </TableHeader>
+                       <TableBody>
+                          {reconciliationQueue.map(tx => (
+                            <TableRow key={tx.id} className="hover:bg-white/5 transition-colors border-white/5">
+                               <TableCell className="pl-8 font-mono text-[10px] text-gold">{tx.id}</TableCell>
+                               <TableCell className="text-xs font-bold uppercase text-white/80">{tx.clientName}</TableCell>
+                               <TableCell className="text-sm font-bold text-white">${tx.amount.toLocaleString()}</TableCell>
+                               <TableCell className="text-right pr-8">
+                                  <Button 
+                                    className="h-8 bg-gold text-black hover:bg-white rounded-none text-[8px] font-bold uppercase tracking-widest"
+                                    onClick={() => handleReconcile(tx.id)}
+                                  >
+                                     VERIFY & SETTLE
+                                  </Button>
+                               </TableCell>
+                            </TableRow>
+                          ))}
+                          {reconciliationQueue.length === 0 && (
+                            <TableRow>
+                               <TableCell colSpan={4} className="py-20 text-center opacity-20">
+                                  <CheckCircle2 className="w-12 h-12 mx-auto mb-4" />
+                                  <p className="text-[10px] font-bold uppercase tracking-widest">Reconciliation Queue Clear</p>
+                               </TableCell>
+                            </TableRow>
+                          )}
+                       </TableBody>
+                    </Table>
+                 </Card>
+              </div>
+
+              <aside className="lg:col-span-4 space-y-8">
+                 <Card className="bg-[#111113] border-white/5 p-8 space-y-6">
+                    <div className="flex items-center space-x-3 text-gold">
+                       <ShieldCheck className="w-5 h-5" />
+                       <h4 className="text-[10px] font-bold uppercase tracking-widest">Verification Protocol</h4>
+                    </div>
+                    <p className="text-xs text-white/40 italic leading-relaxed">
+                      "Manual reconciliation is the final audit layer for institutional transfers. Ensure bank statement reference matches the Entry ID before settling."
+                    </p>
+                    <div className="pt-4 border-t border-white/5 space-y-4">
+                       <div className="flex justify-between text-[9px] font-bold uppercase">
+                          <span className="text-white/20">Audit Velocity</span>
+                          <span className="text-gold">100%</span>
+                       </div>
+                       <Progress value={100} className="h-0.5 bg-white/5" />
+                    </div>
+                 </Card>
+              </aside>
            </div>
         </TabsContent>
 

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import { 
   CartItem, 
   Product, 
@@ -12,12 +12,10 @@ import {
   BuyingGuide, 
   Editorial,
   SocialMetrics,
-  AdminAccount,
   Vendor,
   Affiliate,
   ReturnRequest,
   Campaign,
-  AuditLog,
   VipClient,
   GlobalSettings,
   CustomerSegment,
@@ -32,7 +30,6 @@ import {
   Transaction,
   PrivateInquiry,
   LeadConversation,
-  CMSSection,
   SEOMetadata,
   SalesScript,
   AutomationRule,
@@ -58,7 +55,9 @@ import {
   TransactionStatus,
   PaymentGateway,
   Subscription,
-  SubscriptionStatus
+  SubscriptionStatus,
+  CountryConfig,
+  BrandConfig
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -68,7 +67,6 @@ import {
   CITIES as INITIAL_CITIES,
   BUYING_GUIDES as INITIAL_GUIDES,
   EDITOR_INITIAL,
-  ADMIN_ACCOUNTS,
   VENDORS,
   AFFILIATES,
   RETURNS,
@@ -89,7 +87,6 @@ import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 import { MOCK_SESSION_USER } from './rbac/mock-session';
 import { MaisonUser } from './rbac/mock-users';
-import { useParams } from 'next/navigation';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -251,7 +248,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ] 
   })));
 
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([
+    { id: 'sub-1', tenantId: activeBrandId, userId: 'u-client-1', planId: 'diamond', planName: 'Maison Privé', status: 'ACTIVE', currentPeriodEnd: '2025-03-10', cancelAtPeriodEnd: false, amount: 1500, currency: 'USD' }
+  ]);
+
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
