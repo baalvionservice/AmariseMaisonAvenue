@@ -388,6 +388,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
+  const scopedEditorials = useMemo(() => activeHub === 'global' ? editorials : editorials.filter(e => e.country === activeHub || e.isGlobal), [editorials, activeHub]);
+  const scopedBuyingGuides = useMemo(() => activeHub === 'global' ? buyingGuides : buyingGuides.filter(g => g.country === activeHub || g.isGlobal), [buyingGuides, activeHub]);
   const scopedReturns = useMemo(() => activeHub === 'global' ? returns : returns.filter(r => r.country === activeHub), [returns, activeHub]);
   const scopedNotifications = useMemo(() => !currentUser ? [] : (currentUser.role === 'super_admin' && activeHub === 'global') ? notifications : notifications.filter(n => n.country === activeHub || n.country === 'global'), [notifications, currentUser, activeHub]);
   const scopedApprovals = useMemo(() => activeHub === 'global' ? approvalRequests : approvalRequests.filter(a => a.country === activeHub || a.country === 'global'), [approvalRequests, activeHub]);
@@ -450,7 +452,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials: [], scopedBuyingGuides: [], scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
     cmsSections, products, collections: INITIAL_COLLECTIONS, categories: INITIAL_CATEGORIES, departments: INITIAL_DEPARTMENTS, cities: INITIAL_CITIES, buyingGuides: INITIAL_GUIDES, editorials: EDITOR_INITIAL, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, admins: ADMIN_ACCOUNTS, vendors, affiliates, returns, activeCampaigns,
