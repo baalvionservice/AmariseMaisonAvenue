@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   RefreshCcw,
   LayoutDashboard,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,7 @@ import { useRouter, useParams } from 'next/navigation';
 
 /**
  * AdminTopBar: Global Command Matrix
- * Enhanced for Jurisdictional Hub switching for Super Admins.
+ * Refined layout to prevent jurisdictional labels from overlapping action buttons.
  */
 export function AdminTopBar() {
   const { currentUser, scopedNotifications, adminJurisdiction, setAdminJurisdiction } = useAppStore();
@@ -43,9 +44,9 @@ export function AdminTopBar() {
 
   return (
     <header className="h-20 bg-[#0A0A0B]/80 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 z-40 shrink-0 backdrop-blur-xl">
-      <div className="flex items-center space-x-12 flex-1">
-        {/* Universal Discovery */}
-        <div className="relative max-w-md w-full group">
+      {/* Group 1: Search & Context */}
+      <div className="flex items-center space-x-10">
+        <div className="relative w-64 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
@@ -70,8 +71,9 @@ export function AdminTopBar() {
         </div>
       </div>
 
+      {/* Group 2: Actions & Identity */}
       <div className="flex items-center space-x-10">
-        <div className="flex items-center space-x-4 pr-10 border-r border-white/5">
+        <div className="flex items-center pr-10 border-r border-white/5">
           <Button 
             className="bg-white text-black hover:bg-white/90 h-10 px-6 text-[10px] font-bold uppercase tracking-widest rounded-none transition-all shadow-xl shadow-white/5"
           >

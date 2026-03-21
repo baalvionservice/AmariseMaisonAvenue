@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -25,7 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 /**
  * Bank-Grade Command Center: Level 3 Tactical Oversight.
- * Optimized for information density and 1-Hour Predictive Liquidity Pulse.
+ * Refined layout to prevent ticker text from overlapping the static node indicator.
  */
 export default function AdminDashboard() {
   const { regions, globalTotal, globalUsers, globalPredictedInflow } = useSimulationData();
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 animate-fade-in font-body pb-20">
       {/* 1. System Health Ticker: Bank-Grade Status Bar */}
-      <div className="flex bg-[#111113] border border-white/5 p-1 rounded-sm shadow-2xl">
+      <div className="flex bg-[#111113] border border-white/5 p-1 rounded-sm shadow-2xl relative overflow-hidden">
          <div className="flex-1 overflow-hidden flex items-center">
             <div className="flex items-center space-x-12 px-6 animate-marquee whitespace-nowrap">
                <StatusTick label="GLOBAL SYNC" value="OPTIMAL" color="text-emerald-500" />
@@ -52,7 +53,8 @@ export default function AdminDashboard() {
                <StatusTick label="HUB CONNECTIVITY" value="STABLE" color="text-emerald-500" />
             </div>
          </div>
-         <div className="bg-white/5 px-6 py-2 border-l border-white/10 flex items-center space-x-3">
+         {/* Node Indicator with mask background to prevent overlap */}
+         <div className="relative z-10 bg-[#111113] px-6 py-2 border-l border-white/10 flex items-center space-x-3 shadow-[-10px_0_15px_rgba(17,17,19,0.8)]">
             <Server className="w-3 h-3 text-white/40" />
             <span className="text-[9px] font-bold uppercase tracking-widest text-white/60 tabular">NODE: {jurisdictionLabel}</span>
          </div>
@@ -84,15 +86,6 @@ export default function AdminDashboard() {
             selectedHubId={selectedHub}
             onRegionClick={(id) => setSelectedHub(id || null)} 
           />
-
-          {/* Tactical Overlays (Fixed position, non-clashing) */}
-          <div className="absolute top-8 left-8 z-10 space-y-2 pointer-events-none">
-            <div className="flex items-center space-x-3 text-white/80">
-              <Globe className="w-4 h-4 text-blue-500" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.5em]">Global Matrix</span>
-            </div>
-            <p className="text-[7px] text-white/20 uppercase tracking-[0.3em] font-bold pl-7">NODE SYNC: ACTIVE</p>
-          </div>
 
           <AnimatePresence>
             {selectedHub && activeHubData && (
