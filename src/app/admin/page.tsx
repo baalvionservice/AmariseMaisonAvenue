@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -8,14 +7,13 @@ import {
   Globe, 
   X, 
   TrendingUp, 
-  Lock, 
   Zap, 
-  Cpu,
-  Server,
-  ChevronRight,
-  Activity,
-  ShieldCheck,
-  Clock
+  Server, 
+  ChevronRight, 
+  ShieldCheck, 
+  Clock,
+  ArrowRight,
+  Database
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
@@ -26,11 +24,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 /**
  * Bank-Grade Command Center: Level 3 Tactical Oversight.
- * Refined layout to prevent ticker text from overlapping the static node indicator.
+ * Refined layout with high information density and jurisdictional hub matrix.
  */
 export default function AdminDashboard() {
   const { regions, globalTotal, globalUsers, globalPredictedInflow } = useSimulationData();
-  const { scopedErrors, adminJurisdiction } = useAppStore();
+  const { scopedErrors, adminJurisdiction, setAdminJurisdiction, currentUser } = useAppStore();
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
 
   const activeHubData = useMemo(() => 
@@ -41,20 +39,20 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in font-body pb-20">
-      {/* 1. System Health Ticker: Bank-Grade Status Bar */}
-      <div className="flex bg-[#111113] border border-white/5 p-1 rounded-sm shadow-2xl relative overflow-hidden">
+      {/* 1. System Health Ticker: Bank-Grade Status Bar with Clipping Mask */}
+      <div className="flex bg-[#111113] border border-white/5 p-1 rounded-sm shadow-2xl relative overflow-hidden h-10">
          <div className="flex-1 overflow-hidden flex items-center">
             <div className="flex items-center space-x-12 px-6 animate-marquee whitespace-nowrap">
                <StatusTick label="GLOBAL SYNC" value="OPTIMAL" color="text-emerald-500" />
                <StatusTick label="AI ACCURACY" value="98.2%" color="text-blue-400" />
                <StatusTick label="LATENCY" value="12ms" color="text-blue-400" />
                <StatusTick label="ANOMALIES" value={scopedErrors.filter(e => !e.resolved).length.toString()} color="text-red-500" />
-               <StatusTick label="CRYPTO NODES" value="SECURE" color="text-emerald-500" />
                <StatusTick label="HUB CONNECTIVITY" value="STABLE" color="text-emerald-500" />
+               <StatusTick label="SECURITY MESH" value="ACTIVE" color="text-emerald-500" />
             </div>
          </div>
-         {/* Node Indicator with mask background to prevent overlap */}
-         <div className="relative z-10 bg-[#111113] px-6 py-2 border-l border-white/10 flex items-center space-x-3 shadow-[-10px_0_15px_rgba(17,17,19,0.8)]">
+         {/* Static Mask Node Indicator */}
+         <div className="relative z-10 bg-[#111113] px-6 py-2 border-l border-white/10 flex items-center space-x-3 shadow-[-15px_0_20px_rgba(17,17,19,1)]">
             <Server className="w-3 h-3 text-white/40" />
             <span className="text-[9px] font-bold uppercase tracking-widest text-white/60 tabular">NODE: {jurisdictionLabel}</span>
          </div>
@@ -75,7 +73,7 @@ export default function AdminDashboard() {
         <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" href="/admin/sales" />
       </header>
 
-      {/* 3. Global Viewport & Predictive Pulse */}
+      {/* 3. Global Viewport & Predictive Matrix */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Global Matrix Viewport */}
         <section className="lg:col-span-8 relative h-[520px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl rounded-sm">
@@ -119,11 +117,15 @@ export default function AdminDashboard() {
                      </p>
                      <span className="text-[7px] font-bold uppercase text-blue-400">AI PREDICTION AGENT</span>
                   </div>
-                  <Link href="/admin/super" className="block w-full">
-                    <button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-[0.4em] rounded-none border-none cursor-pointer">
-                      HUB TERMINAL
-                    </button>
-                  </Link>
+                  <Button 
+                    className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-[0.4em] rounded-none border-none"
+                    onClick={() => {
+                      setAdminJurisdiction(activeHubData.id as any);
+                      setSelectedHub(null);
+                    }}
+                  >
+                    ENTER HUB TERMINAL
+                  </Button>
                 </div>
               </motion.div>
             )}
@@ -143,7 +145,7 @@ export default function AdminDashboard() {
              <CardContent className="p-0">
                 <div className="divide-y divide-white/5">
                    {Object.values(regions).map(hub => (
-                     <div key={hub.id} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                     <div key={hub.id} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
                         <div className="flex items-center space-x-4">
                            <span className="text-[9px] font-bold text-white/20 uppercase w-6">{hub.id}</span>
                            <div className="flex flex-col">
@@ -161,13 +163,46 @@ export default function AdminDashboard() {
                 <div className="p-4 bg-white/[0.01] border-t border-white/5">
                    <Link href="/admin/revenue" className="flex items-center justify-center space-x-2 text-[8px] font-bold uppercase tracking-[0.4em] text-white/30 hover:text-blue-400 transition-colors">
                       <span>VIEW REVENUE MATRIX</span>
-                      <ChevronRight className="w-3 h-3" />
+                      <ArrowRight className="w-3 h-3 ml-2" />
                    </Link>
                 </div>
              </CardContent>
           </Card>
         </aside>
       </div>
+
+      {/* 5. Regional Hub Matrix (The Switcher Hub) */}
+      <section className="space-y-6 pt-12 border-t border-white/5">
+         <div className="flex items-center space-x-4">
+            <Database className="w-5 h-5 text-white/40" />
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/40">Market Terminals</h2>
+         </div>
+         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {Object.values(regions).map(hub => (
+              <Card 
+                key={hub.id} 
+                className={cn(
+                  "bg-[#111113] border-white/5 rounded-none p-6 space-y-6 hover:border-blue-500/40 transition-all group cursor-pointer",
+                  adminJurisdiction === hub.id && "border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.1)]"
+                )}
+                onClick={() => setAdminJurisdiction(hub.id as any)}
+              >
+                 <div className="flex justify-between items-start">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/20 group-hover:text-blue-400 transition-colors">{hub.name}</span>
+                    <Globe className={cn("w-4 h-4", adminJurisdiction === hub.id ? "text-blue-500" : "text-white/10")} />
+                 </div>
+                 <div className="space-y-1">
+                    <p className="text-2xl font-headline font-bold italic text-white">${(hub.revenue / 1000).toFixed(1)}k</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest text-white/20">Settled Revenue</p>
+                 </div>
+                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                    <span className="text-[8px] font-bold uppercase tracking-tighter text-emerald-500">Node Active</span>
+                    <ChevronRight className="w-3 h-3 text-white/10 group-hover:text-white transition-all" />
+                 </div>
+              </Card>
+            ))}
+         </div>
+      </section>
     </div>
   );
 }
