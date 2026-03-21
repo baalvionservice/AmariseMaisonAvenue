@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useRef, useMemo, useState, Suspense, useEffect } from 'react';
+import React, { useRef, useMemo, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html, QuadraticBezierLine, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { RegionData } from '@/hooks/use-simulation-data';
 import { cn } from '@/lib/utils';
-import { Plus, Minus, RefreshCcw, Lock, TrendingUp, Users, ShoppingCart, Zap, Crown, Globe } from 'lucide-react';
+import { Plus, Minus, RefreshCcw, Lock, TrendingUp, Users, ShoppingCart, Zap } from 'lucide-react';
 
 /**
  * Institutional Color Palette for Heatmap & Markers
@@ -57,14 +57,6 @@ function HubPoint({
     return HUB_COLORS.low;
   }, [normalizedHeat, isSelected]);
 
-  // Autonomous Insight Generation
-  const aiInsight = useMemo(() => {
-    if (region.cart > region.purchased * 3) return "High checkout friction.";
-    if (region.purchased > 5) return "Conversion momentum.";
-    if (region.wishlist > 20) return "Strong resonance.";
-    return "Market stable.";
-  }, [region.cart, region.purchased, region.wishlist]);
-
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const pulse = 1 + Math.sin(time * 3) * 0.15;
@@ -93,48 +85,7 @@ function HubPoint({
       
       <Html distanceFactor={isSelected ? 10 : 15} zIndexRange={[10, 0]}>
         <div className="pointer-events-none select-none">
-          {isSelected ? (
-            <div className="animate-fade-in -translate-y-48 -translate-x-1/2">
-              <div className="w-64 bg-[#111113]/95 backdrop-blur-2xl border border-white/10 p-6 shadow-[0_40px_80px_rgba(0,0,0,0.6)] space-y-5 relative">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
-                
-                <div className="flex justify-between items-start border-b border-white/10 pb-3">
-                  <div className="space-y-0.5">
-                    <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-blue-400">Tactical Hub {region.id.toUpperCase()}</p>
-                    <h4 className="text-lg font-headline font-bold italic text-white leading-none">{region.name}</h4>
-                  </div>
-                  <Lock className="w-3 h-3 text-white/20" />
-                </div>
-
-                <div className="space-y-4">
-                  <DetailItem label="Yield" value={`$${(region.revenue / 1000).toFixed(1)}k`} icon={<TrendingUp className="w-3 h-3 text-emerald-400" />} />
-                  <DetailItem label="Intent" value={region.activeUsers} icon={<Users className="w-3 h-3 text-blue-400" />} />
-                  <DetailItem label="Density" value={region.cart} icon={<ShoppingCart className="w-3 h-3 text-amber-400" />} />
-                </div>
-
-                <div className="pt-3 border-t border-white/10 space-y-2">
-                  <div className="flex items-center space-x-2 text-blue-400">
-                    <Zap className="w-2.5 h-2.5" />
-                    <span className="text-[7px] font-bold uppercase tracking-widest">Signal</span>
-                  </div>
-                  <p className="text-[9px] text-white/60 font-light italic leading-relaxed">
-                    "{aiInsight}"
-                  </p>
-                </div>
-
-                <div className="pt-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[6px] font-bold text-white/20 uppercase tracking-[0.3em]">Prob.</span>
-                    <span className="text-[8px] font-bold text-blue-400">{((region.purchased / region.activeUsers) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="h-0.5 bg-white/5 w-full overflow-hidden">
-                    <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(region.purchased / region.activeUsers) * 100}%` }} />
-                  </div>
-                </div>
-              </div>
-              <div className="w-px h-16 bg-gradient-to-b from-blue-500/50 to-transparent mx-auto mt-1" />
-            </div>
-          ) : (
+          {!isSelected && (
             <div className="bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-white/5 -translate-y-8 whitespace-nowrap shadow-2xl transition-all">
               <p className="text-[7px] font-bold text-white/60 uppercase tracking-[0.2em] font-mono">{region.id.toUpperCase()}</p>
             </div>
@@ -142,18 +93,6 @@ function HubPoint({
         </div>
       </Html>
     </group>
-  );
-}
-
-function DetailItem({ label, value, icon }: { label: string, value: string | number, icon: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-center group">
-      <div className="flex items-center space-x-2">
-        <div className="opacity-40 group-hover:opacity-100 transition-opacity">{icon}</div>
-        <span className="text-[8px] font-bold text-white/30 uppercase tracking-[0.2em]">{label}</span>
-      </div>
-      <span className="text-[11px] font-bold text-white tracking-tighter tabular-nums">{value}</span>
-    </div>
   );
 }
 
@@ -359,49 +298,30 @@ export function IntelligenceGlobe({
         />
       </Canvas>
 
-      {/* Institutional Legend */}
-      <div className="absolute bottom-8 left-8 space-y-3 pointer-events-none">
-        <div className="space-y-2">
-          <p className="text-[7px] font-bold uppercase tracking-[0.5em] text-white/20 mb-2">Hub Yield Matrix</p>
-          <LegendItem color={HUB_COLORS.high} label="Optimal" />
-          <LegendItem color={HUB_COLORS.medium} label="Strategic" />
-          <LegendItem color={HUB_COLORS.low} label="Base" />
-        </div>
-      </div>
-
       {/* Tactical Hub Control Matrix */}
-      <div className="absolute bottom-8 right-8 flex flex-col space-y-2">
+      <div className="absolute bottom-8 right-8 flex flex-col space-y-2 pointer-events-auto">
         <button 
           onClick={() => onRegionClick(null)}
-          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl group"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl group rounded-none"
           aria-label="Master Reset"
         >
           <RefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-700" />
         </button>
         <button 
           onClick={() => handleManualZoom('in')}
-          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl rounded-none"
           aria-label="Inc. Zoom"
         >
           <Plus size={16} />
         </button>
         <button 
           onClick={() => handleManualZoom('out')}
-          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl"
+          className="w-10 h-10 bg-[#111113]/80 backdrop-blur-xl border border-white/5 flex items-center justify-center text-white/30 hover:text-white hover:border-blue-500/50 transition-all shadow-2xl rounded-none"
           aria-label="Dec. Zoom"
         >
           <Minus size={16} />
         </button>
       </div>
-    </div>
-  );
-}
-
-function LegendItem({ color, label }: { color: string, label: string }) {
-  return (
-    <div className="flex items-center space-x-3 opacity-70">
-      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
-      <span className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/80">{label}</span>
     </div>
   );
 }

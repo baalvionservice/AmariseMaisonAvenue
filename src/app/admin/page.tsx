@@ -4,22 +4,17 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
-  ShoppingCart, 
-  Activity, 
   Globe, 
   X, 
   TrendingUp, 
   Lock, 
   Zap, 
-  ArrowUpRight, 
   Cpu,
   Server,
-  ArrowRight,
+  ChevronRight,
+  Activity,
   ShieldCheck,
-  TrendingDown,
-  Coins,
-  Clock,
-  ChevronRight
+  Clock
 } from 'lucide-react';
 import { useSimulationData } from '@/hooks/use-simulation-data';
 import { IntelligenceGlobe } from '@/components/admin/IntelligenceGlobe';
@@ -44,9 +39,9 @@ export default function AdminDashboard() {
   const jurisdictionLabel = adminJurisdiction === 'global' ? 'GLOBAL MASTER' : adminJurisdiction.toUpperCase() + ' NODE';
 
   return (
-    <div className="space-y-8 animate-fade-in font-body">
+    <div className="space-y-8 animate-fade-in font-body pb-20">
       {/* 1. System Health Ticker: Bank-Grade Status Bar */}
-      <div className="flex bg-[#111113] border border-white/5 p-1">
+      <div className="flex bg-[#111113] border border-white/5 p-1 rounded-sm shadow-2xl">
          <div className="flex-1 overflow-hidden flex items-center">
             <div className="flex items-center space-x-12 px-6 animate-marquee whitespace-nowrap">
                <StatusTick label="GLOBAL SYNC" value="OPTIMAL" color="text-emerald-500" />
@@ -64,14 +59,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* 2. Primary Yield HUD */}
-      <header className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <header className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <SignalNode label="Aggregate Yield" value={`$${(globalTotal / 1000000).toFixed(2)}M`} trend="+12.4% MoM" href="/admin/revenue" />
         <SignalNode label="Network Pulse" value={globalUsers.toLocaleString()} trend="+5.2%" href="/admin/integrations" />
         <SignalNode 
           label="Liquidity Pipeline (1h)" 
           value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} 
           color="text-blue-400" 
-          trend="Incoming Yield"
+          trend="Predicted Inflow"
           icon={<Zap className="w-4 h-4" />}
           href="/admin/revenue"
         />
@@ -81,7 +76,7 @@ export default function AdminDashboard() {
       {/* 3. Global Viewport & Predictive Pulse */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Global Matrix Viewport */}
-        <section className="lg:col-span-8 relative h-[520px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl">
+        <section className="lg:col-span-8 relative h-[520px] bg-[#111113] border border-white/5 overflow-hidden group shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent pointer-events-none" />
           
           <IntelligenceGlobe 
@@ -90,21 +85,13 @@ export default function AdminDashboard() {
             onRegionClick={(id) => setSelectedHub(id || null)} 
           />
 
-          {/* Tactical Overlays */}
-          <div className="absolute top-8 left-8 z-10 space-y-6 pointer-events-none">
-            <div className="flex flex-col space-y-1">
-              <div className="flex items-center space-x-3 text-white/80">
-                <Globe className="w-4 h-4 text-blue-500" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.5em]">Global Matrix V5.2</span>
-              </div>
-              <p className="text-[7px] text-white/20 uppercase tracking-[0.3em] font-bold pl-7">NODE SYNC: ACTIVE</p>
+          {/* Tactical Overlays (Fixed position, non-clashing) */}
+          <div className="absolute top-8 left-8 z-10 space-y-2 pointer-events-none">
+            <div className="flex items-center space-x-3 text-white/80">
+              <Globe className="w-4 h-4 text-blue-500" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.5em]">Global Matrix</span>
             </div>
-            
-            <div className="space-y-4">
-               <HUDMetric icon={<Activity className="w-3.5 h-3.5" />} label="TRAFFIC" value="STABLE" />
-               <HUDMetric icon={<Lock className="w-3.5 h-3.5" />} label="VAULT" value="LOCKED" />
-               <HUDMetric icon={<Cpu className="w-3.5 h-3.5" />} label="AI AGENT" value="ACTIVE" />
-            </div>
+            <p className="text-[7px] text-white/20 uppercase tracking-[0.3em] font-bold pl-7">NODE SYNC: ACTIVE</p>
           </div>
 
           <AnimatePresence>
@@ -113,12 +100,12 @@ export default function AdminDashboard() {
                 initial={{ x: 400, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 400, opacity: 0 }}
-                className="absolute right-0 top-0 h-full w-[340px] bg-[#0A0A0B]/95 backdrop-blur-2xl border-l border-white/5 z-20 p-8 space-y-8 shadow-2xl"
+                className="absolute right-0 top-0 h-full w-[320px] bg-[#0A0A0B]/95 backdrop-blur-2xl border-l border-white/5 z-20 p-8 space-y-8 shadow-2xl"
               >
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <div className="space-y-1">
                     <span className="text-[8px] font-bold uppercase tracking-[0.4em] text-blue-500">Jurisdictional Node</span>
-                    <h3 className="text-2xl font-headline font-bold italic text-white leading-none">{activeHubData.name}</h3>
+                    <h3 className="text-xl font-headline font-bold italic text-white leading-none">{activeHubData.name}</h3>
                   </div>
                   <button onClick={() => setSelectedHub(null)} className="p-2 hover:bg-white/5 text-white/40 border-none bg-transparent cursor-pointer">
                     <X className="w-4 h-4" />
@@ -152,7 +139,7 @@ export default function AdminDashboard() {
 
         {/* 4. Jurisdictional Predictive Pulse */}
         <aside className="lg:col-span-4 space-y-8">
-          <Card className="bg-[#111113] border-white/5 rounded-none shadow-2xl">
+          <Card className="bg-[#111113] border-white/5 rounded-none shadow-2xl h-full">
              <CardHeader className="border-b border-white/5 bg-white/5 p-5 flex flex-row items-center justify-between">
                 <div className="flex items-center space-x-3 text-blue-400">
                    <Clock className="w-3.5 h-3.5" />
@@ -186,18 +173,6 @@ export default function AdminDashboard() {
                 </div>
              </CardContent>
           </Card>
-
-          <Card className="bg-[#111113] border-white/5 rounded-none p-6 space-y-6">
-             <div className="flex items-center space-x-3 text-white/20">
-                <Activity className="w-4 h-4 text-blue-500" />
-                <h4 className="text-[9px] font-bold uppercase tracking-[0.4em]">Strategic Resonance</h4>
-             </div>
-             <div className="space-y-4">
-                <PerformanceRow label="CONVERSION PROB." val={96} />
-                <PerformanceRow label="MARKET LIQUIDITY" val={92} />
-                <PerformanceRow label="AI PREDICTION CONF." val={99} />
-             </div>
-          </Card>
         </aside>
       </div>
     </div>
@@ -215,7 +190,7 @@ function StatusTick({ label, value, color }: { label: string, value: string, col
 
 function SignalNode({ label, value, trend, color = "text-white", icon, href }: { label: string, value: string | number, trend?: string, color?: string, icon?: React.ReactNode, href?: string }) {
   const content = (
-    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl relative overflow-hidden">
+    <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl relative overflow-hidden h-full">
       {icon && <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-20 transition-opacity">{icon}</div>}
       <div className="flex justify-between items-start">
         <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/20">{label}</p>
@@ -229,37 +204,11 @@ function SignalNode({ label, value, trend, color = "text-white", icon, href }: {
   return content;
 }
 
-function HUDMetric({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
-  return (
-    <div className="flex items-center space-x-3 group">
-       <div className="text-blue-500/40 group-hover:text-blue-500 transition-colors">{icon}</div>
-       <div className="flex flex-col">
-          <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</span>
-          <span className="text-[9px] font-bold text-white/60 tabular-nums">{value}</span>
-       </div>
-    </div>
-  );
-}
-
 function HubDetailRow({ label, value, color = "text-white" }: { label: string, value: string | number, color?: string }) {
   return (
     <div className="flex flex-col space-y-1">
       <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</p>
       <p className={cn("text-xl font-body font-bold italic tracking-tighter tabular-nums", color)}>{value}</p>
-    </div>
-  );
-}
-
-function PerformanceRow({ label, val }: { label: string, val: number }) {
-  return (
-    <div className="space-y-1.5">
-      <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest">
-        <span className="text-white/30">{label}</span>
-        <span className="text-white/60 tabular-nums">{val}%</span>
-      </div>
-      <div className="h-0.5 bg-white/5 w-full">
-         <div className="h-full bg-blue-500 opacity-60" style={{ width: `${val}%` }} />
-      </div>
     </div>
   );
 }
