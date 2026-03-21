@@ -313,5 +313,5 @@ function TableHead({ children, className }: { children: React.ReactNode, classNa
   return <th className={cn("h-12 px-4 align-middle", className)}>{children}</th>;
 }
 function TableCell({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <td className={cn("p-4 align-middle", className)}>{children}</th>;
+  return <td className={cn("p-4 align-middle", className)}>{children}</td>;
 }

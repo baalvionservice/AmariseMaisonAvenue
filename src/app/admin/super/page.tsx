@@ -60,9 +60,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { SyncCategory, CountryCode } from '@/lib/types';
+import { SyncCategory, CountryCode, AdminViewMode } from '@/lib/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 /**
  * Global Matrix: Institutional Master Control
@@ -81,7 +88,10 @@ export default function SuperAdminHub() {
     privateInquiries,
     invoices,
     globalSettings,
-    updateGlobalSettings
+    updateGlobalSettings,
+    setAdminJurisdiction,
+    setGuideMode,
+    setAdminViewMode
   } = useAppStore();
 
   const [isSyncModalOpen, setIsSyncOpen] = useState(false);
