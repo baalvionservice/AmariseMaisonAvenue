@@ -32,7 +32,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     
-    --radius: 0.5rem;
+    --radius: 0.25rem;
   }
 }
 
@@ -41,8 +41,13 @@
     @apply relative h-14 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-0 pt-0 text-[11px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:text-slate-900 data-[state=active]:border-blue-600 data-[state=active]:text-slate-900 data-[state=active]:shadow-none;
   }
 
-  .luxury-card-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5;
+  .bank-card {
+    @apply bg-[#111113] border-white/5 rounded-none shadow-2xl transition-all duration-300;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
 
   .status-pulse {
@@ -51,12 +56,6 @@
   
   .status-pulse-inner {
     @apply animate-ping absolute inline-flex h-full w-full rounded-full opacity-75;
-  }
-
-  /* Fintech Tabular Numerals Utility */
-  .tabular {
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
   }
 }
 
@@ -70,7 +69,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -78,29 +77,19 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-blue {
-  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.node-pulse {
-  animation: pulse-blue 2s infinite;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .luxury-blur {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
