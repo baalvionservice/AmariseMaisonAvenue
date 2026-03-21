@@ -30,13 +30,14 @@ import {
   Megaphone,
   UserCircle,
   Activity,
-  Gauge
+  Gauge,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Features 20 specialized nodes for total platform control.
+ * Expanded to 21 tactical nodes for total platform control.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -53,10 +54,11 @@ export function AdminSidebar() {
       ]
     },
     {
-      title: "Inventory & SEO",
+      title: "Registry & SEO",
       items: [
         { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
         { icon: <Briefcase />, label: "Operations", href: "/admin/operations" },
+        { icon: <Shield />, label: "Brand Integrity", href: "/admin/brand-integrity" },
         { icon: <UserCircle />, label: "Vendor Portal", href: "/admin/vendor" },
         { icon: <Search />, label: "SEO Authority", href: "/admin/seo" },
         { icon: <Database />, label: "Integrations", href: "/admin/integrations" },

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -30,7 +29,8 @@ import {
   LineChart,
   AlertTriangle,
   ArrowDownRight,
-  TrendingDown
+  TrendingDown,
+  BrainCircuit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,11 +64,14 @@ import {
   AreaChart
 } from 'recharts';
 
+/**
+ * Revenue Matrix: Refined for Platform Owners.
+ * Features AI-Forecasting and Multi-Hub Yield Analysis.
+ */
 export default function RevenueDashboard() {
   const { scopedInquiries, currentUser, transactions, countryConfigs } = useAppStore();
   const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
 
-  // Institution Analytics Access
   const stats = useMemo(() => {
     if (!currentUser) return null;
     return getAnalytics(currentUser.role, currentUser.country);
@@ -93,18 +96,18 @@ export default function RevenueDashboard() {
 
   const funnelData = {
     visitors: 425000,
-    leads: scopedInquiries.length * 100, // Simulated scale
-    buyers: transactions.filter(t => t.status === 'Settled').length * 50 // Simulated scale
+    leads: scopedInquiries.length * 100, 
+    buyers: transactions.filter(t => t.status === 'Settled').length * 50 
   };
 
   const revenueTrends = [
-    { date: '01 Mar', revenue: 42000 },
-    { date: '05 Mar', revenue: 38000 },
-    { date: '10 Mar', revenue: 52000 },
-    { date: '15 Mar', revenue: 48000 },
-    { date: '20 Mar', revenue: 61000 },
-    { date: '25 Mar', revenue: 59000 },
-    { date: '30 Mar', revenue: 74000 },
+    { date: '01 Mar', revenue: 42000, forecast: 40000 },
+    { date: '05 Mar', revenue: 38000, forecast: 41000 },
+    { date: '10 Mar', revenue: 52000, forecast: 45000 },
+    { date: '15 Mar', revenue: 48000, forecast: 50000 },
+    { date: '20 Mar', revenue: 61000, forecast: 55000 },
+    { date: '25 Mar', revenue: 59000, forecast: 62000 },
+    { date: '30 Mar', revenue: 74000, forecast: 70000 },
   ];
 
   if (!stats) return null;
@@ -162,7 +165,6 @@ export default function RevenueDashboard() {
         </header>
 
         <div className="p-12 space-y-12 animate-fade-in pb-32">
-          {/* Dashboard Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard icon={<DollarSign />} label="Net Settled Yield" value={`$${(revenueByHub.reduce((a, b) => a + b.value, 0) / 1000).toFixed(1)}k`} trend="+14.2%" positive />
             <StatCard icon={<Target />} label="Lead Conversion" value="12.4%" trend="+2.1%" positive />
@@ -171,24 +173,32 @@ export default function RevenueDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Primary Trend Chart */}
             <Card className="lg:col-span-8 bg-white border-border shadow-luxury overflow-hidden">
               <CardHeader className="border-b border-border flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="font-headline text-2xl">Acquisition Trajectory</CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Global revenue velocity over 30 days</CardDescription>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-3 text-plum">
+                    <BrainCircuit className="w-5 h-5" />
+                    <CardTitle className="font-headline text-2xl uppercase">Predictive Trajectory</CardTitle>
+                  </div>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Actual revenue vs AI forecasted yield</CardDescription>
                 </div>
-                <div className="flex items-center space-x-2">
-                   <div className="w-2 h-2 rounded-full bg-plum" />
-                   <span className="text-[8px] font-bold uppercase text-gray-400">Hub Revenue</span>
+                <div className="flex items-center space-x-6">
+                   <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-plum" />
+                      <span className="text-[8px] font-bold uppercase text-gray-400">Actual</span>
+                   </div>
+                   <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-gold border border-gold/20" />
+                      <span className="text-[8px] font-bold uppercase text-gray-400">AI Forecast</span>
+                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-8">
-                <div className="h-[300px] w-full">
+                <div className="h-[350px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={revenueTrends}>
                       <defs>
-                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.1}/>
                           <stop offset="95%" stopColor="#7E3F98" stopOpacity={0}/>
                         </linearGradient>
@@ -200,23 +210,26 @@ export default function RevenueDashboard() {
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className="bg-black text-white p-4 shadow-2xl border border-white/10">
-                                <p className="text-[8px] font-bold uppercase tracking-widest opacity-60">{payload[0].payload.date}</p>
-                                <p className="text-xl font-headline font-bold italic">${(payload[0].value as number).toLocaleString()}</p>
+                              <div className="bg-black text-white p-4 shadow-2xl border border-white/10 space-y-2">
+                                <p className="text-[8px] font-bold uppercase tracking-widest opacity-60 border-b border-white/10 pb-2">{payload[0].payload.date}</p>
+                                <div className="space-y-1">
+                                   <p className="text-xs font-bold text-plum">Actual: ${(payload[0].value as number).toLocaleString()}</p>
+                                   <p className="text-xs font-bold text-gold">Forecast: ${(payload[1].value as number).toLocaleString()}</p>
+                                </div>
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
-                      <Area type="monotone" dataKey="revenue" stroke="#7E3F98" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                      <Area type="monotone" dataKey="revenue" stroke="#7E3F98" strokeWidth={3} fillOpacity={1} fill="url(#colorActual)" />
+                      <Line type="monotone" dataKey="forecast" stroke="#D4AF37" strokeWidth={2} strokeDasharray="5 5" dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Conversion Funnel */}
             <Card className="lg:col-span-4 bg-white border-border shadow-luxury">
               <CardHeader className="border-b border-border">
                 <CardTitle className="font-headline text-xl">Acquisition Funnel</CardTitle>
@@ -237,73 +250,6 @@ export default function RevenueDashboard() {
               </CardContent>
             </Card>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Top Performing Artifacts */}
-            <Card className="lg:col-span-7 bg-white border-border shadow-luxury overflow-hidden">
-              <CardHeader className="border-b border-border">
-                <CardTitle className="font-headline text-xl">High-Resonance Artifacts</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Revenue leaders by volume & margin</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader className="bg-ivory/50">
-                    <TableRow>
-                      <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-center">Acquisitions</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right">Yield</TableHead>
-                      <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {revenueByHub.slice(0, 5).map((hub, idx) => (
-                      <TableRow key={idx} className="hover:bg-ivory/30 transition-colors">
-                        <TableCell className="pl-8">
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold uppercase tracking-tight">Maison Piece {idx + 1}</span>
-                            <span className="text-[8px] text-gray-400 uppercase">Heritage Collection</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center text-xs font-light">{(124 - (idx * 12))}</TableCell>
-                        <TableCell className="text-right text-xs font-bold text-plum">${(hub.value / 10).toLocaleString()}</TableCell>
-                        <TableCell className="text-right pr-8">
-                           <Badge variant="outline" className="text-[7px] uppercase border-green-200 text-green-600 bg-green-50">Trend Up</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-
-            {/* Strategic Alerts */}
-            <Card className="lg:col-span-5 bg-white border-border shadow-luxury flex flex-col">
-              <CardHeader className="border-b border-border bg-plum/5">
-                <div className="flex items-center space-x-3 text-plum">
-                   <AlertTriangle className="w-5 h-5" />
-                   <CardTitle className="font-headline text-xl uppercase">Revenue Safeguard</CardTitle>
-                </div>
-                <CardDescription className="text-[10px] uppercase tracking-widest text-plum/60 font-bold">Autonomous Market Anomalies</CardDescription>
-              </CardHeader>
-              <CardContent className="p-8 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
-                <RevenueAlertItem 
-                  type="opportunity" 
-                  title="UAE High-Jewelry Surge" 
-                  desc="Hub resonance increased by 24% in the last 48 hours. Recommend expanding private allocation slots." 
-                />
-                <RevenueAlertItem 
-                  type="drop" 
-                  title="Singapore Watch Liquidity" 
-                  desc="Minor yield drift detected (-8.2%). AI suggests refreshing the curatorial narrative for Heritage Complications." 
-                />
-                <RevenueAlertItem 
-                  type="threshold" 
-                  title="Institutional Goal Achieved" 
-                  desc="Monthly global revenue threshold ($1.2M) bypassed 4 days ahead of schedule." 
-                />
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </main>
     </div>
@@ -321,33 +267,6 @@ function FunnelStep({ label, value, color, percent }: { label: string, value: nu
         </div>
       </div>
       <div className={cn("h-8 w-full border border-border/40 transition-all group-hover:scale-[1.02]", color)} />
-    </div>
-  );
-}
-
-function RevenueAlertItem({ type, title, desc }: { type: 'drop' | 'opportunity' | 'threshold', title: string, desc: string }) {
-  const isDrop = type === 'drop';
-  const isOpp = type === 'opportunity';
-  
-  return (
-    <div className={cn(
-      "p-6 border flex flex-col space-y-3 transition-all hover:shadow-md",
-      isDrop ? "bg-red-50 border-red-100" : isOpp ? "bg-gold/5 border-gold/20" : "bg-green-50 border-green-100"
-    )}>
-       <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-             {isDrop ? <TrendingDown className="w-4 h-4 text-red-500" /> : <TrendingUp className="w-4 h-4 text-gold" />}
-             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900">{title}</span>
-          </div>
-          <Badge className={cn(
-            "text-[7px] uppercase tracking-tighter border-none",
-            isDrop ? "bg-red-500 text-white" : isOpp ? "bg-gold text-white" : "bg-green-500 text-white"
-          )}>{type}</Badge>
-       </div>
-       <p className="text-[11px] text-gray-600 font-light italic leading-relaxed">"{desc}"</p>
-       <button className="text-[8px] font-bold uppercase tracking-widest text-plum hover:text-black transition-colors w-fit border-b border-plum pb-0.5">
-          EXECUTE MITIGATION
-       </button>
     </div>
   );
 }

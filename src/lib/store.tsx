@@ -55,7 +55,8 @@ import {
   GlobalSyncSession,
   SyncCategory,
   StressTest,
-  AdminViewMode
+  AdminViewMode,
+  BrandIntegrityIssue
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -109,6 +110,7 @@ interface AppContextType {
   scopedQATests: QATestCase[];
   scopedErrors: MaisonError[];
   scopedStressTests: StressTest[];
+  scopedBrandIntegrity: BrandIntegrityIssue[];
   
   cmsSections: CMSSection[];
   products: Product[];
@@ -122,6 +124,7 @@ interface AppContextType {
   maisonErrors: MaisonError[];
   stressTests: StressTest[];
   customerSegments: CustomerSegment[];
+  brandIntegrityIssues: BrandIntegrityIssue[];
   
   privateInquiries: PrivateInquiry[];
   leadConversations: LeadConversation[];
@@ -209,6 +212,8 @@ interface AppContextType {
   addAILog: (log: AIActionLog) => void;
   upsertAISuggestion: (suggestion: AISuggestion) => void;
   updateSuggestionStatus: (id: string, status: AISuggestion['status']) => void;
+
+  resolveBrandIntegrity: (id: string) => void;
 
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -316,6 +321,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'err-1', module: 'AI Autopilot', type: 'JobFailed', country: 'us', message: 'Predictive lead scoring cycle failed due to data drift.', stackTrace: 'ReferenceError: leadScore is not defined', resolved: false, timestamp: new Date().toISOString(), severity: 'high', brandId: activeBrandId }
   ]);
 
+  const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([
+    { id: 'bi-1', productId: 'prod-11', productName: 'Hermes Birkin 25', country: 'in', issueType: 'Tone', severity: 'medium', description: 'Regional description uses informal language inconsistent with Maison standards.', suggestion: 'Replace "luxury bag" with "archival artifact of human brilliance."', timestamp: new Date().toISOString(), status: 'pending' }
+  ]);
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
@@ -377,6 +386,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedQATests = useMemo(() => activeHub === 'global' ? qaTests : qaTests.filter(t => t.country === activeHub || t.country === 'global'), [qaTests, activeHub]);
   const scopedErrors = useMemo(() => activeHub === 'global' ? maisonErrors : maisonErrors.filter(e => e.country === activeHub), [maisonErrors, activeHub]);
   const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(t => t.country === activeHub || t.country === 'global'), [stressTests, activeHub]);
+  const scopedBrandIntegrity = useMemo(() => activeHub === 'global' ? brandIntegrityIssues : brandIntegrityIssues.filter(i => i.country === activeHub), [brandIntegrityIssues, activeHub]);
 
   const logAction = (action: string, entity: string, country = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
@@ -419,8 +429,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules, aiModules, aiLogs, aiSuggestions,
     notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, admins: ADMIN_ACCOUNTS, vendors, affiliates, returns, activeCampaigns,
     vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, indexingLogs, appointments, invoices, transactions, isShowcaseMode, activeVip, activeVendor,
@@ -465,6 +475,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addAILog: (l: AIActionLog) => setAiLogs(prev => [l, ...prev].slice(0, 50)),
     upsertAISuggestion: (suggestion: AISuggestion) => setAiSuggestions(prev => prev.some(i => i.id === suggestion.id) ? prev.map(i => i.id === suggestion.id ? suggestion : i) : [suggestion, ...prev]),
     updateSuggestionStatus: (id: string, s: AISuggestion['status']) => setAiSuggestions(prev => prev.map(i => i.id === id ? { ...i, status: s } : i)),
+    resolveBrandIntegrity: (id: string) => setBrandIntegrityIssues(prev => prev.map(i => i.id === id ? { ...i, status: 'fixed' } : i)),
     addToCart: (p: Product) => setCart(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? { ...i, quantity: i.quantity + 1 } : i) : [...prev, { ...p, quantity: 1 }]),
     removeFromCart: (id: string) => setCart(prev => prev.filter(i => i.id !== id)),
     toggleWishlist: (p: Product) => setWishlist(prev => prev.some(i => i.id === p.id) ? prev.filter(i => i.id !== p.id) : [...prev, p]),
@@ -488,8 +499,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     approveVendor: (id: string) => setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'active' } : v)),
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests,
-    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments,
+    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity,
+    cmsSections, products, collections, categories, departments, cities, buyingGuides, editorials, qaTests, maisonErrors, stressTests, customerSegments, brandIntegrityIssues,
     privateInquiries, leadConversations, messagingTemplates, seoRegistry, automationRules,
     aiModules, aiLogs, aiSuggestions, notifications, workflows, approvalRequests, auditRegistry,
     cart, wishlist, socialMetrics, vendors, affiliates, returns, activeCampaigns,

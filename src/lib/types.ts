@@ -763,3 +763,16 @@ export interface RevenueAlert {
   severity: 'low' | 'medium' | 'high';
   resolved: boolean;
 }
+
+export interface BrandIntegrityIssue {
+  id: string;
+  productId: string;
+  productName: string;
+  country: string;
+  issueType: 'Tone' | 'Vocabulary' | 'Heritage' | 'Technical';
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  suggestion: string;
+  timestamp: string;
+  status: 'pending' | 'fixed' | 'ignored';
+}

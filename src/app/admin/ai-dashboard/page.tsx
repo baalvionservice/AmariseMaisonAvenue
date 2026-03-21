@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -27,7 +26,9 @@ import {
   Coins,
   Target,
   Database,
-  Cpu
+  Cpu,
+  BarChart,
+  Crown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,11 +52,10 @@ import { useToast } from '@/hooks/use-toast';
 
 /**
  * AI Autopilot: High-Frequency Automation Terminal
- * Tab 1: Performance Overview, Tab 2: Automation Logs, Tab 3: Neural Parameters
  */
 export default function AIDashboard() {
   const { modules, logs, suggestions, jobs, runJob, runSequence, approveSuggestion, rejectSuggestion } = useAI();
-  const { workflows, runWorkflowTask, currentUser } = useAppStore();
+  const { workflows, currentUser } = useAppStore();
   const { toast } = useToast();
 
   const stats = useMemo(() => {
@@ -95,6 +95,7 @@ export default function AIDashboard() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-white border-b border-border h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
           <TabsTrigger value="overview" className="tab-trigger">Efficiency Overview</TabsTrigger>
+          <TabsTrigger value="sentiment" className="tab-trigger">Market Sentiment</TabsTrigger>
           <TabsTrigger value="logs" className="tab-trigger">Automation Logs</TabsTrigger>
           <TabsTrigger value="parameters" className="tab-trigger">Neural Parameters</TabsTrigger>
         </TabsList>
@@ -150,6 +151,56 @@ export default function AIDashboard() {
            </div>
         </TabsContent>
 
+        <TabsContent value="sentiment" className="space-y-12 animate-fade-in">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <div className="lg:col-span-8 space-y-8">
+                 <div className="bg-plum/5 p-8 border border-plum/10 space-y-4">
+                    <div className="flex items-center space-x-3 text-plum">
+                       <BarChart className="w-5 h-5" />
+                       <h3 className="text-[10px] font-bold uppercase tracking-[0.4em]">Connoisseur Resonancy Matrix</h3>
+                    </div>
+                    <p className="text-xs text-slate-600 italic leading-relaxed">
+                      "Real-time sentiment tracking of global collectors. AI analyzes search patterns and private brief language to detect market shifts."
+                    </p>
+                 </div>
+
+                 <div className="grid grid-cols-1 gap-6">
+                    <SentimentCard 
+                      hub="UAE" 
+                      topic="High Complication Watches" 
+                      sentiment="Extreme Bullish" 
+                      signal="Lead language shifting from 'value' to 'heritage scarcity'."
+                    />
+                    <SentimentCard 
+                      hub="India" 
+                      topic="Artisanal Silk Archive" 
+                      sentiment="Rising Resonance" 
+                      signal="Significant spike in intent from Tier 1 connoisseurs in Mumbai."
+                    />
+                    <SentimentCard 
+                      hub="USA" 
+                      topic="Exotic Birkin Series" 
+                      sentiment="Stable" 
+                      signal="Traditional seasonal patterns observed. Registry engagement optimal."
+                    />
+                 </div>
+              </div>
+
+              <aside className="lg:col-span-4 space-y-8">
+                 <Card className="bg-black text-white p-10 space-y-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Crown className="w-32 h-32" /></div>
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold">Owner Insight</h4>
+                    <p className="text-sm font-light italic leading-relaxed opacity-70">
+                      "The surge in UAE horological resonance suggests a 24% increase in upcoming auction liquidity. Recommend prioritizing the 1924 Grand Complications for the Dubai salon."
+                    </p>
+                    <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12">
+                       EXECUTE STRATEGIC SHIFT
+                    </Button>
+                 </Card>
+              </aside>
+           </div>
+        </TabsContent>
+
         <TabsContent value="logs" className="space-y-8 animate-fade-in">
            <Card className="bg-white border-border shadow-luxury overflow-hidden">
               <Table>
@@ -172,14 +223,6 @@ export default function AIDashboard() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {logs.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} className="py-40 text-center opacity-30">
-                         <History className="w-12 h-12 mx-auto mb-4" />
-                         <p className="text-sm font-bold uppercase tracking-widest italic">Neural logs are currently synchronizing.</p>
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
            </Card>
@@ -227,6 +270,21 @@ export default function AIDashboard() {
   );
 }
 
+function SentimentCard({ hub, topic, sentiment, signal }: { hub: string, topic: string, sentiment: string, signal: string }) {
+  return (
+    <Card className="bg-white border-border shadow-sm group hover:border-plum transition-all overflow-hidden rounded-none p-8 flex flex-col space-y-4">
+       <div className="flex justify-between items-center">
+          <Badge variant="outline" className="text-[8px] uppercase tracking-widest text-slate-400 border-slate-100">{hub} HUB</Badge>
+          <span className="text-[9px] font-bold text-plum uppercase tracking-widest">{sentiment}</span>
+       </div>
+       <div className="space-y-1">
+          <h4 className="text-sm font-bold uppercase tracking-tight text-slate-900">{topic}</h4>
+          <p className="text-[10px] text-slate-400 italic">Signal: "{signal}"</p>
+       </div>
+    </Card>
+  );
+}
+
 function StatsTile({ label, value, trend }: { label: string, value: string, trend: string }) {
   return (
     <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all">
@@ -255,5 +313,5 @@ function TableHead({ children, className }: { children: React.ReactNode, classNa
   return <th className={cn("h-12 px-4 align-middle", className)}>{children}</th>;
 }
 function TableCell({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <td className={cn("p-4 align-middle", className)}>{children}</td>;
+  return <td className={cn("p-4 align-middle", className)}>{children}</th>;
 }
