@@ -32,7 +32,6 @@ function latLngToVector3(lat: number, lng: number, radius: number) {
 
 /**
  * HubPoint: The interactive marker node with Intelligence Overlay
- * Optimized offset for compact viewport.
  */
 function HubPoint({ 
   region, 
@@ -136,8 +135,8 @@ function HubPoint({
               <div className="w-px h-16 bg-gradient-to-b from-blue-500/50 to-transparent mx-auto mt-1" />
             </div>
           ) : (
-            <div className="bg-black/60 backdrop-blur-md px-3 py-1 border border-white/5 -translate-y-8 whitespace-nowrap shadow-2xl transition-all">
-              <p className="text-[8px] font-bold text-white/80 uppercase tracking-[0.5em]">{region.id.toUpperCase()}</p>
+            <div className="bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-white/5 -translate-y-8 whitespace-nowrap shadow-2xl transition-all">
+              <p className="text-[7px] font-bold text-white/60 uppercase tracking-[0.2em] font-mono">{region.id.toUpperCase()}</p>
             </div>
           )}
         </div>
@@ -153,7 +152,7 @@ function DetailItem({ label, value, icon }: { label: string, value: string | num
         <div className="opacity-40 group-hover:opacity-100 transition-opacity">{icon}</div>
         <span className="text-[8px] font-bold text-white/30 uppercase tracking-[0.2em]">{label}</span>
       </div>
-      <span className="text-[11px] font-bold text-white tracking-tighter">{value}</span>
+      <span className="text-[11px] font-bold text-white tracking-tighter tabular-nums">{value}</span>
     </div>
   );
 }
@@ -247,7 +246,7 @@ function GlobeScene({
     Math.max(...Object.values(regions).map(r => r.revenue), 1), 
   [regions]);
 
-  const targetCamPos = useRef(new THREE.Vector3(0, 1, 6.5)); // Zoomed out slightly more
+  const targetCamPos = useRef(new THREE.Vector3(0, 1, 6.5)); 
   const targetFocus = useRef(new THREE.Vector3(0, 0, 0));
 
   useEffect(() => {
@@ -360,7 +359,7 @@ export function IntelligenceGlobe({
         />
       </Canvas>
 
-      {/* Institutional Legend - Smaller Scale */}
+      {/* Institutional Legend */}
       <div className="absolute bottom-8 left-8 space-y-3 pointer-events-none">
         <div className="space-y-2">
           <p className="text-[7px] font-bold uppercase tracking-[0.5em] text-white/20 mb-2">Hub Yield Matrix</p>
@@ -370,7 +369,7 @@ export function IntelligenceGlobe({
         </div>
       </div>
 
-      {/* Tactical Hub Control Matrix - Compact */}
+      {/* Tactical Hub Control Matrix */}
       <div className="absolute bottom-8 right-8 flex flex-col space-y-2">
         <button 
           onClick={() => onRegionClick(null)}
@@ -393,18 +392,6 @@ export function IntelligenceGlobe({
         >
           <Minus size={16} />
         </button>
-      </div>
-
-      <div className="absolute top-8 left-8 z-10 space-y-2 pointer-events-none">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
-            <Globe className="w-3.5 h-3.5 text-blue-500" />
-          </div>
-          <div className="space-y-0">
-            <span className="text-[10px] font-bold uppercase tracking-[0.6em] text-white/80 leading-none">Global Matrix</span>
-            <p className="text-[7px] text-white/20 uppercase tracking-widest font-bold">Node sync: Active</p>
-          </div>
-        </div>
       </div>
     </div>
   );

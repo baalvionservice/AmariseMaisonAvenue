@@ -48,13 +48,13 @@ export default function AdminDashboard() {
       {/* 1. System Health Ticker: Bank-Grade Status Bar */}
       <div className="flex bg-[#111113] border border-white/5 p-1">
          <div className="flex-1 overflow-hidden flex items-center">
-            <div className="flex items-center space-x-8 px-6 animate-marquee whitespace-nowrap">
+            <div className="flex items-center space-x-12 px-6 animate-marquee whitespace-nowrap">
                <StatusTick label="GLOBAL SYNC" value="OPTIMAL" color="text-emerald-500" />
                <StatusTick label="AI ACCURACY" value="98.2%" color="text-blue-400" />
                <StatusTick label="LATENCY" value="12ms" color="text-blue-400" />
                <StatusTick label="ANOMALIES" value={scopedErrors.filter(e => !e.resolved).length.toString()} color="text-red-500" />
                <StatusTick label="CRYPTO NODES" value="SECURE" color="text-emerald-500" />
-               <StatusTick label="HK HUB" value="ONLINE" color="text-emerald-500" />
+               <StatusTick label="HUB CONNECTIVITY" value="STABLE" color="text-emerald-500" />
             </div>
          </div>
          <div className="bg-white/5 px-6 py-2 border-l border-white/10 flex items-center space-x-3">
@@ -91,15 +91,19 @@ export default function AdminDashboard() {
           />
 
           {/* Tactical Overlays */}
-          <div className="absolute top-6 left-6 z-10 space-y-6 pointer-events-none">
-            <div className="flex items-center space-x-3 text-white/40">
-              <Globe className="w-3.5 h-3.5" />
-              <span className="text-[9px] font-bold uppercase tracking-[0.5em]">Global Matrix v5.2</span>
+          <div className="absolute top-8 left-8 z-10 space-y-6 pointer-events-none">
+            <div className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-3 text-white/80">
+                <Globe className="w-4 h-4 text-blue-500" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.5em]">Global Matrix V5.2</span>
+              </div>
+              <p className="text-[7px] text-white/20 uppercase tracking-[0.3em] font-bold pl-7">NODE SYNC: ACTIVE</p>
             </div>
-            <div className="space-y-3">
-               <HUDMetric icon={<Activity className="w-3 h-3" />} label="TRAFFIC" value="STABLE" />
-               <HUDMetric icon={<Lock className="w-3 h-3" />} label="VAULT" value="LOCKED" />
-               <HUDMetric icon={<Cpu className="w-3 h-3" />} label="AI AGENT" value="ACTIVE" />
+            
+            <div className="space-y-4">
+               <HUDMetric icon={<Activity className="w-3.5 h-3.5" />} label="TRAFFIC" value="STABLE" />
+               <HUDMetric icon={<Lock className="w-3.5 h-3.5" />} label="VAULT" value="LOCKED" />
+               <HUDMetric icon={<Cpu className="w-3.5 h-3.5" />} label="AI AGENT" value="ACTIVE" />
             </div>
           </div>
 
@@ -164,12 +168,12 @@ export default function AdminDashboard() {
                            <span className="text-[9px] font-bold text-white/20 uppercase w-6">{hub.id}</span>
                            <div className="flex flex-col">
                               <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">{hub.name}</span>
-                              <span className="text-[8px] text-white/20 uppercase tracking-tighter">{hub.cart} ACTIVE CARTS</span>
+                              <span className="text-[8px] text-white/20 uppercase tracking-tighter tabular-nums">{hub.cart} ACTIVE CARTS</span>
                            </div>
                         </div>
                         <div className="text-right">
-                           <span className="text-xs font-bold text-blue-400 tabular">${hub.predictedInflow.toLocaleString()}</span>
-                           <p className="text-[7px] text-white/20 font-bold uppercase">Estimated Inflow</p>
+                           <span className="text-xs font-bold text-blue-400 tabular-nums">${hub.predictedInflow.toLocaleString()}</span>
+                           <p className="text-[7px] text-white/20 font-bold uppercase">Expected</p>
                         </div>
                      </div>
                    ))}
@@ -204,7 +208,7 @@ function StatusTick({ label, value, color }: { label: string, value: string, col
   return (
     <div className="flex items-center space-x-3">
        <span className="text-[8px] font-bold uppercase tracking-widest text-white/20">{label}:</span>
-       <span className={cn("text-[9px] font-bold uppercase tracking-widest tabular", color)}>{value}</span>
+       <span className={cn("text-[9px] font-bold uppercase tracking-widest tabular-nums", color)}>{value}</span>
     </div>
   );
 }
@@ -215,9 +219,9 @@ function SignalNode({ label, value, trend, color = "text-white", icon, href }: {
       {icon && <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-20 transition-opacity">{icon}</div>}
       <div className="flex justify-between items-start">
         <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/20">{label}</p>
-        {trend && <span className="text-[8px] font-bold text-blue-400 tabular uppercase">{trend}</span>}
+        {trend && <span className="text-[8px] font-bold text-blue-400 tabular-nums uppercase">{trend}</span>}
       </div>
-      <p className={cn("text-4xl font-body font-bold tracking-tighter italic tabular leading-none", color)}>{value}</p>
+      <p className={cn("text-4xl font-body font-bold tracking-tighter italic tabular-nums leading-none", color)}>{value}</p>
     </Card>
   );
 
@@ -231,7 +235,7 @@ function HUDMetric({ icon, label, value }: { icon: React.ReactNode, label: strin
        <div className="text-blue-500/40 group-hover:text-blue-500 transition-colors">{icon}</div>
        <div className="flex flex-col">
           <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</span>
-          <span className="text-[9px] font-bold text-white/60 tabular">{value}</span>
+          <span className="text-[9px] font-bold text-white/60 tabular-nums">{value}</span>
        </div>
     </div>
   );
@@ -241,7 +245,7 @@ function HubDetailRow({ label, value, color = "text-white" }: { label: string, v
   return (
     <div className="flex flex-col space-y-1">
       <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</p>
-      <p className={cn("text-xl font-body font-bold italic tracking-tighter tabular", color)}>{value}</p>
+      <p className={cn("text-xl font-body font-bold italic tracking-tighter tabular-nums", color)}>{value}</p>
     </div>
   );
 }
@@ -251,7 +255,7 @@ function PerformanceRow({ label, val }: { label: string, val: number }) {
     <div className="space-y-1.5">
       <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest">
         <span className="text-white/30">{label}</span>
-        <span className="text-white/60 tabular">{val}%</span>
+        <span className="text-white/60 tabular-nums">{val}%</span>
       </div>
       <div className="h-0.5 bg-white/5 w-full">
          <div className="h-full bg-blue-500 opacity-60" style={{ width: `${val}%` }} />
