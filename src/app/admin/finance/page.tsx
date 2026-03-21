@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -171,7 +170,7 @@ export default function FinanceHub() {
                     <TableRow key={tx.id} className="hover:bg-ivory/30 transition-colors">
                       <TableCell className="pl-8 font-mono text-[10px] uppercase text-gray-400">{tx.id}</TableCell>
                       <TableCell className="text-xs font-bold uppercase">{tx.clientName}</TableCell>
-                      <TableCell className="text-xs font-light text-plum">${tx.amount.toLocaleString()}</TableCell>
+                      <TableCell className="text-xs font-bold text-plum tabular">${tx.amount.toLocaleString()}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="text-[8px] uppercase tracking-tighter">{tx.status}</Badge>
                       </TableCell>
@@ -207,7 +206,7 @@ export default function FinanceHub() {
                     {countryConfigs.map(c => (
                       <div key={c.code} className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                          <span className="text-gray-400">{c.name} Hub</span>
-                         <span className="text-plum">{c.taxType} ({c.taxRate}%)</span>
+                         <span className="text-plum tabular">{c.taxType} ({c.taxRate}%)</span>
                       </div>
                     ))}
                  </div>
@@ -234,12 +233,12 @@ export default function FinanceHub() {
 
 function StatsTile({ label, value, trend }: { label: string, value: string, trend: string }) {
   return (
-    <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all">
+    <Card className="bg-white border-border shadow-luxury p-8 space-y-4 group hover:border-plum transition-all rounded-none">
        <div className="flex justify-between items-start">
           <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 group-hover:text-plum transition-colors">{label}</span>
           <Badge variant="outline" className="text-[8px] uppercase">{trend}</Badge>
        </div>
-       <div className="text-4xl font-headline font-bold italic text-gray-900">{value}</div>
+       <div className="text-4xl font-body font-bold italic text-gray-900 tabular">{value}</div>
     </Card>
   );
 }

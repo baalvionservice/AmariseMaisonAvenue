@@ -84,11 +84,11 @@ export default function MaisonWalletPage() {
         <div className="lg:col-span-8 space-y-12">
            <Card className="bg-black text-white p-12 shadow-2xl relative overflow-hidden rounded-none border-none">
               <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none"><Wallet className="w-64 h-64" /></div>
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
+              <div className="relative z-10 flex flex-col md:row justify-between items-center gap-12">
                  <div className="space-y-4 text-center md:text-left">
                     <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-gold">Available Liquidity</p>
                     <div className="text-7xl font-body font-semibold tracking-tighter tabular">
-                       ${activeVip.walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                       ${activeVip.walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <div className="flex items-center justify-center md:justify-start space-x-4">
                        <div className="flex items-center space-x-2 text-[9px] font-bold uppercase text-white/40 tracking-widest">
@@ -169,7 +169,7 @@ export default function MaisonWalletPage() {
                                  "text-sm font-bold tabular",
                                  tx.amount > 0 ? "text-green-600" : "text-gray-900"
                                )}>
-                                  {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                  {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                </span>
                             </TableCell>
                          </TableRow>
@@ -221,6 +221,18 @@ function ProtocolItem({ title, desc }: { title: string, desc: string }) {
     <div className="space-y-1">
        <p className="text-xs font-bold uppercase tracking-tight text-gray-900">{title}</p>
        <p className="text-[11px] text-gray-500 italic font-light leading-relaxed">"{desc}"</p>
+    </div>
+  );
+}
+
+function ProtocolRow({ label, desc, enabled = false }: { label: string, desc: string, enabled?: boolean }) {
+  return (
+    <div className="flex items-center justify-between group">
+       <div className="space-y-1">
+          <p className="text-sm font-bold uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{label}</p>
+          <p className="text-xs text-gray-400 font-light italic">{desc}</p>
+       </div>
+       <Switch defaultChecked={enabled} className="data-[state=checked]:bg-plum" />
     </div>
   );
 }

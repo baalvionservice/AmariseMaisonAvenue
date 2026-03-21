@@ -66,7 +66,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
 
         <div className="absolute top-6 right-6 flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-all duration-700 z-10 border border-gray-100 shadow-sm">
            <Heart className={cn("w-3 h-3", isWishlisted ? "fill-black text-black" : "text-gray-400")} />
-           <span className="text-[9px] font-bold text-gray-900 tracking-tighter">{metrics.likes.toLocaleString()}</span>
+           <span className="text-[9px] font-bold text-gray-900 tracking-tighter tabular">{metrics.likes.toLocaleString()}</span>
         </div>
 
         {/* Action Overlay: Standardized Plum/Gold */}
@@ -112,7 +112,7 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
         <div className="flex flex-col items-center space-y-2">
           <div className="flex items-center space-x-2">
              <Sparkles className="w-3 h-3 text-gold opacity-0 group-hover:opacity-100 transition-opacity" />
-             <span className="text-sm font-bold tracking-tight text-gray-900">
+             <span className="text-sm font-bold tracking-tight text-gray-900 tabular">
                {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Allocation"}
              </span>
           </div>

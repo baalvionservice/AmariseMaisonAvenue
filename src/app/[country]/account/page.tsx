@@ -82,7 +82,7 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
 
       {/* Strategic Overview Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <DashboardCard label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString()}`} icon={<Wallet className="w-5 h-5 text-gold" />}>
+        <DashboardCard label="Maison Treasury" value={`$${stats.walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} icon={<Wallet className="w-5 h-5 text-gold" />}>
            <Link href={`/${countryCode}/account/wallet`}>
               <Button variant="ghost" size="sm" className="p-0 h-auto text-[9px] font-bold uppercase tracking-widest text-plum hover:text-gold">MANAGE LIQUIDITY <ArrowRight className="ml-2 w-3 h-3" /></Button>
            </Link>
@@ -91,7 +91,7 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
         <DashboardCard label="Collection Value" value={`$${stats.totalCollectionValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} icon={<TrendingUp className="w-5 h-5 text-gold" />}>
            <div className="flex items-center space-x-2 text-[10px] font-bold uppercase text-green-600">
               <Sparkles className="w-3 h-3" />
-              <span>+14.2% Appreciation</span>
+              <span className="tabular">+14.2% Appreciation</span>
            </div>
         </DashboardCard>
 
@@ -136,11 +136,11 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
                          <div className="p-3 bg-plum/5 rounded-full text-plum"><Package className="w-4 h-4" /></div>
                          <div>
                             <p className="text-sm font-bold uppercase tracking-tight text-gray-900">{tx.artifactName || 'Archive Transfer'}</p>
-                            <p className="text-[9px] text-gray-400 uppercase tracking-widest">ID: {tx.id}</p>
+                            <p className="text-[9px] text-gray-400 uppercase tracking-widest font-mono">ID: {tx.id}</p>
                          </div>
                       </div>
                       <div className="text-right">
-                         <p className="text-sm font-bold text-gray-900">${tx.amount.toLocaleString()}</p>
+                         <p className="text-sm font-bold text-gray-900 tabular">${tx.amount.toLocaleString()}</p>
                          <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-green-100 text-green-600 bg-green-50">{tx.status}</Badge>
                       </div>
                    </div>
@@ -173,7 +173,7 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
               <div className="space-y-4">
                  <div className="flex justify-between text-[9px] font-bold uppercase">
                     <span className="text-gray-400">Next Plateau</span>
-                    <span className="text-plum">{stats.nextTierAt.toLocaleString()}</span>
+                    <span className="text-plum tabular">{stats.nextTierAt.toLocaleString()}</span>
                  </div>
                  <Progress value={(stats.loyaltyPoints / stats.nextTierAt) * 100} className="h-1 bg-ivory" />
                  <p className="text-[9px] text-gray-400 italic">"Progressing toward Heritage Master tier."</p>
@@ -203,7 +203,7 @@ function NormalRegistryDashboard({ countryCode, stats, transactions, currentUser
         <div className="flex items-center space-x-4">
            <div className="text-right mr-4">
               <p className="text-[8px] font-bold uppercase text-gray-400">Treasury</p>
-              <p className="text-sm font-bold text-gray-900">${stats.walletBalance.toLocaleString()}</p>
+              <p className="text-sm font-bold text-gray-900 tabular">${stats.walletBalance.toLocaleString()}</p>
            </div>
            <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200 h-9 px-4 rounded-none text-[9px] font-bold uppercase tracking-widest">
              Standard Collector
@@ -257,7 +257,7 @@ function DashboardCard({ label, value, icon, children }: any) {
           <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-plum transition-colors">{label}</span>
           {icon}
        </div>
-       <div className="text-4xl font-headline font-bold italic text-gray-900 leading-none">{value}</div>
+       <div className="text-4xl font-body font-bold italic text-gray-900 leading-none tabular">{value}</div>
        {children}
     </Card>
   );
@@ -269,7 +269,7 @@ function RegistryStat({ label, value, icon, color = "text-gray-900" }: any) {
        <div className="p-2 bg-slate-50 rounded-full text-slate-400">{icon}</div>
        <div className="text-center">
           <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-1">{label}</p>
-          <p className={cn("text-xl font-headline font-bold", color)}>{value}</p>
+          <p className={cn("text-xl font-body font-bold tabular", color)}>{value}</p>
        </div>
     </Card>
   );
@@ -281,7 +281,7 @@ function StrategySuggestion({ label, value, price }: { label: string, value: str
        <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">{label}</span>
        <div className="flex justify-between items-end mt-1">
           <p className="text-xs font-bold uppercase tracking-tight text-gray-900">{value}</p>
-          <span className="text-[10px] font-bold text-plum">{price}</span>
+          <span className="text-[10px] font-bold text-plum tabular">{price}</span>
        </div>
     </div>
   );

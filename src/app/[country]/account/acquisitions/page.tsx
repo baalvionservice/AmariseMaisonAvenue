@@ -82,15 +82,15 @@ export default function AcquisitionsPage() {
                    <div className="space-y-2">
                       <div className="flex justify-between text-xs font-light italic">
                          <span>Base Price</span>
-                         <span className="font-body font-semibold tabular">${(selectedTx.netAmount || selectedTx.amount * 0.92).toLocaleString()}</span>
+                         <span className="font-body font-semibold tabular">${(selectedTx.netAmount || selectedTx.amount * 0.92).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="flex justify-between text-xs font-light italic">
                          <span>Regional Tax</span>
-                         <span className="font-body font-semibold tabular">${(selectedTx.taxAmount || selectedTx.amount * 0.08).toLocaleString()}</span>
+                         <span className="font-body font-semibold tabular">${(selectedTx.taxAmount || selectedTx.amount * 0.08).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="flex justify-between text-sm font-bold pt-2 border-t border-border">
                          <span>Total Yield</span>
-                         <span className="font-body text-plum tabular">${selectedTx.amount.toLocaleString()}</span>
+                         <span className="font-body text-plum tabular">${selectedTx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
                    </div>
                 </div>
@@ -184,7 +184,7 @@ export default function AcquisitionsPage() {
                       <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{tx.country.toUpperCase()} Hub</span>
                    </div>
                 </TableCell>
-                <TableCell><span className="text-sm font-bold text-gray-900 font-body tabular">${tx.amount.toLocaleString()}</span></TableCell>
+                <TableCell><span className="text-sm font-bold text-gray-900 font-body tabular">${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></TableCell>
                 <TableCell className="text-center">
                   <Badge variant="outline" className={cn("text-[8px] uppercase tracking-tighter border-none", 
                     tx.status === 'Settled' ? 'bg-green-50 text-green-600' : 'bg-gold/10 text-gold'

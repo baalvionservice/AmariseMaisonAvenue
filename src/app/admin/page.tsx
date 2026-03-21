@@ -182,13 +182,13 @@ export default function AdminDashboard() {
                     </div>
                     
                     <div className="space-y-1">
-                      <p className="text-3xl font-headline font-bold text-white/90 group-hover:text-white tracking-tighter italic">
+                      <p className="text-3xl font-body font-bold text-white/90 group-hover:text-white tracking-tighter italic tabular">
                         ${(hub.revenue / 1000).toFixed(0)}k
                       </p>
                       <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20">Market Yield</p>
                     </div>
 
-                    <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-white/40 pt-3 border-t border-white/5">
+                    <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-white/40 pt-3 border-t border-white/5 tabular">
                        <span className="flex items-center"><ShoppingCart className="w-2.5 h-2.5 mr-1.5" /> {hub.cart}</span>
                        <span className="flex items-center"><Heart className="w-2.5 h-2.5 mr-1.5" /> {hub.wishlist}</span>
                        <span className="text-blue-400">{yieldIndex.toFixed(1)}%</span>
@@ -250,7 +250,7 @@ function SignalNode({ label, value, color = "text-white" }: { label: string, val
   return (
     <div className="space-y-2">
       <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-white/20">{label}</p>
-      <p className={cn("text-4xl font-headline font-bold tracking-tighter select-none italic", color)}>{value}</p>
+      <p className={cn("text-4xl font-body font-bold tracking-tighter select-none italic tabular", color)}>{value}</p>
     </div>
   );
 }
@@ -261,7 +261,7 @@ function HUDMetric({ icon, label, value }: { icon: React.ReactNode, label: strin
        <div className="text-blue-500/40 group-hover:text-blue-500 transition-colors">{icon}</div>
        <div className="flex flex-col">
           <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/20">{label}</span>
-          <span className="text-[9px] font-bold text-white/60">{value}</span>
+          <span className="text-[9px] font-bold text-white/60 tabular">{value}</span>
        </div>
     </div>
   );
@@ -272,8 +272,8 @@ function HubDetailRow({ label, value, trend }: { label: string, value: string | 
     <div className="flex flex-col space-y-0.5 group">
       <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/20 group-hover:text-white/40 transition-colors">{label}</p>
       <div className="flex items-baseline space-x-2">
-        <p className="text-2xl font-headline font-bold text-white italic tracking-tighter">{value}</p>
-        {trend && <span className="text-emerald-400 text-[8px] font-bold">{trend}</span>}
+        <p className="text-2xl font-body font-bold text-white italic tracking-tighter tabular">{value}</p>
+        {trend && <span className="text-emerald-400 text-[8px] font-bold tabular">{trend}</span>}
       </div>
     </div>
   );
@@ -302,7 +302,7 @@ function PerformanceRow({ label, val }: { label: string, val: number }) {
     <div className="space-y-1.5">
       <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest">
         <span className="text-white/30">{label}</span>
-        <span className="text-white/60">{val}%</span>
+        <span className="text-white/60 tabular">{val}%</span>
       </div>
       <div className="h-0.5 bg-white/5 w-full">
          <div className="h-full bg-blue-500 opacity-60" style={{ width: `${val}%` }} />
