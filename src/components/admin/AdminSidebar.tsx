@@ -31,13 +31,15 @@ import {
   UserCircle,
   Activity,
   Gauge,
-  Shield
+  Shield,
+  Video,
+  Award
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Expanded to 21 tactical nodes for total platform control.
+ * Expanded to include all 21 tactical nodes for full platform oversight.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -49,19 +51,25 @@ export function AdminSidebar() {
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
         { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
-        { icon: <Settings2 />, label: "AI Control Hub", href: "/admin/ai-control" },
         { icon: <PlayCircle />, label: "Automation", href: "/admin/automation" },
       ]
     },
     {
-      title: "Registry & SEO",
+      title: "Curatorial Control",
       items: [
+        { icon: <Video />, label: "Live Sessions", href: "/admin/live-sessions" },
+        { icon: <Award />, label: "Heritage Bureau", href: "/admin/heritage-archive" },
         { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
-        { icon: <Briefcase />, label: "Operations", href: "/admin/operations" },
         { icon: <Shield />, label: "Brand Integrity", href: "/admin/brand-integrity" },
-        { icon: <UserCircle />, label: "Vendor Portal", href: "/admin/vendor" },
-        { icon: <Search />, label: "SEO Authority", href: "/admin/seo" },
-        { icon: <Database />, label: "Integrations", href: "/admin/integrations" },
+      ]
+    },
+    {
+      title: "Market Operations",
+      items: [
+        { icon: <Megaphone />, label: "Marketing", href: "/admin/marketing" },
+        { icon: <MessageSquare />, label: "Messaging", href: "/admin/messaging" },
+        { icon: <Activity />, label: "Integrations", href: "/admin/integrations" },
+        { icon: <UserCircle />, label: "Partner Hub", href: "/admin/vendor" },
       ]
     },
     {
@@ -69,17 +77,15 @@ export function AdminSidebar() {
       items: [
         { icon: <Target />, label: "Sales CRM", href: "/admin/sales" },
         { icon: <BarChart3 />, label: "Revenue Matrix", href: "/admin/revenue" },
-        { icon: <Megaphone />, label: "Marketing Hub", href: "/admin/marketing" },
-        { icon: <MessageSquare />, label: "Messaging", href: "/admin/messaging" },
         { icon: <CreditCard />, label: "Treasury", href: "/admin/finance" },
       ]
     },
     {
       title: "Infrastructure",
       items: [
-        { icon: <FlaskConical />, label: "QA Laboratory", href: "/admin/qa" },
+        { icon: <FlaskConical />, label: "QA Stress Lab", href: "/admin/qa" },
+        { icon: <LifeBuoy />, label: "Client Care", href: "/admin/support" },
         { icon: <Bell />, label: "Alerts", href: "/admin/notifications" },
-        { icon: <LifeBuoy />, label: "Support", href: "/admin/support" },
         { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
         { icon: <ShieldCheck />, label: "Audit Log", href: "/admin/compliance" },
       ]
@@ -87,8 +93,7 @@ export function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50 h-full">
-      {/* Brand Signature */}
+    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50 h-full shrink-0">
       <div className="p-10 border-b border-white/5">
         <Link href="/admin">
           <div className="font-headline text-3xl font-bold tracking-tighter text-white flex items-center group">
@@ -97,7 +102,6 @@ export function AdminSidebar() {
         </Link>
       </div>
 
-      {/* Navigation Matrix */}
       <nav className="flex-1 overflow-y-auto p-6 py-10 space-y-12 custom-scrollbar">
         {menuGroups.map((group) => (
           <div key={group.title} className="space-y-4">
@@ -127,7 +131,6 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      {/* Terminal Footer */}
       <div className="p-6 border-t border-white/5 space-y-2 bg-[#0A0A0B]">
         <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors border-none bg-transparent outline-none cursor-pointer">
           <Settings size={16} />
