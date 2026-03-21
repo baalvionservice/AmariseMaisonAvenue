@@ -147,6 +147,11 @@ export default function AIDashboard() {
                       </div>
                     ))}
                  </div>
+                 <Link href="/admin/automation">
+                    <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white hover:text-black rounded-none h-12 text-[9px] font-bold uppercase tracking-widest mt-4">
+                      MANAGE LOGIC RULES
+                    </Button>
+                 </Link>
               </Card>
            </div>
         </TabsContent>
@@ -193,9 +198,11 @@ export default function AIDashboard() {
                     <p className="text-sm font-light italic leading-relaxed opacity-70">
                       "The surge in UAE horological resonance suggests a 24% increase in upcoming auction liquidity. Recommend prioritizing the 1924 Grand Complications for the Dubai salon."
                     </p>
-                    <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12">
-                       EXECUTE STRATEGIC SHIFT
-                    </Button>
+                    <Link href="/admin/super">
+                      <Button variant="outline" className="w-full border-gold/40 text-gold rounded-none text-[9px] font-bold uppercase h-12 hover:bg-gold hover:text-black transition-all">
+                         EXECUTE STRATEGIC SHIFT
+                      </Button>
+                    </Link>
                  </Card>
               </aside>
            </div>
@@ -226,6 +233,13 @@ export default function AIDashboard() {
                 </TableBody>
               </Table>
            </Card>
+           <div className="flex justify-end">
+              <Link href="/admin/qa">
+                <Button variant="ghost" className="text-[9px] font-bold uppercase tracking-widest text-gray-400 hover:text-plum">
+                  VIEW FULL EXECUTION TRACES <ChevronRight className="w-3 h-3 ml-2" />
+                </Button>
+              </Link>
+           </div>
         </TabsContent>
 
         <TabsContent value="parameters" className="animate-fade-in space-y-12">
@@ -242,9 +256,11 @@ export default function AIDashboard() {
                     {modules.map(mod => (
                       <div key={mod.id} className="flex justify-between items-center">
                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900">{mod.name}</span>
-                         <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest px-3 py-1 cursor-pointer hover:bg-black transition-all">
-                            {mod.level}
-                         </Badge>
+                         <Link href="/admin/ai-control">
+                           <Badge className="bg-plum text-white text-[8px] uppercase tracking-widest px-3 py-1 cursor-pointer hover:bg-black transition-all">
+                              {mod.level}
+                           </Badge>
+                         </Link>
                       </div>
                     ))}
                  </div>

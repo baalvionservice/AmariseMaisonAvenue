@@ -65,16 +65,17 @@ export default function AdminDashboard() {
 
       {/* 2. Primary Yield HUD */}
       <header className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <SignalNode label="Aggregate Yield" value={`$${(globalTotal / 1000000).toFixed(2)}M`} trend="+12.4% MoM" />
-        <SignalNode label="Network Pulse" value={globalUsers.toLocaleString()} trend="+5.2%" />
+        <SignalNode label="Aggregate Yield" value={`$${(globalTotal / 1000000).toFixed(2)}M`} trend="+12.4% MoM" href="/admin/revenue" />
+        <SignalNode label="Network Pulse" value={globalUsers.toLocaleString()} trend="+5.2%" href="/admin/integrations" />
         <SignalNode 
           label="Liquidity Pipeline (1h)" 
           value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} 
           color="text-blue-400" 
           trend="Incoming Yield"
           icon={<Zap className="w-4 h-4" />}
+          href="/admin/revenue"
         />
-        <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" />
+        <SignalNode label="Strategic Win Rate" value="14.2%" color="text-emerald-400" href="/admin/sales" />
       </header>
 
       {/* 3. Global Viewport & Predictive Pulse */}
@@ -134,9 +135,11 @@ export default function AdminDashboard() {
                      </p>
                      <span className="text-[7px] font-bold uppercase text-blue-400">AI PREDICTION AGENT</span>
                   </div>
-                  <button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-[0.4em] rounded-none border-none cursor-pointer">
-                    HUB TERMINAL
-                  </button>
+                  <Link href="/admin/super" className="block w-full">
+                    <button className="w-full h-12 bg-white text-black hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-[0.4em] rounded-none border-none cursor-pointer">
+                      HUB TERMINAL
+                    </button>
+                  </Link>
                 </div>
               </motion.div>
             )}
@@ -206,8 +209,8 @@ function StatusTick({ label, value, color }: { label: string, value: string, col
   );
 }
 
-function SignalNode({ label, value, trend, color = "text-white", icon }: { label: string, value: string | number, trend?: string, color?: string, icon?: React.ReactNode }) {
-  return (
+function SignalNode({ label, value, trend, color = "text-white", icon, href }: { label: string, value: string | number, trend?: string, color?: string, icon?: React.ReactNode, href?: string }) {
+  const content = (
     <Card className="bg-[#111113] border-white/5 p-6 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl relative overflow-hidden">
       {icon && <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:opacity-20 transition-opacity">{icon}</div>}
       <div className="flex justify-between items-start">
@@ -217,6 +220,9 @@ function SignalNode({ label, value, trend, color = "text-white", icon }: { label
       <p className={cn("text-4xl font-body font-bold tracking-tighter italic tabular leading-none", color)}>{value}</p>
     </Card>
   );
+
+  if (href) return <Link href={href}>{content}</Link>;
+  return content;
 }
 
 function HUDMetric({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {

@@ -15,7 +15,8 @@ import {
   Scale, 
   ShieldCheck, 
   Sparkles,
-  BarChart3
+  BarChart3,
+  BadgeDollarSign
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -120,16 +121,18 @@ export default function RevenueDashboard() {
                   </button>
                 ))}
              </div>
-            <div className="w-10 h-10 bg-plum rounded-none flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-xl">RM</div>
+            <Link href="/admin/finance">
+              <div className="w-10 h-10 bg-plum rounded-none flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-xl hover:bg-black transition-colors cursor-pointer">RM</div>
+            </Link>
           </div>
       </header>
 
       {/* Primary Metrics: Tactical Density */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <StatCard icon={<DollarSign />} label="Net Settled Yield" value={`$${(totalSettledRevenue / 1000).toFixed(1)}k`} trend="+14.2% MoM" positive />
+        <StatCard icon={<DollarSign />} label="Net Settled Yield" value={`$${(totalSettledRevenue / 1000).toFixed(1)}k`} trend="+14.2% MoM" positive href="/admin/finance" />
         <StatCard icon={<Zap />} label="1h Incoming Yield" value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} trend="Predicted Inflow" color="text-blue-400" positive />
-        <StatCard icon={<Scale />} label="Tax Compliance" value="Verified" trend="Audited" positive />
-        <StatCard icon={<TrendingUp />} label="Mean Acquisition" value="$42.5k" trend="+8.4%" positive />
+        <StatCard icon={<Scale />} label="Tax Compliance" value="Verified" trend="Audited" positive href="/admin/compliance" />
+        <StatCard icon={<TrendingUp />} label="Mean Acquisition" value="$42.5k" trend="+8.4%" positive href="/admin/sales" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -251,6 +254,11 @@ export default function RevenueDashboard() {
                  </div>
                  <Progress value={(funnelData.buyers / funnelData.visitors * 100) * 10} className="h-0.5 bg-white/5" />
               </div>
+              <Link href="/admin/sales">
+                <Button className="w-full h-12 bg-white text-black hover:bg-plum hover:text-white rounded-none text-[9px] font-bold uppercase tracking-widest">
+                  MANAGE SALES PIPELINE <ArrowRight className="w-3 h-3 ml-2" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -297,9 +305,9 @@ function FunnelStep({ label, value, color, percent }: { label: string, value: nu
   );
 }
 
-function StatCard({ icon, label, value, trend, positive, color = "text-white" }: { icon: any, label: string, value: string, trend: string, positive: boolean, color?: string }) {
-  return (
-    <Card className="bg-[#111113] border-white/5 p-8 space-y-6 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl">
+function StatCard({ icon, label, value, trend, positive, color = "text-white", href }: { icon: any, label: string, value: string, trend: string, positive: boolean, color?: string, href?: string }) {
+  const content = (
+    <Card className="bg-[#111113] border-white/5 p-8 space-y-6 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl h-full">
       <div className="flex justify-between items-start">
         <div className="p-4 bg-white/5 rounded-none group-hover:bg-blue-500/10 transition-colors text-blue-400 border border-white/5">{icon}</div>
         <div className={cn(
@@ -315,4 +323,7 @@ function StatCard({ icon, label, value, trend, positive, color = "text-white" }:
       </div>
     </Card>
   );
+
+  if (href) return <Link href={href}>{content}</Link>;
+  return content;
 }
