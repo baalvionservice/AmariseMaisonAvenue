@@ -8,16 +8,14 @@ import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap } from 'lucide-react';
+import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap, Smartphone, Building2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { paymentService } from '@/lib/services/paymentService';
+import { PaymentGateway } from '@/lib/types';
 
-/**
- * Institutional Settlement Registry: Bank-Grade Checkout.
- * High-fidelity multi-step flow for high-ticket acquisitions.
- */
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice, createTransaction, activeBrandId } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser } = useAppStore();
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const router = useRouter();
@@ -26,56 +24,74 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('STRIPE');
   const [isSettling, setIsSettling] = useState(false);
   
   const subtotal = cart.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setIsSettling(true);
     
-    // Simulate Institutional Settlement Delay
-    setTimeout(() => {
-      const orderId = `AM-${(Math.random() * 10000).toFixed(0)}`;
-      const invoiceId = `inv-${Date.now()}`;
-      const customerName = `${firstName} ${lastName}`;
-      
-      createInvoice({
-        id: invoiceId,
-        orderId,
-        customerName,
+    try {
+      const response = await paymentService.createPaymentIntent({
         amount: subtotal,
         currency: countryCode.toUpperCase(),
-        status: 'paid',
-        date: new Date().toISOString(),
-        taxAmount: subtotal * 0.08,
-        taxRate: 8,
-        complianceCertified: true,
-        brandId: activeBrandId
+        gateway: selectedGateway,
+        userId: currentUser?.id || 'guest',
+        tenantId: activeBrandId
       });
 
-      createTransaction({
-        id: `tx-${Date.now()}`,
-        country: countryCode,
-        type: 'Sale',
-        clientName: customerName,
-        amount: subtotal,
-        currency: countryCode.toUpperCase(),
-        status: 'Settled',
-        timestamp: new Date().toISOString(),
-        invoiceId: invoiceId,
-        brandId: activeBrandId,
-        artifactName: cart[0]?.name,
-        isProvenanceCertified: true
-      });
+      if (response.success) {
+        const orderId = `AM-${(Math.random() * 10000).toFixed(0)}`;
+        const invoiceId = `inv-${Date.now()}`;
+        const customerName = `${firstName} ${lastName}`;
+        
+        createInvoice({
+          id: invoiceId,
+          orderId,
+          customerName,
+          amount: subtotal,
+          currency: countryCode.toUpperCase(),
+          status: selectedGateway === 'BANK_TRANSFER' ? 'pending' : 'paid',
+          date: new Date().toISOString(),
+          taxAmount: subtotal * 0.08,
+          taxRate: 8,
+          complianceCertified: true,
+          brandId: activeBrandId
+        });
 
+        createTransaction({
+          id: `tx-${Date.now()}`,
+          country: countryCode,
+          type: 'Sale',
+          clientName: customerName,
+          amount: subtotal,
+          currency: countryCode.toUpperCase(),
+          status: selectedGateway === 'BANK_TRANSFER' ? 'Pending' : 'Settled',
+          timestamp: new Date().toISOString(),
+          invoiceId: invoiceId,
+          brandId: activeBrandId,
+          artifactName: cart[0]?.name,
+          isProvenanceCertified: true,
+          gateway: selectedGateway
+        });
+
+        setIsSettling(false);
+        setStep(3);
+        clearCart();
+        toast({
+          title: response.gateway_order_id ? "Order Created" : "Settlement Confirmed",
+          description: response.message,
+        });
+      }
+    } catch (e) {
       setIsSettling(false);
-      setStep(3);
-      clearCart();
       toast({
-        title: "Settlement Confirmed",
-        description: "Your acquisition registry entry has been formalized.",
+        variant: "destructive",
+        title: "Settlement Failed",
+        description: "The payment gateway rejected the intent. Please try another method.",
       });
-    }, 2000);
+    }
   };
 
   if (cart.length === 0 && step !== 3) {
@@ -85,7 +101,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto px-12 py-24 max-w-7xl animate-fade-in">
-      {/* 1. Protocol Progress */}
       <div className="flex justify-center items-center space-x-12 mb-24">
         <ProtocolStep num={1} label="Logistics Registry" active={step === 1} completed={step > 1} />
         <div className={cn("w-20 h-px transition-colors duration-1000", step > 1 ? "bg-plum" : "bg-border")} />
@@ -97,7 +112,6 @@ export default function CheckoutPage() {
       <div className="flex flex-col lg:flex-row gap-24 items-start">
         {step < 3 ? (
           <>
-            {/* Form Section */}
             <div className="flex-1 space-y-16">
               {step === 1 && (
                 <div className="space-y-12 animate-fade-in">
@@ -129,14 +143,6 @@ export default function CheckoutPage() {
                       <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Primary Residence / Dispatch Address</Label>
                       <Input className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum" placeholder="730 Fifth Avenue" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Jurisdictional City</Label>
-                      <Input className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum" placeholder="New York" />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Postal Protocol</Label>
-                      <Input className="rounded-none border-border bg-ivory/30 h-14 text-sm font-mono focus:border-plum" placeholder="10019" />
-                    </div>
                   </div>
 
                   <div className="pt-12 border-t border-border flex justify-end">
@@ -155,35 +161,42 @@ export default function CheckoutPage() {
                 <div className="space-y-12 animate-fade-in">
                   <div className="space-y-2">
                     <h2 className="text-4xl font-headline font-bold italic tracking-tight">Vault Authorization</h2>
-                    <p className="text-sm text-gray-500 font-light italic">Institutional payment gateway • 256-bit encrypted.</p>
+                    <p className="text-sm text-gray-500 font-light italic">Select your preferred global settlement gateway.</p>
                   </div>
 
-                  <div className="p-12 border border-plum/30 bg-plum/5 space-y-10 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:opacity-10 transition-opacity">
-                       <Lock className="w-64 h-64 text-black" />
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 text-plum relative z-10">
-                      <CreditCard className="w-6 h-6" />
-                      <span className="text-[11px] font-bold tracking-[0.3em] uppercase">Private Client Card</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-10 relative z-10">
-                      <div className="space-y-3">
-                        <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Treasury Identifier (Card Number)</Label>
-                        <Input className="rounded-none border-plum/20 bg-white/50 h-14 text-lg font-mono focus:border-plum" placeholder="**** **** **** 1924" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-10">
-                        <div className="space-y-3">
-                          <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Expiry Horizon</Label>
-                          <Input className="rounded-none border-plum/20 bg-white/50 h-14 text-sm font-mono" placeholder="MM / YY" />
-                        </div>
-                        <div className="space-y-3">
-                          <Label className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Security Node (CVC)</Label>
-                          <Input className="rounded-none border-plum/20 bg-white/50 h-14 text-sm font-mono" placeholder="***" />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <GatewayCard 
+                      id="STRIPE" 
+                      label="Stripe Global" 
+                      desc="Cards, Apple Pay, Google Pay" 
+                      icon={<CreditCard className="w-5 h-5" />} 
+                      active={selectedGateway === 'STRIPE'} 
+                      onClick={() => setSelectedGateway('STRIPE')} 
+                    />
+                    <GatewayCard 
+                      id="RAZORPAY" 
+                      label="Razorpay India" 
+                      desc="UPI, Netbanking, Cards" 
+                      icon={<Smartphone className="w-5 h-5" />} 
+                      active={selectedGateway === 'RAZORPAY'} 
+                      onClick={() => setSelectedGateway('RAZORPAY')} 
+                    />
+                    <GatewayCard 
+                      id="PAYU" 
+                      label="PayU" 
+                      desc="International Cards & Wallets" 
+                      icon={<Globe className="w-5 h-5" />} 
+                      active={selectedGateway === 'PAYU'} 
+                      onClick={() => setSelectedGateway('PAYU')} 
+                    />
+                    <GatewayCard 
+                      id="BANK_TRANSFER" 
+                      label="Bank Transfer / ACH" 
+                      desc="Delayed Settlement (2-3 Days)" 
+                      icon={<Building2 className="w-5 h-5" />} 
+                      active={selectedGateway === 'BANK_TRANSFER'} 
+                      onClick={() => setSelectedGateway('BANK_TRANSFER')} 
+                    />
                   </div>
 
                   <div className="flex flex-col space-y-6">
@@ -202,7 +215,6 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {/* Order Summary Sidebar */}
             <aside className="lg:w-96 shrink-0 lg:sticky lg:top-40">
               <div className="bg-ivory p-10 border border-border space-y-10 rounded-none shadow-sm">
                 <h3 className="text-xl font-headline font-bold uppercase tracking-widest border-b border-border pb-6">Acquisition Context</h3>
@@ -230,21 +242,9 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
-
-              <div className="mt-10 space-y-6">
-                <div className="flex items-center justify-center space-x-3 text-[9px] font-bold text-gray-400 uppercase tracking-[0.3em]">
-                  <ShieldCheck className="w-4 h-4 text-gold" />
-                  <span>Immutable Audit Trail Active</span>
-                </div>
-                <div className="flex items-center justify-center space-x-3 text-[9px] font-bold text-gray-400 uppercase tracking-[0.3em]">
-                  <Truck className="w-4 h-4 text-gold" />
-                  <span>Global White-Glove Dispatch</span>
-                </div>
-              </div>
             </aside>
           </>
         ) : (
-          /* Confirmation State: The Success Registry */
           <div className="w-full flex flex-col items-center justify-center py-32 space-y-16 animate-fade-in text-center max-w-4xl mx-auto">
             <div className="relative">
                <div className="w-32 h-32 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-xl">
@@ -261,7 +261,7 @@ export default function CheckoutPage() {
                  <h1 className="text-7xl font-headline font-bold italic tracking-tighter text-gray-900">Settlement Registry Established</h1>
               </div>
               <p className="text-xl text-gray-500 font-light italic max-w-2xl mx-auto leading-relaxed">
-                Thank you for your choice. Your artifacts have been secured within the Maison registry. A private curator from our Parisian atelier will contact you within the hour to finalize the dispatch charter.
+                Thank you for your choice. Your artifacts have been secured within the Maison registry. {selectedGateway === 'BANK_TRANSFER' ? "Please fulfill the bank transfer instructions sent to your correspondence email to complete settlement." : "A private curator from our Parisian atelier will contact you within the hour to finalize the dispatch charter."}
               </p>
             </div>
 
@@ -315,5 +315,28 @@ function ProtocolStep({ num, label, active, completed }: { num: number, label: s
       </div>
       <span className="text-[10px] font-bold uppercase tracking-[0.3em]">{label}</span>
     </div>
+  );
+}
+
+function GatewayCard({ id, label, desc, icon, active, onClick }: { id: string, label: string, desc: string, icon: any, active: boolean, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={cn(
+        "p-6 border text-left flex flex-col space-y-3 transition-all",
+        active ? "border-plum bg-plum/5 shadow-inner" : "border-border bg-white hover:border-plum/20"
+      )}
+    >
+      <div className="flex justify-between items-center">
+        <div className={cn("p-2 rounded-full", active ? "bg-plum text-white" : "bg-ivory text-slate-400")}>
+          {icon}
+        </div>
+        {active && <Check className="w-4 h-4 text-plum" />}
+      </div>
+      <div className="space-y-1">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-900">{label}</p>
+        <p className="text-[10px] text-slate-400 italic">{desc}</p>
+      </div>
+    </button>
   );
 }

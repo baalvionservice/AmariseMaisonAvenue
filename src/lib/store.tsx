@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
@@ -35,8 +36,6 @@ import {
   SEOMetadata,
   SalesScript,
   AutomationRule,
-  CountryConfig,
-  BrandConfig,
   CountryCode,
   AIModuleStatus,
   AIActionLog,
@@ -56,7 +55,10 @@ import {
   WalletTransaction,
   LiveRequest,
   MaisonCertificate,
-  TransactionStatus
+  TransactionStatus,
+  PaymentGateway,
+  Subscription,
+  SubscriptionStatus
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -149,6 +151,7 @@ interface AppContextType {
   affiliates: Affiliate[];
   activeCampaigns: Campaign[];
 
+  subscriptions: Subscription[];
   isShowcaseMode: boolean;
   activeVip: VipClient | null;
   activeVendor: Vendor | null;
@@ -210,7 +213,6 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // --- 1. CORE STATE: DECLARE ALL FIRST ---
   const [activeBrandId] = useState<string>(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
@@ -249,6 +251,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ] 
   })));
 
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
@@ -256,7 +259,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [apiLogs] = useState<ApiLog[]>(API_LOGS);
   const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
-  const [invoices] = useState<Invoice[]>(INVOICES);
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
   const [automationRules] = useState<AutomationRule[]>([]);
@@ -291,14 +294,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     adminViewMode: 'advanced'
   });
 
-  // --- 2. JURISDICTIONAL DETECTION ---
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
     return currentUser.country as CountryCode;
   }, [currentUser, adminJurisdiction]);
 
-  // --- 3. SCOPED DATA (Memoized logic) ---
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
@@ -324,7 +325,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return activeHub === 'global' ? all : all.filter(c => c.country === activeHub);
   }, [vipClients, activeHub]);
 
-  // --- 4. ACTIONS ---
   const logAction = (action: string, entity: string, countryCode = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
     const entry: AuditLogEntry = { 
@@ -344,10 +344,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const topUpWallet = (amount: number) => {
     if (!activeVip) return;
-    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Deposit', amount, description: 'Maison Wallet Top-Up', timestamp: new Date().toISOString(), status: 'Settled' };
+    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Deposit', amount, description: 'Maison Treasury Deposit', timestamp: new Date().toISOString(), status: 'Settled' };
     setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance + amount, walletHistory: [newTx, ...v.walletHistory] } : v));
     setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance + amount, walletHistory: [newTx, ...prev.walletHistory] } : null);
-    logAction('Wallet Funded', `Amount: $${amount}`, activeVip.brandId);
+    logAction('Treasury Funded', `Amount: $${amount}`, activeVip.brandId);
   };
 
   const deductFromWallet = (amount: number, description: string): boolean => {
@@ -428,7 +428,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor,
+    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor, subscriptions,
     setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(prev => ({...prev, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(prev => ({...prev, adminViewMode: v})),
     upsertProduct, deleteProduct, toggleProductVipStatus, lockProductForEditing: () => true,
     upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
@@ -444,7 +444,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, 
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor
+    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, activeVip, activeVendor, subscriptions
   ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

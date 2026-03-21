@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -18,12 +19,17 @@ import {
   Clock,
   ArrowUpRight,
   ArrowDownRight,
-  Database
+  Database,
+  Search,
+  CheckCircle2,
+  XCircle,
+  Smartphone,
+  CreditCard,
+  Globe
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -46,18 +52,15 @@ import {
   CartesianGrid
 } from 'recharts';
 
-/**
- * Bank-Grade Finance Hub: Multi-Jurisdictional Treasury Engine.
- * High-fidelity ledger tracking, tax compliance, and cross-border settlement.
- */
 export default function FinanceHub() {
-  const { scopedTransactions, currentUser, countryConfigs } = useAppStore();
+  const { scopedTransactions, currentUser, countryConfigs, updateTransactionStatus } = useAppStore();
   const { toast } = useToast();
   const [activeInternalTab, setActiveInternalTab] = useState('overview');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const stats = useMemo(() => {
     const completed = scopedTransactions.filter(t => t.status === 'Settled' || t.status === 'Closed');
-    const pipeline = scopedTransactions.filter(t => t.status === 'Paid' || t.status === 'Processing');
+    const pipeline = scopedTransactions.filter(t => t.status === 'Paid' || t.status === 'Processing' || t.status === 'Pending');
     
     const revenueByCountry = countryConfigs.map(c => {
       const countryTrans = completed.filter(t => t.country.toLowerCase() === c.code.toLowerCase());
@@ -68,13 +71,35 @@ export default function FinanceHub() {
       };
     });
 
+    const revenueByGateway = ['STRIPE', 'RAZORPAY', 'PAYU', 'BANK_TRANSFER'].map(gw => {
+      const gwTrans = completed.filter(t => t.gateway === gw);
+      return {
+        gateway: gw,
+        value: gwTrans.reduce((acc, t) => acc + t.amount, 0)
+      };
+    });
+
     return {
       netRevenue: completed.reduce((acc, t) => acc + (t.netAmount || t.amount), 0),
       totalTax: completed.reduce((acc, t) => acc + (t.taxAmount || 0), 0),
       pipelineValue: pipeline.reduce((acc, t) => acc + t.amount, 0),
-      revenueByCountry
+      revenueByCountry,
+      revenueByGateway
     };
   }, [scopedTransactions, countryConfigs]);
+
+  const handleReconcile = (id: string) => {
+    updateTransactionStatus(id, 'Settled');
+    toast({
+      title: "Transaction Reconciled",
+      description: "Treasury ledger has been updated with verified funds.",
+    });
+  };
+
+  const filteredTransactions = scopedTransactions.filter(tx => 
+    tx.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tx.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-10 animate-fade-in pb-20">
@@ -86,7 +111,7 @@ export default function FinanceHub() {
              <span className="text-white">Institutional Treasury</span>
           </nav>
           <h1 className="text-4xl font-headline font-bold italic tracking-tight text-white uppercase">Finance Hub</h1>
-          <p className="text-sm text-white/40 font-light italic">Global settlement engine & jurisdictional compliance registry.</p>
+          <p className="text-sm text-white/40 font-light italic">Global settlement engine & gateway health matrix.</p>
         </div>
         <div className="flex items-center space-x-6">
            <Button className="h-14 px-10 rounded-none bg-plum text-white hover:bg-black transition-all text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl">
@@ -99,6 +124,7 @@ export default function FinanceHub() {
         <TabsList className="bg-[#111113] border border-white/5 h-14 w-full justify-start p-1 rounded-none space-x-2 mb-10">
           <TabsTrigger value="overview" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Strategic Yield</TabsTrigger>
           <TabsTrigger value="ledger" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Global Ledger</TabsTrigger>
+          <TabsTrigger value="gateways" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Gateway Resonance</TabsTrigger>
           <TabsTrigger value="compliance" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Jurisdictional Matrix</TabsTrigger>
         </TabsList>
 
@@ -148,35 +174,68 @@ export default function FinanceHub() {
 
         <TabsContent value="ledger" className="animate-fade-in space-y-8">
            <Card className="bg-[#111113] border-white/5 rounded-none overflow-hidden shadow-2xl">
+              <CardHeader className="bg-white/[0.02] border-b border-white/5 flex flex-row items-center justify-between p-6">
+                 <div>
+                    <CardTitle className="text-white font-headline text-xl">Transactional Registry</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest text-white/30">High-fidelity ledger of all global transfers</CardDescription>
+                 </div>
+                 <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+                    <input 
+                      className="bg-white/5 border border-white/10 h-10 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none w-64 focus:border-plum text-white" 
+                      placeholder="FILTER LEDGER..." 
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                    />
+                 </div>
+              </CardHeader>
               <Table>
                 <TableHeader className="bg-white/[0.02]">
                   <TableRow className="border-white/5">
-                    <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Entry Reference</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Entry ID</TableHead>
                     <TableHead className="text-[9px] uppercase font-bold text-white/40">Collector Identity</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-white/40">Settlement Delta</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-white/40">Settlement Gateway</TableHead>
+                    <TableHead className="text-[9px] uppercase font-bold text-white/40">Delta</TableHead>
                     <TableHead className="text-[9px] uppercase font-bold text-center text-white/40">Status</TableHead>
                     <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {scopedTransactions.map(tx => (
+                  {filteredTransactions.map(tx => (
                     <TableRow key={tx.id} className="hover:bg-white/5 transition-colors border-white/5">
                       <TableCell className="pl-8 font-mono text-[10px] uppercase text-plum">{tx.id}</TableCell>
                       <TableCell className="text-xs font-bold uppercase text-white/80 tracking-tight">{tx.clientName}</TableCell>
+                      <TableCell>
+                         <div className="flex items-center space-x-2 text-white/40">
+                            {tx.gateway === 'STRIPE' && <CreditCard className="w-3 h-3" />}
+                            {tx.gateway === 'RAZORPAY' && <Smartphone className="w-3 h-3" />}
+                            {tx.gateway === 'PAYU' && <Globe className="w-3 h-3" />}
+                            {tx.gateway === 'BANK_TRANSFER' && <Building2 className="w-3 h-3" />}
+                            <span className="text-[9px] font-bold uppercase">{tx.gateway || 'MAISON_WALLET'}</span>
+                         </div>
+                      </TableCell>
                       <TableCell className="text-sm font-bold text-white tabular">${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className={cn("text-[7px] uppercase border-none px-2 py-0.5", 
-                          tx.status === 'Settled' ? "bg-emerald-500/10 text-emerald-400" : "bg-white/10 text-white/40"
+                          tx.status === 'Settled' ? "bg-emerald-500/10 text-emerald-400" : 
+                          tx.status === 'Pending' ? "bg-blue-500/10 text-blue-400" :
+                          "bg-white/10 text-white/40"
                         )}>{tx.status}</Badge>
                       </TableCell>
                       <TableCell className="text-right pr-8">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
+                        {tx.status === 'Pending' && tx.gateway === 'BANK_TRANSFER' ? (
+                          <Button size="sm" className="h-7 bg-white text-black hover:bg-plum hover:text-white text-[8px] font-bold uppercase rounded-none" onClick={() => handleReconcile(tx.id)}>
+                             RECONCILE
+                          </Button>
+                        ) : (
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white"><FileText className="w-3.5 h-3.5" /></Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
-                  {scopedTransactions.length === 0 && (
+                  {filteredTransactions.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} className="py-40 text-center opacity-20">
+                      <TableCell colSpan={6} className="py-40 text-center opacity-20">
                          <Receipt className="w-12 h-12 mx-auto mb-4" />
                          <p className="text-[10px] font-bold uppercase tracking-widest italic">Ledger currently dormant.</p>
                       </TableCell>
@@ -185,6 +244,26 @@ export default function FinanceHub() {
                 </TableBody>
               </Table>
            </Card>
+        </TabsContent>
+
+        <TabsContent value="gateways" className="animate-fade-in space-y-10">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {stats.revenueByGateway.map(gw => (
+                <Card key={gw.gateway} className="bg-[#111113] border-white/5 p-8 space-y-6 rounded-none group hover:border-plum transition-all">
+                   <div className="flex justify-between items-start">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20 group-hover:text-plum">{gw.gateway}</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                   </div>
+                   <div className="text-3xl font-body font-bold text-white tabular">${(gw.value / 1000).toFixed(1)}k</div>
+                   <div className="pt-4 border-t border-white/5">
+                      <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-white/20">
+                         <span>API Health</span>
+                         <span className="text-emerald-500">OPTIMAL</span>
+                      </div>
+                   </div>
+                </Card>
+              ))}
+           </div>
         </TabsContent>
 
         <TabsContent value="compliance" className="animate-fade-in space-y-10">

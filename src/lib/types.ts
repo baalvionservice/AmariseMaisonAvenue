@@ -1,14 +1,14 @@
 
-// Existing types... (Keeping relevant parts for brevity)
 export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
 
 export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
+export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
 
 export interface Payment {
   id: string;
   tenantId: string;
-  subscriptionId: string;
+  subscriptionId?: string;
   userId: string;
   amount: number;
   currency: string;
@@ -18,6 +18,7 @@ export interface Payment {
   idempotencyKey: string;
   createdAt: string;
   updatedAt: string;
+  metadata?: Record<string, any>;
 }
 
 export interface PaymentLog {
@@ -29,7 +30,15 @@ export interface PaymentLog {
   timestamp: string;
 }
 
-// ... rest of existing types
+export interface Subscription {
+  id: string;
+  tenantId: string;
+  planId: string;
+  status: SubscriptionStatus;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+}
+
 export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed';
 
 export type FulfillmentStep = 'Registry Confirmed' | 'Atelier Preparation' | 'Heritage Audit' | 'Institutional Dispatch' | 'White-Glove Delivery';
@@ -37,7 +46,7 @@ export type FulfillmentStep = 'Registry Confirmed' | 'Atelier Preparation' | 'He
 export interface Transaction {
   id: string;
   country: string;
-  type: 'Sale' | 'Refund' | 'Payout';
+  type: 'Sale' | 'Refund' | 'Payout' | 'Subscription';
   clientName: string;
   vendorId?: string;
   amount: number;
@@ -48,7 +57,7 @@ export interface Transaction {
   brandId: string;
   taxAmount?: number;
   netAmount?: number;
-  // Detail View Extensions
+  gateway?: PaymentGateway;
   fulfillmentSteps?: {
     step: FulfillmentStep;
     timestamp: string;
@@ -59,7 +68,6 @@ export interface Transaction {
   isProvenanceCertified?: boolean;
 }
 
-// Ensure all other existing types (Product, Collection, etc.) are preserved below
 export interface Product {
   id: string;
   name: string;
@@ -412,6 +420,7 @@ export interface Vendor {
   performance: number;
   salesTotal: number;
   status: 'active' | 'pending' | 'rejected';
+  brandId?: string;
 }
 
 export interface BrandConfig {
@@ -476,6 +485,7 @@ export interface LiveRequest {
   status: string;
   requestedAt: string;
   scheduledAt?: string;
+  fee: number;
 }
 
 export interface MaisonCertificate {
@@ -500,4 +510,44 @@ export interface GlobalSyncSession {
   snapshotBefore: any;
   actorName: string;
   status: string;
+}
+
+export interface WalletTransaction {
+  id: string;
+  type: 'Deposit' | 'Service Fee' | 'Acquisition' | 'Refund';
+  amount: number;
+  description: string;
+  timestamp: string;
+  status: 'Settled' | 'Pending';
+}
+
+export interface ProductExtended {
+  collectorValue: string;
+  marketRange: string;
+  investmentInsight: string;
+  scarcityTag: string;
+  priceVisible: boolean;
+}
+
+export interface MaisonService {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  priceRange: string;
+  features: string[];
+  imageUrl: string;
+  brandId: string;
+  isGlobal: boolean;
+}
+
+export interface MaisonReport {
+  id: string;
+  title: string;
+  summary: string;
+  date: string;
+  author: string;
+  isPremium: boolean;
+  previewImage: string;
+  brandId: string;
 }
