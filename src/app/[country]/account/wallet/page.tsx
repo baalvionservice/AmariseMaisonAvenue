@@ -37,6 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 /**
  * Maison Treasury: Institutional Digital Wallet.
  * Handles deposits, artifact payments, and service fee deductions.
+ * Optimized with Fintech-grade tabular typography.
  */
 export default function MaisonWalletPage() {
   const { country } = useParams();
@@ -86,7 +87,7 @@ export default function MaisonWalletPage() {
               <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
                  <div className="space-y-4 text-center md:text-left">
                     <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-gold">Available Liquidity</p>
-                    <div className="text-7xl font-headline font-bold italic tracking-tighter">
+                    <div className="text-7xl font-body font-semibold tracking-tighter tabular">
                        ${activeVip.walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
                     <div className="flex items-center justify-center md:justify-start space-x-4">
@@ -111,7 +112,7 @@ export default function MaisonWalletPage() {
                                 type="number" 
                                 value={topUpAmount}
                                 onChange={(e) => setTopUpAmount(e.target.value)}
-                                className="bg-black/40 border-white/10 h-14 pl-10 text-xl font-bold text-white rounded-none focus:border-gold outline-none"
+                                className="bg-black/40 border-white/10 h-14 pl-10 text-xl font-bold text-white rounded-none focus:border-gold outline-none tabular"
                              />
                           </div>
                        </div>
@@ -151,7 +152,7 @@ export default function MaisonWalletPage() {
                                   </div>
                                   <div>
                                      <p className="text-xs font-bold uppercase tracking-tight text-gray-900">{tx.description}</p>
-                                     <p className="text-[8px] text-gray-400 font-mono">REF: {tx.id}</p>
+                                     <p className="text-[8px] text-gray-400 font-mono uppercase">REF: {tx.id}</p>
                                   </div>
                                </div>
                             </TableCell>
@@ -161,11 +162,11 @@ export default function MaisonWalletPage() {
                                </Badge>
                             </TableCell>
                             <TableCell>
-                               <span className="text-[10px] text-gray-400 font-medium">{new Date(tx.timestamp).toLocaleDateString()}</span>
+                               <span className="text-[10px] text-gray-400 font-medium font-mono">{new Date(tx.timestamp).toLocaleDateString()}</span>
                             </TableCell>
                             <TableCell className="text-right pr-8">
                                <span className={cn(
-                                 "text-sm font-bold",
+                                 "text-sm font-bold tabular",
                                  tx.amount > 0 ? "text-green-600" : "text-gray-900"
                                )}>
                                   {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -201,7 +202,7 @@ export default function MaisonWalletPage() {
               <div className="p-4 bg-white border border-border flex items-center justify-between group cursor-pointer hover:border-plum transition-all">
                  <div className="flex items-center space-x-4">
                     <div className="w-10 h-6 bg-slate-900 rounded-sm flex items-center justify-center text-[6px] font-bold text-white italic">VISA</div>
-                    <span className="text-xs font-bold tracking-tighter">•••• 1924</span>
+                    <span className="text-xs font-bold tracking-tighter tabular">•••• 1924</span>
                  </div>
                  <Badge className="bg-green-50 text-green-600 text-[7px] uppercase border-none">Primary</Badge>
               </div>
