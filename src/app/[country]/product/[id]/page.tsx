@@ -20,7 +20,8 @@ import {
   Linkedin,
   Mail,
   MessageCircle,
-  HelpCircle
+  HelpCircle,
+  ShoppingBag
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { useToast } from "@/hooks/use-toast";
@@ -39,6 +40,7 @@ export default function ProductPage() {
   const countryCode = (country as string) || 'us';
   const { toast } = useToast();
   const { toggleWishlist, wishlist, addToCart } = useAppStore();
+  const router = useRouter();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
   const isWishlisted = wishlist.some(i => i.id === product?.id);
@@ -46,6 +48,24 @@ export default function ProductPage() {
   if (!product) {
     return <div className="container mx-auto px-6 py-40 text-center font-headline text-3xl text-gray-900">Artifact not found.</div>;
   }
+
+  const handleAddToBag = () => {
+    addToCart(product);
+    toast({
+      title: "Registry Updated",
+      description: `${product.name} has been added to your shopping bag.`,
+      action: (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="rounded-none border-black text-[9px] font-bold uppercase tracking-widest"
+          onClick={() => router.push(`/${countryCode}/cart`)}
+        >
+          VIEW BAG
+        </Button>
+      ),
+    });
+  };
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -86,9 +106,9 @@ export default function ProductPage() {
       {/* Breadcrumbs */}
       <nav className="container mx-auto px-12 pt-8 pb-4 max-w-[1600px]">
         <div className="flex items-center space-x-2 text-[11px] font-normal text-gray-500 uppercase tracking-wide">
-          <Link href={`/${countryCode}`} className="hover:text-black">Home</Link>
+          <Link href={`/${countryCode}`} className="hover:text-black transition-colors">Home</Link>
           <ChevronRight className="w-2.5 h-2.5" />
-          <Link href={`/${countryCode}/category/hermes`} className="hover:text-black">Registry Archive</Link>
+          <Link href={`/${countryCode}/category/hermes`} className="hover:text-black transition-colors">Registry Archive</Link>
           <ChevronRight className="w-2.5 h-2.5" />
           <span className="text-gray-900 line-clamp-1">{product.name}</span>
         </div>
@@ -148,7 +168,7 @@ export default function ProductPage() {
               <h1 className="text-3xl font-headline font-medium text-gray-900 leading-tight">
                 {product.name}
               </h1>
-              <p className="text-xl font-bold text-black tracking-tight">
+              <p className="text-xl font-bold text-black tracking-tight tabular">
                 {formatPrice(product.basePrice, countryCode)}
               </p>
             </header>
@@ -171,7 +191,7 @@ export default function ProductPage() {
             {/* Primary Action Button: Standardized Plum/Gold */}
             <div className="flex gap-4">
               <Button 
-                onClick={() => addToCart(product)}
+                onClick={handleAddToBag}
                 className="flex-[2] h-16 bg-plum text-white hover:bg-gold hover:text-gray-900 rounded-none text-[11px] font-bold tracking-[0.3em] uppercase shadow-lg transition-all"
               >
                 ADD TO SHOPPING BAG
