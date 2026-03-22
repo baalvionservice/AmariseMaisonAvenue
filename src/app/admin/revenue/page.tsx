@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -97,25 +96,25 @@ export default function RevenueDashboard() {
   if (!stats) return null;
 
   return (
-    <div className="space-y-10 animate-fade-in pb-20 font-body">
-      <header className="flex justify-between items-end border-b border-white/5 pb-10">
-        <div className="space-y-2">
-          <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30 flex items-center space-x-2">
+    <div className="space-y-8 animate-fade-in pb-20 font-body">
+      <header className="flex justify-between items-end border-b border-white/5 pb-8">
+        <div className="space-y-1">
+          <nav className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/30 flex items-center space-x-2">
              <Link href="/admin" className="hover:text-white transition-colors">Terminal</Link>
-             <ChevronRight className="w-2.5 h-2.5" />
+             <ChevronRight className="w-2 h-2" />
              <span className="text-white">Yield Matrix</span>
           </nav>
-          <h1 className="text-4xl font-headline font-bold italic tracking-tight text-white uppercase">Revenue Matrix</h1>
-          <p className="text-sm text-white/40 font-light italic">Jurisdictional Unit Economics & Predictive Yield</p>
+          <h1 className="text-3xl font-headline font-bold italic tracking-tight text-white uppercase">Revenue Matrix</h1>
+          <p className="text-xs text-white/40 font-light italic">Jurisdictional Unit Economics & Predictive Yield</p>
         </div>
-        <div className="flex items-center space-x-6">
-             <div className="flex bg-[#111113] border border-white/10 p-1">
+        <div className="flex items-center space-x-4">
+             <div className="flex bg-[#111113] border border-white/10 p-0.5">
                 {(['daily', 'weekly', 'monthly'] as const).map(range => (
                   <button 
                     key={range}
                     onClick={() => setTimeRange(range)}
                     className={cn(
-                      "px-5 py-2 text-[9px] font-bold uppercase tracking-widest transition-all",
+                      "px-4 py-1.5 text-[8px] font-bold uppercase tracking-widest transition-all",
                       timeRange === range ? "bg-plum text-white" : "text-white/20 hover:text-plum"
                     )}
                   >
@@ -124,38 +123,38 @@ export default function RevenueDashboard() {
                 ))}
              </div>
             <Link href="/admin/finance">
-              <div className="w-10 h-10 bg-plum rounded-none flex items-center justify-center font-headline text-xl font-bold italic text-white shadow-xl hover:bg-black transition-colors cursor-pointer">RM</div>
+              <div className="w-9 h-9 bg-plum rounded-none flex items-center justify-center font-headline text-lg font-bold italic text-white shadow-xl hover:bg-black transition-colors cursor-pointer">RM</div>
             </Link>
           </div>
       </header>
 
       {/* Primary Metrics: Tactical Density */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <StatCard icon={<DollarSign />} label="Net Settled Yield" value={`$${(totalSettledRevenue / 1000).toFixed(1)}k`} trend="+14.2% MoM" positive href="/admin/finance" />
-        <StatCard icon={<Zap />} label="1h Incoming Yield" value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} trend="Predicted Inflow" color="text-blue-400" positive />
-        <StatCard icon={<Scale />} label="Tax Compliance" value="Verified" trend="Audited" positive href="/admin/compliance" />
-        <StatCard icon={<TrendingUp />} label="Mean Acquisition" value="$42.5k" trend="+8.4%" positive href="/admin/sales" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard icon={<DollarSign className="w-4 h-4" />} label="Net Settled Yield" value={`$${(totalSettledRevenue / 1000).toFixed(1)}k`} trend="+14.2% MoM" positive href="/admin/finance" />
+        <StatCard icon={<Zap className="w-4 h-4" />} label="1h Incoming Yield" value={`$${(globalPredictedInflow / 1000).toFixed(1)}k`} trend="Predicted Inflow" color="text-blue-400" positive />
+        <StatCard icon={<Scale className="w-4 h-4" />} label="Tax Compliance" value="Verified" trend="Audited" positive href="/admin/compliance" />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Mean Acquisition" value="$42.5k" trend="+8.4%" positive href="/admin/sales" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Yield Chart: Sharp Line Aesthetics */}
-        <div className="lg:col-span-8 space-y-10">
+        <div className="lg:col-span-8 space-y-8">
            <Card className="bg-[#111113] border-white/5 rounded-none overflow-hidden">
-             <CardHeader className="border-b border-white/5 flex flex-row items-center justify-between p-8 bg-white/[0.02]">
+             <CardHeader className="border-b border-white/5 flex flex-row items-center justify-between p-6 bg-white/[0.02]">
                <div className="space-y-1">
-                 <div className="flex items-center space-x-3 text-blue-400">
-                   <BrainCircuit className="w-5 h-5" />
-                   <CardTitle className="font-headline text-2xl uppercase italic">Yield Trajectory</CardTitle>
+                 <div className="flex items-center space-x-2 text-blue-400">
+                   <BrainCircuit className="w-4 h-4" />
+                   <CardTitle className="font-headline text-xl uppercase italic">Yield Trajectory</CardTitle>
                  </div>
-                 <p className="text-[10px] uppercase tracking-widest text-white/20">Actual revenue vs AI forecasted yield</p>
+                 <p className="text-[9px] uppercase tracking-widest text-white/20">Actual revenue vs AI forecasted yield</p>
                </div>
-               <div className="flex items-center space-x-6">
+               <div className="flex items-center space-x-4">
                   <LegendNode color="bg-plum" label="ACTUAL" />
                   <LegendNode color="bg-blue-500" label="FORECAST" />
                </div>
              </CardHeader>
-             <CardContent className="p-10">
-               <div className="h-[380px] w-full">
+             <CardContent className="p-8">
+               <div className="h-[320px] w-full">
                  <ResponsiveContainer width="100%" height="100%">
                    <AreaChart data={revenueTrends}>
                      <defs>
@@ -165,17 +164,17 @@ export default function RevenueDashboard() {
                        </linearGradient>
                      </defs>
                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                     <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#666', fontWeight: 700}} />
-                     <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#666'}} tickFormatter={(val) => `$${val/1000}k`} />
+                     <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 8, fill: '#666', fontWeight: 700}} />
+                     <YAxis axisLine={false} tickLine={false} tick={{fontSize: 8, fill: '#666'}} tickFormatter={(val) => `$${val/1000}k`} />
                      <Tooltip 
                        content={({ active, payload }) => {
                          if (active && payload && payload.length) {
                            return (
-                             <div className="bg-black text-white p-5 border border-white/10 shadow-2xl space-y-3 rounded-none">
-                               <p className="text-[8px] font-bold uppercase tracking-[0.4em] text-white/40 border-b border-white/5 pb-2">{payload[0].payload.date}</p>
-                               <div className="space-y-1.5">
-                                  <p className="text-xs font-bold text-plum tabular">Settled: ${(payload[0].value as number).toLocaleString()}</p>
-                                  <p className="text-xs font-bold text-blue-400 tabular">Target: ${(payload[1].value as number).toLocaleString()}</p>
+                             <div className="bg-black text-white p-4 border border-white/10 shadow-2xl space-y-2 rounded-none">
+                               <p className="text-[7px] font-bold uppercase tracking-[0.4em] text-white/40 border-b border-white/5 pb-1.5">{payload[0].payload.date}</p>
+                               <div className="space-y-1">
+                                  <p className="text-[10px] font-bold text-plum tabular">Settled: ${(payload[0].value as number).toLocaleString()}</p>
+                                  <p className="text-[10px] font-bold text-blue-400 tabular">Target: ${(payload[1].value as number).toLocaleString()}</p>
                                </div>
                              </div>
                            );
@@ -183,8 +182,8 @@ export default function RevenueDashboard() {
                          return null;
                        }}
                      />
-                     <Area type="monotone" dataKey="revenue" stroke="#7E3F98" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
-                     <Line type="monotone" dataKey="forecast" stroke="#3B82F6" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                     <Area type="monotone" dataKey="revenue" stroke="#7E3F98" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                     <Line type="monotone" dataKey="forecast" stroke="#3B82F6" strokeWidth={1.5} strokeDasharray="5 5" dot={false} />
                    </AreaChart>
                  </ResponsiveContainer>
                </div>
@@ -193,41 +192,41 @@ export default function RevenueDashboard() {
 
            {/* 1-Hour Forecast Horizon Node: Jurisdictional Liquidity Tracking */}
            <Card className="bg-[#111113] border-white/5 rounded-none overflow-hidden">
-              <CardHeader className="border-b border-white/5 p-8 bg-white/[0.02] flex flex-row items-center justify-between">
+              <CardHeader className="border-b border-white/5 p-6 bg-white/[0.02] flex flex-row items-center justify-between">
                  <div className="space-y-1">
-                    <div className="flex items-center space-x-3 text-blue-400">
-                       <Clock className="w-5 h-5" />
-                       <CardTitle className="font-headline text-xl uppercase italic tracking-tight">1-Hour Forecast Horizon</CardTitle>
+                    <div className="flex items-center space-x-2 text-blue-400">
+                       <Clock className="w-4 h-4" />
+                       <CardTitle className="font-headline text-lg uppercase italic tracking-tight">1-Hour Forecast Horizon</CardTitle>
                     </div>
-                    <p className="text-[9px] uppercase tracking-widest text-white/20">Incoming liquidity based on active cart resonance across all countries</p>
+                    <p className="text-[8px] uppercase tracking-widest text-white/20">Incoming liquidity based on active cart resonance</p>
                  </div>
-                 <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-none px-4 h-8 rounded-none text-[8px] font-bold uppercase tracking-widest">
+                 <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-none px-3 h-7 rounded-none text-[7px] font-bold uppercase tracking-widest">
                     Neural Flow Active
                  </Badge>
               </CardHeader>
               <CardContent className="p-0">
                  <Table>
                     <TableHeader className="bg-white/[0.01]">
-                       <TableRow className="border-white/5">
-                          <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Market Hub</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-white/40 text-center">Active Carts</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-white/40 text-center">Conversion Prob.</TableHead>
-                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">Expected Inflow</TableHead>
+                       <TableRow className="border-white/5 h-10">
+                          <TableHead className="text-[8px] uppercase font-bold pl-6 text-white/40">Market Hub</TableHead>
+                          <TableHead className="text-[8px] uppercase font-bold text-white/40 text-center">Active Carts</TableHead>
+                          <TableHead className="text-[8px] uppercase font-bold text-white/40 text-center">Conv. Prob.</TableHead>
+                          <TableHead className="text-[8px] uppercase font-bold text-right pr-6 text-white/40">Inflow</TableHead>
                        </TableRow>
                     </TableHeader>
                     <TableBody>
                        {Object.values(regions).map(hub => (
-                         <TableRow key={hub.id} className="hover:bg-white/5 transition-colors border-white/5">
-                            <TableCell className="pl-8 font-bold text-xs text-white/80 uppercase tracking-widest">{hub.name}</TableCell>
-                            <TableCell className="text-sm font-body font-bold text-white/60 tabular text-center">{hub.cart}</TableCell>
+                         <TableRow key={hub.id} className="hover:bg-white/5 transition-colors border-white/5 h-12">
+                            <TableCell className="pl-6 font-bold text-[10px] text-white/80 uppercase tracking-widest">{hub.name}</TableCell>
+                            <TableCell className="text-xs font-body font-bold text-white/60 tabular text-center">{hub.cart}</TableCell>
                             <TableCell>
-                               <div className="flex items-center justify-center space-x-3">
-                                  <Progress value={((hub.purchased / (hub.activeUsers || 1)) * 100) * 2} className="h-0.5 w-16 bg-white/5" />
-                                  <span className="text-[9px] font-bold text-blue-400 tabular">{((hub.purchased / (hub.activeUsers || 1)) * 100).toFixed(1)}%</span>
+                               <div className="flex items-center justify-center space-x-2">
+                                  <Progress value={((hub.purchased / (hub.activeUsers || 1)) * 100) * 2} className="h-0.5 w-12 bg-white/5" />
+                                  <span className="text-[8px] font-bold text-blue-400 tabular">{((hub.purchased / (hub.activeUsers || 1)) * 100).toFixed(1)}%</span>
                                </div>
                             </TableCell>
-                            <TableCell className="text-right pr-8">
-                               <span className="text-sm font-bold text-blue-400 tabular">${hub.predictedInflow.toLocaleString()}</span>
+                            <TableCell className="text-right pr-6">
+                               <span className="text-xs font-bold text-blue-400 tabular">${hub.predictedInflow.toLocaleString()}</span>
                             </TableCell>
                          </TableRow>
                        ))}
@@ -238,43 +237,43 @@ export default function RevenueDashboard() {
         </div>
 
         {/* Tactical Conversion Pipeline */}
-        <aside className="lg:col-span-4 space-y-10">
+        <aside className="lg:col-span-4 space-y-8">
           <Card className="bg-[#111113] border-white/5 rounded-none shadow-2xl">
-            <CardHeader className="border-b border-white/5 p-6 bg-white/[0.02]">
-              <CardTitle className="font-headline text-xl text-white">Acquisition Funnel</CardTitle>
-              <p className="text-[9px] uppercase tracking-widest text-white/20">Institutional Conversion Index</p>
+            <CardHeader className="border-b border-white/5 p-5 bg-white/[0.02]">
+              <CardTitle className="font-headline text-lg text-white">Acquisition Funnel</CardTitle>
+              <p className="text-[8px] uppercase tracking-widest text-white/20">Institutional Conversion Index</p>
             </CardHeader>
-            <CardContent className="p-8 space-y-12">
+            <CardContent className="p-6 space-y-8">
               <FunnelStep label="Global Visitors" value={funnelData.visitors} color="bg-white/5" />
               <FunnelStep label="Verified Leads" value={funnelData.leads} color="bg-blue-500/10" percent={(funnelData.leads / funnelData.visitors * 100).toFixed(1) + '%'} />
               <FunnelStep label="Successful Buyers" value={funnelData.buyers} color="bg-plum/20" percent={(funnelData.buyers / funnelData.leads * 100).toFixed(1) + '%'} />
               
-              <div className="pt-8 border-t border-white/5 space-y-4">
+              <div className="pt-6 border-t border-white/5 space-y-3">
                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Pipeline Velocity</span>
-                    <span className="text-sm font-bold text-blue-400 tabular">{(funnelData.buyers / funnelData.visitors * 100).toFixed(2)}%</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/30">Pipeline Velocity</span>
+                    <span className="text-xs font-bold text-blue-400 tabular">{(funnelData.buyers / funnelData.visitors * 100).toFixed(2)}%</span>
                  </div>
                  <Progress value={(funnelData.buyers / funnelData.visitors * 100) * 10} className="h-0.5 bg-white/5" />
               </div>
               <Link href="/admin/sales">
-                <Button className="w-full h-12 bg-white text-black hover:bg-plum hover:text-white rounded-none text-[9px] font-bold uppercase tracking-widest">
-                  MANAGE SALES PIPELINE <ArrowRight className="w-3 h-3 ml-2" />
+                <Button className="w-full h-10 bg-white text-black hover:bg-plum hover:text-white rounded-none text-[8px] font-bold uppercase tracking-widest transition-all">
+                  MANAGE SALES PIPELINE
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
           {/* Strategic Alert: Yield Volatility */}
-          <div className="bg-blue-500/5 border border-blue-500/20 p-8 space-y-4 relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
-                <Sparkles className="w-20 h-20 text-blue-400" />
+          <div className="bg-blue-500/5 border border-blue-500/20 p-6 space-y-3 relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
+                <Sparkles className="w-16 h-16 text-blue-400" />
              </div>
-             <div className="flex items-center space-x-3 text-blue-400">
-                <ShieldCheck className="w-4 h-4" />
-                <h4 className="text-[10px] font-bold uppercase tracking-widest">Inflow Prediction</h4>
+             <div className="flex items-center space-x-2 text-blue-400">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <h4 className="text-[9px] font-bold uppercase tracking-widest">Inflow Prediction</h4>
              </div>
-             <p className="text-xs text-white/60 font-light italic leading-relaxed relative z-10">
-               "High activity across all jurisdictional carts. Global predictive inflow suggests a potential $125k yield surge in the next 60-minute window."
+             <p className="text-[10px] text-white/60 font-light italic leading-relaxed relative z-10">
+               "High activity across jurisdictional carts. Potential $125k yield surge predicted."
              </p>
           </div>
         </aside>
@@ -285,43 +284,43 @@ export default function RevenueDashboard() {
 
 function LegendNode({ color, label }: { color: string, label: string }) {
   return (
-    <div className="flex items-center space-x-2">
-       <div className={cn("w-2 h-2 rounded-full", color)} />
-       <span className="text-[8px] font-bold uppercase tracking-widest text-white/40">{label}</span>
+    <div className="flex items-center space-x-1.5">
+       <div className={cn("w-1.5 h-1.5 rounded-full", color)} />
+       <span className="text-[7px] font-bold uppercase tracking-widest text-white/40">{label}</span>
     </div>
   );
 }
 
 function FunnelStep({ label, value, color, percent }: { label: string, value: number, color: string, percent?: string }) {
   return (
-    <div className="space-y-3 group">
+    <div className="space-y-2 group">
       <div className="flex justify-between items-end">
-        <span className="text-[9px] font-bold uppercase tracking-widest text-white/30 group-hover:text-white/60 transition-colors">{label}</span>
+        <span className="text-[8px] font-bold uppercase tracking-widest text-white/30 group-hover:text-white/60 transition-colors">{label}</span>
         <div className="text-right">
-           <span className="text-lg font-body font-bold tabular text-white">{value.toLocaleString()}</span>
-           {percent && <span className="text-[8px] font-bold text-blue-400 block leading-none tabular tracking-tighter">{percent} yield</span>}
+           <span className="text-base font-body font-bold tabular text-white">{value.toLocaleString()}</span>
+           {percent && <span className="text-[7px] font-bold text-blue-400 block leading-none tabular tracking-tighter">{percent} yield</span>}
         </div>
       </div>
-      <div className={cn("h-8 w-full border border-white/5 transition-all group-hover:scale-[1.02]", color)} />
+      <div className={cn("h-6 w-full border border-white/5 transition-all group-hover:scale-[1.01]", color)} />
     </div>
   );
 }
 
 function StatCard({ icon, label, value, trend, positive, color = "text-white", href }: { icon: any, label: string, value: string, trend: string, positive: boolean, color?: string, href?: string }) {
   const content = (
-    <Card className="bg-[#111113] border-white/5 p-8 space-y-6 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl h-full">
+    <Card className="bg-[#111113] border-white/5 p-5 space-y-4 group hover:border-blue-500/40 transition-all rounded-none shadow-2xl h-full">
       <div className="flex justify-between items-start">
-        <div className="p-4 bg-white/5 rounded-none group-hover:bg-blue-500/10 transition-colors text-blue-400 border border-white/5">{icon}</div>
+        <div className="p-3 bg-white/5 rounded-none group-hover:bg-blue-500/10 transition-colors text-blue-400 border border-white/5">{icon}</div>
         <div className={cn(
-          "flex items-center text-[10px] font-bold tracking-widest uppercase",
+          "flex items-center text-[8px] font-bold tracking-widest uppercase",
           positive ? "text-emerald-400" : "text-red-500"
         )}>
-          {trend} {positive ? <ArrowUpRight className="ml-1 w-3 h-3" /> : <ArrowDownRight className="ml-1 w-3 h-3" />}
+          {trend} {positive ? <ArrowUpRight className="ml-1 w-2.5 h-2.5" /> : <ArrowDownRight className="ml-1 w-2.5 h-2.5" />}
         </div>
       </div>
       <div>
-        <div className="text-white/20 text-[10px] uppercase tracking-[0.4em] font-bold group-hover:text-white/40 transition-colors">{label}</div>
-        <div className={cn("text-4xl font-body font-bold tabular mt-2 group-hover:text-white", color)}>{value}</div>
+        <div className="text-white/20 text-[8px] uppercase tracking-[0.4em] font-bold group-hover:text-white/40 transition-colors">{label}</div>
+        <div className={cn("text-2xl font-body font-bold tabular mt-1.5 group-hover:text-white", color)}>{value}</div>
       </div>
     </Card>
   );
