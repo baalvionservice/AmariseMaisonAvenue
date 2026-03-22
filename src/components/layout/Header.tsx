@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -306,7 +305,7 @@ export const Header = () => {
                 Log in
               </Link>
               <span className="text-gray-200 font-extralight mx-1">|</span>
-              <Link href={`/${countryCode}/sell`} className="hover:text-black transition-colors">
+              <Link href={`/${countryCode}/account/register`} className="hover:text-black transition-colors">
                 Sign Up
               </Link>
             </>
