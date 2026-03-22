@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 
 /**
  * SellPage: Replicated "Sell and Consign with Us" Portal.
- * Designed to match the provided Madison Avenue Couture reference image.
+ * Designed to match the high-fidelity institutional selling entryway.
  */
 export default function SellPage() {
   const { country } = useParams();
@@ -19,7 +19,7 @@ export default function SellPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic for sending login code would go here
+    // Simulate navigation to the Partner Hub
     console.log('Login code requested for:', email);
   };
 
@@ -39,7 +39,7 @@ export default function SellPage() {
         <div className="text-center">
           <Link href={`/${countryCode}`} className="group">
             <span className="font-headline text-3xl font-medium tracking-[0.05em] text-black">
-              MC <span className="text-xs font-bold tracking-[0.2em] ml-2 uppercase opacity-60">Madison Avenue Couture</span>
+              AMARISÉ <span className="text-xs font-bold tracking-[0.2em] ml-2 uppercase opacity-60 font-body italic">Maison Avenue</span>
             </span>
           </Link>
         </div>
@@ -47,7 +47,7 @@ export default function SellPage() {
         <div className="flex-1" />
       </header>
 
-      <main className="container mx-auto px-6 py-24 flex flex-col items-center">
+      <main className="container mx-auto px-6 py-32 flex flex-col items-center">
         {/* Main Heading */}
         <h1 className="text-5xl font-headline font-medium text-gray-900 mb-16 tracking-tight">
           Sell and Consign with Us

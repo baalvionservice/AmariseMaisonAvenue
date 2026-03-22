@@ -24,10 +24,10 @@ export default function HowToSellPage() {
         <div className="w-full md:w-[45%] p-12 md:p-24 flex flex-col justify-center space-y-8 bg-black text-white">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl font-headline font-bold italic leading-tight tracking-tight">
-              Sell or Consign with <br /> Madison Ave Couture
+              Sell or Consign with <br /> Amarisé Maison
             </h1>
             <p className="text-sm md:text-base font-light leading-relaxed text-gray-300 max-w-md italic">
-              At Madison Avenue Couture, we offer the most personalized way to sell or consign your designer bags or jewelry. Earn up to 85% of the market price for your mint, new, vintage, or pre-owned items.
+              We offer the most personalized way to sell or consign your designer bags or jewelry. Earn up to 85% of the market price for your mint, new, vintage, or pre-owned items.
             </p>
           </div>
 
@@ -45,7 +45,7 @@ export default function HowToSellPage() {
                 href={`/${countryCode}/sell`} 
                 className="text-[10px] font-bold tracking-[0.2em] text-white hover:text-gold transition-colors uppercase border-b border-white/20 pb-1"
               >
-                LOGIN TO OUR NEW SELLING PORTAL
+                LOGIN TO OUR SELLING PORTAL
               </Link>
             </div>
           </div>
@@ -60,6 +60,7 @@ export default function HowToSellPage() {
             className="object-cover transition-transform duration-[5s] hover:scale-105"
             priority
             sizes="60vw"
+            data-ai-hint="luxury fashion"
           />
           <div className="absolute inset-0 bg-black/5" />
         </div>
@@ -70,7 +71,7 @@ export default function HowToSellPage() {
         <div className="text-center space-y-12">
           <div className="max-w-4xl mx-auto space-y-8">
             <p className="text-[13px] md:text-base text-gray-600 font-light leading-relaxed italic text-justify md:text-center">
-              If you&apos;re looking to sell or consign your designer bag, jewelry or accessories, entrust it to the care and knowledge of people who know luxury — Madison Avenue Couture. We are one of the leading sellers and buyers of Hermès and Chanel handbags and accessories in the secondary market. We bring our years of experience and expertise buying and selling designer bags to evaluate your bags so that we can offer you the best price. We specialize in selling store-fresh luxury bags, so we prefer to purchase never worn bags outright. We also accept recently produced and vintage pre-owned bags in excellent to like new condition, jewelry and accessories.
+              If you're looking to sell or consign your designer bag, jewelry or accessories, entrust it to the care and knowledge of people who know luxury — Amarisé Maison. We are one of the leading sellers and buyers of Hermès and Chanel handbags and accessories in the secondary market. We bring our years of experience and expertise buying and selling designer bags to evaluate your bags so that we can offer you the best price. We specialize in selling store-fresh luxury bags, so we prefer to purchase never worn bags outright. We also accept recently produced and vintage pre-owned bags in excellent to like new condition, jewelry and accessories.
             </p>
           </div>
           
@@ -92,7 +93,6 @@ export default function HowToSellPage() {
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
                 <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
-                  {/* Birkin Inspired Minimalist Outline */}
                   <path d="M20 40 L80 40 L85 85 L15 85 Z" />
                   <path d="M35 40 C35 25, 65 25, 65 40" />
                   <path d="M45 40 L45 50 M55 40 L55 50" />
@@ -108,11 +108,9 @@ export default function HowToSellPage() {
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
                 <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
-                  {/* Shipping Box with Bag being packed */}
                   <path d="M20 50 L20 85 L80 85 L80 50" />
                   <path d="M20 50 L10 35 L50 35 L50 50" />
                   <path d="M80 50 L90 35 L50 35" />
-                  {/* Bag inside */}
                   <path d="M40 60 L60 60 L62 75 L38 75 Z" opacity="0.5" />
                   <path d="M45 60 C45 55, 55 55, 55 60" opacity="0.5" />
                 </svg>
@@ -126,10 +124,8 @@ export default function HowToSellPage() {
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
                 <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
-                  {/* Hands with Cash illustration */}
                   <path d="M30 70 C20 70, 10 60, 10 50 C10 40, 20 30, 35 30" />
                   <path d="M70 70 C80 70, 90 60, 90 50 C90 40, 80 30, 65 30" />
-                  {/* Banknotes */}
                   <rect x="35" y="35" width="30" height="15" rx="1" transform="rotate(-15 50 42)" />
                   <rect x="35" y="45" width="30" height="15" rx="1" />
                   <rect x="35" y="55" width="30" height="15" rx="1" transform="rotate(15 50 62)" />
