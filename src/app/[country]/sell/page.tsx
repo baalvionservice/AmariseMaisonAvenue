@@ -3,29 +3,44 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAppStore } from '@/lib/store';
+import { useToast } from '@/hooks/use-toast';
 
 /**
- * SellPage: Replicated "Sell and Consign with Us" Portal.
- * Designed to match the high-fidelity institutional selling entryway.
+ * SellPage: Institutional Consignment Entrance.
+ * Redirects authenticated sellers to their private terminal.
  */
 export default function SellPage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
+  const router = useRouter();
+  const { toast } = useToast();
+  const { recordLog } = useAppStore();
+  
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate navigation to the Partner Hub
-    console.log('Login code requested for:', email);
+    setIsSubmitting(true);
+    
+    // Simulate Institutional Authentication
+    setTimeout(() => {
+      toast({
+        title: "Atelier Identity Established",
+        description: "Entering the private Partner Terminal.",
+      });
+      recordLog('Seller Login Initiated', 'Auth', countryCode);
+      router.push('/admin/vendor');
+    }, 1500);
   };
 
   return (
     <div className="bg-white min-h-screen font-body text-gray-900">
-      {/* Sell Page Header */}
       <header className="h-20 border-b border-gray-100 px-12 flex items-center justify-between bg-white sticky top-0 z-50">
         <div className="flex-1">
           <Link 
@@ -48,12 +63,10 @@ export default function SellPage() {
       </header>
 
       <main className="container mx-auto px-6 py-32 flex flex-col items-center">
-        {/* Main Heading */}
         <h1 className="text-5xl font-headline font-medium text-gray-900 mb-16 tracking-tight">
           Sell and Consign with Us
         </h1>
 
-        {/* Login Box Container */}
         <div className="w-full max-w-[500px] bg-white border border-gray-50 p-12 md:p-20 shadow-sm text-center space-y-10">
           <div className="space-y-4">
             <h2 className="text-sm font-bold tracking-[0.3em] uppercase text-gray-900">LOGIN</h2>
@@ -76,9 +89,10 @@ export default function SellPage() {
             
             <Button 
               type="submit"
+              disabled={isSubmitting}
               className="w-full max-w-[160px] h-12 bg-[#E1D3DC] text-gray-900 hover:bg-[#D8C4D1] rounded-none text-[10px] font-bold tracking-[0.25em] uppercase transition-all mx-auto shadow-sm"
             >
-              SUBMIT
+              {isSubmitting ? 'SECURE...' : 'SUBMIT'}
             </Button>
           </form>
 

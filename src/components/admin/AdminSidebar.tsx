@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -34,13 +35,14 @@ import {
   Shield,
   Video,
   Award,
-  ExternalLink
+  ExternalLink,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
  * AdminSidebar: Institutional Navigation Matrix
- * Optimized for clear storefront exits and technical node oversight.
+ * Standardized for Super Admin, Hub Lead, and Partner Atelier personas.
  */
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -54,25 +56,15 @@ export function AdminSidebar() {
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
         { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
-        { icon: <PlayCircle />, label: "Automation", href: "/admin/automation" },
       ]
     },
     {
-      title: "Curatorial Control",
+      title: "Operations Hub",
       items: [
-        { icon: <Video />, label: "Live Sessions", href: "/admin/live-sessions" },
-        { icon: <Award />, label: "Heritage Bureau", href: "/admin/heritage-archive" },
         { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
-        { icon: <Shield />, label: "Brand Integrity", href: "/admin/brand-integrity" },
-      ]
-    },
-    {
-      title: "Market Operations",
-      items: [
-        { icon: <Megaphone />, label: "Marketing", href: "/admin/marketing" },
-        { icon: <MessageSquare />, label: "Messaging", href: "/admin/messaging" },
-        { icon: <Activity />, label: "Integrations", href: "/admin/integrations" },
-        { icon: <UserCircle />, label: "Partner Hub", href: "/admin/vendor" },
+        { icon: <Truck />, label: "Logistics", href: "/admin/logistics" },
+        { icon: <ClipboardList />, label: "Consignments", href: "/admin/operations" },
+        { icon: <Award />, label: "Heritage Bureau", href: "/admin/heritage-archive" },
       ]
     },
     {
@@ -84,10 +76,17 @@ export function AdminSidebar() {
       ]
     },
     {
+      title: "Market Integrity",
+      items: [
+        { icon: <UserCircle />, label: "Partner Hub", href: "/admin/vendor" },
+        { icon: <Megaphone />, label: "Marketing", href: "/admin/marketing" },
+        { icon: <Activity />, label: "Integrations", href: "/admin/integrations" },
+      ]
+    },
+    {
       title: "Infrastructure",
       items: [
         { icon: <FlaskConical />, label: "QA Stress Lab", href: "/admin/qa" },
-        { icon: <LifeBuoy />, label: "Client Care", href: "/admin/support" },
         { icon: <Bell />, label: "Alerts", href: "/admin/notifications" },
         { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
         { icon: <ShieldCheck />, label: "Audit Log", href: "/admin/compliance" },
