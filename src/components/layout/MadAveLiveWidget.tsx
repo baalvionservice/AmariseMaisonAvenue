@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * MadAveLiveWidget: Persistent storefront live-stream preview.
- * Designed to match the high-luxury "Live Shop" experience.
+ * Updated to AMARISÉ branding.
  */
 export function MadAveLiveWidget() {
   const [isVisible, setIsVisible] = useState(false);
@@ -38,7 +38,7 @@ export function MadAveLiveWidget() {
         {/* Header */}
         <div className="p-6 pb-4 flex justify-between items-center bg-white">
           <h3 className="font-headline text-2xl font-medium tracking-tight text-gray-900">
-            MADAVE LIVE
+            AMARISÉ
           </h3>
           <button 
             onClick={() => setIsVisible(false)}
@@ -98,7 +98,7 @@ export function MadAveLiveWidget() {
             <Link href={`/${countryCode}/account/live`}>
               <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-plum transition-colors group flex items-center justify-center mx-auto border-b border-gray-900 pb-1">
                 VIEW LIVE SHOP
-                <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
           </div>
