@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -6,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 import { MaisonPopup } from '@/components/layout/MaisonPopup';
+import { MadAveLiveWidget } from '@/components/layout/MadAveLiveWidget';
 import Link from 'next/link';
 import { 
   Phone, 
@@ -30,6 +30,7 @@ export default function CountryLayout({
   return (
     <>
       <MaisonPopup />
+      <MadAveLiveWidget />
       <Header />
       <main id="main-content" className="min-h-screen pt-[148px] animate-fade-in relative bg-white">
         {children}
