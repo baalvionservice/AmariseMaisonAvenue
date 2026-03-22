@@ -301,7 +301,7 @@ export const Header = () => {
             </Link>
           ) : (
             <>
-              <Link href={`/${countryCode}/sell`} className="hover:text-black transition-colors">
+              <Link href={`/${countryCode}/account/login`} className="hover:text-black transition-colors">
                 Log in
               </Link>
               <span className="text-gray-200 font-extralight mx-1">|</span>
