@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -17,7 +16,8 @@ import {
   X,
   Plus,
   SlidersHorizontal,
-  Search
+  Search,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles } from 'lucide-react';
 
 /**
  * CategoryPage: Replicated for the Madison Avenue Couture archive view.

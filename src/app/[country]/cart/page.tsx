@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -154,14 +153,14 @@ export default function CartPage() {
                <div className="flex items-center space-x-4">
                   <div className="p-3 bg-white rounded-full shadow-sm text-gold"><ShieldCheck className="w-5 h-5" /></div>
                   <div className="space-y-0.5">
-                     <p className="text-[10px] font-bold uppercase tracking-widest">256-Bit SSL SECURE</p>
+                     <p className="text-10px font-bold uppercase tracking-widest">256-Bit SSL SECURE</p>
                      <p className="text-[8px] text-gray-400 italic">Institutional Encryption Standard</p>
                   </div>
                </div>
                <div className="flex items-center space-x-4">
                   <div className="p-3 bg-white rounded-full shadow-sm text-gold"><Truck className="w-5 h-5" /></div>
                   <div className="space-y-0.5">
-                     <p className="text-[10px] font-bold uppercase tracking-widest">Global White-Glove</p>
+                     <p className="text-10px font-bold uppercase tracking-widest">Global White-Glove</p>
                      <p className="text-[8px] text-gray-400 italic">Tracked Dispatch via Maison Logistics</p>
                   </div>
                </div>

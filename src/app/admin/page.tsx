@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -15,7 +14,6 @@ import {
   Clock,
   ArrowRight,
   Database,
-  LayoutDashboard,
   Truck,
   Package,
   Activity,
@@ -34,8 +32,8 @@ import { Button } from '@/components/ui/button';
  * Central node for Global Super Admin oversight.
  */
 export default function AdminDashboard() {
-  const { regions, globalTotal, globalUsers, globalPredictedInflow } = useSimulationData();
-  const { scopedErrors, adminJurisdiction, setAdminJurisdiction, currentUser } = useAppStore();
+  const { regions, globalTotal, globalPredictedInflow } = useSimulationData();
+  const { scopedErrors, adminJurisdiction, setAdminJurisdiction } = useAppStore();
   const [selectedHub, setSelectedHub] = useState<string | null>(null);
 
   const activeHubData = useMemo(() => 

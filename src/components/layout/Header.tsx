@@ -50,7 +50,8 @@ export const Header = () => {
     setMounted(true);
   }, []);
 
-  const countryCode = mounted ? ((country as string) || 'us') : 'us';
+  // countryCode must be stable between server and client to avoid hydration errors
+  const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   
   const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;

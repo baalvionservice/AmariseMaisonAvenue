@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -6,16 +5,9 @@ import Link from 'next/link';
 import { 
   DollarSign, 
   ChevronRight, 
-  Receipt,
-  Scale,
-  ArrowRight,
   BadgeDollarSign,
   ShieldCheck,
   TrendingUp,
-  Download,
-  Clock,
-  ArrowUpRight,
-  ArrowDownRight,
   Database,
   Search,
   CheckCircle2,
@@ -23,11 +15,8 @@ import {
   Globe,
   Smartphone,
   Building2,
-  RefreshCcw,
-  AlertCircle,
   Undo2,
-  XCircle,
-  Info,
+  FileText,
   BrainCircuit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -65,7 +54,6 @@ import { Label } from '@/components/ui/label';
 export default function FinanceHub() {
   const { scopedTransactions, currentUser, countryConfigs, updateTransactionStatus, refundTransaction } = useAppStore();
   const { toast } = useToast();
-  const [activeInternalTab, setActiveInternalTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [refundTargetId, setRefundTargetId] = useState<string | null>(null);
   const [refundReason, setRefundReason] = useState('');
@@ -168,7 +156,7 @@ export default function FinanceHub() {
         </div>
       </header>
 
-      <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveInternalTab}>
+      <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-[#111113] border border-white/5 h-14 w-full justify-start p-1 rounded-none space-x-2 mb-10">
           <TabsTrigger value="overview" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Strategic Yield</TabsTrigger>
           <TabsTrigger value="ledger" className="tab-trigger-modern !text-white/40 data-[state=active]:!bg-white/5 data-[state=active]:!text-white rounded-none">Global Ledger</TabsTrigger>
@@ -189,7 +177,10 @@ export default function FinanceHub() {
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
               <Card className="lg:col-span-8 bg-[#111113] border-white/5 rounded-none overflow-hidden">
                 <CardHeader className="border-b border-white/5 bg-white/[0.02] p-8">
-                   <CardTitle className="font-headline text-2xl text-white uppercase italic">Regional Performance Matrix</CardTitle>
+                   <div className="flex items-center space-x-3 text-blue-400">
+                      <BrainCircuit className="w-5 h-5" />
+                      <CardTitle className="font-headline text-2xl text-white uppercase italic">Regional Performance Matrix</CardTitle>
+                   </div>
                    <CardDescription className="text-[10px] uppercase tracking-widest text-white/30">Settled revenue split by jurisdictional hub</CardDescription>
                 </CardHeader>
                 <CardContent className="p-10 h-[380px]">
@@ -372,7 +363,7 @@ export default function FinanceHub() {
            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <Card className="bg-[#111113] border-white/5 p-10 space-y-8 rounded-none">
                  <div className="flex items-center space-x-4 text-blue-400">
-                    <Scale className="w-6 h-6" />
+                    <Database className="w-6 h-6" />
                     <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Jurisdictional Tax Matrix</h3>
                  </div>
                  <p className="text-sm text-white/40 font-light italic leading-relaxed">
