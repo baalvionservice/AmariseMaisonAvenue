@@ -294,18 +294,23 @@ export const Header = () => {
 
       {/* Maison Brand Header */}
       <div className="h-28 border-b border-gray-100 px-12 flex items-center justify-between relative bg-white">
-        <div className="flex items-center space-x-6 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
+        <div className="flex items-center space-x-3 text-[13px] font-light text-gray-600">
           {currentUser ? (
-            <Link href={`/${countryCode}/account`} className="hover:text-black border-r border-gray-100 pr-6 py-2 flex items-center space-x-2">
+            <Link href={`/${countryCode}/account`} className="hover:text-black flex items-center space-x-2">
               <User className="w-3.5 h-3.5" />
-              <span>PRIVATE PORTAL</span>
+              <span>Private Portal</span>
             </Link>
           ) : (
-            <Link href={`/${countryCode}/sell`} className="hover:text-black border-r border-gray-100 pr-6 py-2">
-              Login
-            </Link>
+            <>
+              <Link href={`/${countryCode}/sell`} className="hover:text-black transition-colors">
+                Log in
+              </Link>
+              <span className="text-gray-200 font-extralight mx-1">|</span>
+              <Link href={`/${countryCode}/sell`} className="hover:text-black transition-colors">
+                Sign Up
+              </Link>
+            </>
           )}
-          <Link href={`/${countryCode}/sell`} className="hover:text-black py-2">Join the Maison</Link>
         </div>
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
