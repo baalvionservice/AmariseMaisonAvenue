@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, User, LayoutDashboard } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronLeft, ChevronRight, ShieldCheck, User, LayoutDashboard, Sparkles, ArrowRight } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { MAISON_SERVICES } from '@/lib/mock-monetization';
 import { useAppStore } from '@/lib/store';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface MegaColumn {
   title: string;
@@ -43,6 +44,7 @@ export const Header = () => {
   const router = useRouter();
   const { cart, wishlist, currentUser } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   
   useEffect(() => {
@@ -319,6 +321,7 @@ export const Header = () => {
             className="text-gray-400 hover:text-black transition-colors group relative flex items-center min-w-[44px] min-h-[44px] justify-center" 
             type="button"
             aria-label="Search Maison Intelligence"
+            onClick={() => setIsSearchOpen(true)}
           >
             <Search className="w-5 h-5 stroke-[1.5px]" aria-hidden="true" />
             <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">Intelligence</span>
@@ -453,6 +456,72 @@ export const Header = () => {
         <span className="text-[10px] font-bold uppercase tracking-[0.5em] italic">Maison Menu</span>
         <div className="w-10" aria-hidden="true" />
       </div>
+
+      {/* Institutional Search Overlay */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-3xl flex flex-col p-12"
+          >
+            <div className="container mx-auto max-w-6xl flex-1 flex flex-col">
+              <div className="flex justify-between items-center mb-24">
+                <span className="font-headline text-2xl font-bold italic text-gray-900 uppercase tracking-widest">Archive Discovery</span>
+                <button 
+                  onClick={() => setIsSearchOpen(false)}
+                  className="p-4 hover:scale-110 transition-transform text-black"
+                >
+                  <X className="w-10 h-10 stroke-[1px]" />
+                </button>
+              </div>
+
+              <div className="space-y-12">
+                <div className="relative group">
+                  <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black transition-colors" />
+                  <input 
+                    autoFocus
+                    type="text" 
+                    placeholder="Search Maison Intelligence..." 
+                    className="w-full bg-transparent border-b border-gray-100 h-24 pl-16 pr-12 text-4xl md:text-6xl font-headline italic font-light outline-none focus:border-black transition-all placeholder:text-gray-100"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-24 pt-12">
+                  <div className="space-y-8">
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Neural Suggestions</h3>
+                    <ul className="space-y-6">
+                      {['Hermès 1924 Series', 'Grand Complication Watches', 'Bespoke Evening Registry', 'Artisanal Silk Archive'].map(term => (
+                        <li key={term}>
+                          <button className="flex items-center text-xl font-light italic text-gray-600 hover:text-black transition-colors group">
+                            <Sparkles className="w-4 h-4 mr-4 text-gold opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {term}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-ivory p-12 space-y-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                      <LayoutDashboard className="w-40 h-40" />
+                    </div>
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-plum">Maison Assistant</h3>
+                    <p className="text-xl font-light italic text-gray-500 leading-relaxed">
+                      "I can assist you in finding specific provenance records or artifacts across our global ateliers."
+                    </p>
+                    <div className="pt-4">
+                      <button className="text-[10px] font-bold uppercase tracking-widest text-black border-b border-black pb-1 flex items-center">
+                        ASK THE CURATOR <ArrowRight className="ml-2 w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

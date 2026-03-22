@@ -49,7 +49,7 @@ export function AdminTopBar() {
         <Link href="/admin" className="p-2 hover:bg-white/5 rounded-none transition-colors border border-white/5 shrink-0" title="Admin Home">
           <LayoutDashboard className="w-5 h-5 text-blue-500" />
         </Link>
-        <div className="relative w-full max-w-[200px] group hidden lg:block min-w-0">
+        <div className="relative w-full max-w-[240px] group min-w-0 flex items-center">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
