@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -16,10 +15,16 @@ import {
   FlaskConical,
   Zap,
   Globe,
-  Award
+  Award,
+  Package,
+  Activity,
+  Truck
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
 
 /**
  * Maison Homepage: The Minimalist Luxury Entry.
@@ -29,7 +34,9 @@ export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const { products } = useAppStore();
+  const { products, scopedErrors } = useAppStore();
+
+  const jurisdictionLabel = countryCode === 'global' ? 'GLOBAL MASTER' : countryCode.toUpperCase() + ' NODE';
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -108,7 +115,7 @@ export default function HomePage() {
               </div>
               <div className="space-y-6 relative z-10">
                 <h4 className="text-5xl font-headline font-bold italic text-gray-900 leading-tight">The Institutional Registry</h4>
-                <p className="text-lg text-gray-500 font-light italic leading-relaxed max-sm">
+                <p className="text-lg text-gray-500 font-light italic leading-relaxed">
                   Normal Collector Flow: High-density technical data grid optimized for marketplace trust and absolute asset transparency.
                 </p>
               </div>
@@ -129,7 +136,7 @@ export default function HomePage() {
               </div>
               <div className="space-y-6 relative z-10">
                 <h4 className="text-5xl font-headline font-bold italic text-white leading-tight">The Private Salon</h4>
-                <p className="text-lg text-white/40 font-light italic leading-relaxed max-sm">
+                <p className="text-lg text-white/40 font-light italic leading-relaxed">
                   Elite Client Flow: Cinematic, narrative-first design reserved for high-value VIP artifacts and bespoke curatorial briefs.
                 </p>
               </div>

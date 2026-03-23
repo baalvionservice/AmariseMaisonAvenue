@@ -80,13 +80,13 @@ export const Header = () => {
       {/* 1. Ticker Hub */}
       <div className="hidden sm:flex bg-[#fcfcfc] text-gray-500 h-10 items-center justify-center px-6 text-[9px] tracking-[0.4em] font-bold uppercase border-b border-gray-100">
         <div className="flex items-center space-x-10">
-          <button className="opacity-40 p-2 hover:text-black transition-colors" onClick={() => setActiveSlide(s => s === 0 ? slides.length-1 : s-1)} aria-label="Prev">
+          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === 0 ? slides.length-1 : s-1)} aria-label="Prev">
             <ChevronLeft className="w-3 h-3" />
           </button>
           <div className="overflow-hidden relative flex items-center justify-center min-w-[300px] lg:min-w-[500px]">
             <span className="animate-fade-in text-center" key={activeSlide}>{slides[activeSlide]}</span>
           </div>
-          <button className="opacity-40 p-2 hover:text-black transition-colors" onClick={() => setActiveSlide(s => s === slides.length-1 ? 0 : s+1)} aria-label="Next">
+          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === slides.length-1 ? 0 : s+1)} aria-label="Next">
             <ChevronRight className="w-3 h-3" />
           </button>
         </div>
@@ -151,7 +151,7 @@ export const Header = () => {
                     <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">Maison Archive</SheetTitle>
                     <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">Institutional Registry</p>
                   </div>
-                  <SheetClose className="p-2 hover:bg-gray-50 transition-colors">
+                  <SheetClose className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
                     <X className="w-5 h-5 text-gray-400" />
                   </SheetClose>
                 </div>
@@ -162,36 +162,44 @@ export const Header = () => {
                 <div className="p-8 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">Departments</p>
                   {navLinks.map(link => (
-                    <Link key={link.name} href={link.href} className="block group">
-                      <SheetClose className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
-                        {link.name}
-                        <ChevronRight className="w-4 h-4 text-gray-200 group-hover:text-plum group-hover:translate-x-1 transition-all" />
-                      </SheetClose>
-                    </Link>
+                    <SheetClose asChild key={link.name}>
+                      <Link href={link.href} className="block group">
+                        <div className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
+                          {link.name}
+                          <ChevronRight className="w-4 h-4 text-gray-200 group-hover:text-plum group-hover:translate-x-1 transition-all" />
+                        </div>
+                      </Link>
+                    </SheetClose>
                   ))}
                 </div>
 
                 {/* Collector Portal Section */}
                 <div className="px-8 py-10 bg-ivory/50 border-y border-gray-50 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6 px-2">Collector Services</p>
-                  <Link href={`/${countryCode}/account`} className="block group">
-                    <SheetClose className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm font-bold uppercase tracking-widest text-gray-700">My Dashboard</span>
-                    </SheetClose>
-                  </Link>
-                  <Link href={`/${countryCode}/how-to-sell`} className="block group">
-                    <SheetClose className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                      <Briefcase className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Consign Artifacts</span>
-                    </SheetClose>
-                  </Link>
-                  <Link href={`/${countryCode}/appointments`} className="block group">
-                    <SheetClose className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                      <MapPin className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Book Private Salon</span>
-                    </SheetClose>
-                  </Link>
+                  <SheetClose asChild>
+                    <Link href={`/${countryCode}/account`} className="block group">
+                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                        <User className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">My Dashboard</span>
+                      </div>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href={`/${countryCode}/how-to-sell`} className="block group">
+                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                        <Briefcase className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Consign Artifacts</span>
+                      </div>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href={`/${countryCode}/appointments`} className="block group">
+                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                        <MapPin className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Book Private Salon</span>
+                      </div>
+                    </Link>
+                  </SheetClose>
                 </div>
 
                 {/* Jurisdictional Passport Section */}
@@ -203,7 +211,7 @@ export const Header = () => {
                         key={c.code} 
                         onClick={() => { handleCountryChange(c.code); }}
                         className={cn(
-                          "flex flex-col items-center justify-center p-4 border transition-all rounded-none",
+                          "flex flex-col items-center justify-center p-4 border transition-all rounded-none outline-none cursor-pointer",
                           countryCode === c.code ? "bg-black border-black text-white shadow-lg" : "bg-white border-gray-100 text-gray-400 hover:border-plum"
                         )}
                       >
