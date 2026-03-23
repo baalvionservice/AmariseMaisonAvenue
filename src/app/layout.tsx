@@ -33,6 +33,10 @@ export const metadata: Metadata = {
     template: '%s | AMARISÉ MAISON AVENUE'
   },
   description: 'Curating the world\'s most exquisite treasures since 1924. Explore exclusive collections in haute couture, high-end watches, and fine jewelry.',
+  keywords: ['luxury fashion', 'bespoke jewelry', 'high-end watches', 'heritage couture', 'private acquisition'],
+  authors: [{ name: 'Amarisé Maison Avenue' }],
+  creator: 'Amarisé Maison Avenue',
+  publisher: 'Amarisé Maison Avenue',
   openGraph: {
     title: 'AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury',
     description: 'Curating the world\'s most exquisite treasures since 1924.',
@@ -45,6 +49,23 @@ export const metadata: Metadata = {
       height: 630,
       alt: 'AMARISÉ MAISON AVENUE Global Flagship'
     }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AMARISÉ MAISON AVENUE | Global Luxury',
+    description: 'The Absolute Standard of Heritage Curation.',
+    images: ['https://picsum.photos/seed/amarise-twitter/1200/600'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

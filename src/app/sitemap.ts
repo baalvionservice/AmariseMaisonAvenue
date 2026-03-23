@@ -1,4 +1,3 @@
-
 import { MetadataRoute } from 'next';
 import { PRODUCTS, CATEGORIES, CITIES, BUYING_GUIDES, EDITOR_INITIAL, COUNTRIES } from '@/lib/mock-data';
 

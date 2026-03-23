@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -16,13 +15,9 @@ import {
   Lock, 
   Crown, 
   Globe, 
-  MessageSquare, 
-  Mail,
   ArrowRight,
-  Star,
-  Sparkles
+  Star
 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
 import { useSalesSystem } from '@/hooks/use-sales-system';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,14 +26,12 @@ import Link from 'next/link';
 
 /**
  * Private Client Experience (Design B: The Private Salon).
- * Reserved for VIP artifacts and high-value acquisitions. Focuses on narrative and discretion.
- * Enhanced with dynamic SEO Authority metadata.
+ * Optimized for high-value acquisition and Elite SEO authority.
  */
 export default function PrivateOrderPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
-  const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const { createInitialInquiry } = useSalesSystem();
   const { toast } = useToast();
   const router = useRouter();
@@ -79,12 +72,7 @@ export default function PrivateOrderPage() {
 
   return (
     <div className="bg-ivory min-h-screen pb-40">
-      {/* Dynamic SEO Title & Meta Tags */}
-      <title>{product.seoTitle || `Private Acquisition: ${product.name} | Amarisé Salon`}</title>
-      <meta name="description" content={product.seoDescription || `Discreet acquisition flow for the rare ${product.name} artifact.`} />
-      {product.targetKeyword && <meta name="keywords" content={`${product.targetKeyword}, private luxury acquisition`} />}
-
-      {/* Institutional JSON-LD Schema */}
+      {/* SEO Structured Data: Elite Product Offering */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -93,16 +81,14 @@ export default function PrivateOrderPage() {
             "@type": "Product",
             "name": product.name,
             "image": [product.imageUrl],
-            "description": product.seoDescription || product.specialNotes || product.name,
+            "description": `Private acquisition brief for the rare ${product.name} artifact. Restricted to the Maison Private Salon.`,
             "sku": product.id,
             "brand": { "@type": "Brand", "name": "AMARISÉ MAISON AVENUE" },
             "offers": {
               "@type": "Offer",
-              "url": `https://amarise-maison-avenue.com/${countryCode}/private-order/${product.id}`,
+              "availability": "https://schema.org/LimitedAvailability",
               "priceCurrency": COUNTRIES[countryCode]?.currency || "USD",
-              "price": product.basePrice,
-              "availability": "https://schema.org/InStock",
-              "itemCondition": "https://schema.org/NewCondition"
+              "price": product.basePrice
             }
           })
         }}
@@ -112,9 +98,11 @@ export default function PrivateOrderPage() {
       <section className="relative h-[55vh] w-full flex items-center justify-center overflow-hidden border-b border-border">
         <Image 
           src="https://picsum.photos/seed/amarise-private/2560/1440" 
-          alt="Maison Private Salon" 
+          alt="Maison Private Salon Exclusive Environment" 
           fill 
           className="object-cover opacity-40 grayscale-[50%]" 
+          priority
+          data-ai-hint="exclusive interior"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-ivory/20 to-ivory" />
         <div className="relative z-10 text-center space-y-6 px-6">
@@ -174,7 +162,7 @@ export default function PrivateOrderPage() {
             </Tabs>
           </div>
 
-          {/* Right Action Column: The Acquisition Form */}
+          {/* Right Action Column */}
           <aside className="lg:w-2/5 space-y-12 lg:sticky lg:top-40">
             <div className="space-y-6 pb-12 border-b border-border">
               <div className="flex items-center space-x-3 text-gold">
@@ -183,7 +171,7 @@ export default function PrivateOrderPage() {
               </div>
               <h2 className="text-4xl font-headline font-bold italic text-gray-900 leading-tight">{product.name}</h2>
               <div className="flex items-center space-x-6">
-                <div className="text-5xl font-light tracking-tighter text-gray-900">{formatPrice(product.basePrice, countryCode)}</div>
+                <div className="text-5xl font-light tracking-tighter text-gray-900 tabular-nums">{formatPrice(product.basePrice, countryCode)}</div>
                 <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-plum/20 text-plum px-3 py-1">Inquire Only</Badge>
               </div>
             </div>
@@ -197,18 +185,17 @@ export default function PrivateOrderPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">Full Legal Name</Label>
-                  <Input required className="rounded-none border-border bg-ivory/30 h-14 text-sm italic" placeholder="Julian Vandervilt" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  <Input required className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum" placeholder="Julian Vandervilt" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">Private Correspondence Email</Label>
-                  <Input required type="email" className="rounded-none border-border bg-ivory/30 h-14 text-sm italic" placeholder="j.vandervilt@luxury.net" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <Input required type="email" className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum" placeholder="j.vandervilt@luxury.net" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">Strategic Brief</Label>
-                  <Textarea className="rounded-none border-border bg-ivory/30 min-h-[120px] text-sm italic py-4" placeholder="Detail your collection intent or specific provenance requirements..." value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
+                  <Textarea className="rounded-none border-border bg-ivory/30 min-h-[120px] text-sm italic py-4 focus:border-plum" placeholder="Detail your collection intent or specific provenance requirements..." value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
                 </div>
                 
-                {/* Action Button: Plum with Gold Hover */}
                 <Button type="submit" className="w-full h-20 bg-plum text-white hover:bg-gold hover:text-gray-900 rounded-none text-[10px] font-bold tracking-[0.4em] uppercase shadow-2xl transition-all">
                   TRANSMIT PRIVATE BRIEF <ArrowRight className="ml-3 w-4 h-4" />
                 </Button>

@@ -7,25 +7,22 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { 
   ChevronLeft, 
-  Sparkles, 
   Lightbulb, 
   Package, 
   ArrowRight,
   Share2,
   Bookmark,
   TrendingUp,
-  ShieldCheck,
-  History
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 import { generateBuyingGuideNarrative } from '@/ai/flows/generate-buying-guide-narrative';
-import { cn } from '@/lib/utils';
 import { COUNTRIES } from '@/lib/mock-data';
 
 /**
  * BuyingGuideDetailPage: High-authority editorial guide.
- * Features advanced metadata and investment insights.
+ * Features HowTo Structured Data for improved Google Rich Result rankings.
  */
 export default function BuyingGuideDetailPage() {
   const { id, country } = useParams();
@@ -62,12 +59,12 @@ export default function BuyingGuideDetailPage() {
   }, [guide, currentCountry.name]);
 
   if (!guide) {
-    return <div className="py-40 text-center font-headline text-3xl">Guide not found.</div>;
+    return <div className="py-40 text-center font-headline text-3xl">Intelligence record not found.</div>;
   }
 
   return (
     <div className="animate-fade-in bg-ivory">
-      {/* SEO Structured Data */}
+      {/* SEO Structured Data: HowTo Authority */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -96,10 +93,11 @@ export default function BuyingGuideDetailPage() {
           fill
           className="object-cover opacity-80 animate-slow-zoom"
           priority
+          data-ai-hint="luxury tutorial"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ivory via-ivory/10 to-transparent" />
         <div className="container mx-auto px-12 pb-24 relative z-10 max-w-[1600px]">
-          <Link href={`/${countryCode}/buying-guide`} className="inline-flex items-center text-[10px] tracking-[0.4em] uppercase text-gray-900 hover:text-primary transition-colors mb-12">
+          <Link href={`/${countryCode}/buying-guide`} className="inline-flex items-center text-[10px] tracking-[0.4em] uppercase text-gray-900 hover:text-plum transition-colors mb-12 font-bold">
             <ChevronLeft className="w-3 h-3 mr-2" /> Back to Intelligence
           </Link>
           <div className="space-y-8 max-w-5xl">
@@ -119,7 +117,6 @@ export default function BuyingGuideDetailPage() {
       {/* Main Authority Content */}
       <section className="container mx-auto px-12 py-40 grid grid-cols-1 lg:grid-cols-12 gap-32 items-start max-w-[1600px]">
         <div className="lg:col-span-8 space-y-32">
-          {/* Narrative Block */}
           <div className="space-y-16">
              <div className="flex items-center space-x-6 text-gray-400">
                 <div className="h-px flex-1 bg-gray-100" />
@@ -140,9 +137,8 @@ export default function BuyingGuideDetailPage() {
               )}
           </div>
 
-          {/* Investment Outlook - New Authority Section */}
           <div className="bg-white p-20 border border-border shadow-luxury relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-16 opacity-5 pointer-events-none">
+             <div className="absolute top-0 right-0 p-16 opacity-[0.03] pointer-events-none group-hover:opacity-10 transition-opacity">
                 <TrendingUp className="w-64 h-64 text-black" />
              </div>
              <div className="relative z-10 space-y-10">
@@ -177,7 +173,6 @@ export default function BuyingGuideDetailPage() {
              </div>
           </div>
 
-          {/* Expert Tips / How-To Section */}
           <div className="space-y-20">
              <div className="flex flex-col items-center text-center space-y-4">
                 <Lightbulb className="w-10 h-10 text-secondary" />
@@ -185,9 +180,9 @@ export default function BuyingGuideDetailPage() {
                 <p className="text-gray-400 text-[10px] uppercase tracking-[0.5em] font-bold">Artisanal Identification & Verification</p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                {(aiTips.length > 0 ? aiTips : guide.tips).map((tip, idx) => (
-                  <div key={idx} className="p-12 bg-white border border-border hover:border-secondary transition-all group relative overflow-hidden">
-                     <span className="text-[150px] font-headline font-bold text-gray-50 absolute -bottom-10 -right-4 pointer-events-none group-hover:text-secondary/5 transition-colors">0{idx + 1}</span>
+                {(aiTips.length > 0 ? aiTips : (guide.tips || [])).map((tip, idx) => (
+                  <div key={idx} className="p-12 bg-white border border-border hover:border-plum transition-all group relative overflow-hidden shadow-sm">
+                     <span className="text-[150px] font-headline font-bold text-gray-50 absolute -bottom-10 -right-4 pointer-events-none group-hover:text-plum/5 transition-colors">0{idx + 1}</span>
                      <div className="relative z-10 space-y-6">
                         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Step 0{idx + 1}</span>
                         <p className="text-2xl text-gray-900 font-light italic leading-tight">
@@ -200,9 +195,7 @@ export default function BuyingGuideDetailPage() {
           </div>
         </div>
 
-        {/* Dynamic Authority Sidebar */}
         <aside className="lg:col-span-4 space-y-16 sticky top-40">
-          {/* Specialist Card */}
           <div className="bg-black p-12 text-white shadow-2xl relative overflow-hidden">
              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
              <div className="relative z-10 space-y-10">
@@ -220,22 +213,20 @@ export default function BuyingGuideDetailPage() {
              </div>
           </div>
 
-          {/* Social Resonance */}
-          <div className="space-y-8 p-10 bg-white border border-border">
+          <div className="space-y-8 p-10 bg-white border border-border shadow-sm">
              <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 border-b border-gray-100 pb-4">Collective Resonance</h4>
              <div className="flex gap-4">
-                <Button variant="outline" className="flex-1 rounded-none border-gray-100 hover:border-secondary text-[9px] font-bold tracking-widest uppercase"><Share2 className="w-3.5 h-3.5 mr-2" /> Share</Button>
-                <Button variant="outline" className="flex-1 rounded-none border-gray-100 hover:border-secondary text-[9px] font-bold tracking-widest uppercase"><Bookmark className="w-3.5 h-3.5 mr-2" /> Save</Button>
+                <Button variant="outline" className="flex-1 rounded-none border-gray-100 hover:border-plum text-[9px] font-bold tracking-widest uppercase"><Share2 className="w-3.5 h-3.5 mr-2" /> Share</Button>
+                <Button variant="outline" className="flex-1 rounded-none border-gray-100 hover:border-plum text-[9px] font-bold tracking-widest uppercase"><Bookmark className="w-3.5 h-3.5 mr-2" /> Save</Button>
              </div>
           </div>
 
-          {/* Related Curations */}
           {relCollections.length > 0 && (
             <div className="space-y-8">
                <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Contextual Edits</h4>
                <div className="space-y-4">
                   {relCollections.map(col => (
-                    <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group flex items-center space-x-6 p-6 bg-white border border-border hover:border-black transition-all">
+                    <Link key={col.id} href={`/${countryCode}/collection/${col.id}`} className="group flex items-center space-x-6 p-6 bg-white border border-border hover:border-black transition-all shadow-sm">
                        <div className="relative w-20 h-24 shrink-0 bg-muted overflow-hidden">
                           <div className="w-full h-full flex items-center justify-center text-[6px] font-bold uppercase text-gray-300">Asset</div>
                        </div>
@@ -252,7 +243,6 @@ export default function BuyingGuideDetailPage() {
         </aside>
       </section>
 
-      {/* Curated Acquisition Gallery */}
       <section className="container mx-auto px-12 py-40 border-t border-border max-w-[1600px]">
          <div className="flex flex-col md:row items-end justify-between mb-24 gap-8">
             <div className="space-y-4">
@@ -262,8 +252,8 @@ export default function BuyingGuideDetailPage() {
                </div>
                <h2 className="text-6xl font-headline font-bold italic text-gray-900 leading-none">Artifacts to Consider</h2>
             </div>
-            <Link href={`/${countryCode}/category/${guide.category.toLowerCase()}`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2 flex items-center">
-              Explore Full Atelier <ArrowRight className="w-3 h-3 ml-2" />
+            <Link href={`/${countryCode}/category/hermes`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-plum transition-all border-b border-black pb-2 flex items-center">
+              Explore Full Atelier <ArrowRight className="w-3.5 h-3.5 ml-2" />
             </Link>
          </div>
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16">
@@ -273,10 +263,9 @@ export default function BuyingGuideDetailPage() {
          </div>
       </section>
 
-      {/* SEO Content Footer */}
       <section className="bg-white py-48 border-t border-border text-center">
          <div className="max-w-4xl mx-auto space-y-16 px-12">
-            <div className="inline-flex items-center justify-center p-6 bg-ivory border border-secondary/10 rounded-full">
+            <div className="inline-flex items-center justify-center p-6 bg-ivory border border-secondary/10 rounded-full shadow-lg">
                <ShieldCheck className="w-8 h-8 text-secondary" />
             </div>
             <div className="space-y-8">
@@ -292,7 +281,7 @@ export default function BuyingGuideDetailPage() {
                   </Button>
                </Link>
                <Link href={`/${countryCode}/buying-guide`}>
-                  <Button className="h-16 px-16 rounded-none bg-black text-white hover:bg-secondary transition-all text-[10px] tracking-[0.4em] font-bold uppercase shadow-2xl">
+                  <Button className="h-16 px-16 rounded-none bg-black text-white hover:bg-plum transition-all text-[10px] tracking-[0.4em] font-bold uppercase shadow-2xl">
                     All Intelligence
                   </Button>
                </Link>

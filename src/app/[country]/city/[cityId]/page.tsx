@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 
 /**
  * CityPage: Programmatic SEO Authority Page.
- * Focuses on high-authority city-specific luxury content.
+ * Focuses on high-authority city-specific luxury content and local structured data.
  */
 export default function CityPage() {
   const { country, cityId } = useParams();
@@ -56,20 +56,26 @@ export default function CityPage() {
     fetchNarrative();
   }, [city, currentCountry.name]);
 
-  if (!city) return <div className="py-40 text-center font-headline text-3xl">Destination not found</div>;
+  if (!city) return <div className="py-40 text-center font-headline text-3xl">Destination not found in global network.</div>;
 
   return (
     <div className="animate-fade-in bg-ivory pb-40">
-      {/* SEO Schema: City Authority */}
+      {/* SEO Schema: City Authority & Local Business Intelligence */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Guide",
-            "name": `Luxury Shopping in ${city.name}`,
+            "name": `Luxury Shopping in ${city.name} | Amarisé Maison`,
             "description": city.description,
             "abstract": narrative,
+            "mainEntity": {
+              "@type": "LocalBusiness",
+              "name": `Amarisé Maison Avenue ${city.name}`,
+              "address": { "@type": "PostalAddress", "streetAddress": city.office.address, "addressLocality": city.name },
+              "telephone": city.office.phone
+            },
             "hasPart": featuredProducts.map(p => ({
               "@type": "Product",
               "name": p.name
@@ -80,7 +86,7 @@ export default function CityPage() {
 
       {/* Hero Header */}
       <section className="relative h-[80vh] w-full flex items-center justify-center overflow-hidden bg-muted">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
            <span className="text-[25vw] font-headline font-bold text-gray-900 italic tracking-tighter leading-none">{city.name.charAt(0)}</span>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-ivory" />
@@ -141,7 +147,6 @@ export default function CityPage() {
 
       {/* Local Trends & Curated Edits */}
       <section className="container mx-auto px-12 py-24 space-y-48 max-w-[1600px]">
-        {/* Local Resonace Grid */}
         <div className="space-y-24">
           <div className="flex flex-col items-center text-center space-y-4">
             <History className="w-10 h-10 text-secondary" />
@@ -150,9 +155,9 @@ export default function CityPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             {city.trends.map((trend, idx) => (
-              <div key={idx} className="bg-white p-16 border border-border shadow-sm group hover:border-secondary hover:shadow-luxury transition-all duration-700">
-                <h4 className="text-3xl font-headline font-bold italic text-gray-900 mb-6 group-hover:text-secondary transition-colors tracking-tight">{trend.title}</h4>
-                <p className="text-xl text-gray-500 font-light leading-relaxed italic border-l-2 border-secondary/20 pl-8">
+              <div key={idx} className="bg-white p-16 border border-border shadow-sm group hover:border-plum hover:shadow-luxury transition-all duration-700">
+                <h4 className="text-3xl font-headline font-bold italic text-gray-900 mb-6 group-hover:text-plum transition-colors tracking-tight">{trend.title}</h4>
+                <p className="text-xl text-gray-500 font-light leading-relaxed italic border-l-2 border-plum/20 pl-8">
                   {trend.description}
                 </p>
               </div>
@@ -160,7 +165,6 @@ export default function CityPage() {
           </div>
         </div>
 
-        {/* Featured Local Availability */}
         <div className="space-y-24">
            <div className="flex items-end justify-between border-b border-gray-100 pb-12">
               <div className="space-y-4">
@@ -170,7 +174,7 @@ export default function CityPage() {
                 </div>
                 <h2 className="text-5xl font-headline font-bold italic text-gray-900 leading-none">City-Specific Selection</h2>
               </div>
-              <Link href={`/${countryCode}/category/apparel`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-secondary transition-all border-b border-black pb-2 flex items-center">
+              <Link href={`/${countryCode}/category/apparel`} className="text-[10px] font-bold tracking-[0.4em] uppercase text-black hover:text-plum transition-all border-b border-black pb-2 flex items-center">
                 Explore Full Archive <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Link>
            </div>
@@ -182,14 +186,14 @@ export default function CityPage() {
            </div>
         </div>
 
-        {/* Flagship Experience Authority Section */}
         <div className="flex flex-col lg:flex-row items-stretch gap-0 bg-white shadow-2xl border border-gray-100 overflow-hidden">
            <div className="lg:w-1/2 relative min-h-[600px] overflow-hidden group bg-muted">
               <Image 
                 src="https://picsum.photos/seed/amarise-flagship/1200/1200" 
-                alt={`${city.name} Flagship`}
+                alt={`${city.name} Flagship Sanctuary`}
                 fill
                 className="object-cover transition-transform duration-[3s] group-hover:scale-105 opacity-80 grayscale-[20%]"
+                data-ai-hint="luxury boutique"
               />
               <div className="absolute inset-0 bg-black/10" />
               <div className="absolute inset-0 flex items-center justify-center p-12">
@@ -213,12 +217,12 @@ export default function CityPage() {
               </div>
               <div className="pt-12 flex flex-col sm:flex-row gap-8">
                  <Link href={city.office.mapUrl} target="_blank" className="flex-1">
-                    <Button className="w-full h-20 rounded-none bg-black text-white hover:bg-secondary transition-all text-[10px] font-bold tracking-[0.5em] uppercase shadow-xl" aria-label="Request Directions">
+                    <Button className="w-full h-20 rounded-none bg-black text-white hover:bg-plum transition-all text-[10px] font-bold tracking-[0.5em] uppercase shadow-xl" aria-label="Request Directions to Flagship">
                       Request Directions
                     </Button>
                  </Link>
                  <Link href={`/${countryCode}/appointments`} className="flex-1">
-                    <Button variant="outline" className="w-full h-20 rounded-none border-black text-[10px] font-bold tracking-[0.5em] uppercase hover:bg-black hover:text-white transition-all" aria-label="Book Private Salon">
+                    <Button variant="outline" className="w-full h-20 rounded-none border-black text-[10px] font-bold tracking-[0.5em] uppercase hover:bg-black hover:text-white transition-all" aria-label="Book Private Salon Appointment">
                       Book Private Salon
                     </Button>
                  </Link>
@@ -227,7 +231,6 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* SEO Compliance & Trust Footer */}
       <section className="container mx-auto px-12 mt-48 pt-48 border-t border-gray-100 text-center max-w-4xl">
          <div className="space-y-12">
             <ShieldCheck className="w-12 h-12 text-secondary mx-auto" />

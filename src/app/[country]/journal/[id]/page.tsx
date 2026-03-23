@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -15,7 +14,6 @@ import {
   Linkedin, 
   Copy, 
   Sparkles,
-  History,
   BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,7 +29,7 @@ import {
 
 /**
  * JournalArticlePage: High-authority editorial content.
- * Designed for deep narrative and multi-country SEO authority.
+ * Features advanced JSON-LD for Article and News discovery.
  */
 export default function JournalArticlePage() {
   const { id, country } = useParams();
@@ -45,14 +43,14 @@ export default function JournalArticlePage() {
   const isLiked = wishlist.some(w => w.id === id);
 
   if (!article) {
-    return <div className="py-40 text-center font-headline text-3xl">Article not found.</div>;
+    return <div className="py-40 text-center font-headline text-3xl">Article not found in the archives.</div>;
   }
 
   const handleToggleLike = () => {
     toggleLike(article.id, countryCode);
     toast({
-      title: isLiked ? "Reaction Removed" : "Article Appreciated",
-      description: isLiked ? "Your mark has been cleared." : "The Maison appreciates your interest in our heritage.",
+      title: isLiked ? "Mark Cleared" : "Article Appreciated",
+      description: isLiked ? "Your mark has been removed from the registry." : "The Maison appreciates your intellectual interest.",
     });
   };
 
@@ -60,13 +58,13 @@ export default function JournalArticlePage() {
     trackShare(article.id, countryCode);
     toast({
       title: `Shared to ${platform}`,
-      description: "The AMARISÉ Journal is reaching a wider audience.",
+      description: "Expanding the Maison's digital reach.",
     });
   };
 
   return (
     <div className="animate-fade-in bg-white">
-      {/* SEO Metadata Structured Data */}
+      {/* SEO Metadata Structured Data: Article Authority */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -78,25 +76,24 @@ export default function JournalArticlePage() {
             "image": [article.imageUrl],
             "datePublished": article.date,
             "author": [{ "@type": "Person", "name": article.author }],
-            "publisher": { "@type": "Organization", "name": "AMARISÉ MAISON AVENUE" }
+            "publisher": { "@type": "Organization", "name": "AMARISÉ MAISON AVENUE", "logo": { "@type": "ImageObject", "url": "https://picsum.photos/seed/logo/200/200" } }
           })
         }}
       />
 
       {/* Cinematic Hero */}
       <section className="relative h-[85vh] w-full flex items-end overflow-hidden border-b border-border bg-ivory">
-        {/* Background Visual Box */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
            <span className="text-[20vw] font-headline font-bold text-black tracking-widest uppercase">{article.category.charAt(0)}</span>
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
         <div className="container mx-auto px-12 pb-24 relative z-10 max-w-[1600px]">
-          <Link href={`/${countryCode}/journal`} className="inline-flex items-center text-[10px] tracking-[0.5em] uppercase text-black hover:text-secondary transition-colors mb-16 font-bold">
+          <Link href={`/${countryCode}/journal`} className="inline-flex items-center text-[10px] tracking-[0.5em] uppercase text-black hover:text-plum transition-colors mb-16 font-bold">
             <ChevronLeft className="w-3.5 h-3.5 mr-2" /> Back to The Journal
           </Link>
           <div className="space-y-10 max-w-6xl">
             <div className="flex items-center space-x-10">
-              <span className="text-secondary text-xs font-bold tracking-[0.6em] uppercase px-5 py-2 border border-secondary/30">
+              <span className="text-secondary text-xs font-bold tracking-[0.6em] uppercase px-5 py-2 border border-secondary/30 bg-white/50 backdrop-blur-sm">
                 {article.category}
               </span>
               <span className="text-gray-400 text-[10px] uppercase tracking-[0.4em] font-bold">{article.date}</span>
@@ -111,7 +108,6 @@ export default function JournalArticlePage() {
         </div>
       </section>
 
-      {/* Editorial Content Grid */}
       <section className="container mx-auto px-12 py-40 max-w-[1600px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-32">
           {/* Metadata Sidebar */}
@@ -122,29 +118,28 @@ export default function JournalArticlePage() {
                      {article.author.charAt(0)}
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold tracking-widest uppercase text-gray-400">Written By</span>
+                      <span className="text-[9px] font-bold tracking-widest uppercase text-gray-400">Curated By</span>
                       <span className="text-sm font-bold uppercase text-black">{article.author}</span>
                    </div>
                 </div>
                 <div className="flex flex-col space-y-4 pt-4">
                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-500">
                       <span>Appreciation</span>
-                      <span className="text-black">{metrics.likes.toLocaleString()}</span>
+                      <span className="text-black tabular">{metrics.likes.toLocaleString()}</span>
                    </div>
                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-500">
                       <span>Collective Resonance</span>
-                      <span className="text-black">{metrics.shares.toLocaleString()}</span>
+                      <span className="text-black tabular">{metrics.shares.toLocaleString()}</span>
                    </div>
                 </div>
              </div>
 
-             {/* Dynamic Article Anchor Nav */}
              <div className="space-y-8">
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-secondary">In This Volume</h4>
                 <ul className="space-y-6">
-                   {article.contentOutline?.map((item, i) => (
+                   {(article.contentOutline || ['The Heritage of Craft', 'Modern Market Dynamics', 'The Collector Perspective']).map((item, i) => (
                      <li key={i} className="group cursor-pointer">
-                        <div className="flex items-center space-x-4 border-b border-gray-50 pb-4 group-hover:border-secondary transition-colors">
+                        <div className="flex items-center space-x-4 border-b border-gray-50 pb-4 group-hover:border-plum transition-colors">
                            <span className="text-[10px] font-bold text-gray-300">0{i+1}</span>
                            <span className="text-[11px] font-bold uppercase tracking-widest text-gray-600 group-hover:text-black transition-colors">{item}</span>
                         </div>
@@ -153,14 +148,13 @@ export default function JournalArticlePage() {
                 </ul>
              </div>
 
-             {/* Specialist Inquiry */}
-             <div className="bg-ivory p-10 border border-border space-y-8">
+             <div className="bg-ivory p-10 border border-border space-y-8 shadow-sm">
                 <div className="flex items-center space-x-3 text-secondary">
                    <Sparkles className="w-5 h-5" />
-                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase">Atelier Dialogue</span>
+                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-plum">Atelier Dialogue</span>
                 </div>
                 <p className="text-xs font-light italic leading-relaxed text-gray-600">
-                  Should this narrative resonate with your private collection strategy, our specialists are available for consultation.
+                  Should this narrative resonate with your private collection strategy, our senior curators are available for consultation.
                 </p>
                 <Link href={`/${countryCode}/contact`}>
                    <Button variant="outline" className="w-full rounded-none border-black text-[9px] font-bold tracking-[0.4em] uppercase h-14 hover:bg-black hover:text-white transition-all">
@@ -172,14 +166,13 @@ export default function JournalArticlePage() {
 
           {/* Main Narrative Body */}
           <div className="lg:col-span-9 space-y-32">
-             <div className="prose prose-2xl max-w-none font-light leading-relaxed text-gray-700 whitespace-pre-wrap selection:bg-secondary/10 first-letter:text-[120px] first-letter:font-headline first-letter:text-black first-letter:float-left first-letter:mr-8 first-letter:mt-6 italic">
+             <article className="prose prose-2xl max-w-none font-light leading-relaxed text-gray-700 whitespace-pre-wrap selection:bg-plum/10 first-letter:text-[120px] first-letter:font-headline first-letter:text-black first-letter:float-left first-letter:mr-8 first-letter:mt-6 italic">
                {article.content}
-             </div>
+             </article>
 
-             {/* Contextual Product Integration: "Shop the Story" */}
              <div className="space-y-24 border-t border-gray-100 pt-32">
                 <div className="flex flex-col items-center text-center space-y-6">
-                   <div className="inline-flex items-center justify-center p-4 bg-ivory rounded-full">
+                   <div className="inline-flex items-center justify-center p-4 bg-ivory rounded-full shadow-inner">
                       <BookOpen className="w-8 h-8 text-secondary" />
                    </div>
                    <h2 className="text-5xl font-headline font-bold italic tracking-tight">Shop the Narrative</h2>
@@ -193,19 +186,18 @@ export default function JournalArticlePage() {
                 </div>
              </div>
 
-             {/* Engagement & Resonance Row */}
              <div className="flex flex-col sm:flex-row justify-between items-center py-12 border-y border-gray-100 gap-8">
                 <div className="flex items-center space-x-12">
                    <button 
                     onClick={handleToggleLike}
-                    className={cn("flex flex-col items-center space-y-2 group", isLiked ? "text-secondary" : "text-gray-400")}
+                    className={cn("flex flex-col items-center space-y-2 group transition-colors", isLiked ? "text-plum" : "text-gray-400")}
                    >
                       <Heart className={cn("w-6 h-6 transition-transform group-hover:scale-110", isLiked && "fill-current")} />
                       <span className="text-[9px] font-bold uppercase tracking-widest">Appreciate</span>
                    </button>
                    <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                         <button className="flex flex-col items-center space-y-2 text-gray-400 hover:text-secondary transition-colors group">
+                         <button className="flex flex-col items-center space-y-2 text-gray-400 hover:text-plum transition-colors group">
                             <Share2 className="w-6 h-6 transition-transform group-hover:scale-110" />
                             <span className="text-[9px] font-bold uppercase tracking-widest">Resonance</span>
                          </button>
@@ -227,7 +219,7 @@ export default function JournalArticlePage() {
                    </DropdownMenu>
                 </div>
                 <div className="flex items-center space-x-4">
-                   <Bookmark className="w-5 h-5 text-gray-300 cursor-pointer hover:text-secondary transition-colors" />
+                   <Bookmark className="w-5 h-5 text-gray-300 cursor-pointer hover:text-plum transition-colors" />
                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Save to Private Archive</span>
                 </div>
              </div>
@@ -235,7 +227,6 @@ export default function JournalArticlePage() {
         </div>
       </section>
 
-      {/* Editorial Footer Navigation */}
       <section className="bg-ivory py-48 border-t border-border overflow-hidden">
         <div className="container mx-auto px-12 max-w-[1600px] flex flex-col lg:flex-row justify-between items-center gap-24 relative">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
@@ -249,7 +240,7 @@ export default function JournalArticlePage() {
           </div>
           <div className="relative z-10">
             <Link href={`/${countryCode}/journal`}>
-              <Button className="h-20 px-20 rounded-none bg-black text-white hover:bg-secondary transition-all text-[11px] font-bold tracking-[0.5em] uppercase shadow-2xl">
+              <Button className="h-20 px-20 rounded-none bg-black text-white hover:bg-plum transition-all text-[11px] font-bold tracking-[0.5em] uppercase shadow-2xl">
                 Explore More Stories
               </Button>
             </Link>
