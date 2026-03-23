@@ -39,7 +39,7 @@ interface NavLink {
 
 export const Header = () => {
   const [mounted, setMounted] = useState(false);
-  const { country } = useParams();
+  const params = useParams();
   const router = useRouter();
   const { cart, wishlist, currentUser } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,8 +50,7 @@ export const Header = () => {
     setMounted(true);
   }, []);
 
-  // countryCode must be stable between server and client to avoid hydration errors
-  const countryCode = (country as string) || 'us';
+  const countryCode = (params?.country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   
   const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;
