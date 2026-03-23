@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { formatPrice } from '@/lib/mock-data';
@@ -27,7 +26,15 @@ export default function CheckoutPage() {
   const [lastName, setLastName] = useState('');
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('STRIPE');
   const [isSettling, setIsSettling] = useState(false);
+  const [orderRef, setOrderRef] = useState('');
   
+  // Prevent hydration mismatch for random order ID
+  useEffect(() => {
+    if (step === 3 && !orderRef) {
+      setOrderRef(`#AM-${Math.floor(Math.random() * 10000)}`);
+    }
+  }, [step, orderRef]);
+
   const planId = searchParams.get('planId');
   const selectedPlan = useMemo(() => paymentPlans.find(p => p.id === planId), [planId, paymentPlans]);
   const currentCountryConfig = useMemo(() => countryConfigs.find(c => c.code === countryCode), [countryCode, countryConfigs]);
@@ -304,7 +311,7 @@ export default function CheckoutPage() {
               <div className="bg-ivory p-8 border border-border flex items-center justify-between group cursor-help">
                 <div className="flex flex-col items-start space-y-1">
                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Registry Reference</span>
-                   <span className="font-mono text-xl font-bold uppercase tracking-tighter text-gray-900">#AM-{(Math.random() * 10000).toFixed(0)}</span>
+                   <span className="font-mono text-xl font-bold uppercase tracking-tighter text-gray-900">{orderRef || '...'}</span>
                 </div>
                 <div className="p-3 bg-white border border-border rounded-full group-hover:border-plum transition-colors">
                    <Lock className="w-5 h-5 text-plum" />

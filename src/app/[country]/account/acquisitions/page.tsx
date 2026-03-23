@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { 
   Package, 
@@ -39,15 +39,31 @@ import {
 
 /**
  * Acquisition Registry: High-Detail Transactional Ledger.
- * Optimized with tabular banking-style typography for numeric clarity.
  */
 export default function AcquisitionsPage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const { transactions } = useAppStore();
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const selectedTx = transactions.find(t => t.id === selectedTxId);
+
+  // Prevent hydration mismatch for dynamic timestamps
+  const fulfillmentSteps = useMemo(() => {
+    if (!mounted) return [];
+    return [
+      { step: 'Registry Confirmed', timestamp: new Date().toISOString(), completed: true },
+      { step: 'Atelier Preparation', timestamp: '', completed: false },
+      { step: 'Heritage Audit', timestamp: '', completed: false },
+      { step: 'Institutional Dispatch', timestamp: '', completed: false },
+      { step: 'White-Glove Delivery', timestamp: '', completed: false }
+    ];
+  }, [mounted]);
 
   return (
     <div className="space-y-12 animate-fade-in">
@@ -104,7 +120,7 @@ export default function AcquisitionsPage() {
                  </div>
 
                  <div className="space-y-10">
-                    {(selectedTx.fulfillmentSteps || defaultFulfillmentSteps).map((step, idx) => (
+                    {(selectedTx.fulfillmentSteps || fulfillmentSteps).map((step, idx) => (
                       <div key={idx} className="flex items-start space-x-6 relative">
                          {idx < 4 && <div className={cn("absolute left-2.5 top-6 w-px h-10 bg-border", step.completed && "bg-plum")} />}
                          <div className={cn(
@@ -229,11 +245,3 @@ export default function AcquisitionsPage() {
     </div>
   );
 }
-
-const defaultFulfillmentSteps = [
-  { step: 'Registry Confirmed', timestamp: new Date().toISOString(), completed: true },
-  { step: 'Atelier Preparation', timestamp: '', completed: false },
-  { step: 'Heritage Audit', timestamp: '', completed: false },
-  { step: 'Institutional Dispatch', timestamp: '', completed: false },
-  { step: 'White-Glove Delivery', timestamp: '', completed: false }
-];

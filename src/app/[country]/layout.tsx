@@ -34,8 +34,8 @@ export default function CountryLayout({
       <MadAveLiveWidget />
       <JudyTrigger />
       <Header />
-      {/* Responsive Top Padding Adjustment for Header Height */}
-      <main id="main-content" className="min-h-screen pt-20 lg:pt-[148px] animate-fade-in relative bg-white">
+      {/* Optimized Content Offset for Responsive Tiered Header */}
+      <main id="main-content" className="min-h-screen pt-20 lg:pt-[260px] animate-fade-in relative bg-white">
         {children}
       </main>
 
