@@ -17,10 +17,6 @@ interface ProductCardProps {
   product: Product;
 }
 
-/**
- * ProductCard: Persona-Aware Acquisition Gateway.
- * Routes Normal Users to the Archive Registry (Design A) and Private Users to the Salon (Design B).
- */
 export const ProductCard = memo(({ product }: ProductCardProps) => {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
@@ -31,99 +27,54 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
   const metrics = socialMetrics[product.id] || { likes: 0, shares: 0, engagementRate: 0 };
   const monetization = useMemo(() => PRODUCTS_EXTENDED[product.id] || { priceVisible: true }, [product.id]);
 
-  // Determine the primary environment based on Institutional Policy
   const targetFlow = product.isVip ? 'private-order' : 'product';
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toggleWishlist(product);
-    if (!isWishlisted) {
-      toast({ title: "Archive Updated", description: "Artifact reserved in your private wishlist." });
-    }
-  };
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    trackShare(product.id, countryCode);
-    toast({ title: "Resonance", description: "Secure sharing link initialized." });
   };
 
   return (
     <article className="group relative flex flex-col bg-transparent overflow-hidden animate-fade-in h-full">
-      {/* Visual Gateway */}
-      <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="block relative aspect-[3/4] overflow-hidden" aria-label={`View ${product.name}`}>
+      {/* 1. Visual Gateway - Aspect Ratio Locked for CLS prevention */}
+      <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#fcfcfc] border border-gray-50" aria-label={`View ${product.name}`}>
         <PlaceholderImage className="absolute inset-0 w-full h-full transition-transform duration-[1.5s] group-hover:scale-105" />
         
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-        
         {product.isVip && (
-          <div className="absolute top-6 left-6 bg-black px-4 py-1.5 text-[8px] font-bold tracking-[0.3em] text-white uppercase shadow-lg z-10 border border-white/10">
-            {monetization.scarcityTag || 'Private Allocation'}
+          <div className="absolute top-4 lg:top-6 left-4 lg:left-6 bg-black px-3 py-1 text-[7px] lg:text-[8px] font-bold tracking-[0.3em] text-white uppercase z-10">
+            PRIVATE ALLOCATION
           </div>
         )}
 
-        <div className="absolute top-6 right-6 flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-all duration-700 z-10 border border-gray-100 shadow-sm">
-           <Heart className={cn("w-3 h-3", isWishlisted ? "fill-black text-black" : "text-gray-400")} />
-           <span className="text-[9px] font-bold text-gray-900 tracking-tighter tabular">{metrics.likes.toLocaleString()}</span>
-        </div>
-
-        {/* Action Overlay: Standardized Plum/Gold */}
-        <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-1000 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
-          <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="w-full">
-            <Button 
-              className={cn(
-                "w-full h-14 rounded-none transition-all text-[9px] font-bold tracking-[0.4em] uppercase shadow-xl",
-                product.isVip ? "bg-plum text-white hover:bg-gold hover:text-gray-900" : "bg-black text-white hover:bg-gold hover:text-gray-900"
-              )}
-            >
-              {product.isVip ? <Lock className="w-3.5 h-3.5 mr-2" /> : <ArrowRight className="w-3.5 h-3.5 mr-2" />}
-              {product.isVip ? 'PRIVATE ACQUISITION' : 'VIEW REGISTRY ENTRY'}
-            </Button>
-          </Link>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              className={cn("flex-1 h-12 rounded-none border-gray-200 text-gray-900 hover:bg-gray-50 transition-all text-[9px] font-bold tracking-[0.3em] uppercase", isWishlisted && "bg-black text-white border-black")}
-              onClick={handleToggleWishlist}
-            >
-              {isWishlisted ? "In Archive" : "Save Piece"}
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-12 h-12 rounded-none border-gray-200 text-gray-900 hover:bg-gray-50 transition-all p-0 flex items-center justify-center"
-              onClick={handleShare}
-            >
-              <Share2 className="w-3.5 h-3.5" />
-            </Button>
-          </div>
+        {/* Desktop Action Overlay - Hidden on Mobile */}
+        <div className="hidden lg:flex absolute inset-x-0 bottom-0 p-8 flex-col space-y-3 translate-y-full group-hover:translate-y-0 transition-transform duration-700 bg-white/95 backdrop-blur-xl z-20 border-t border-gray-100">
+          <Button className="w-full h-14 bg-black text-white hover:bg-gold rounded-none text-[9px] font-bold tracking-[0.4em] uppercase">
+            {product.isVip ? 'PRIVATE BRIEF' : 'VIEW ENTRY'}
+          </Button>
         </div>
       </Link>
       
-      {/* Metadata */}
-      <div className="pt-8 pb-4 flex-1 flex flex-col space-y-3 text-center">
-        <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="block">
-          <h3 className="font-headline text-xl text-gray-900 group-hover:text-plum transition-colors duration-700 leading-tight tracking-tight px-4 line-clamp-1 italic">
+      {/* 2. Metadata - Responsively Spaced */}
+      <div className="pt-4 lg:pt-8 pb-4 flex-1 flex flex-col space-y-2 lg:space-y-3 text-center">
+        <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="block px-2">
+          <h3 className="font-headline text-base lg:text-xl text-gray-900 group-hover:text-plum transition-colors duration-500 leading-tight tracking-tight line-clamp-1 italic">
             {product.name}
           </h3>
         </Link>
         
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center space-x-2">
-             <Sparkles className="w-3 h-3 text-gold opacity-0 group-hover:opacity-100 transition-opacity" />
-             <span className="text-sm font-bold tracking-tight text-gray-900 tabular">
-               {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire for Allocation"}
-             </span>
-          </div>
-          <div className="w-8 h-px bg-gray-100 group-hover:w-16 transition-all duration-1000" />
+        <div className="flex flex-col items-center space-y-1">
+          <span className="text-xs lg:text-sm font-bold tracking-tight text-gray-900 tabular">
+            {monetization.priceVisible ? formatPrice(product.basePrice, countryCode) : "Inquire"}
+          </span>
+          <div className="w-6 lg:w-8 h-px bg-gray-100 group-hover:w-12 transition-all duration-700" />
         </div>
 
-        <div className="pt-4 opacity-0 group-hover:opacity-100 transition-all duration-1000">
-          <div className="flex items-center justify-center space-x-2 text-[9px] text-gray-400 font-bold uppercase tracking-[0.3em]">
-            <ShieldCheck className="w-3 h-3 text-secondary" />
-            <span>Maison Verified</span>
-          </div>
+        {/* Mobile Action Indicator */}
+        <div className="lg:hidden pt-2">
+           <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-plum flex items-center justify-center">
+             View Details <ArrowRight className="w-2.5 h-2.5 ml-1" />
+           </span>
         </div>
       </div>
     </article>
