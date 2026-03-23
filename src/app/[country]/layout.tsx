@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 import { MaisonPopup } from '@/components/layout/MaisonPopup';
 import { MadAveLiveWidget } from '@/components/layout/MadAveLiveWidget';
+import { JudyTrigger } from '@/components/layout/JudyTrigger';
 import Link from 'next/link';
 import { 
   Phone, 
@@ -31,6 +32,7 @@ export default function CountryLayout({
     <>
       <MaisonPopup />
       <MadAveLiveWidget />
+      <JudyTrigger />
       <Header />
       {/* Responsive Top Padding Adjustment for Header Height */}
       <main id="main-content" className="min-h-screen pt-20 lg:pt-[148px] animate-fade-in relative bg-white">
