@@ -42,6 +42,12 @@
       "description": "Private Salon Environment",
       "imageUrl": "https://picsum.photos/seed/amarise-salon-interior/1600/1000",
       "imageHint": "exclusive interior"
+    },
+    {
+      "id": "madave-live-section",
+      "description": "MadAve Live Handbag Archive",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Hermes_Bestsellers_Mega_Menu_Banner.jpg?v=1691512345&width=1200",
+      "imageHint": "luxury handbags"
     }
   ]
 }

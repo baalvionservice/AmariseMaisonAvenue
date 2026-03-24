@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -25,6 +26,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
+import placeholderData from '@/app/lib/placeholder-images.json';
 
 /**
  * Maison Homepage: The Minimalist Luxury Entry.
@@ -36,7 +38,7 @@ export default function HomePage() {
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const { products, scopedErrors } = useAppStore();
 
-  const jurisdictionLabel = countryCode === 'global' ? 'GLOBAL MASTER' : countryCode.toUpperCase() + ' NODE';
+  const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || '';
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -89,7 +91,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Dual-Persona Acquisition Matrix */}
+      {/* 3. MADAVE LIVE Section (Replicated from Reference) */}
+      <section className="flex flex-col lg:flex-row min-h-[500px] border-b border-border overflow-hidden">
+        <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center">
+              <span className="font-headline text-4xl lg:text-6xl font-bold tracking-[0.05em] text-white">MAC</span>
+              <div className="h-px w-12 bg-white/20 mt-4" />
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-headline font-medium italic tracking-tighter uppercase leading-none">
+              MADAVE LIVE
+            </h2>
+          </div>
+          <div className="space-y-8 max-w-lg">
+            <p className="text-xs lg:text-sm font-body font-light leading-relaxed text-gray-400 italic">
+              Experience luxury at your fingertips with our live shopping events, featuring exquisite handcrafted handbags from the world's top designers. Join us live every Wednesday and Friday.
+            </p>
+            <Link href={`/${countryCode}/account/live`} className="block">
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white hover:text-gold transition-colors border-b border-white/20 pb-2 flex items-center justify-center w-fit mx-auto">
+                ENTER LIVE ATELIER <ArrowRight className="ml-3 w-3 h-3" />
+              </span>
+            </Link>
+          </div>
+        </div>
+        <div className="lg:w-1/2 relative min-h-[400px] lg:min-h-auto bg-muted overflow-hidden">
+          <Image 
+            src={liveImage}
+            alt="MadAve Live Archive Preview"
+            fill
+            className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-[3s] hover:scale-105"
+            data-ai-hint="luxury handbags"
+          />
+          <div className="absolute inset-0 bg-black/10" />
+        </div>
+      </section>
+
+      {/* 4. Dual-Persona Acquisition Matrix */}
       <section className="container mx-auto px-6 py-40 max-w-[1600px]">
         <div className="text-center space-y-24">
           <div className="space-y-8 max-w-4xl mx-auto">
@@ -148,7 +185,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Rare Archive Grid */}
+      {/* 5. Rare Archive Grid */}
       <section className="bg-ivory/30 py-60 border-y border-border">
          <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
             <div className="flex flex-col md:row items-end justify-between gap-12">
@@ -193,7 +230,7 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* 5. Institutional Trust Footer */}
+      {/* 6. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
