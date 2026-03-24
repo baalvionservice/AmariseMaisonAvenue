@@ -616,6 +616,89 @@ export const Header = () => {
             </div>
           </motion.div>
         )}
+
+        {hoveredLink === 'jewelry' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('jewelry')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1400px] py-16 px-12 grid grid-cols-1 md:grid-cols-4 gap-12">
+              {/* Col 1: JEWELRY */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">JEWELRY</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Fine Jewelry', 'Vintage', 'Contemporary', 'Costume Jewelry', 'New Arrivals'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/jewelry`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 2: CATEGORY */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">CATEGORY</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Earrings', 'Bracelets', 'Necklaces', 'Rings', 'Watches'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/jewelry`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 3: BRAND */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">BRAND</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Hermès', 'Tiffany', 'Van Cleef & Arpels'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/jewelry`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 4: FEATURED VISUAL */}
+              <div className="space-y-8 flex flex-col items-start text-left">
+                <div className="relative aspect-[4/3] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://picsum.photos/seed/jewelry-mega/800/600"
+                    alt="Van Cleef & Arpels New Arrivals"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                    data-ai-hint="luxury jewelry"
+                  />
+                  <div className="absolute inset-0 bg-black/[0.02]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-headline text-2xl font-medium text-gray-900 italic tracking-tight uppercase">Van Cleef & Arpels</h3>
+                  <p className="text-[11px] font-body font-bold text-gray-400 uppercase tracking-widest">NEW ARRIVALS</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <AnimatePresence>
