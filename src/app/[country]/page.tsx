@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -30,7 +29,7 @@ import placeholderData from '@/app/lib/placeholder-images.json';
 
 /**
  * Maison Homepage: The Minimalist Luxury Entry.
- * Restored with high-fidelity detailing and architectural spacing.
+ * Optimized for high-fidelity detailing and architectural spacing.
  */
 export default function HomePage() {
   const { country } = useParams();
@@ -38,7 +37,7 @@ export default function HomePage() {
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const { products, scopedErrors } = useAppStore();
 
-  const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || '';
+  const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -74,25 +73,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Tactical Ticker */}
-      <section className="bg-black py-5 border-y border-white/10">
-        <div className="container mx-auto flex items-center justify-center space-x-16">
-           <div className="flex items-center space-x-4 text-gold">
-              <Zap className="w-4 h-4 animate-pulse" />
-              <span className="text-[10px] font-bold tracking-[0.5em] uppercase">REGISTRY SYNC: ACTIVE</span>
-           </div>
-           <p className="text-white/40 text-[10px] font-bold tracking-[0.4em] uppercase hidden md:block">
-             Specialist Access: 1924 Heritage Series Now Syncing in {currentCountry.name} Hub
-           </p>
-           <div className="hidden lg:flex items-center space-x-4 text-white/20">
-              <Globe className="w-4 h-4" />
-              <span className="text-[10px] font-bold tracking-[0.4em] uppercase">GLOBAL NODES: 05 / 05</span>
-           </div>
-        </div>
-      </section>
-
-      {/* 3. MADAVE LIVE Section (Replicated from Reference) */}
-      <section className="flex flex-col lg:flex-row min-h-[500px] border-b border-border overflow-hidden">
+      {/* 2. MADAVE LIVE Section (Elevated to 2nd Primary Section) */}
+      <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-4">
             <div className="flex flex-col items-center justify-center">
@@ -107,9 +89,9 @@ export default function HomePage() {
             <p className="text-xs lg:text-sm font-body font-light leading-relaxed text-gray-400 italic">
               Experience luxury at your fingertips with our live shopping events, featuring exquisite handcrafted handbags from the world's top designers. Join us live every Wednesday and Friday.
             </p>
-            <Link href={`/${countryCode}/account/live`} className="block">
-              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white hover:text-gold transition-colors border-b border-white/20 pb-2 flex items-center justify-center w-fit mx-auto">
-                ENTER LIVE ATELIER <ArrowRight className="ml-3 w-3 h-3" />
+            <Link href={`/${countryCode}/account/live`} className="block group">
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white group-hover:text-gold transition-colors border-b border-white/20 pb-2 flex items-center justify-center w-fit mx-auto">
+                ENTER LIVE ATELIER <ArrowRight className="ml-3 w-3 h-3 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
           </div>
@@ -119,10 +101,27 @@ export default function HomePage() {
             src={liveImage}
             alt="MadAve Live Archive Preview"
             fill
-            className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-[3s] hover:scale-105"
+            className="object-cover grayscale-[20%] transition-all duration-[3s] hover:grayscale-0 hover:scale-105"
             data-ai-hint="luxury handbags"
           />
           <div className="absolute inset-0 bg-black/10" />
+        </div>
+      </section>
+
+      {/* 3. Tactical Ticker */}
+      <section className="bg-black py-5 border-y border-white/10">
+        <div className="container mx-auto flex items-center justify-center space-x-16">
+           <div className="flex items-center space-x-4 text-gold">
+              <Zap className="w-4 h-4 animate-pulse" />
+              <span className="text-[10px] font-bold tracking-[0.5em] uppercase">REGISTRY SYNC: ACTIVE</span>
+           </div>
+           <p className="text-white/40 text-[10px] font-bold tracking-[0.4em] uppercase hidden md:block">
+             Specialist Access: 1924 Heritage Series Now Syncing in {currentCountry.name} Hub
+           </p>
+           <div className="hidden lg:flex items-center space-x-4 text-white/20">
+              <Globe className="w-4 h-4" />
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase">GLOBAL NODES: 05 / 05</span>
+           </div>
         </div>
       </section>
 
