@@ -130,7 +130,7 @@ export const Header = () => {
                       <span className="text-lg">{c.flag}</span>
                       <span className="text-[10px] font-bold uppercase tracking-widest">{c.name} Hub</span>
                     </div>
-                    {countryCode === c.code && <ShieldCheck className="w-3 h-3 text-gold" />}
+                    {countryCode === c.code && <ShieldCheck className="w-3.5 h-3.5 text-gold" />}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -554,6 +554,63 @@ export const Header = () => {
                 <div className="space-y-2">
                   <h3 className="font-headline text-4xl font-medium text-gray-900 tracking-tight uppercase">THE SAIGON BAG</h3>
                   <p className="text-sm font-body font-light text-gray-500 tracking-wide italic">Iconic Style</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {hoveredLink === 'other' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('other')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1200px] py-16 px-12 flex gap-24">
+              <div className="w-80 space-y-10 shrink-0">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">BRANDS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                  <ul className="space-y-6">
+                    {['The Row', 'Goyard', 'Louis Vuitton'].map((item) => (
+                      <li key={item}>
+                        <Link href={`/${countryCode}/category/other-brands`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <ul className="space-y-6">
+                    {['Christian Dior', 'Fendi', 'Loro Piana'].map((item) => (
+                      <li key={item}>
+                        <Link href={`/${countryCode}/category/other-brands`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col space-y-8">
+                <div className="relative aspect-[16/9] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://picsum.photos/seed/other-brands-mega/1200/800"
+                    alt="The Row Collection"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                    data-ai-hint="luxury bag"
+                  />
+                  <div className="absolute inset-0 bg-black/5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-headline text-4xl font-medium text-gray-900 tracking-tight">New Bags From</h3>
+                  <p className="text-xs font-bold uppercase tracking-[0.3em] text-gray-500">THE ROW</p>
                 </div>
               </div>
             </div>
