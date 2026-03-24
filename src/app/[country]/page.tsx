@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -86,21 +85,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. MADAVE LIVE Section */}
+      {/* 2. AMARISÉ MAISON AVENUE LIVE Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-col items-center justify-center">
-              <span className="font-headline text-4xl lg:text-6xl font-bold tracking-[0.05em] text-white">MAC</span>
-              <div className="h-px w-12 bg-white/20 mt-4" />
+              <div className="h-px w-12 bg-gold/40 mb-6" />
+              <h2 className="text-4xl lg:text-6xl font-headline font-medium italic tracking-tighter uppercase leading-tight max-w-md">
+                Amarisé Maison <br /> Avenue Live
+              </h2>
+              <div className="h-px w-12 bg-gold/40 mt-6" />
             </div>
-            <h2 className="text-4xl lg:text-6xl font-headline font-medium italic tracking-tighter uppercase leading-none">
-              MADAVE LIVE
-            </h2>
           </div>
           <div className="space-y-8 max-w-lg">
             <p className="text-xs lg:text-sm font-body font-light leading-relaxed text-gray-400 italic">
-              Experience luxury at your fingertips with our live shopping events, featuring exquisite handcrafted handbags from the world's top designers. Join us live every Wednesday and Friday.
+              Experience the absolute standard of discovery with our live shopping events. Featuring exotic archive entries and high-fidelity curatorial presentations from our global flagship ateliers.
             </p>
             <Link href={`/${countryCode}/account/live`} className="block group">
               <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white group-hover:text-gold transition-colors border-b border-white/20 pb-2 flex items-center justify-center w-fit mx-auto">
@@ -112,7 +111,7 @@ export default function HomePage() {
         <div className="lg:w-1/2 relative min-h-[400px] lg:min-h-auto bg-muted overflow-hidden">
           <Image 
             src={liveImage}
-            alt="MadAve Live Archive Preview"
+            alt="Amarisé Maison Live Archive Preview"
             fill
             className="object-cover grayscale-[20%] transition-all duration-[3s] hover:grayscale-0 hover:scale-105"
             data-ai-hint="luxury handbags"
@@ -153,7 +152,7 @@ export default function HomePage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 px-6">
             <Link href={`/${countryCode}/product/prod-11`} className="group relative p-16 lg:p-24 bg-white border border-border hover:border-black transition-all text-left space-y-10 shadow-sm overflow-hidden">
-              <div className="absolute top-0 right-0 p-16 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+              <div className="absolute top-0 right-0 p-16 lg:p-24 opacity-[0.03] group-hover:opacity-10 transition-opacity">
                  <Eye className="w-80 h-80 text-black" />
               </div>
               <div className="flex items-center justify-between relative z-10">
@@ -174,7 +173,7 @@ export default function HomePage() {
             </Link>
 
             <Link href={`/${countryCode}/private-order/prod-11`} className="group relative p-16 lg:p-24 bg-[#0A0A0B] border border-white/5 hover:border-gold transition-all text-left space-y-10 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 p-16 opacity-10 group-hover:opacity-20 transition-opacity">
+              <div className="absolute top-0 right-0 p-16 lg:p-24 opacity-10 group-hover:opacity-20 transition-opacity">
                  <Crown className="w-80 h-80 text-gold" />
               </div>
               <div className="flex items-center justify-between relative z-10">

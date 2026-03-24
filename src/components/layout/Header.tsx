@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -76,7 +75,7 @@ export const Header = () => {
     { id: 'goyard', name: 'GOYARD', href: `/${countryCode}/category/goyard` },
     { id: 'other', name: 'OTHER BRANDS', href: `/${countryCode}/category/other-brands` },
     { id: 'jewelry', name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
-    { id: 'live', name: 'LIVE SHOP', href: `/${countryCode}/account/live` },
+    { id: 'live', name: 'AMARISÉ LIVE', href: `/${countryCode}/account/live` },
     { id: 'journal', name: 'BLOG', href: `/${countryCode}/journal` },
   ];
 
