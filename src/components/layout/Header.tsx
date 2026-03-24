@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -30,11 +31,12 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 interface NavLink {
   name: string;
   href: string;
-  mega?: boolean;
+  id: string;
 }
 
 export const Header = () => {
@@ -44,6 +46,7 @@ export const Header = () => {
   const { cart, wishlist, currentUser } = useAppStore();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   
   useEffect(() => {
     setMounted(true);
@@ -67,16 +70,18 @@ export const Header = () => {
   const isAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'country_admin';
 
   const navLinks: NavLink[] = [
-    { name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals` },
-    { name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
-    { name: 'CHANEL', href: `/${countryCode}/category/chanel` },
-    { name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
-    { name: 'LIVE SHOP', href: `/${countryCode}/account/live` },
-    { name: 'THE JOURNAL', href: `/${countryCode}/journal` },
+    { id: 'new', name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals` },
+    { id: 'hermes', name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
+    { id: 'chanel', name: 'CHANEL', href: `/${countryCode}/category/chanel` },
+    { id: 'goyard', name: 'GOYARD', href: `/${countryCode}/category/goyard` },
+    { id: 'other', name: 'OTHER BRANDS', href: `/${countryCode}/category/other-brands` },
+    { id: 'jewelry', name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
+    { id: 'live', name: 'LIVE SHOP', href: `/${countryCode}/account/live` },
+    { id: 'journal', name: 'BLOG', href: `/${countryCode}/journal` },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white" onMouseLeave={() => setHoveredLink(null)}>
       {/* 1. Ticker Hub */}
       <div className="hidden sm:flex bg-[#fcfcfc] text-gray-500 h-10 items-center justify-center px-6 text-[9px] tracking-[0.4em] font-bold uppercase border-b border-gray-100">
         <div className="flex items-center space-x-10">
@@ -151,8 +156,10 @@ export const Header = () => {
                     <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">Maison Archive</SheetTitle>
                     <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">Institutional Registry</p>
                   </div>
-                  <SheetClose className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                    <X className="w-5 h-5 text-gray-400" />
+                  <SheetClose asChild>
+                    <button className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
+                      <X className="w-5 h-5 text-gray-400" />
+                    </button>
                   </SheetClose>
                 </div>
               </SheetHeader>
@@ -162,7 +169,7 @@ export const Header = () => {
                 <div className="p-8 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">Departments</p>
                   {navLinks.map(link => (
-                    <SheetClose asChild key={link.name}>
+                    <SheetClose asChild key={link.id}>
                       <Link href={link.href} className="block group">
                         <div className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
                           {link.name}
@@ -269,17 +276,81 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* 4. Curatorial Nav (Desktop Only) */}
+      {/* 4. Curatorial Nav (Desktop Only) with Mega Menu Logic */}
       <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-16">
         {navLinks.map((link) => (
-          <div key={link.name} className="group h-full flex items-center">
-            <Link href={link.href} className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-plum transition-all relative py-2">
+          <div 
+            key={link.id} 
+            className="h-full flex items-center relative"
+            onMouseEnter={() => setHoveredLink(link.id)}
+          >
+            <Link 
+              href={link.href} 
+              className={cn(
+                "text-[10px] font-bold uppercase tracking-[0.4em] text-gray-900 hover:text-plum transition-all relative py-2",
+                hoveredLink === link.id && "text-plum"
+              )}
+            >
               {link.name}
-              <span className="absolute -bottom-1 left-1/2 w-0 h-[1.5px] bg-plum transition-all duration-500 group-hover:w-full group-hover:left-0" />
+              <span className={cn(
+                "absolute -bottom-1 left-0 h-[1.5px] bg-black transition-all duration-500",
+                hoveredLink === link.id ? "w-full" : "w-0"
+              )} />
             </Link>
           </div>
         ))}
       </nav>
+
+      {/* MEGA MENU OVERLAY */}
+      <AnimatePresence>
+        {hoveredLink === 'new' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('new')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1200px] py-16 px-12 flex gap-24">
+              {/* Left Column: Category Registry */}
+              <div className="w-64 space-y-10 shrink-0">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">NEW ARRIVALS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-6">
+                  {['Hermès', 'Chanel', 'Other Brands', 'Jewelry'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/new-arrivals`} className="text-lg font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Right Column: Featured Visual */}
+              <div className="flex-1 flex flex-col space-y-8">
+                <div className="relative aspect-[16/9] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://madisonavenuecouture.com/cdn/shop/files/New_Arrivals_Mega_Menu_Banner.jpg?v=1691512345&width=1200"
+                    alt="New Arrivals Curation"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/5" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-headline text-4xl font-medium text-gray-900 tracking-tight uppercase">NEW ARRIVALS</h3>
+                  <p className="text-sm font-body font-light text-gray-500 tracking-wide">Hermès New Arrivals</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Discovery Overlay */}
       <AnimatePresence>
