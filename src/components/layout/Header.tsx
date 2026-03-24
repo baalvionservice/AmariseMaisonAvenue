@@ -301,8 +301,9 @@ export const Header = () => {
         ))}
       </nav>
 
-      {/* MEGA MENU OVERLAY */}
+      {/* MEGA MENU OVERLAYS */}
       <AnimatePresence>
+        {/* 1. NEW ARRIVALS MEGA MENU */}
         {hoveredLink === 'new' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -314,7 +315,6 @@ export const Header = () => {
             onMouseLeave={() => setHoveredLink(null)}
           >
             <div className="container mx-auto max-w-[1200px] py-16 px-12 flex gap-24">
-              {/* Left Column: Category Registry */}
               <div className="w-64 space-y-10 shrink-0">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">NEW ARRIVALS</h4>
@@ -330,8 +330,6 @@ export const Header = () => {
                   ))}
                 </ul>
               </div>
-
-              {/* Right Column: Featured Visual */}
               <div className="flex-1 flex flex-col space-y-8">
                 <div className="relative aspect-[16/9] w-full bg-ivory overflow-hidden group">
                   <Image 
@@ -346,6 +344,86 @@ export const Header = () => {
                   <h3 className="font-headline text-4xl font-medium text-gray-900 tracking-tight uppercase">NEW ARRIVALS</h3>
                   <p className="text-sm font-body font-light text-gray-500 tracking-wide">Hermès New Arrivals</p>
                 </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* 2. HERMÈS MEGA MENU */}
+        {hoveredLink === 'hermes' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('hermes')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1400px] py-16 px-12 grid grid-cols-1 md:grid-cols-4 gap-12">
+              {/* Col 1: HANDBAGS */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">HANDBAGS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Birkin', 'Kelly', 'Constance', 'Evelyne', 'Picotin', 'Lindy', 'Herbag', 'Other Bags', 'All Hermès Bags'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/hermes`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 2: ACCESSORIES */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">ACCESSORIES</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Wallets', 'Watches', 'Belts', 'Charms', 'Scarves', 'Shoes', 'Jewelry'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/hermes`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 3: CURATIONS */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">CURATIONS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['New Arrivals', 'Best Sellers', 'Exotic Handbags', 'Rare & Unique Bags', 'HSS Horseshoe Stamp Bags', 'Pre-Owned & Vintage Handbags', 'Home Goods', 'Atelier Bags', 'Palm Beach Collection', 'Bag Besties & Organizers'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/hermes`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 4: FEATURED VISUAL */}
+              <div className="space-y-8 flex flex-col items-center text-center">
+                <div className="relative aspect-[3/2] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://madisonavenuecouture.com/cdn/shop/files/Hermes_Bestsellers_Mega_Menu_Banner.jpg?v=1691512345&width=800"
+                    alt="Hermès Bestsellers"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/[0.02]" />
+                </div>
+                <h3 className="font-headline text-3xl font-medium text-gray-900 italic tracking-tight">Hermès Bestsellers</h3>
               </div>
             </div>
           </motion.div>
