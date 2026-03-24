@@ -165,7 +165,6 @@ export const Header = () => {
               </SheetHeader>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar">
-                {/* Core Navigation Section */}
                 <div className="p-8 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">Departments</p>
                   {navLinks.map(link => (
@@ -180,7 +179,6 @@ export const Header = () => {
                   ))}
                 </div>
 
-                {/* Collector Portal Section */}
                 <div className="px-8 py-10 bg-ivory/50 border-y border-gray-50 space-y-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6 px-2">Collector Services</p>
                   <SheetClose asChild>
@@ -209,7 +207,6 @@ export const Header = () => {
                   </SheetClose>
                 </div>
 
-                {/* Jurisdictional Passport Section */}
                 <div className="p-8 space-y-6">
                   <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-2 px-2">Market Hubs</p>
                   <div className="grid grid-cols-2 gap-3 px-2">
@@ -244,7 +241,6 @@ export const Header = () => {
           </Sheet>
         </div>
 
-        {/* Logo Hub */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link href={`/${countryCode}`} className="group text-center block">
             <span className="font-headline text-3xl lg:text-5xl font-medium tracking-[0.05em] text-black">
@@ -253,7 +249,6 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* Tactical Actions */}
         <div className="flex items-center space-x-1 lg:space-x-10">
           <button className="p-2 text-gray-400 hover:text-black hidden sm:flex items-center bg-transparent border-none outline-none cursor-pointer" onClick={() => setIsSearchOpen(true)}>
             <Search className="w-5 h-5 stroke-[1.5px]" />
@@ -276,7 +271,6 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* 4. Curatorial Nav (Desktop Only) with Mega Menu Logic */}
       <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-16">
         {navLinks.map((link) => (
           <div 
@@ -301,9 +295,7 @@ export const Header = () => {
         ))}
       </nav>
 
-      {/* MEGA MENU OVERLAYS */}
       <AnimatePresence>
-        {/* 1. NEW ARRIVALS MEGA MENU */}
         {hoveredLink === 'new' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -349,7 +341,6 @@ export const Header = () => {
           </motion.div>
         )}
 
-        {/* 2. HERMÈS MEGA MENU */}
         {hoveredLink === 'hermes' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -361,7 +352,6 @@ export const Header = () => {
             onMouseLeave={() => setHoveredLink(null)}
           >
             <div className="container mx-auto max-w-[1400px] py-16 px-12 grid grid-cols-1 md:grid-cols-4 gap-12">
-              {/* Col 1: HANDBAGS */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">HANDBAGS</h4>
@@ -378,7 +368,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 2: ACCESSORIES */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">ACCESSORIES</h4>
@@ -395,7 +384,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 3: CURATIONS */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">CURATIONS</h4>
@@ -412,7 +400,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 4: FEATURED VISUAL */}
               <div className="space-y-8 flex flex-col items-center text-center">
                 <div className="relative aspect-[3/2] w-full bg-ivory overflow-hidden group">
                   <Image 
@@ -429,7 +416,6 @@ export const Header = () => {
           </motion.div>
         )}
 
-        {/* 3. CHANEL MEGA MENU */}
         {hoveredLink === 'chanel' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -441,7 +427,6 @@ export const Header = () => {
             onMouseLeave={() => setHoveredLink(null)}
           >
             <div className="container mx-auto max-w-[1400px] py-16 px-12 grid grid-cols-1 md:grid-cols-5 gap-12">
-              {/* Col 1: HANDBAGS */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">HANDBAGS</h4>
@@ -458,7 +443,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 2: ACCESSORIES */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">ACCESSORIES</h4>
@@ -475,7 +459,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 3: JEWELRY */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">JEWELRY</h4>
@@ -492,7 +475,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 4: CURATIONS */}
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">CURATIONS</h4>
@@ -509,7 +491,6 @@ export const Header = () => {
                 </ul>
               </div>
 
-              {/* Col 5: FEATURED VISUAL */}
               <div className="space-y-8 flex flex-col items-start text-left">
                 <div className="relative aspect-[4/3] w-full bg-ivory overflow-hidden group">
                   <Image 
@@ -529,9 +510,57 @@ export const Header = () => {
             </div>
           </motion.div>
         )}
+
+        {hoveredLink === 'goyard' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('goyard')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1200px] py-16 px-12 flex gap-24">
+              {/* Col 1: HANDBAGS */}
+              <div className="w-64 space-y-10 shrink-0">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">HANDBAGS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-6">
+                  {['Saint Louis', 'Saigon', 'Anjou', 'Artois', 'Other', 'All Goyard Bags'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/goyard`} className="text-lg font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 2: FEATURED VISUAL */}
+              <div className="flex-1 space-y-10">
+                <div className="relative aspect-[16/9] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://picsum.photos/seed/goyard-mega/1200/800"
+                    alt="The Saigon Bag"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                    data-ai-hint="luxury handbag"
+                  />
+                  <div className="absolute inset-0 bg-black/[0.02]" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-headline text-4xl font-medium text-gray-900 tracking-tight uppercase">THE SAIGON BAG</h3>
+                  <p className="text-sm font-body font-light text-gray-500 tracking-wide italic">Iconic Style</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* Discovery Overlay */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-white/98 backdrop-blur-3xl flex flex-col p-8 lg:p-24 font-body">
