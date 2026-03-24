@@ -48,6 +48,12 @@
       "description": "MadAve Live Handbag Archive",
       "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Hermes_Bestsellers_Mega_Menu_Banner.jpg?v=1691512345&width=1200",
       "imageHint": "luxury handbags"
+    },
+    {
+      "id": "home-hero-banner-main",
+      "description": "Maison Amarisé Primary Heritage Banner",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964",
+      "imageHint": "luxury banner"
     }
   ]
 }

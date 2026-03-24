@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -37,35 +38,47 @@ export default function HomePage() {
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const { products, scopedErrors } = useAppStore();
 
+  const heroImage = placeholderData.placeholderImages.find(img => img.id === 'home-hero-banner-main')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964';
   const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
-      {/* 1. Minimalist Heritage Hero */}
-      <section className="relative h-[80vh] w-full flex items-center justify-center bg-ivory border-b border-border overflow-hidden">
-        {/* Subtle Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-           <span className="text-[25vw] font-headline font-bold text-black italic leading-none">1924</span>
-        </div>
+      {/* 1. Cinematic Heritage Hero Banner */}
+      <section className="relative h-[65vh] lg:h-[85vh] w-full flex items-center justify-center overflow-hidden bg-white">
+        <Image 
+          src={heroImage}
+          alt="Maison Amarisé Heritage Collection"
+          fill
+          priority
+          className="object-cover"
+          data-ai-hint="luxury fashion"
+        />
         
-        <div className="relative z-10 text-center space-y-12 max-w-5xl px-6">
-          <div className="space-y-6">
-            <span className="text-[10px] font-bold tracking-[0.6em] text-plum uppercase">Est. 1924 | Paris Flagship</span>
-            <h1 className="text-7xl md:text-[130px] font-headline font-medium text-gray-900 leading-[0.8] tracking-tighter italic">
+        {/* Transparent Overlay for Text Legibility */}
+        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+        
+        <div className="relative z-10 text-center space-y-8 lg:space-y-12 max-w-5xl px-6 lg:mt-20">
+          <div className="space-y-4 lg:space-y-6">
+            <span className="text-[10px] lg:text-[12px] font-bold tracking-[0.6em] text-white uppercase drop-shadow-md">
+              Est. 1924 | Paris Flagship
+            </span>
+            <h1 className="text-5xl md:text-7xl lg:text-[110px] font-headline font-medium text-white leading-[0.9] tracking-tighter italic drop-shadow-2xl">
               Amarisé Maison
             </h1>
           </div>
-          <p className="text-xl md:text-3xl text-gray-500 font-light italic max-w-3xl mx-auto leading-relaxed font-headline">
+          
+          <p className="text-lg md:text-2xl lg:text-3xl text-white/90 font-light italic max-w-3xl mx-auto leading-relaxed font-headline drop-shadow-lg">
             "Curating the world's most significant artifacts. A dialogue between human brilliance and the absolute standard of the archive."
           </p>
-          <div className="pt-12 flex flex-col sm:flex-row items-center justify-center gap-8">
+          
+          <div className="pt-8 lg:pt-16 flex flex-col sm:flex-row items-center justify-center gap-6 lg:gap-10">
             <Link href={`/${countryCode}/category/hermes`}>
-              <Button className="bg-black text-white hover:bg-plum px-20 h-20 rounded-none text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl">
+              <Button className="bg-white text-black hover:bg-black hover:text-white px-12 lg:px-24 h-16 lg:h-20 rounded-none text-[10px] lg:text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl">
                 EXPLORE THE ARCHIVE
               </Button>
             </Link>
             <Link href={`/${countryCode}/appointments`}>
-              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white px-16 h-20 rounded-none text-[11px] font-bold tracking-[0.4em] uppercase transition-all">
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black px-10 lg:px-20 h-16 lg:h-20 rounded-none text-[10px] lg:text-[11px] font-bold tracking-[0.4em] uppercase transition-all">
                 BOOK PRIVATE VIEWING
               </Button>
             </Link>
@@ -73,7 +86,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. MADAVE LIVE Section (Elevated to 2nd Primary Section) */}
+      {/* 2. MADAVE LIVE Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-4">
