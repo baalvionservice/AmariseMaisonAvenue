@@ -428,6 +428,107 @@ export const Header = () => {
             </div>
           </motion.div>
         )}
+
+        {/* 3. CHANEL MEGA MENU */}
+        {hoveredLink === 'chanel' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute top-[148px] lg:top-[212px] left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-40 overflow-hidden"
+            onMouseEnter={() => setHoveredLink('chanel')}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto max-w-[1400px] py-16 px-12 grid grid-cols-1 md:grid-cols-5 gap-12">
+              {/* Col 1: HANDBAGS */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">HANDBAGS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Classic Flap Bags', 'Chanel 22 Bags', 'Chanel 25 Bags', 'Totes', 'Boy Bags', 'Wallet on Chains', 'Fashion & Runway Bags', 'All Chanel Bags'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/chanel`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 2: ACCESSORIES */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">ACCESSORIES</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Wallets', 'Shoes'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/chanel`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 3: JEWELRY */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">JEWELRY</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Vintage', 'Contemporary'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/chanel`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 4: CURATIONS */}
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-900">CURATIONS</h4>
+                  <div className="h-px w-8 bg-black" />
+                </div>
+                <ul className="space-y-4">
+                  {['Vintage Handbags', 'Pre-Owned Handbags'].map((item) => (
+                    <li key={item}>
+                      <Link href={`/${countryCode}/category/chanel`} className="text-sm font-body font-light text-gray-500 hover:text-black transition-colors">
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Col 5: FEATURED VISUAL */}
+              <div className="space-y-8 flex flex-col items-start text-left">
+                <div className="relative aspect-[4/3] w-full bg-ivory overflow-hidden group">
+                  <Image 
+                    src="https://picsum.photos/seed/chanel-mega/800/600"
+                    alt="Chanel Classic Bags"
+                    fill
+                    className="object-cover transition-transform duration-[3s] group-hover:scale-105"
+                    data-ai-hint="chanel handbag"
+                  />
+                  <div className="absolute inset-0 bg-black/[0.02]" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-headline text-2xl font-medium text-gray-900 uppercase tracking-tight">CHANEL CLASSIC BAGS</h3>
+                  <p className="text-[11px] font-body font-light text-gray-500 tracking-wide italic">Discover the Beauty of Chanel</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Discovery Overlay */}
