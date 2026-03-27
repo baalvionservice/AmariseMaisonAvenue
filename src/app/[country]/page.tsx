@@ -1,7 +1,6 @@
-
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { COUNTRIES } from '@/lib/mock-data';
@@ -19,13 +18,15 @@ import {
   Award,
   Package,
   Activity,
-  Truck
+  Truck,
+  ChevronLeft,
+  ChevronRight,
+  Heart
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
 import placeholderData from '@/app/lib/placeholder-images.json';
 
 /**
@@ -37,6 +38,7 @@ export default function HomePage() {
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
   const { products } = useAppStore();
+  const [activeNewArrivalTab, setActiveNewArrivalTab] = useState('HERMÈS');
 
   const heroImage = placeholderData.placeholderImages.find(img => img.id === 'home-hero-banner-main')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964';
   const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
@@ -44,6 +46,34 @@ export default function HomePage() {
   const gridSpring = placeholderData.placeholderImages.find(img => img.id === 'home-grid-spring')?.imageUrl;
   const gridArrivals = placeholderData.placeholderImages.find(img => img.id === 'home-grid-arrivals')?.imageUrl;
   const gridVisit = placeholderData.placeholderImages.find(img => img.id === 'home-grid-visit')?.imageUrl;
+
+  // Specific "New Arrival" artifacts inspired by the reference image
+  const newArrivals = [
+    {
+      id: 'prod-11',
+      name: 'Hermès Kelly Sellier 25 Craie Epsom Electrum Hardware',
+      price: 34500,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Kelly_25_Sellier_Craie_Epsom_Electrum_Hardware_1.jpg?v=1691512345&width=1000'
+    },
+    {
+      id: 'prod-kelly-yellow',
+      name: 'Hermès Kelly Sellier 20 Jaune Mango Epsom Palladium Hardware',
+      price: 32500,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Hermes_Kelly_20_Sellier_Jaune_Mango_Epsom_Palladium_Hardware_1.jpg?v=1691512345&width=1000'
+    },
+    {
+      id: 'prod-birkin-hss',
+      name: 'Hermès Special Order (HSS) Birkin 30 Hermès Birkin 30 Etoupe and Rose Sakura Chevre Mysore Brushed Gold Hardware',
+      price: 34500,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_30_Etoupe_and_Rose_Sakura_Chevre_Mysore_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000'
+    },
+    {
+      id: 'prod-kelly-green',
+      name: 'Hermès Kelly Sellier 25 Vert Amande Epsom Gold Hardware',
+      price: 24500,
+      imageUrl: 'https://madisonavenuecouture.com/cdn/shop/files/Hermes_Kelly_25_Sellier_Vert_Amande_Epsom_Gold_Hardware_1.jpg?v=1691512345&width=1000'
+    }
+  ];
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -58,7 +88,6 @@ export default function HomePage() {
           data-ai-hint="luxury fashion"
         />
         
-        {/* Transparent Overlay for Text Legibility */}
         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
         
         <div className="relative z-10 text-center space-y-8 lg:space-y-12 max-w-5xl px-6 lg:mt-20">
@@ -126,7 +155,68 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Amarisé Maison Avenue Live Section */}
+      {/* 4. New Arrivals Carousel Section */}
+      <section className="container mx-auto px-6 lg:px-12 py-24 lg:py-32 max-w-[1600px] space-y-16">
+        <div className="text-center space-y-8">
+          <h2 className="text-5xl lg:text-6xl font-headline font-medium text-gray-900 tracking-tight">New Arrivals</h2>
+          
+          <div className="flex items-center justify-center space-x-12 border-b border-gray-100 pb-1">
+            {['HERMÈS', 'CHANEL', 'OTHER BRANDS', 'VIEW ALL'].map((tab) => (
+              <button 
+                key={tab}
+                onClick={() => setActiveNewArrivalTab(tab)}
+                className={cn(
+                  "pb-4 text-[11px] font-bold tracking-[0.2em] transition-all relative uppercase outline-none",
+                  activeNewArrivalTab === tab ? "text-black" : "text-gray-400 hover:text-black"
+                )}
+              >
+                {tab}
+                {activeNewArrivalTab === tab && (
+                  <motion.div layoutId="arrival-underline" className="absolute bottom-0 left-0 right-0 h-[1px] bg-black" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative group px-12">
+          {/* Navigation Arrows */}
+          <button className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all bg-white z-10">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all bg-white z-10">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+            {newArrivals.map((prod) => (
+              <div key={prod.id} className="flex flex-col items-center text-center space-y-8 group/card cursor-pointer">
+                <div className="relative aspect-[4/5] w-full bg-white flex items-center justify-center p-8 overflow-hidden">
+                  <Image 
+                    src={prod.imageUrl} 
+                    alt={prod.name} 
+                    fill 
+                    className="object-contain transition-transform duration-[2s] group-hover/card:scale-105" 
+                  />
+                  <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors">
+                    <Heart className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="space-y-3 px-4">
+                  <h3 className="text-[12px] font-light text-gray-600 uppercase tracking-widest leading-relaxed line-clamp-2">
+                    {prod.name}
+                  </h3>
+                  <p className="text-[14px] font-bold text-gray-900 tabular-nums">
+                    ${prod.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Amarisé Maison Avenue Live Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-6">
@@ -161,7 +251,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Tactical Ticker */}
+      {/* 6. Tactical Ticker */}
       <section className="bg-black py-5 border-y border-white/10">
         <div className="container mx-auto flex items-center justify-center space-x-16">
            <div className="flex items-center space-x-4 text-gold">
@@ -178,7 +268,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Dual-Persona Acquisition Matrix */}
+      {/* 7. Dual-Persona Acquisition Matrix */}
       <section className="container mx-auto px-6 py-40 max-w-[1600px]">
         <div className="text-center space-y-24">
           <div className="space-y-8 max-w-4xl mx-auto">
@@ -230,14 +320,14 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="pt-12 flex items-center text-[11px] font-bold tracking-[0.5em] uppercase text-gold group-hover:translate-x-6 transition-transform relative z-10">
-                AUDIT SALON VIEW <ArrowRight className="w-5 h-5 ml-4" />
+                AUDIT SALON VIEW <ArrowRight className="ml-4 w-5 h-5" />
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 7. Rare Archive Grid */}
+      {/* 8. Rare Archive Grid */}
       <section className="bg-ivory/30 py-60 border-y border-border">
          <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
             <div className="flex flex-col md:row items-end justify-between gap-12">
@@ -282,7 +372,7 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* 8. Institutional Trust Footer */}
+      {/* 9. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
