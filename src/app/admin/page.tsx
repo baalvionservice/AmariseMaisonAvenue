@@ -42,6 +42,14 @@ import {
   Bar,
   BarChart
 } from 'recharts';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 
 /**
  * Executive Audit Dashboard: SEMrush-Style Control Center.
@@ -62,7 +70,7 @@ export default function ExecutiveDashboard() {
   ];
 
   return (
-    <div className="space-y-10 animate-fade-in pb-20 font-body">
+    <div className="space-y-10 animate-fade-in pb-20 font-body text-white">
       {/* 1. Header: Jurisdictional Identity */}
       <header className="flex justify-between items-end border-b border-white/5 pb-10">
         <div className="space-y-2">
