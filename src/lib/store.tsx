@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { 
-  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob, FXRate, TaxRule, FraudLog, DynamicPrice, Order
+  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob, FXRate, TaxRule, FraudLog, DynamicPrice, Order, Shipment, WarehouseMovement
 } from './types';
 import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES, formatPrice } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
@@ -18,6 +18,7 @@ import { SupportedLanguage } from './i18n/config';
 import { FXEngine } from './finance/fx-engine';
 import { TaxEngine } from './finance/tax-engine';
 import { DynamicPricingEngine } from './ai-autopilot/dynamic-pricing-engine';
+import { LogisticsEngine } from './logistics/engine';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -51,6 +52,8 @@ interface AppContextType {
   scopedJobs: BackgroundJob[];
   scopedFraudLogs: FraudLog[];
   scopedPricingOptimizations: DynamicPrice[];
+  scopedShipments: Shipment[];
+  warehouseLogs: WarehouseMovement[];
   systemLogs: SystemLog[];
   products: Product[];
   privateInquiries: PrivateInquiry[];
@@ -90,6 +93,8 @@ interface AppContextType {
   backgroundJobs: BackgroundJob[];
   fraudLogs: FraudLog[];
   dynamicPrices: DynamicPrice[];
+  shipments: Shipment[];
+  returns: ReturnRequest[];
   isShowcaseMode: boolean;
   isCartOpen: boolean;
   activeVip: VipClient | null;
@@ -160,6 +165,11 @@ interface AppContextType {
   recordFraudLog: (params: Omit<FraudLog, 'id'>) => void;
   optimizeRegistryPricing: (country: CountryCode) => void;
   updateInventory: (productId: string, country: CountryCode, adjustment: number) => void;
+  createShipment: (orderId: string, userId: string, country: CountryCode) => void;
+  updateShipmentStatus: (id: string, status: Shipment['status']) => void;
+  initiateReturn: (orderId: string, productId: string, reason: string, country: CountryCode) => void;
+  processReturn: (returnId: string, action: 'received' | 'inspected' | 'restocked' | 'rejected') => void;
+  performWarehouseIntake: (productId: string, quantity: number, reason: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -237,6 +247,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [backgroundJobs, setBackgroundJobs] = useState<BackgroundJob[]>([]);
   const [fraudLogs, setFraudLogs] = useState<FraudLog[]>([]);
   const [dynamicPrices, setDynamicPrices] = useState<DynamicPrice[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [returns, setReturns] = useState<ReturnRequest[]>(RETURNS.map(r => ({ ...r, country: 'us' as CountryCode })));
+  const [warehouseLogs, setWarehouseLogs] = useState<WarehouseMovement[]>([]);
 
   // 📊 Observability State
   const [metrics, setMetrics] = useState<MaisonMetric[]>([]);
@@ -250,7 +263,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
   const scopedBuyingGuides = useMemo(() => activeHub === 'global' ? INITIAL_GUIDES : INITIAL_GUIDES.filter(g => g.country === activeHub || g.isGlobal), [activeHub]);
-  const scopedReturns = useMemo(() => activeHub === 'global' ? RETURNS : RETURNS.filter(r => r.country === activeHub), [activeHub]);
+  const scopedReturns = useMemo(() => activeHub === 'global' ? returns : returns.filter(r => r.country === activeHub), [returns, activeHub]);
   const scopedNotifications = useMemo(() => activeHub === 'global' ? notifications : notifications.filter(n => n.country === activeHub || n.country === 'global'), [notifications, activeHub]);
   const scopedApprovals = useMemo(() => activeHub === 'global' ? approvalRequests : approvalRequests.filter(a => a.country === activeHub), [approvalRequests, activeHub]);
   const scopedAuditLogs = useMemo(() => activeHub === 'global' ? auditRegistry : auditRegistry.filter(log => log.country === activeHub || log.country === 'global'), [auditRegistry, activeHub]);
@@ -265,6 +278,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedJobs = useMemo(() => activeHub === 'global' ? backgroundJobs : backgroundJobs.filter(j => j.country === activeHub || j.country === 'global'), [backgroundJobs, activeHub]);
   const scopedFraudLogs = useMemo(() => activeHub === 'global' ? fraudLogs : fraudLogs.filter(f => (f as any).country === activeHub), [fraudLogs, activeHub]);
   const scopedPricingOptimizations = useMemo(() => activeHub === 'global' ? dynamicPrices : dynamicPrices.filter(p => p.country === activeHub), [dynamicPrices, activeHub]);
+  const scopedShipments = useMemo(() => activeHub === 'global' ? shipments : shipments.filter(s => s.country === activeHub), [shipments, activeHub]);
   
   const scopedAlerts = useMemo(() => activeHub === 'global' ? alerts : alerts.filter(a => a.country === activeHub || a.country === 'global'), [alerts, activeHub]);
   const scopedMetrics = useMemo(() => activeHub === 'global' ? metrics : metrics.filter(m => m.country === activeHub || m.country === 'global'), [metrics, activeHub]);
@@ -351,7 +365,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, scopedFraudLogs, scopedPricingOptimizations, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs, fraudLogs, dynamicPrices,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, scopedFraudLogs, scopedPricingOptimizations, scopedShipments, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs, fraudLogs, dynamicPrices, shipments, returns, warehouseLogs,
     setLanguage, getLocalizedPrice, setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(p => ({...p, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(p => ({...p, adminViewMode: v})),
     upsertProduct: (p: Product, changeSummary = 'Modified Registry Entry') => {
       const before = products.find(i => i.id === p.id);
@@ -429,8 +443,65 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
         return p;
       }));
+    },
+    createShipment: (orderId: string, userId: string, country: CountryCode) => {
+      const shipment = LogisticsEngine.createShipment(orderId, userId, country);
+      setShipments(prev => [shipment, ...prev]);
+      recordAudit({ action: 'Shipment Created', entity: 'Logistics', entityId: shipment.id, country, severity: 'low' });
+    },
+    updateShipmentStatus: (id: string, status: ShipmentStatus) => {
+      setShipments(prev => prev.map(s => {
+        if (s.id === id) {
+          return {
+            ...s,
+            status,
+            updatedAt: new Date().toISOString(),
+            history: [...s.history, {
+              status,
+              location: 'Jurisdictional Dispatch Center',
+              timestamp: new Date().toISOString(),
+              message: `Status updated manually to ${status}.`
+            }]
+          };
+        }
+        return s;
+      }));
+    },
+    initiateReturn: (orderId: string, productId: string, reason: string, country: CountryCode) => {
+      const returnReq: ReturnRequest = {
+        id: `ret-${Date.now()}`,
+        orderId,
+        productId,
+        reason,
+        status: 'pending',
+        warehouseId: `${country}-wh-1`,
+        requestedAt: new Date().toISOString(),
+        brandId: activeBrandId,
+        country
+      };
+      setReturns(prev => [returnReq, ...prev]);
+      recordAudit({ action: 'Return Initiated', entity: 'Logistics', entityId: returnReq.id, country, severity: 'medium' });
+    },
+    processReturn: (returnId: string, action: any) => {
+      setReturns(prev => prev.map(r => r.id === returnId ? { ...r, status: action } : r));
+      recordAudit({ action: 'Return Status Change', entity: 'Logistics', entityId: returnId, country: activeHub, severity: 'low', reason: `Action: ${action}` });
+    },
+    performWarehouseIntake: (productId: string, quantity: number, reason: string) => {
+      const movement: WarehouseMovement = {
+        id: `move-${Date.now()}`,
+        productId,
+        type: 'intake',
+        quantity,
+        hub: activeHub as CountryCode,
+        actorName: currentUser?.name || 'System',
+        reason,
+        timestamp: new Date().toISOString()
+      };
+      setWarehouseLogs(prev => [movement, ...prev]);
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, stock: p.stock + quantity } : p));
+      recordAudit({ action: 'Physical Intake', entity: 'Warehouse', entityId: productId, country: activeHub, severity: 'medium', reason });
     }
-  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, scopedFraudLogs, scopedPricingOptimizations, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs, fraudLogs, dynamicPrices]);
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedShipments, scopedJobs, scopedFraudLogs, scopedPricingOptimizations, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs, fraudLogs, dynamicPrices, shipments, returns, warehouseLogs]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

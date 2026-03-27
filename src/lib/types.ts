@@ -121,6 +121,26 @@ export interface Transaction {
   refundedAt?: string;
 }
 
+export type ShipmentStatus = 'pending' | 'packed' | 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned';
+
+export interface Shipment {
+  id: string;
+  orderId: string;
+  userId: string;
+  country: CountryCode;
+  courierName: string;
+  trackingId: string;
+  status: ShipmentStatus;
+  createdAt: string;
+  updatedAt: string;
+  history: {
+    status: ShipmentStatus;
+    location: string;
+    timestamp: string;
+    message: string;
+  }[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -831,6 +851,29 @@ export interface InventoryLock {
   quantity: number;
   expiresAt: string;
   createdAt: string;
+}
+
+export interface WarehouseMovement {
+  id: string;
+  productId: string;
+  type: 'intake' | 'adjustment' | 'dispatch' | 'return';
+  quantity: number;
+  hub: CountryCode;
+  actorName: string;
+  reason: string;
+  timestamp: string;
+}
+
+export interface ReturnRequest {
+  id: string;
+  orderId: string;
+  productId: string;
+  reason: string;
+  status: 'pending' | 'authorized' | 'received' | 'inspected' | 'restocked' | 'rejected';
+  warehouseId: string;
+  requestedAt: string;
+  brandId: string;
+  country: CountryCode;
 }
 
 export interface Order {
