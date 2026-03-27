@@ -175,6 +175,20 @@ export interface Product {
   targetKeyword?: string;
 }
 
+export interface CMSPage {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  language: LanguageCode;
+  country: CountryCode | 'global';
+  status: 'draft' | 'published';
+  createdAt: string;
+  updatedAt: string;
+  authorId: string;
+  seoId?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -888,4 +902,8 @@ export interface Order {
   paymentStatus: PaymentStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CartItem extends Product {
+  quantity: number;
 }
