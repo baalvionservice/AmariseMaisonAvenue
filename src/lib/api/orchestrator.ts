@@ -1,10 +1,12 @@
+
 /**
  * @fileOverview BAALVION / AMARISÉ - API Orchestrator (Mock)
- * Simulates real-world backend behavior including latency, idempotency, and inventory locking.
+ * Simulates real-world backend behavior including latency, idempotency, and semantic search.
  */
 
 import { CountryCode, PaymentGateway, TransactionStatus } from '../types';
 import { StockManager } from '../inventory/stockManager';
+import { applyAdvancedSearch } from '../search/engine';
 
 export interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -36,14 +38,32 @@ class MockApiOrchestrator {
   }
 
   /**
+   * 🔍 AI SEARCH API
+   * Implements Semantic & Hybrid search logic.
+   */
+  async searchProductsSemantic(query: string, country: string, products: any[]): Promise<ApiResponse<any>> {
+    await this.simulate();
+    
+    try {
+      const results = await applyAdvancedSearch(products, query, {}, 'user', country);
+      return {
+        status: 'success',
+        data: results
+      };
+    } catch (e: any) {
+      return {
+        status: 'error',
+        error: "Neural Index Timeout",
+        code: 504
+      };
+    }
+  }
+
+  /**
    * 📦 INVENTORY APIs (Atomic Locking)
-   * Prevents overselling by reserving stock for 15 minutes.
    */
   async lockInventory(variantId: string, userId: string, quantity: number = 1): Promise<ApiResponse<any>> {
     await this.simulate();
-    
-    // In production, this would be a Firestore Transaction
-    // For mock, we use the StockManager utility
     const result = StockManager.reserveStock({ id: variantId, stock: 1, name: "Luxury Artifact" } as any, userId, quantity);
 
     if (!result.success) {
@@ -92,21 +112,6 @@ class MockApiOrchestrator {
         status: 'PENDING'
       }
     };
-  }
-
-  /**
-   * 🛠️ ADMIN APIs (RBAC Checked)
-   */
-  async viewAuditLogs(role: string): Promise<ApiResponse<any>> {
-    await this.simulate();
-    if (role !== 'super_admin' && role !== 'country_admin') {
-      return {
-        status: 'error',
-        error: 'ACCESS_DENIED: Institutional authority required.',
-        code: 403
-      };
-    }
-    return { status: 'success', data: [] };
   }
 }
 

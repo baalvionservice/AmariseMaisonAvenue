@@ -22,6 +22,21 @@
       },
       "required": ["id", "name", "category", "basePrice"]
     },
+    "SearchIndexEntry": {
+      "title": "SearchIndexEntry",
+      "description": "A vectorized entry for semantic search discovery.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "latentFeatures": { "type": "array", "items": { "type": "number" }, "description": "Mock embedding vector." },
+        "country": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
     "Payment": {
       "title": "Payment",
       "description": "A financial transaction record within the Maison settlement layer.",
@@ -59,6 +74,7 @@
   },
   "firestore": {
     "/products/{productId}": { "schema": "Product", "description": "Global catalog of luxury items." },
+    "/search_index/{entryId}": { "schema": "SearchIndexEntry", "description": "Vectorized registry for semantic discovery." },
     "/payments/{paymentId}": { "schema": "Payment", "description": "Treasury settlement records." },
     "/payments/{paymentId}/logs/{logId}": { "schema": "PaymentLog", "description": "Detailed transaction traces." }
   }
