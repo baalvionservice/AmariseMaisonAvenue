@@ -573,6 +573,32 @@ export interface WalletTransaction {
   status: 'Settled' | 'Pending';
 }
 
+/** 📊 BACKGROUND WORKER TYPES */
+
+export type JobType = 
+  | 'PAYMENT_VERIFY' 
+  | 'INVENTORY_TTL' 
+  | 'EVENT_RETRY' 
+  | 'NOTIF_DISPATCH' 
+  | 'METRICS_AGG' 
+  | 'CLEANUP';
+
+export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';
+
+export interface BackgroundJob {
+  id: string;
+  type: JobType;
+  payload: any;
+  status: JobStatus;
+  retryCount: number;
+  maxRetries: number;
+  nextRunAt: string;
+  country: string;
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** 📊 OBSERVABILITY TYPES */
 
 export interface MaisonMetric {
