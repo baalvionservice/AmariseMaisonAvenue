@@ -8,6 +8,7 @@ import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
 import { MaisonPopup } from '@/components/layout/MaisonPopup';
 import { MadAveLiveWidget } from '@/components/layout/MadAveLiveWidget';
 import { JudyTrigger } from '@/components/layout/JudyTrigger';
+import { CartSheet } from '@/components/layout/CartSheet';
 import Link from 'next/link';
 import { 
   Phone, 
@@ -34,6 +35,7 @@ export default function CountryLayout({
       <MaisonPopup />
       <MadAveLiveWidget />
       <JudyTrigger />
+      <CartSheet />
       <Header />
       {/* Optimized Content Offset for Responsive Tiered Header */}
       <main id="main-content" className="min-h-screen pt-20 lg:pt-[260px] animate-fade-in relative bg-white">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo } from 'react';
@@ -32,12 +33,18 @@ export default function ProductPage() {
   const { id, country } = useParams();
   const countryCode = (country as string) || 'us';
   const { toast } = useToast();
-  const { toggleWishlist, wishlist, addToCart } = useAppStore();
+  const { toggleWishlist, wishlist, addToCart, setCartOpen } = useAppStore();
   
   const product = useMemo(() => PRODUCTS.find(p => p.id === id), [id]);
   const isWishlisted = wishlist.some(i => i.id === product?.id);
 
   if (!product) return <div className="py-40 text-center font-headline text-3xl">Artifact not found in registry.</div>;
+
+  const handleAddToCart = () => {
+    addToCart(product);
+    setCartOpen(true);
+    toast({ title: "Registry Updated", description: "Artifact added to shopping bag." });
+  };
 
   return (
     <div className="bg-white min-h-screen pb-20 lg:pb-40 animate-fade-in font-body">
@@ -126,7 +133,7 @@ export default function ProductPage() {
             <div className="space-y-6">
               <div className="flex gap-4">
                 <Button 
-                  onClick={() => { addToCart(product); toast({ title: "Registry Updated", description: "Artifact added to shopping bag." }); }}
+                  onClick={handleAddToCart}
                   className="flex-[5] h-20 bg-black text-white hover:bg-plum rounded-none text-[12px] font-bold tracking-[0.5em] uppercase transition-all shadow-2xl shadow-black/10"
                 >
                   ADD TO SHOPPING BAG
