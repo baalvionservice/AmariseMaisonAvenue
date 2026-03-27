@@ -1,7 +1,6 @@
-
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { useParams } from 'next/navigation';
 import { ShowcaseControls } from '@/components/demo/ShowcaseControls';
@@ -21,6 +20,8 @@ import {
   Youtube,
   Music2
 } from 'lucide-react';
+import { useAppStore } from '@/lib/store';
+import { i18n } from '@/lib/i18n/engine';
 
 export default function CountryLayout({
   children,
@@ -29,9 +30,16 @@ export default function CountryLayout({
 }) {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
+  const { currentLanguage } = useAppStore();
+
+  useEffect(() => {
+    // Update directionality on load
+    document.documentElement.dir = i18n.getDirection();
+    document.documentElement.lang = currentLanguage;
+  }, [currentLanguage]);
   
   return (
-    <>
+    <div dir={i18n.getDirection()}>
       <MaisonPopup />
       <MadAveLiveWidget />
       <JudyTrigger />
@@ -110,6 +118,6 @@ export default function CountryLayout({
       </footer>
 
       <ShowcaseControls />
-    </>
+    </div>
   );
 }

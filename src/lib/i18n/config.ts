@@ -1,7 +1,5 @@
-
 /**
- * @fileOverview Institutional Localization Configuration (i18n)
- * Provides the architectural foundation for multi-language support in global hubs.
+ * @fileOverview Institutional Localization Configuration
  */
 
 export type SupportedLanguage = 'en' | 'ar' | 'hi' | 'fr';
@@ -22,36 +20,53 @@ export const I18N_CONFIG: LocalizationConfig = {
       'nav.home': 'Home',
       'nav.archive': 'Registry',
       'nav.curation': 'Curation',
+      'nav.intelligence': 'Intelligence',
       'product.inquire': 'Inquire Privately',
-      'footer.charter': 'Founding Charter 1924'
+      'product.add_to_bag': 'Add to Shopping Bag',
+      'product.provenance': 'Provenance Verified',
+      'footer.charter': 'Founding Charter 1924',
+      'common.search': 'Search Registry...',
+      'common.hub': 'Market Hub',
+      'common.login': 'Log in | Sign up'
     },
     ar: {
       'nav.home': 'الرئيسية',
       'nav.archive': 'السجل',
       'nav.curation': 'تقييم',
+      'nav.intelligence': 'ذكاء',
       'product.inquire': 'استفسار خاص',
-      'footer.charter': 'ميثاق التأسيس ١٩٢٤'
+      'product.add_to_bag': 'أضف إلى حقيبة التسوق',
+      'product.provenance': 'تم التحقق من المصدر',
+      'footer.charter': 'ميثاق التأسيس ١٩٢٤',
+      'common.search': 'البحث في السجل...',
+      'common.hub': 'مركز السوق',
+      'common.login': 'تسجيل الدخول | تسجيل'
     },
     hi: {
       'nav.home': 'होम',
       'nav.archive': 'रजिस्ट्री',
       'nav.curation': 'क्यूरेशन',
+      'nav.intelligence': 'इंटेलिजेंस',
       'product.inquire': 'निजी तौर पर पूछताछ करें',
-      'footer.charter': 'स्थापना चार्टर १९२४'
+      'product.add_to_bag': 'शॉपिंग बैग में जोड़ें',
+      'product.provenance': 'स्रोत सत्यापित',
+      'footer.charter': 'स्थापना चार्टर १९२४',
+      'common.search': 'रजिस्ट्री खोजें...',
+      'common.hub': 'मार्केट हब',
+      'common.login': 'लॉग इन करें | साइन अप'
     },
     fr: {
       'nav.home': 'Accueil',
       'nav.archive': 'Registre',
       'nav.curation': 'Curation',
+      'nav.intelligence': 'Intelligence',
       'product.inquire': 'S’informer en privé',
-      'footer.charter': 'Charte de Fondation 1924'
+      'product.add_to_bag': 'Ajouter au panier',
+      'product.provenance': 'Provenance vérifiée',
+      'footer.charter': 'Charte de Fondation 1924',
+      'common.search': 'Rechercher dans le registre...',
+      'common.hub': 'Centre de Marché',
+      'common.login': 'Connexion | Inscription'
     }
   }
 };
-
-/**
- * Localization Resolver
- */
-export function t(key: string, lang: SupportedLanguage = 'en'): string {
-  return I18N_CONFIG.translations[lang]?.[key] || I18N_CONFIG.translations['en'][key] || key;
-}
