@@ -365,6 +365,10 @@ export interface AIActionLog {
   status: string;
   timestamp: string;
   details: string;
+  input?: any;
+  output?: any;
+  confidence?: number;
+  traceId?: string;
 }
 
 export interface AISuggestion {
@@ -386,9 +390,27 @@ export interface AuditLogEntry {
   country: string;
   action: string;
   entity: string;
+  entityId?: string;
   timestamp: string;
   severity: 'low' | 'medium' | 'high';
+  beforeState?: any;
+  afterState?: any;
+  reason?: string;
   brandId?: string;
+}
+
+export interface SystemLog {
+  id: string;
+  type: 'api' | 'security' | 'inventory' | 'payment' | 'system' | 'event';
+  source: string;
+  userId?: string;
+  action: string;
+  requestData?: any;
+  responseData?: any;
+  status: 'success' | 'failure';
+  error?: string;
+  timestamp: string;
+  country: string;
 }
 
 export interface QATestCase {
@@ -411,6 +433,7 @@ export interface MaisonError {
   resolved: boolean;
   timestamp: string;
   severity: string;
+  stackTrace?: string;
 }
 
 export interface StressTest {
