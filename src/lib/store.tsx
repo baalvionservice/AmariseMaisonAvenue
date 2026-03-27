@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { 
-  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob, FXRate, TaxRule, FraudLog, DynamicPrice
+  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob, FXRate, TaxRule, FraudLog, DynamicPrice, Order
 } from './types';
 import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES, formatPrice } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
@@ -159,6 +159,7 @@ interface AppContextType {
   upsertSEOMetadata: (meta: SEOMetadata) => void;
   recordFraudLog: (params: Omit<FraudLog, 'id'>) => void;
   optimizeRegistryPricing: (country: CountryCode) => void;
+  updateInventory: (productId: string, country: CountryCode, adjustment: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -211,7 +212,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
-  const [apiLogs] = useState<ApiLog[]>(API_LOGS);
+  const [apiLogs, setApiLogs] = useState<ApiLog[]>(API_LOGS);
   const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
   const [appointments] = useState<Appointment[]>(APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
@@ -418,7 +419,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     recordLog, recordAudit, triggerReindex: (type: string) => recordLog('Re-index Triggered', 'system', 'global'), toggleEmergencyMode: () => { recordAudit({ action: 'Emergency Toggle', entity: 'System', severity: 'high', reason: 'Manual fail-safe trigger' }); setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})); }, runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); },
     recordMetric, resolveAlert: (id: string) => setAlerts(prev => prev.map(a => a.id === id ? {...a, status: 'resolved'} : a)), enqueueBackgroundJob,
     upsertSEOMetadata: (meta: SEOMetadata) => setSeoRegistry(prev => prev.find(m => m.id === meta.id) ? prev.map(m => m.id === meta.id ? meta : m) : [meta, ...prev]),
-    recordFraudLog, optimizeRegistryPricing
+    recordFraudLog, optimizeRegistryPricing,
+    updateInventory: (productId: string, country: CountryCode, adjustment: number) => {
+      setProducts(prev => prev.map(p => {
+        if (p.id === productId) {
+          const newStock = Math.max(0, p.stock + adjustment);
+          recordAudit({ action: 'Inventory Adjustment', entity: 'Inventory', entityId: productId, country, severity: 'medium', reason: `Manual adjustment of ${adjustment} units.` });
+          return { ...p, stock: newStock };
+        }
+        return p;
+      }));
+    }
   }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, scopedFraudLogs, scopedPricingOptimizations, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs, fraudLogs, dynamicPrices]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

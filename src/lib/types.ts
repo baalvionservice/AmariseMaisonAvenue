@@ -832,3 +832,17 @@ export interface InventoryLock {
   expiresAt: string;
   createdAt: string;
 }
+
+export interface Order {
+  id: string;
+  userId: string;
+  clientName: string;
+  country: CountryCode;
+  items: CartItem[];
+  totalAmount: number;
+  currency: string;
+  status: 'Pending' | 'Confirmed' | 'Processing' | 'Shipped' | 'Delivered' | 'Failed';
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+}
