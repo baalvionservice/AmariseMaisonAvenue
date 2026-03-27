@@ -54,6 +54,24 @@
       "description": "Maison Amarisé Primary Heritage Banner",
       "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964",
       "imageHint": "luxury banner"
+    },
+    {
+      "id": "home-grid-spring",
+      "description": "Spring Edit Curatorial Block",
+      "imageUrl": "https://picsum.photos/seed/amarise-spring/800/1000",
+      "imageHint": "luxury bags"
+    },
+    {
+      "id": "home-grid-arrivals",
+      "description": "New Arrivals Curatorial Block",
+      "imageUrl": "https://picsum.photos/seed/amarise-arrivals/800/1000",
+      "imageHint": "hermes collection"
+    },
+    {
+      "id": "home-grid-visit",
+      "description": "Visit Us Curatorial Block",
+      "imageUrl": "https://picsum.photos/seed/amarise-visit/800/1000",
+      "imageHint": "luxury boutique"
     }
   ]
 }

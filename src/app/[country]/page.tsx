@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -35,10 +36,14 @@ export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || 'us';
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const { products, scopedErrors } = useAppStore();
+  const { products } = useAppStore();
 
   const heroImage = placeholderData.placeholderImages.find(img => img.id === 'home-hero-banner-main')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964';
   const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
+  
+  const gridSpring = placeholderData.placeholderImages.find(img => img.id === 'home-grid-spring')?.imageUrl;
+  const gridArrivals = placeholderData.placeholderImages.find(img => img.id === 'home-grid-arrivals')?.imageUrl;
+  const gridVisit = placeholderData.placeholderImages.find(img => img.id === 'home-grid-visit')?.imageUrl;
 
   return (
     <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
@@ -94,7 +99,34 @@ export default function HomePage() {
         </div>
       </Link>
 
-      {/* 3. AMARISÉ MAISON AVENUE LIVE Section */}
+      {/* 3. Seasonal Curatorial Grid (3 Columns) */}
+      <section className="container mx-auto px-6 lg:px-12 py-12 lg:py-20 max-w-[1600px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
+          <CuratorialBlock 
+            imageUrl={gridSpring!} 
+            title="Spring Edit" 
+            subtitle="Refresh Your Closet" 
+            href={`/${countryCode}/category/spring-edit`} 
+            hint="luxury bags"
+          />
+          <CuratorialBlock 
+            imageUrl={gridArrivals!} 
+            title="Hermès New Arrivals" 
+            subtitle="Just Arrived Bags" 
+            href={`/${countryCode}/category/hermes`} 
+            hint="hermes collection"
+          />
+          <CuratorialBlock 
+            imageUrl={gridVisit!} 
+            title="Visit Us" 
+            subtitle="Shop In Person" 
+            href={`/${countryCode}/contact`} 
+            hint="luxury boutique"
+          />
+        </div>
+      </section>
+
+      {/* 4. Amarisé Maison Avenue Live Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-6">
@@ -129,7 +161,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Tactical Ticker */}
+      {/* 5. Tactical Ticker */}
       <section className="bg-black py-5 border-y border-white/10">
         <div className="container mx-auto flex items-center justify-center space-x-16">
            <div className="flex items-center space-x-4 text-gold">
@@ -146,7 +178,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Dual-Persona Acquisition Matrix */}
+      {/* 6. Dual-Persona Acquisition Matrix */}
       <section className="container mx-auto px-6 py-40 max-w-[1600px]">
         <div className="text-center space-y-24">
           <div className="space-y-8 max-w-4xl mx-auto">
@@ -205,7 +237,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Rare Archive Grid */}
+      {/* 7. Rare Archive Grid */}
       <section className="bg-ivory/30 py-60 border-y border-border">
          <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
             <div className="flex flex-col md:row items-end justify-between gap-12">
@@ -250,7 +282,7 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* 7. Institutional Trust Footer */}
+      {/* 8. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
@@ -276,5 +308,27 @@ export default function HomePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function CuratorialBlock({ imageUrl, title, subtitle, href, hint }: { imageUrl: string, title: string, subtitle: string, href: string, hint: string }) {
+  return (
+    <Link href={href} className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-muted shadow-sm">
+      <Image 
+        src={imageUrl} 
+        alt={title} 
+        fill 
+        className="object-cover transition-transform duration-[5s] group-hover:scale-110" 
+        data-ai-hint={hint}
+      />
+      {/* Dynamic Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+      
+      {/* Content Overlay */}
+      <div className="absolute inset-x-0 bottom-0 p-8 lg:p-12 text-center text-white space-y-2 lg:space-y-3 translate-y-2 group-hover:translate-y-0 transition-transform duration-700">
+        <h3 className="text-2xl lg:text-4xl font-headline font-medium italic tracking-tight">{title}</h3>
+        <p className="text-[10px] lg:text-[12px] font-body font-light italic opacity-80 tracking-wide">{subtitle}</p>
+      </div>
+    </Link>
   );
 }
