@@ -1,4 +1,3 @@
-
 export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
 
 export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
