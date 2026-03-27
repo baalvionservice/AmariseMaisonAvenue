@@ -3,6 +3,7 @@ import { PrivateInquiry, LeadConversation } from './types';
 /**
  * HIGH-TICKET SALES MOCK DATA
  * Mocked CRM registry for private acquisitions.
+ * Using stable strings for hydration consistency.
  */
 
 export const MOCK_INQUIRIES: PrivateInquiry[] = [
@@ -17,7 +18,7 @@ export const MOCK_INQUIRIES: PrivateInquiry[] = [
     contactMethod: 'WhatsApp',
     status: 'new',
     leadTier: 1,
-    timestamp: new Date().toISOString(),
+    timestamp: '2024-03-15T10:00:00Z',
     productId: 'prod-1'
   },
   {
@@ -31,7 +32,7 @@ export const MOCK_INQUIRIES: PrivateInquiry[] = [
     contactMethod: 'Email',
     status: 'contacted',
     leadTier: 2,
-    timestamp: new Date().toISOString(),
+    timestamp: '2024-03-15T09:30:00Z',
     productId: 'prod-10'
   }
 ];
@@ -42,8 +43,8 @@ export const MOCK_CONVERSATIONS: LeadConversation[] = [
     inquiryId: 'inq-101',
     status: 'active',
     messages: [
-      { id: 'm1', sender: 'client', text: 'Seeking a 1924 series Birkin in pristine condition.', timestamp: new Date().toISOString() },
-      { id: 'm2', sender: 'curator', text: 'Thank you for your inquiry. Your request has been personally reviewed by our acquisition desk. Before we proceed, I would like to understand your intent more precisely.', timestamp: new Date().toISOString() }
+      { id: 'm1', sender: 'client', text: 'Seeking a 1924 series Birkin in pristine condition.', timestamp: '2024-03-15T10:05:00Z' },
+      { id: 'm2', sender: 'curator', text: 'Thank you for your inquiry. Your request has been personally reviewed by our acquisition desk. Before we proceed, I would like to understand your intent more precisely.', timestamp: '2024-03-15T10:10:00Z' }
     ]
   }
 ];

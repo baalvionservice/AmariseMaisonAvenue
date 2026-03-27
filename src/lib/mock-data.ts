@@ -207,9 +207,9 @@ export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
 };
 
 export const VIP_CLIENTS: VipClient[] = [
-  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10', isSubscriber: true, subscriptionPlan: 'Maison Privé', brandId: 'amarise-luxe', status: 'verified' },
-  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28', isSubscriber: false, brandId: 'amarise-luxe' },
-  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14', isSubscriber: true, subscriptionPlan: 'Atelier Reserve', brandId: 'amarise-luxe' }
+  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10', isSubscriber: true, subscriptionPlan: 'Maison Privé', brandId: 'amarise-luxe', status: 'verified', walletBalance: 12500.50, walletHistory: [], liveRequests: [], certificates: [] },
+  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28', isSubscriber: false, brandId: 'amarise-luxe', walletBalance: 500, walletHistory: [], liveRequests: [], certificates: [] },
+  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14', isSubscriber: true, subscriptionPlan: 'Atelier Reserve', brandId: 'amarise-luxe', walletBalance: 42000, walletHistory: [], liveRequests: [], certificates: [] }
 ];
 
 export const AFFILIATES: Affiliate[] = [
@@ -274,10 +274,10 @@ export const SUPPORT_TICKETS: SupportTicket[] = [
     priority: 'urgent',
     category: 'Product Query',
     lastMessage: 'I am seeking archival documentation for the 1924 series.',
-    updatedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    updatedAt: '2024-03-15T12:00:00Z',
+    createdAt: '2024-03-15T10:00:00Z',
     messages: [
-      { id: 'm-1', sender: 'customer', text: 'I am seeking archival documentation for the 1924 series.', timestamp: new Date().toISOString() }
+      { id: 'm-1', sender: 'customer', text: 'I am seeking archival documentation for the 1924 series.', timestamp: '2024-03-15T10:00:00Z' }
     ],
     brandId: 'amarise-luxe'
   }
@@ -292,26 +292,26 @@ export const SUPPORT_STATS: SupportStats = {
 };
 
 export const INTEGRATIONS: MaisonIntegration[] = [
-  { id: 'i-1', name: 'Global Payment Node', type: 'Payment', provider: 'Stripe Institutional', status: 'Connected', lastSync: new Date().toISOString(), uptime: 99.9, brandId: 'amarise-luxe' },
-  { id: 'i-2', name: 'White-Glove Logistics', type: 'Logistics', provider: 'FedEx Custom Critical', status: 'Connected', lastSync: new Date().toISOString(), uptime: 99.8, brandId: 'amarise-luxe' }
+  { id: 'i-1', name: 'Global Payment Node', type: 'Payment', provider: 'Stripe Institutional', status: 'Connected', lastSync: '2024-03-15T12:00:00Z', uptime: 99.9, brandId: 'amarise-luxe' },
+  { id: 'i-2', name: 'White-Glove Logistics', type: 'Logistics', provider: 'FedEx Custom Critical', status: 'Connected', lastSync: '2024-03-15T12:00:00Z', uptime: 99.8, brandId: 'amarise-luxe' }
 ];
 
 export const API_LOGS: ApiLog[] = [
-  { id: 'log-1', timestamp: new Date().toISOString(), endpoint: '/v1/authorize', method: 'POST', status: 200, latency: '42ms', integrationId: 'i-1' },
-  { id: 'log-2', timestamp: new Date().toISOString(), endpoint: '/v1/shipping/quote', method: 'GET', status: 200, latency: '124ms', integrationId: 'i-2' }
+  { id: 'log-1', timestamp: '2024-03-15T12:00:00Z', endpoint: '/v1/authorize', method: 'POST', status: 200, latency: '42ms', integrationId: 'i-1' },
+  { id: 'log-2', timestamp: '2024-03-15T11:55:00Z', endpoint: '/v1/shipping/quote', method: 'GET', status: 200, latency: '124ms', integrationId: 'i-2' }
 ];
 
 export const INDEXING_STATUS: IndexingStatus = {
   catalogItems: 1240,
   indexedItems: 1240,
-  lastFullScan: new Date().toISOString(),
+  lastFullScan: '2024-03-15T08:00:00Z',
   searchEngineStatus: 'Optimal',
   sitemapStatus: 'Up to date',
   autoSyncEnabled: true
 };
 
 export const INDEXING_LOGS: IndexingLog[] = [
-  { id: 'idx-1', timestamp: new Date().toISOString(), action: 'Catalog Re-index', itemsAffected: 1240, duration: '1.2s', status: 'Success' }
+  { id: 'idx-1', timestamp: '2024-03-15T08:00:00Z', action: 'Catalog Re-index', itemsAffected: 1240, duration: '1.2s', status: 'Success' }
 ];
 
 export const formatPrice = (price: number, countryCode: string = 'us') => {

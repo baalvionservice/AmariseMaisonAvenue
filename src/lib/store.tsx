@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
@@ -231,7 +230,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
   const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS.map(c => ({ ...c, brandId: activeBrandId })));
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
-  const [workflows, setWorkflows] = useState<WorkflowTask[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowTask[]>([
+    { id: 'wt-1', taskName: 'Cache Invalidation', status: 'idle', country: 'global' },
+    { id: 'wt-2', taskName: 'Sitemap Generation', status: 'idle', country: 'global' },
+    { id: 'wt-3', taskName: 'Lead Tier Recalibration', status: 'idle', country: 'global' }
+  ]);
   const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([]);
   const [auditRegistry, setAuditRegistry] = useState<AuditLogEntry[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -281,7 +284,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
   const [aiLogs, setAiLogs] = useState<AIActionLog[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
-  const [qaTests] = useState<QATestCase[]>([]);
+  const [qaTests, setQaTests] = useState<QATestCase[]>([
+    { id: 'qa-1', name: 'Financial Settlement Sync', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId },
+    { id: 'qa-2', name: 'AI Content Safety Audit', module: 'AI', status: 'idle', logs: [], country: 'global', brandId: activeBrandId },
+    { id: 'qa-3', name: 'Regional Tax Matrix Verification', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId }
+  ]);
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [seoRegistry] = useState<SEOMetadata[]>([]);
@@ -414,6 +421,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const upsertAISuggestion = (s: AISuggestion) => setAiSuggestions(prev => [s, ...prev]);
   const updateSuggestionStatus = (id: string, s: any) => setAiSuggestions(prev => prev.map(i => i.id === id ? {...i, status: s} : i));
 
+  const runQATest = (id: string) => {
+    setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'running' } : t));
+    setTimeout(() => {
+      setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', lastRun: new Date().toISOString(), logs: [{ id: `l-${Date.now()}`, message: 'All integrity checks cleared.', timestamp: new Date().toISOString() }] } : t));
+    }, 2000);
+  };
+
+  const runAllQATests = () => {
+    qaTests.forEach(t => runQATest(t.id));
+  };
+
+  const runStressTest = (loadSize: number, type: StressTest['type']) => {
+    const id = `stress-${Date.now()}`;
+    const newTest: StressTest = {
+      id,
+      name: `${type} High-Frequency Simulation`,
+      loadSize,
+      type,
+      status: 'running',
+      metrics: { processedCount: 0, errorCount: 0, failureCount: 0 },
+      logs: [],
+      country: 'global'
+    };
+    setStressTests(prev => [newTest, ...prev]);
+    
+    let processed = 0;
+    const interval = setInterval(() => {
+      processed += Math.floor(loadSize / 5);
+      if (processed >= loadSize) {
+        clearInterval(interval);
+        setStressTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', metrics: { ...t.metrics, processedCount: loadSize, durationMs: 1420 }, logs: [...t.logs, { message: 'Load simulation complete. System stable.', timestamp: new Date().toISOString() }] } : t));
+      } else {
+        setStressTests(prev => prev.map(t => t.id === id ? { ...t, metrics: { ...t.metrics, processedCount: processed } } : t));
+      }
+    }, 500);
+  };
+
+  const upsertCampaign = (campaign: Campaign) => {
+    setActiveCampaigns(prev => prev.find(c => c.id === campaign.id) ? prev.map(c => c.id === campaign.id ? campaign : c) : [campaign, ...prev]);
+  };
+
   const executeSafeSync = (categories: SyncCategory[], targets: CountryCode[]) => {
     const sessionId = `sync-${Date.now()}`;
     const actor = currentUser?.name || 'System';
@@ -440,6 +488,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }, 1500);
   };
 
+  const runWorkflowSequence = (name: string, country?: string) => {
+    sendNotification('AI_AUTOPILOT', `Sequence "${name}" initiated for ${country || 'Global'} hub.`, country || 'global', 'info');
+    workflows.forEach(w => runWorkflowTask(w.id));
+  };
+
   const value = useMemo(() => ({
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
@@ -452,10 +505,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     updateGlobalSettings: (s: GlobalSettings) => setGlobalSettings(s), setShowcaseMode, setActiveVip, setActiveVendor, createInvoice, createTransaction, updateTransactionStatus, refundTransaction,
     toggleLike, trackShare,
     upsertAppointment, updateTicketStatus, addTicketMessage,
-    upsertCampaign: () => {}, toggleRule: () => {}, upsertRule: () => {}, verifyClient, approveVendor,
+    upsertCampaign, toggleRule: () => {}, upsertRule: () => {}, verifyClient, approveVendor,
     updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
-    resolveBrandIntegrity, runQATest: () => {}, runAllQATests: () => {}, runStressTest: () => {}, executeSafeSync, logAction, triggerReindex: () => {}, toggleEmergencyMode,
-    runWorkflowTask, runWorkflowSequence: () => {}
+    resolveBrandIntegrity, runQATest, runAllQATests, runStressTest, executeSafeSync, logAction, triggerReindex: () => {}, toggleEmergencyMode,
+    runWorkflowTask, runWorkflowSequence
   }), [
     countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
     scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
