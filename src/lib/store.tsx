@@ -1,88 +1,10 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { 
-  CartItem, 
-  Product, 
-  Collection, 
-  Category, 
-  Department,
-  City, 
-  BuyingGuide, 
-  Editorial,
-  SocialMetrics,
-  Vendor,
-  Affiliate,
-  ReturnRequest,
-  Campaign,
-  VipClient,
-  GlobalSettings,
-  CustomerSegment,
-  SupportTicket,
-  SupportStats,
-  MaisonIntegration,
-  ApiLog,
-  IndexingStatus,
-  IndexingLog,
-  Appointment,
-  Invoice,
-  Transaction,
-  PrivateInquiry,
-  LeadConversation,
-  SEOMetadata,
-  SalesScript,
-  AutomationRule,
-  CountryCode,
-  AIModuleStatus,
-  AIActionLog,
-  AISuggestion,
-  AIAutomationLevel,
-  MaisonNotification,
-  WorkflowTask,
-  ApprovalRequest,
-  AuditLogEntry,
-  QATestCase,
-  MaisonError,
-  GlobalSyncSession,
-  SyncCategory,
-  StressTest,
-  AdminViewMode,
-  BrandIntegrityIssue,
-  WalletTransaction,
-  LiveRequest,
-  MaisonCertificate,
-  TransactionStatus,
-  PaymentGateway,
-  Subscription,
-  SubscriptionStatus,
-  CountryConfig,
-  BrandConfig,
-  PaymentPlan
+  CartItem, Product, Collection, Category, Department, City, BuyingGuide, Editorial, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentGateway, Subscription, SubscriptionStatus, CountryConfig, BrandConfig, PaymentPlan
 } from './types';
-import { 
-  PRODUCTS as INITIAL_PRODUCTS, 
-  COLLECTIONS as INITIAL_COLLECTIONS, 
-  CATEGORIES as INITIAL_CATEGORIES,
-  DEPARTMENTS as INITIAL_DEPARTMENTS,
-  CITIES as INITIAL_CITIES,
-  BUYING_GUIDES as INITIAL_GUIDES,
-  EDITOR_INITIAL,
-  VENDORS,
-  AFFILIATES,
-  RETURNS,
-  CAMPAIGNS,
-  VIP_CLIENTS,
-  CUSTOMER_SEGMENTS,
-  SUPPORT_TICKETS,
-  SUPPORT_STATS,
-  INTEGRATIONS,
-  API_LOGS,
-  INDEXING_STATUS,
-  INDEXING_LOGS,
-  APPOINTMENTS,
-  INVOICES
-} from './mock-data';
+import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
@@ -97,7 +19,6 @@ interface AppContextType {
   adminJurisdiction: CountryCode | 'global';
   globalSyncHistory: GlobalSyncSession[];
   paymentPlans: PaymentPlan[];
-  
   scopedProducts: Product[];
   scopedInquiries: PrivateInquiry[];
   scopedEditorials: Editorial[];
@@ -114,7 +35,6 @@ interface AppContextType {
   scopedBrandIntegrity: BrandIntegrityIssue[];
   scopedLiveRequests: LiveRequest[];
   scopedCertificates: MaisonCertificate[];
-  
   products: Product[];
   privateInquiries: PrivateInquiry[];
   leadConversations: LeadConversation[];
@@ -149,13 +69,11 @@ interface AppContextType {
   seoRegistry: SEOMetadata[];
   affiliates: Affiliate[];
   activeCampaigns: Campaign[];
-
   subscriptions: Subscription[];
   isShowcaseMode: boolean;
   isCartOpen: boolean;
   activeVip: VipClient | null;
   activeVendor: Vendor | null;
-  
   setCountryEnabled: (code: CountryCode, enabled: boolean) => void;
   setCurrentUser: (user: MaisonUser | null) => void;
   setAdminJurisdiction: (jurisdiction: CountryCode | 'global') => void;
@@ -215,22 +133,15 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [activeBrandId] = useState<string>(BRANDS_CONFIG[0].id);
+  const [activeBrandId] = useState(BRANDS_CONFIG[0].id);
   const [currentUser, setCurrentUser] = useState<MaisonUser | null>(MOCK_SESSION_USER);
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
-  
-  const [countryConfigs, setCountryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({
-    ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15
-  })));
+  const [countryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({ ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15 })));
   const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
-  
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ 
-    ...p, brandId: activeBrandId, status: 'published', regions: ['us', 'uk', 'ae', 'in', 'sg'], currentVersion: 1, versionHistory: [] 
-  })));
-  
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, status: 'published', regions: ['us', 'uk', 'ae', 'in', 'sg'], currentVersion: 1, versionHistory: [] })));
   const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
   const [leadConversations, setLeadConversations] = useState<LeadConversation[]>(MOCK_CONVERSATIONS.map(c => ({ ...c, brandId: activeBrandId })));
   const [notifications, setNotifications] = useState<MaisonNotification[]>([]);
@@ -239,285 +150,83 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     { id: 'wt-2', taskName: 'Sitemap Generation', status: 'idle', country: 'global' },
     { id: 'wt-3', taskName: 'Lead Tier Recalibration', status: 'idle', country: 'global' }
   ]);
-  const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([]);
+  const [approvalRequests] = useState<ApprovalRequest[]>([]);
   const [auditRegistry, setAuditRegistry] = useState<AuditLogEntry[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [socialMetrics, setSocialMetrics] = useState<Record<string, SocialMetrics>>({});
   const [vendors, setVendors] = useState<Vendor[]>(VENDORS.map(v => ({ ...v, brandId: activeBrandId })));
-  
-  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ 
-    ...v, 
-    brandId: activeBrandId, 
-    status: 'verified', 
-    walletBalance: 12500.50, 
-    walletHistory: [], 
-    liveRequests: [], 
-    certificates: [
-      { id: 'cert-1', productId: 'prod-11', artifactName: 'Hermès Special Order Birkin 25', issueDate: '2024-03-10', nfcSealId: 'MA-1924-X-001', provenanceScore: 100, status: 'verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000' }
-    ] 
-  })));
-
-  const [paymentPlans] = useState<PaymentPlan[]>([
-    { id: 'silver', name: 'Maison Discovery', price: 250, currency: 'USD', interval: 'monthly', features: ['Global Concierge Access', 'Provenance Previews', 'Heritage Newsletter'], tier: 'Silver' },
-    { id: 'gold', name: 'Atelier Reserve', price: 1200, currency: 'USD', interval: 'yearly', features: ['Priority Sourcing', 'Private Salon Invitations', 'Standard Logistics', 'NFC Authentication'], tier: 'Gold', isPopular: true },
-    { id: 'diamond', name: 'Maison Privé', price: 5000, currency: 'USD', interval: 'yearly', features: ['Unlimited Live Ateliers', 'Bespoke Commissions', 'White-Glove Global Dispatch', 'Investment Advisory'], tier: 'Diamond' }
-  ]);
-
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([
-    { id: 'sub-1', tenantId: activeBrandId, userId: 'u-client-1', planId: 'diamond', planName: 'Maison Privé', status: 'ACTIVE', currentPeriodEnd: '2025-03-10', cancelAtPeriodEnd: false, amount: 1500, currency: 'USD' }
-  ]);
-
+  const [vipClients, setVipClients] = useState<VipClient[]>(VIP_CLIENTS.map(v => ({ ...v, brandId: activeBrandId, status: 'verified', walletBalance: 12500.50, walletHistory: [], liveRequests: [], certificates: [{ id: 'cert-1', productId: 'prod-11', artifactName: 'Hermès Special Order Birkin 25', issueDate: '2024-03-10', nfcSealId: 'MA-1924-X-001', provenanceScore: 100, status: 'verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000' }] })));
+  const [paymentPlans] = useState<PaymentPlan[]>([{ id: 'silver', name: 'Maison Discovery', price: 250, currency: 'USD', interval: 'monthly', features: ['Global Concierge Access', 'Provenance Previews', 'Heritage Newsletter'], tier: 'Silver' }, { id: 'gold', name: 'Atelier Reserve', price: 1200, currency: 'USD', interval: 'yearly', features: ['Priority Sourcing', 'Private Salon Invitations', 'Standard Logistics', 'NFC Authentication'], tier: 'Gold', isPopular: true }, { id: 'diamond', name: 'Maison Privé', price: 5000, currency: 'USD', interval: 'yearly', features: ['Unlimited Live Ateliers', 'Bespoke Commissions', 'White-Glove Global Dispatch', 'Investment Advisory'], tier: 'Diamond' }]);
+  const [subscriptions] = useState<Subscription[]>([{ id: 'sub-1', tenantId: activeBrandId, userId: 'u-client-1', planId: 'diamond', planName: 'Maison Privé', status: 'ACTIVE', currentPeriodEnd: '2025-03-10', cancelAtPeriodEnd: false, amount: 1500, currency: 'USD' }]);
   const [customerSegments] = useState<CustomerSegment[]>(CUSTOMER_SEGMENTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(SUPPORT_TICKETS.map(t => ({ ...t, brandId: activeBrandId })));
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs] = useState<ApiLog[]>(API_LOGS);
   const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
-  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS);
-  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
+  const [appointments] = useState<Appointment[]>(APPOINTMENTS);
+  const [invoices] = useState<Invoice[]>(INVOICES);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
   const [automationRules] = useState<AutomationRule[]>([]);
-  
-  const [aiModules, setAiModules] = useState<AIModuleStatus[]>([
-    { id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' },
-    { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' },
-    { id: 'ai-content', name: 'AI Content Engine', enabled: true, level: 'assisted' },
-    { id: 'ai-seo', name: 'AI SEO Optimizer', enabled: true, level: 'auto' }
-  ]);
+  const [aiModules, setAiModules] = useState<AIModuleStatus[]>([{ id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' }, { id: 'ai-analytics', name: 'AI Analytics Engine', enabled: true, level: 'auto' }, { id: 'ai-content', name: 'AI Content Engine', enabled: true, level: 'assisted' }, { id: 'ai-seo', name: 'AI SEO Optimizer', enabled: true, level: 'auto' }]);
   const [aiLogs, setAiLogs] = useState<AIActionLog[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
-  const [qaTests, setQaTests] = useState<QATestCase[]>([
-    { id: 'qa-1', name: 'Financial Settlement Sync', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId },
-    { id: 'qa-2', name: 'AI Content Safety Audit', module: 'AI', status: 'idle', logs: [], country: 'global', brandId: activeBrandId },
-    { id: 'qa-3', name: 'Regional Tax Matrix Verification', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId }
-  ]);
+  const [qaTests, setQaTests] = useState<QATestCase[]>([{ id: 'qa-1', name: 'Financial Sync', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId }, { id: 'qa-2', name: 'Content Audit', module: 'AI', status: 'idle', logs: [], country: 'global', brandId: activeBrandId }]);
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [seoRegistry] = useState<SEOMetadata[]>([]);
-  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
+  const [affiliates] = useState<Affiliate[]>(AFFILIATES);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [messagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
-
   const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({ theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' }, seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' }, payments: { cards: true, wallets: true, crypto: false }, compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' }, performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' }, emergencyMode: false, isGuideMode: false, adminViewMode: 'advanced' });
 
-  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({
-    theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' },
-    seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' },
-    payments: { cards: true, wallets: true, crypto: false },
-    compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' },
-    performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' },
-    emergencyMode: false,
-    isGuideMode: false,
-    adminViewMode: 'advanced'
-  });
+  const activeHub = useMemo(() => (!currentUser ? 'global' : currentUser.role === 'super_admin' ? adminJurisdiction : currentUser.country as CountryCode), [currentUser, adminJurisdiction]);
 
-  const activeHub = useMemo(() => {
-    if (!currentUser) return 'global';
-    if (currentUser.role === 'super_admin') return adminJurisdiction;
-    return currentUser.country as CountryCode;
-  }, [currentUser, adminJurisdiction]);
-
+  // Scoped Data Logic: Super Admin sees all, Regional Hubs are isolated
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
   const scopedBuyingGuides = useMemo(() => activeHub === 'global' ? INITIAL_GUIDES : INITIAL_GUIDES.filter(g => g.country === activeHub || g.isGlobal), [activeHub]);
   const scopedReturns = useMemo(() => activeHub === 'global' ? RETURNS : RETURNS.filter(r => r.country === activeHub), [activeHub]);
   const scopedNotifications = useMemo(() => activeHub === 'global' ? notifications : notifications.filter(n => n.country === activeHub || n.country === 'global'), [notifications, activeHub]);
-  const scopedApprovals = useMemo(() => activeHub === 'global' ? approvalRequests : approvalRequests.filter(a => a.country === activeHub || a.country === 'global'), [approvalRequests, activeHub]);
+  const scopedApprovals = useMemo(() => activeHub === 'global' ? approvalRequests : approvalRequests.filter(a => a.country === activeHub), [approvalRequests, activeHub]);
   const scopedAuditLogs = useMemo(() => activeHub === 'global' ? auditRegistry : auditRegistry.filter(log => log.country === activeHub || log.country === 'global'), [auditRegistry, activeHub]);
   const scopedWorkflows = useMemo(() => activeHub === 'global' ? workflows : workflows.filter(w => w.country === activeHub || w.country === 'global'), [workflows, activeHub]);
   const scopedTransactions = useMemo(() => activeHub === 'global' ? transactions : transactions.filter(t => t.country.toLowerCase() === activeHub.toLowerCase()), [transactions, activeHub]);
   const scopedQATests = useMemo(() => activeHub === 'global' ? qaTests : qaTests.filter(t => t.country === activeHub || t.country === 'global'), [qaTests, activeHub]);
   const scopedErrors = useMemo(() => activeHub === 'global' ? maisonErrors : maisonErrors.filter(e => e.country === activeHub), [maisonErrors, activeHub]);
-  const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(t => t.country === activeHub || t.country === 'global'), [stressTests, activeHub]);
+  const scopedStressTests = useMemo(() => activeHub === 'global' ? stressTests : stressTests.filter(s => s.country === activeHub), [stressTests, activeHub]);
   const scopedBrandIntegrity = useMemo(() => activeHub === 'global' ? brandIntegrityIssues : brandIntegrityIssues.filter(i => i.country === activeHub), [brandIntegrityIssues, activeHub]);
-  
-  const scopedLiveRequests = useMemo(() => {
-    const all = vipClients.flatMap(v => v.liveRequests.map(r => ({ ...r, clientName: v.name, country: v.brandId })));
-    return activeHub === 'global' ? all : all.filter(r => r.country === activeHub);
-  }, [vipClients, activeHub]);
-
-  const scopedCertificates = useMemo(() => {
-    const all = vipClients.flatMap(v => v.certificates.map(c => ({ ...c, clientName: v.name, country: v.brandId })));
-    return activeHub === 'global' ? all : all.filter(c => c.country === activeHub);
-  }, [vipClients, activeHub]);
+  const scopedLiveRequests = useMemo(() => activeHub === 'global' ? (activeVip?.liveRequests || []) : (activeVip?.liveRequests || []).filter(r => (r as any).country === activeHub), [activeVip, activeHub]);
+  const scopedCertificates = useMemo(() => activeHub === 'global' ? (activeVip?.certificates || []) : (activeVip?.certificates || []).filter(c => c.country === activeHub), [activeVip, activeHub]);
 
   const logAction = (action: string, entity: string, countryCode = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
-    const entry: AuditLogEntry = { 
-      id: `aud-${Date.now()}`, 
-      actorId: currentUser.id, 
-      actorName: currentUser.name, 
-      actorRole: currentUser.role, 
-      country: countryCode, 
-      action, 
-      entity, 
-      timestamp: new Date().toISOString(), 
-      severity, 
-      brandId: activeBrandId 
-    };
-    setAuditRegistry(prev => [entry, ...prev]);
-  };
-
-  const topUpWallet = (amount: number) => {
-    if (!activeVip) return;
-    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Deposit', amount, description: 'Maison Treasury Deposit', timestamp: new Date().toISOString(), status: 'Settled' };
-    setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance + amount, walletHistory: [newTx, ...v.walletHistory] } : v));
-    setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance + amount, walletHistory: [newTx, ...prev.walletHistory] } : null);
-    logAction('Treasury Funded', `Amount: $${amount}`, activeVip.brandId);
-  };
-
-  const deductFromWallet = (amount: number, description: string): boolean => {
-    if (!activeVip || activeVip.walletBalance < amount) return false;
-    const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Service Fee', amount: -amount, description, timestamp: new Date().toISOString(), status: 'Settled' };
-    setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance - amount, walletHistory: [newTx, ...v.walletHistory] } : v));
-    setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance - amount, walletHistory: [newTx, ...prev.walletHistory] } : null);
-    return true;
-  };
-
-  const requestLiveSession = (productId: string, productName: string): boolean => {
-    const fee = 250;
-    if (deductFromWallet(fee, `Live Request: ${productName}`)) {
-      const newReq: LiveRequest = { id: `lr-${Date.now()}`, productId, productName, status: 'pending', requestedAt: new Date().toISOString(), fee };
-      setVipClients(prev => prev.map(v => v.id === activeVip!.id ? { ...v, liveRequests: [...v.liveRequests, newReq] } : v));
-      setActiveVip(prev => prev ? { ...prev, liveRequests: [...prev.liveRequests, newReq] } : null);
-      logAction('Live Session Requested', productName, activeVip!.brandId);
-      return true;
-    }
-    return false;
-  };
-
-  const upsertProduct = (p: Product) => setProducts(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? p : i) : [p, ...prev]);
-  const deleteProduct = (id: string) => setProducts(prev => prev.filter(i => i.id !== id));
-  const toggleProductVipStatus = (id: string) => setProducts(prev => prev.map(p => p.id === id ? {...p, isVip: !p.isVip} : p));
-  const upsertPrivateInquiry = (i: PrivateInquiry) => setPrivateInquiries(prev => [i, ...prev]);
-  const updateInquiryStatus = (id: string, s: any) => setPrivateInquiries(prev => prev.map(i => i.id === id ? {...i, status: s} : i));
-  const addLeadMessage = (id: string, t: string, s: any) => setLeadConversations(prev => prev.map(c => c.inquiryId === id ? {...c, messages: [...c.messages, {id: `m-${Date.now()}`, sender: s, text: t, timestamp: new Date().toISOString()}]} : c));
-  const sendNotification = (to: string, m: string, c = 'global', t: any = 'info') => setNotifications(prev => [{id: `n-${Date.now()}`, toRole: to, country: c, message: m, timestamp: new Date().toISOString(), read: false, type: t}, ...prev]);
-  const markNotificationRead = (id: string) => setNotifications(prev => prev.map(n => n.id === id ? {...n, read: true} : n));
-  const addToCart = (p: Product) => setCart(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? {...i, quantity: i.quantity + 1} : i) : [...prev, {...p, quantity: 1}]);
-  const removeFromCart = (id: string) => setCart(prev => prev.filter(i => i.id !== id));
-  const toggleWishlist = (p: Product) => setWishlist(prev => prev.some(i => i.id === p.id) ? prev.filter(i => i.id !== p.id) : [...prev, p]);
-  const clearCart = () => setCart([]);
-  const createInvoice = (i: Invoice) => setInvoices(prev => [i, ...prev]);
-  const createTransaction = (t: Transaction) => setTransactions(prev => [t, ...prev]);
-  const updateTransactionStatus = (id: string, s: any) => setTransactions(prev => prev.map(t => t.id === id ? {...t, status: s} : t));
-  
-  const refundTransaction = (id: string, reason: string) => {
-    setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: 'Refunded', refundReason: reason, refundedAt: new Date().toISOString() } : t));
-    logAction('Refund Processed', `TX: ${id}`, 'global', 'medium');
-  };
-
-  const toggleLike = (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), likes: (prev[id]?.likes||0)+1}}));
-  const trackShare = (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), shares: (prev[id]?.shares||0)+1}}));
-  const upsertAppointment = (a: Appointment) => setAppointments(prev => [a, ...prev]);
-  const updateTicketStatus = (id: string, s: any) => setSupportTickets(prev => prev.map(t => t.id === id ? {...t, status: s} : t));
-  const addTicketMessage = (id: string, t: string, s: any) => setSupportTickets(prev => prev.map(tk => tk.id === id ? {...tk, messages: [...tk.messages, {id: `m-${Date.now()}`, sender: s, text: t, timestamp: new Date().toISOString()}]} : tk));
-  const verifyClient = (id: string) => setVipClients(prev => prev.map(v => v.id === id ? {...v, status: 'verified'} : v));
-  const approveVendor = (id: string) => setVendors(prev => prev.map(v => v.id === id ? {...v, status: 'active'} : v));
-  const resolveBrandIntegrity = (id: string) => setBrandIntegrityIssues(prev => prev.map(i => i.id === id ? {...i, status: 'fixed'} : i));
-  const toggleEmergencyMode = () => setGlobalSettings(prev => ({...prev, emergencyMode: !prev.emergencyMode}));
-  const updateAIModule = (id: string, e: boolean, l: any) => setAiModules(prev => prev.map(m => m.id === id ? {...m, enabled: e, level: l} : m));
-  const addAILog = (l: AIActionLog) => setAiLogs(prev => [l, ...prev]);
-  const upsertAISuggestion = (s: AISuggestion) => setAiSuggestions(prev => [s, ...prev]);
-  const updateSuggestionStatus = (id: string, s: any) => setAiSuggestions(prev => prev.map(i => i.id === id ? {...i, status: s} : i));
-
-  const runQATest = (id: string) => {
-    setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'running' } : t));
-    setTimeout(() => {
-      setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', lastRun: new Date().toISOString(), logs: [{ id: `l-${Date.now()}`, message: 'All integrity checks cleared.', timestamp: new Date().toISOString() }] } : t));
-    }, 2000);
-  };
-
-  const runAllQATests = () => {
-    qaTests.forEach(t => runQATest(t.id));
-  };
-
-  const runStressTest = (loadSize: number, type: StressTest['type']) => {
-    const id = `stress-${Date.now()}`;
-    const newTest: StressTest = {
-      id,
-      name: `${type} High-Frequency Simulation`,
-      loadSize,
-      type,
-      status: 'running',
-      metrics: { processedCount: 0, errorCount: 0, failureCount: 0 },
-      logs: [],
-      country: 'global'
-    };
-    setStressTests(prev => [newTest, ...prev]);
-    
-    let processed = 0;
-    const interval = setInterval(() => {
-      processed += Math.floor(loadSize / 5);
-      if (processed >= loadSize) {
-        clearInterval(interval);
-        setStressTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', metrics: { ...t.metrics, processedCount: loadSize, durationMs: 1420 }, logs: [...t.logs, { message: 'Load simulation complete. System stable.', timestamp: new Date().toISOString() }] } : t));
-      } else {
-        setStressTests(prev => prev.map(t => t.id === id ? { ...t, metrics: { ...t.metrics, processedCount: processed } } : t));
-      }
-    }, 500);
-  };
-
-  const upsertCampaign = (campaign: Campaign) => {
-    setActiveCampaigns(prev => prev.find(c => c.id === campaign.id) ? prev.map(c => c.id === campaign.id ? campaign : c) : [campaign, ...prev]);
-  };
-
-  const executeSafeSync = (categories: SyncCategory[], targets: CountryCode[]) => {
-    const sessionId = `sync-${Date.now()}`;
-    const actor = currentUser?.name || 'System';
-    logAction('Global Sync Initiated', `Session: ${sessionId}`, 'global', 'medium');
-    
-    setTimeout(() => {
-      setGlobalSyncHistory(prev => [{
-        id: sessionId,
-        timestamp: new Date().toISOString(),
-        categories,
-        targets,
-        actorName: actor,
-        status: 'applied',
-        snapshotBefore: { products: [], seo: [], config: [] }
-      }, ...prev]);
-      sendNotification('SUPER_ADMIN', `Global Sync ${sessionId} applied to ${targets.join(', ')} markets.`, 'global', 'success');
-    }, 2000);
-  };
-
-  const runWorkflowTask = (taskId: string) => {
-    setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w));
-    setTimeout(() => {
-      setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w));
-    }, 1500);
-  };
-
-  const runWorkflowSequence = (name: string, country?: string) => {
-    sendNotification('AI_AUTOPILOT', `Sequence "${name}" initiated for ${country || 'Global'} hub.`, country || 'global', 'info');
-    workflows.forEach(w => runWorkflowTask(w.id));
+    setAuditRegistry(prev => [{ id: `aud-${Date.now()}`, actorId: currentUser.id, actorName: currentUser.name, actorRole: currentUser.role, country: countryCode, action, entity, timestamp: new Date().toISOString(), severity, brandId: activeBrandId }, ...prev]);
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions,
-    setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(prev => ({...prev, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(prev => ({...prev, adminViewMode: v})),
-    upsertProduct, deleteProduct, toggleProductVipStatus, lockProductForEditing: () => true,
-    upsertPrivateInquiry, updateInquiryStatus, addLeadMessage,
-    sendNotification, markNotificationRead,
-    topUpWallet, deductFromWallet, requestLiveSession, addToCart, removeFromCart, toggleWishlist, clearCart, setCartOpen,
-    updateGlobalSettings: (s: GlobalSettings) => setGlobalSettings(s), setShowcaseMode, setActiveVip, setActiveVendor, createInvoice, createTransaction, updateTransactionStatus, refundTransaction,
-    toggleLike, trackShare,
-    upsertAppointment, updateTicketStatus, addTicketMessage,
-    upsertCampaign, toggleRule: () => {}, upsertRule: () => {}, verifyClient, approveVendor,
-    updateAIModule, addAILog, upsertAISuggestion, updateSuggestionStatus,
-    resolveBrandIntegrity, runQATest, runAllQATests, runStressTest, executeSafeSync, logAction, triggerReindex: () => {}, toggleEmergencyMode,
-    runWorkflowTask, runWorkflowSequence
-  }), [
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans,
-    scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates,
-    products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions
-  ]);
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions,
+    setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(p => ({...p, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(p => ({...p, adminViewMode: v})),
+    upsertProduct: (p: Product) => setProducts(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? p : i) : [p, ...prev]), deleteProduct: (id: string) => setProducts(p => p.filter(i => i.id !== id)), toggleProductVipStatus: (id: string) => setProducts(prev => prev.map(p => p.id === id ? {...p, isVip: !p.isVip} : p)), lockProductForEditing: () => true, upsertPrivateInquiry: (i: PrivateInquiry) => setPrivateInquiries(p => [i, ...p]), updateInquiryStatus: (id: string, s: any) => setPrivateInquiries(prev => prev.map(i => i.id === id ? {...i, status: s} : i)), addLeadMessage: (id: string, t: string, s: any) => setLeadConversations(prev => prev.map(c => c.inquiryId === id ? {...c, messages: [...c.messages, {id: `m-${Date.now()}`, sender: s, text: t, timestamp: new Date().toISOString()}]} : c)),
+    sendNotification: (to: string, m: string, c = 'global', t: any = 'info') => setNotifications(prev => [{id: `n-${Date.now()}`, toRole: to, country: c, message: m, timestamp: new Date().toISOString(), read: false, type: t}, ...prev]), markNotificationRead: (id: string) => setNotifications(prev => prev.map(n => n.id === id ? {...n, read: true} : n)),
+    topUpWallet: (amount: number) => { if (!activeVip) return; const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Deposit', amount, description: 'Maison Treasury Deposit', timestamp: new Date().toISOString(), status: 'Settled' }; setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance + amount, walletHistory: [newTx, ...v.walletHistory] } : v)); setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance + amount, walletHistory: [newTx, ...prev.walletHistory] } : null); logAction('Treasury Funded', `Amount: $${amount}`, activeVip.brandId); },
+    deductFromWallet: (amount: number, description: string) => { if (!activeVip || activeVip.walletBalance < amount) return false; const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Service Fee', amount: -amount, description, timestamp: new Date().toISOString(), status: 'Settled' }; setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance - amount, walletHistory: [newTx, ...v.walletHistory] } : v)); setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance - amount, walletHistory: [newTx, ...prev.walletHistory] } : null); return true; },
+    requestLiveSession: (productId: string, productName: string) => { const fee = 250; if (activeVip && activeVip.walletBalance >= fee) { const newTx: WalletTransaction = { id: `wt-${Date.now()}`, type: 'Service Fee', amount: -fee, description: `Live: ${productName}`, timestamp: new Date().toISOString(), status: 'Settled' }; setVipClients(prev => prev.map(v => v.id === activeVip.id ? { ...v, walletBalance: v.walletBalance - fee, walletHistory: [newTx, ...v.walletHistory], liveRequests: [...v.liveRequests, { id: `lr-${Date.now()}`, productId, productName, status: 'pending', requestedAt: new Date().toISOString(), fee }] } : v)); setActiveVip(prev => prev ? { ...prev, walletBalance: prev.walletBalance - fee, walletHistory: [newTx, ...prev.walletHistory], liveRequests: [...prev.liveRequests, { id: `lr-${Date.now()}`, productId, productName, status: 'pending', requestedAt: new Date().toISOString(), fee }] } : null); return true; } return false; },
+    addToCart: (p: Product) => setCart(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? {...i, quantity: i.quantity + 1} : i) : [...prev, {...p, quantity: 1}]), removeFromCart: (id: string) => setCart(prev => prev.filter(i => i.id !== id)), toggleWishlist: (p: Product) => setWishlist(prev => prev.some(i => i.id === p.id) ? prev.filter(i => i.id !== p.id) : [...prev, p]), clearCart: () => setCart([]), setCartOpen, updateGlobalSettings: (s: GlobalSettings) => setGlobalSettings(s), setShowcaseMode, setActiveVip, setActiveVendor, createInvoice: (i: Invoice) => setInvoices(p => [i, ...p]), createTransaction: (t: Transaction) => setTransactions(p => [t, ...p]), updateTransactionStatus: (id: string, s: any) => setTransactions(prev => prev.map(t => t.id === id ? {...t, status: s} : t)), refundTransaction: (id: string, reason: string) => { setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: 'Refunded', refundReason: reason, refundedAt: new Date().toISOString() } : t)); logAction('Refund Processed', `TX: ${id}`, 'global', 'medium'); },
+    toggleLike: (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), likes: (prev[id]?.likes||0)+1}})), trackShare: (id: string) => setSocialMetrics(prev => ({...prev, [id]: {...(prev[id]||{likes:0,shares:0,engagementRate:0}), shares: (prev[id]?.shares||0)+1}})), upsertAppointment: (a: Appointment) => setAppointments(p => [a, ...p]), updateTicketStatus: (id: string, s: any) => setSupportTickets(prev => prev.map(t => t.id === id ? {...t, status: s} : t)), addTicketMessage: (id: string, t: string, s: any) => setSupportTickets(prev => prev.map(tk => tk.id === id ? {...tk, messages: [...tk.messages, {id: `m-${Date.now()}`, sender: s, text: t, timestamp: new Date().toISOString()}]} : tk)),
+    upsertCampaign: (c: Campaign) => setActiveCampaigns(prev => prev.find(i => i.id === c.id) ? prev.map(i => i.id === c.id ? c : i) : [c, ...prev]), toggleRule: () => {}, upsertRule: () => {}, verifyClient: (id: string) => setVipClients(prev => prev.map(v => v.id === id ? {...v, status: 'verified'} : v)), approveVendor: (id: string) => setVendors(prev => prev.map(v => v.id === id ? {...v, status: 'active'} : v)),
+    updateAIModule: (id: string, e: boolean, l: any) => setAiModules(prev => prev.map(m => m.id === id ? {...m, enabled: e, level: l} : m)), addAILog: (l: AIActionLog) => setAiLogs(prev => [l, ...prev]), upsertAISuggestion: (s: AISuggestion) => setAiSuggestions(prev => [s, ...prev]), updateSuggestionStatus: (id: string, s: any) => setAiSuggestions(prev => prev.map(i => i.id === id ? {...i, status: s} : i)), resolveBrandIntegrity: (id: string) => setBrandIntegrityIssues(prev => prev.map(i => i.id === id ? {...i, status: 'fixed'} : i)),
+    runQATest: (id: string) => { setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'running' } : t)); setTimeout(() => { setQaTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', lastRun: new Date().toISOString(), logs: [{ id: `l-${Date.now()}`, message: 'All integrity checks cleared.', timestamp: new Date().toISOString() }] } : t)); }, 2000); },
+    runAllQATests: () => { qaTests.forEach(t => { setQaTests(prev => prev.map(item => item.id === t.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setQaTests(prev => prev.map(item => item.id === t.id ? { ...item, status: 'passed', lastRun: new Date().toISOString() } : item)); }, 2000); }); },
+    runStressTest: (loadSize: number, type: StressTest['type']) => { const id = `stress-${Date.now()}`; setStressTests(prev => [{ id, name: `${type} High-Frequency Simulation`, loadSize, type, status: 'running', metrics: { processedCount: 0, errorCount: 0, failureCount: 0 }, logs: [], country: 'global' }, ...prev]); let processed = 0; const interval = setInterval(() => { processed += Math.floor(loadSize / 5); if (processed >= loadSize) { clearInterval(interval); setStressTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', metrics: { ...t.metrics, processedCount: loadSize, durationMs: 1420 }, logs: [...t.logs, { message: 'Load simulation complete. System stable.', timestamp: new Date().toISOString() }] } : t)); } else { setStressTests(prev => prev.map(t => t.id === id ? { ...t, metrics: { ...t.metrics, processedCount: processed } } : t)); } }, 500); },
+    executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => { const sessionId = `sync-${Date.now()}`; logAction('Global Sync Initiated', `Session: ${sessionId}`, 'global', 'medium'); setTimeout(() => { setGlobalSyncHistory(prev => [{ id: sessionId, timestamp: new Date().toISOString(), categories: cats, targets, actorName: currentUser?.name || 'System', status: 'applied', snapshotBefore: { products: [], seo: [], config: [] } }, ...prev]); }, 2000); },
+    logAction, triggerReindex: () => {}, toggleEmergencyMode: () => setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})), runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); }
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
