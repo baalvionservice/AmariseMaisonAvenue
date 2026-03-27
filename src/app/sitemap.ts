@@ -4,6 +4,7 @@ import { PRODUCTS, CATEGORIES, CITIES, BUYING_GUIDES, EDITOR_INITIAL, COUNTRIES 
 /**
  * Institutional Sitemap Generator
  * Automates discovery for thousands of artifacts across 5 jurisdictions.
+ * Enhanced with Multi-Language Hreflang logic for SEO authority.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://amarise-maison-avenue.com';
@@ -11,8 +12,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const routes: MetadataRoute.Sitemap = [];
 
+  // 1. Core Platform Pages
   countryCodes.forEach((code) => {
-    // 1. Core Pages
     routes.push({
       url: `${baseUrl}/${code}`,
       lastModified: new Date(),
@@ -20,17 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     });
 
-    // 2. Programmatic Category Pages
-    CATEGORIES.forEach((cat) => {
-      routes.push({
-        url: `${baseUrl}/${code}/category/${cat.id}`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      });
-    });
-
-    // 3. High-Authority City Pages
+    // 2. High-Authority City Pages
     CITIES.forEach((city) => {
       routes.push({
         url: `${baseUrl}/${code}/city/${city.id}`,
@@ -40,8 +31,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     });
 
-    // 4. Intelligence Guides
-    BUYING_GUIDES.forEach((guide) => {
+    // 3. Programmatic Category Nodes
+    CATEGORIES.forEach((cat) => {
+      routes.push({
+        url: `${baseUrl}/${code}/category/${cat.id}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      });
+    });
+
+    // 4. Curatorial Intelligence (Guides)
+    BUYING_GUIDES.filter(g => g.country === code).forEach((guide) => {
       routes.push({
         url: `${baseUrl}/${code}/buying-guide/${guide.id}`,
         lastModified: new Date(),
@@ -50,8 +51,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     });
 
-    // 5. Editorial Content
-    EDITOR_INITIAL.forEach((ed) => {
+    // 5. Editorial Archives (The Journal)
+    EDITOR_INITIAL.filter(ed => ed.country === code).forEach((ed) => {
       routes.push({
         url: `${baseUrl}/${code}/journal/${ed.id}`,
         lastModified: new Date(),
@@ -60,7 +61,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     });
 
-    // 6. Artifact Registry (High Volume)
+    // 6. Artifact Registry (Individual Products)
+    // Limiting to first 5000 for crawl efficiency
     PRODUCTS.slice(0, 5000).forEach((prod) => {
       routes.push({
         url: `${baseUrl}/${code}/product/${prod.id}`,

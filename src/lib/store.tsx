@@ -151,6 +151,7 @@ interface AppContextType {
   resolveAlert: (id: string) => void;
   enqueueBackgroundJob: (type: BackgroundJob['type'], payload: any, maxRetries?: number) => void;
   getLocalizedPrice: (amount: number, country?: CountryCode) => string;
+  upsertSEOMetadata: (meta: SEOMetadata) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -203,7 +204,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [supportStats] = useState<SupportStats>(SUPPORT_STATS);
   const [integrations] = useState<MaisonIntegration[]>(INTEGRATIONS);
   const [apiLogs] = useState<ApiLog[]>(API_LOGS);
-  const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
+  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
   const [appointments] = useState<Appointment[]>(APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -215,7 +216,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [qaTests, setQaTests] = useState<QATestCase[]>([{ id: 'qa-1', name: 'Financial Sync', module: 'Finance', status: 'passed', logs: [], country: 'global', brandId: activeBrandId }, { id: 'qa-2', name: 'Content Audit', module: 'AI', status: 'idle', logs: [], country: 'global', brandId: activeBrandId }]);
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
-  const [seoRegistry] = useState<SEOMetadata[]>([]);
+  const [seoRegistry, setSeoRegistry] = useState<SEOMetadata[]>([
+    { id: 'seo-1', path: '/', language: 'en', country: 'us', title: 'AMARISÉ MAISON | Global Luxury Discovery', description: 'The absolute standard of heritage curation since 1924.', keywords: 'luxury, heritage, couture', h1: 'Amarisé Maison', canonicalUrl: 'https://amarise-maison-avenue.com/us', updatedAt: new Date().toISOString(), hreflangs: [{ lang: 'en-US', url: '/us' }, { lang: 'en-GB', url: '/uk' }, { lang: 'ar-AE', url: '/ae' }] }
+  ]);
   const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [messagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
@@ -362,7 +365,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => { const sessionId = `sync-${Date.now()}`; recordAudit({ action: 'Global Sync Hub', entity: 'System', country: 'global', severity: 'medium', reason: `Sync Session: ${sessionId}` }); setTimeout(() => { setGlobalSyncHistory(prev => [{ id: sessionId, timestamp: new Date().toISOString(), categories: cats, targets, actorName: currentUser?.name || 'System', status: 'applied', snapshotBefore: { products: [], seo: [], config: [] } }, ...prev]); }, 2000); },
     rollbackGlobalSync: (sessionId: string) => setGlobalSyncHistory(prev => prev.map(s => s.id === sessionId ? {...s, status: 'rolled_back'} : s)),
     recordLog, recordAudit, triggerReindex: (type: string) => recordLog('Re-index Triggered', 'system', 'global'), toggleEmergencyMode: () => { recordAudit({ action: 'Emergency Toggle', entity: 'System', severity: 'high', reason: 'Manual fail-safe trigger' }); setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})); }, runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); },
-    recordMetric, resolveAlert: (id: string) => setAlerts(prev => prev.map(a => a.id === id ? {...a, status: 'resolved'} : a)), enqueueBackgroundJob
+    recordMetric, resolveAlert: (id: string) => setAlerts(prev => prev.map(a => a.id === id ? {...a, status: 'resolved'} : a)), enqueueBackgroundJob,
+    upsertSEOMetadata: (meta: SEOMetadata) => setSeoRegistry(prev => prev.find(m => m.id === meta.id) ? prev.map(m => m.id === meta.id ? meta : m) : [meta, ...prev])
   }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, taxRules, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -485,13 +485,22 @@ export interface StressTest {
   country: string;
 }
 
+/**
+ * 🔍 SEO AUTHORITY TYPES
+ */
 export interface SEOMetadata {
   id: string;
   path: string;
+  language: LanguageCode;
+  country: CountryCode;
   title: string;
   description: string;
   keywords: string;
   h1: string;
+  canonicalUrl: string;
+  ogImage?: string;
+  hreflangs: { lang: string; url: string }[];
+  updatedAt: string;
 }
 
 export interface Vendor {
@@ -620,7 +629,8 @@ export type JobType =
   | 'NOTIF_DISPATCH' 
   | 'METRICS_AGG' 
   | 'FX_SYNC'
-  | 'CLEANUP';
+  | 'CLEANUP'
+  | 'SEO_SYNC';
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';
 
