@@ -573,6 +573,41 @@ export interface WalletTransaction {
   status: 'Settled' | 'Pending';
 }
 
+/** 📊 OBSERVABILITY TYPES */
+
+export interface MaisonMetric {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  timestamp: string;
+  source: string;
+  country: CountryCode | 'global';
+  tags?: Record<string, string>;
+}
+
+export interface MaisonAlert {
+  id: string;
+  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  triggeredAt: string;
+  status: 'active' | 'resolved' | 'acknowledged';
+  country: CountryCode | 'global';
+  metadata?: any;
+}
+
+export interface SystemHealthScore {
+  overall: number;
+  subsystems: {
+    payments: number;
+    api: number;
+    inventory: number;
+    ai: number;
+  };
+  lastUpdated: string;
+}
+
 export interface ProductExtended {
   collectorValue: string;
   marketRange: string;

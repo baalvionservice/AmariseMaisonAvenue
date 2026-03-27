@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -56,6 +55,7 @@ export function AdminSidebar() {
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
         { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
+        { icon: <Activity />, label: "Observability", href: "/admin/observability" },
       ]
     },
     {

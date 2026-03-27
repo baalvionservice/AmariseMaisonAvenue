@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useAppStore } from '@/lib/store';
 
 export interface RegionData {
   id: string;
@@ -23,6 +24,7 @@ export interface RegionData {
  * Recalibrated to simulate real-time "Incoming Money" signals.
  */
 export function useSimulationData() {
+  const { recordMetric } = useAppStore();
   const [regions, setRegions] = useState<Record<string, RegionData>>({
     us: { id: 'us', name: 'USA Hub', revenue: 1245000, activeUsers: 420, viewing: 250, wishlist: 80, cart: 45, checkout: 12, purchased: 124, growth: 12.4, lat: 37.0902, lng: -95.7129, predictedInflow: 42000 },
     uk: { id: 'uk', name: 'UK Hub', revenue: 842000, activeUsers: 215, viewing: 130, wishlist: 42, cart: 22, checkout: 8, purchased: 82, growth: 8.2, lat: 55.3781, lng: -3.4360, predictedInflow: 18500 },
@@ -48,12 +50,28 @@ export function useSimulationData() {
         region.cart = Math.max(2, Math.floor(region.wishlist * 0.45) + (Math.random() > 0.9 ? 1 : 0));
         
         // 3. Predicted Inflow Logic: 15% of Cart Value is "Money Coming"
-        // Assumes average cart value of $15,000 for luxury artifacts
         const cartValue = region.cart * 15000;
         const checkoutValue = region.checkout * 25000;
         region.predictedInflow = Math.floor((cartValue * 0.12) + (checkoutValue * 0.45));
 
-        // 4. Purchase Event Simulation
+        // 4. Record Observability Metrics
+        recordMetric({
+          name: 'api_response_time',
+          value: 40 + Math.random() * 120,
+          unit: 'ms',
+          source: 'System',
+          country: region.id as any
+        });
+
+        recordMetric({
+          name: 'payment_success_rate',
+          value: 94 + Math.random() * 6,
+          unit: 'percent',
+          source: 'Payments',
+          country: region.id as any
+        });
+
+        // 5. Purchase Event Simulation
         if (Math.random() > 0.85 && region.cart > 0) {
           const checkoutCount = Math.ceil(Math.random() * 2);
           region.checkout = Math.min(region.cart, region.checkout + checkoutCount);
@@ -70,10 +88,10 @@ export function useSimulationData() {
       });
       return next;
     });
-  }, []);
+  }, [recordMetric]);
 
   useEffect(() => {
-    const interval = setInterval(simulateUpdate, 2000);
+    const interval = setInterval(simulateUpdate, 5000);
     return () => clearInterval(interval);
   }, [simulateUpdate]);
 

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { 
-  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog
+  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore
 } from './types';
 import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES, formatPrice } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
@@ -11,6 +11,7 @@ import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 import { MOCK_SESSION_USER, MaisonUser } from './permissions/mock-users';
 import { StockManager } from './inventory/stockManager';
 import { logger } from './services/loggingService';
+import { obsEngine } from './observability/engine';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -36,6 +37,8 @@ interface AppContextType {
   scopedBrandIntegrity: BrandIntegrityIssue[];
   scopedLiveRequests: LiveRequest[];
   scopedCertificates: MaisonCertificate[];
+  scopedAlerts: MaisonAlert[];
+  scopedMetrics: MaisonMetric[];
   systemLogs: SystemLog[];
   products: Product[];
   privateInquiries: PrivateInquiry[];
@@ -76,6 +79,7 @@ interface AppContextType {
   isCartOpen: boolean;
   activeVip: VipClient | null;
   activeVendor: Vendor | null;
+  systemHealth: SystemHealthScore;
   setCountryEnabled: (code: CountryCode, enabled: boolean) => void;
   setCurrentUser: (user: MaisonUser | null) => void;
   setAdminJurisdiction: (jurisdiction: CountryCode | 'global') => void;
@@ -132,6 +136,8 @@ interface AppContextType {
   toggleEmergencyMode: () => void;
   runWorkflowTask: (taskId: string) => void;
   runWorkflowSequence: (name: string, country?: string) => void;
+  recordMetric: (params: Omit<MaisonMetric, 'id' | 'timestamp'>) => void;
+  resolveAlert: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -189,6 +195,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({ theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' }, seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' }, payments: { cards: true, wallets: true, crypto: false }, compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' }, performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' }, emergencyMode: false, isGuideMode: false, adminViewMode: 'advanced' });
 
+  // 📊 Observability State
+  const [metrics, setMetrics] = useState<MaisonMetric[]>([]);
+  const [alerts, setAlerts] = useState<MaisonAlert[]>([]);
+  const [systemHealth, setSystemHealth] = useState<SystemHealthScore>(obsEngine.calculateHealth());
+
   const activeHub = useMemo(() => (!currentUser ? 'global' : currentUser.role === 'super_admin' ? adminJurisdiction : currentUser.country.toLowerCase() as CountryCode), [currentUser, adminJurisdiction]);
 
   // Scoped Data Logic
@@ -208,6 +219,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedBrandIntegrity = useMemo(() => activeHub === 'global' ? brandIntegrityIssues : brandIntegrityIssues.filter(i => i.country === activeHub), [brandIntegrityIssues, activeHub]);
   const scopedLiveRequests = useMemo(() => activeHub === 'global' ? (activeVip?.liveRequests || []) : (activeVip?.liveRequests || []).filter(r => (r as any).country === activeHub), [activeVip, activeHub]);
   const scopedCertificates = useMemo(() => activeHub === 'global' ? (activeVip?.certificates || []) : (activeVip?.certificates || []).filter(c => c.country === activeHub), [activeVip, activeHub]);
+  
+  const scopedAlerts = useMemo(() => activeHub === 'global' ? alerts : alerts.filter(a => a.country === activeHub || a.country === 'global'), [alerts, activeHub]);
+  const scopedMetrics = useMemo(() => activeHub === 'global' ? metrics : metrics.filter(m => m.country === activeHub || m.country === 'global'), [metrics, activeHub]);
 
   const recordLog = (action: string, type: SystemLog['type'], countryCodeStr = 'global', status: 'success' | 'failure' = 'success') => {
     const id = logger.log({ type, source: 'AppStore', action, country: countryCodeStr, status, userId: currentUser?.id });
@@ -228,8 +242,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAuditRegistry([...registry.audit]);
   };
 
+  const recordMetric = (params: Omit<MaisonMetric, 'id' | 'timestamp'>) => {
+    obsEngine.recordMetric(params);
+    const registry = obsEngine.getRegistry();
+    setMetrics([...registry.metrics]);
+    setAlerts([...registry.alerts]);
+    setSystemHealth(obsEngine.calculateHealth(activeHub));
+  };
+
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs,
+    countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics,
     setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(p => ({...p, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(p => ({...p, adminViewMode: v})),
     upsertProduct: (p: Product, changeSummary = 'Modified Registry Entry') => {
       const before = products.find(i => i.id === p.id);
@@ -252,8 +274,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setProducts(prev => prev.map(item => item.id === p.id ? {...item, stock: result.remainingStock!} : item));
         setCart(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? {...i, quantity: i.quantity + 1} : i) : [...prev, {...p, quantity: 1}]);
         recordLog('Item Reserved', 'inventory', activeHub);
+        recordMetric({ name: 'inventory_lock_count', value: 1, unit: 'count', source: 'Inventory', country: activeHub });
       } else {
         logger.error({ module: 'Inventory', type: 'STOCK_OUT', message: result.message, country: activeHub, severity: 'medium' });
+        recordMetric({ name: 'stock_lock_fail_count', value: 1, unit: 'count', source: 'Inventory', country: activeHub });
       }
     }, 
     removeFromCart: (id: string) => {
@@ -291,8 +315,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runStressTest: (loadSize: number, type: StressTest['type']) => { const id = `stress-${Date.now()}`; setStressTests(prev => [{ id, name: `${type} High-Frequency Simulation`, loadSize, type, status: 'running', metrics: { processedCount: 0, errorCount: 0, failureCount: 0 }, logs: [], country: 'global' }, ...prev]); let processed = 0; const interval = setInterval(() => { processed += Math.floor(loadSize / 5); if (processed >= loadSize) { clearInterval(interval); setStressTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', metrics: { ...t.metrics, processedCount: loadSize, durationMs: 1420 }, logs: [...t.logs, { message: 'Load simulation complete. System stable.', timestamp: new Date().toISOString() }] } : t)); } else { setStressTests(prev => prev.map(t => t.id === id ? { ...t, metrics: { ...t.metrics, processedCount: processed } } : t)); } }, 500); },
     executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => { const sessionId = `sync-${Date.now()}`; recordAudit({ action: 'Global Sync Hub', entity: 'System', country: 'global', severity: 'medium', reason: `Sync Session: ${sessionId}` }); setTimeout(() => { setGlobalSyncHistory(prev => [{ id: sessionId, timestamp: new Date().toISOString(), categories: cats, targets, actorName: currentUser?.name || 'System', status: 'applied', snapshotBefore: { products: [], seo: [], config: [] } }, ...prev]); }, 2000); },
     rollbackGlobalSync: (id: string) => setGlobalSyncHistory(prev => prev.map(s => s.id === id ? {...s, status: 'rolled_back'} : s)),
-    recordLog, recordAudit, triggerReindex: (type: string) => recordLog('Re-index Triggered', 'system', 'global'), toggleEmergencyMode: () => { recordAudit({ action: 'Emergency Toggle', entity: 'System', severity: 'high', reason: 'Manual fail-safe trigger' }); setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})); }, runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); }
-  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs]);
+    recordLog, recordAudit, triggerReindex: (type: string) => recordLog('Re-index Triggered', 'system', 'global'), toggleEmergencyMode: () => { recordAudit({ action: 'Emergency Toggle', entity: 'System', severity: 'high', reason: 'Manual fail-safe trigger' }); setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})); }, runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); },
+    recordMetric, resolveAlert: (id: string) => setAlerts(prev => prev.map(a => a.id === id ? {...a, status: 'resolved'} : a))
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
