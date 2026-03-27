@@ -149,7 +149,7 @@ export default function FinanceHub() {
           <h1 className="text-4xl font-headline font-bold italic tracking-tight text-white uppercase">Finance Hub</h1>
           <p className="text-sm text-white/40 font-light italic">Global settlement engine & gateway health matrix.</p>
         </div>
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4">
            <Button className="h-14 px-10 rounded-none bg-plum text-white hover:bg-black transition-all text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl">
              <BadgeDollarSign className="w-4 h-4 mr-3" /> RECONCILE LEDGER
            </Button>
@@ -302,7 +302,7 @@ export default function FinanceHub() {
                     </CardHeader>
                     <Table>
                        <TableHeader className="bg-white/[0.01]">
-                          <TableRow className="border-white/5">
+                          <TableRow className="border-white/5 h-10">
                              <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Reference</TableHead>
                              <TableHead className="text-[9px] uppercase font-bold text-white/40">Connoisseur</TableHead>
                              <TableHead className="text-[9px] uppercase font-bold text-white/40">Amount</TableHead>
