@@ -44,6 +44,7 @@ export default function HomePage() {
   const heroImage = placeholderData.placeholderImages.find(img => img.id === 'home-hero-banner-main')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964';
   const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
   const authImage = placeholderData.placeholderImages.find(img => img.id === 'home-authenticity-banner')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720';
+  const missionImage = placeholderData.placeholderImages.find(img => img.id === 'home-mission-banner')?.imageUrl || 'https://picsum.photos/seed/amarise-mission/1200/800';
   
   const gridSpring = placeholderData.placeholderImages.find(img => img.id === 'home-grid-spring')?.imageUrl;
   const gridArrivals = placeholderData.placeholderImages.find(img => img.id === 'home-grid-arrivals')?.imageUrl;
@@ -364,7 +365,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 10. Institutional Trust Footer */}
+      {/* 10. Our Mission Section (Dual-Panel) */}
+      <section className="flex flex-col lg:flex-row min-h-[600px] overflow-hidden bg-black">
+        {/* Left Side: Cinematic Mission Visual */}
+        <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
+          <Image 
+            src={missionImage}
+            alt="Maison Amarisé Our Mission"
+            fill
+            className="object-cover"
+            data-ai-hint="luxury fashion mission"
+          />
+        </div>
+
+        {/* Right Side: Narrative Panel */}
+        <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col justify-center space-y-10">
+          <div className="space-y-6">
+            <h2 className="text-4xl lg:text-5xl font-headline font-medium tracking-tight italic">
+              Our Mission
+            </h2>
+            <div className="space-y-8 max-w-xl">
+              <p className="text-sm lg:text-base font-body font-light leading-relaxed text-gray-300">
+                At Amarisé Maison Avenue, we specialize in the rare, the iconic, and the extraordinary. As the leading global curator of Hermès and Chanel artifacts, we offer a curated selection of investment-worthy pieces with unmatched access and authenticity. We believe in empowering and inspiring connoisseurs to express themselves through fashion, confidence, and bold individuality. Every artifact in our collection tells a story of heritage, craftsmanship, and timeless style. Founded in 1924, our company is driven by a passion for luxury and a commitment to trust. With private showrooms in New York, London, and Dubai, we're thrilled to bring the world's most coveted artifacts to you. Whether you're collecting or simply falling in love, our pieces are meant to be worn, treasured, and passed down to the next generation.
+              </p>
+              <p className="text-sm lg:text-base font-body font-light leading-relaxed text-gray-300">
+                From rare Hermès bags, to shoes and fine jewelry, we curate the most comprehensive stock of new and never worn accessories, in stock and in your hands the very next day. We specialize in your favorite Hermès Birkin, Kelly, Constance and Picotin series as well as a wide assortment of Hermès accessories, scarves and jewelry. As you search for your next designer acquisition, gift or investment piece, we aim to be your trusted advisor, dedicated to finding authentic luxury designer bags and accessories matching the style and sophistication you so well deserve. Welcome to the art of the selection.
+              </p>
+            </div>
+          </div>
+          <Link href={`/${countryCode}/about`}>
+            <Button className="bg-white text-black hover:bg-gray-200 h-14 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em] transition-all w-fit shadow-xl">
+              LEARN MORE
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* 11. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">

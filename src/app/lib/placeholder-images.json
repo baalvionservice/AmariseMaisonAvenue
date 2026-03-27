@@ -96,6 +96,12 @@
       "description": "Informational Grid: Showrooms",
       "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Showroom_1.jpg?v=1770664405&width=800",
       "imageHint": "luxury interior"
+    },
+    {
+      "id": "home-mission-banner",
+      "description": "Maison Mission Statement Visual",
+      "imageUrl": "https://picsum.photos/seed/amarise-mission/1200/800",
+      "imageHint": "luxury fashion"
     }
   ]
 }
