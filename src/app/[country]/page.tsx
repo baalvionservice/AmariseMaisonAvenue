@@ -85,7 +85,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. AMARISÉ MAISON AVENUE LIVE Section */}
+      {/* 2. Tactical Collection CTA Bar */}
+      <Link href={`/${countryCode}/category/hermes`} className="block bg-[#262626] hover:bg-black transition-colors py-5 border-b border-white/5">
+        <div className="container mx-auto px-6 text-center">
+          <span className="text-[9px] md:text-[11px] font-bold tracking-[0.35em] text-white uppercase">
+            SHOP OUR COLLECTION OF NEW HERMÈS BIRKIN BAGS
+          </span>
+        </div>
+      </Link>
+
+      {/* 3. AMARISÉ MAISON AVENUE LIVE Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-6">
@@ -120,7 +129,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Tactical Ticker */}
+      {/* 4. Tactical Ticker */}
       <section className="bg-black py-5 border-y border-white/10">
         <div className="container mx-auto flex items-center justify-center space-x-16">
            <div className="flex items-center space-x-4 text-gold">
@@ -137,7 +146,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Dual-Persona Acquisition Matrix */}
+      {/* 5. Dual-Persona Acquisition Matrix */}
       <section className="container mx-auto px-6 py-40 max-w-[1600px]">
         <div className="text-center space-y-24">
           <div className="space-y-8 max-w-4xl mx-auto">
@@ -196,7 +205,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Rare Archive Grid */}
+      {/* 6. Rare Archive Grid */}
       <section className="bg-ivory/30 py-60 border-y border-border">
          <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
             <div className="flex flex-col md:row items-end justify-between gap-12">
@@ -241,7 +250,7 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* 6. Institutional Trust Footer */}
+      {/* 7. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
