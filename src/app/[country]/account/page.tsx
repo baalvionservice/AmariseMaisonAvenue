@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -138,7 +137,7 @@ function PremiumSalonDashboard({ countryCode, stats, transactions, currentUser, 
                     <AreaChart data={appreciationData}>
                        <defs>
                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.1}/>
+                             <stop offset="5%" stopColor="#7E3F98" stopOpacity={0.15}/>
                              <stop offset="95%" stopColor="#7E3F98" stopOpacity={0}/>
                           </linearGradient>
                        </defs>

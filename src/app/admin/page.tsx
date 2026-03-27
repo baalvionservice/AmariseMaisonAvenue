@@ -142,8 +142,8 @@ export default function ExecutiveDashboard() {
                  <AreaChart data={chartData}>
                     <defs>
                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3B82F6" stopOpacity0.15}/>
-                          <stop offset="95%" stopColor="#3B82F6" stopOpacity0}/>
+                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15}/>
+                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                        </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />

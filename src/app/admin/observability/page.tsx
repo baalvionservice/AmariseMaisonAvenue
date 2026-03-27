@@ -298,7 +298,7 @@ export default function SREHub() {
                       <TableRow key={log.id} className="hover:bg-white/5 transition-colors border-white/5 h-12">
                          <TableCell className="pl-8 text-[10px] font-mono text-white/20">{new Date(log.timestamp).toLocaleTimeString()}</TableCell>
                          <TableCell><Badge variant="outline" className="text-[7px] border-white/10 text-blue-400 uppercase">{log.type}</Badge></TableCell>
-                         <TableCell className="text-xs font-light italic text-white/60">"{log.action}"</TableCell>
+                         <TableCell className="text-xs font-light italic text-white/80">"{log.action}"</TableCell>
                          <TableCell className="text-right pr-8 font-mono text-[9px] text-white/20">{(Math.random() * 50 + 10).toFixed(0)}ms</TableCell>
                       </TableRow>
                     ))}
