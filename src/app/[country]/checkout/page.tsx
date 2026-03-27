@@ -6,16 +6,17 @@ import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap, Smartphone, Building2, Ticket } from 'lucide-react';
+import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, Globe, Zap, Smartphone, Building2, Ticket, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { paymentService } from '@/lib/services/paymentService';
 import { apiOrchestrator } from '@/lib/api/orchestrator';
 import { PaymentGateway, CountryCode } from '@/lib/types';
 import { TaxEngine } from '@/lib/finance/tax-engine';
+import { RiskEngine } from '@/lib/fraud/risk-engine';
 
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs, fxRates, getLocalizedPrice, taxRules } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs, fxRates, getLocalizedPrice, taxRules, recordFraudLog } = useAppStore();
   const { country } = useParams();
   const searchParams = useSearchParams();
   const countryCode = (country as string) || 'us';
@@ -30,6 +31,7 @@ export default function CheckoutPage() {
   const [orderRef, setOrderRef] = useState('');
   const [inventoryLockId, setInventoryLockId] = useState<string | null>(null);
   const [lockedFXRate, setLockedFXRate] = useState<number | null>(null);
+  const [fraudBlocked, setFraudBlocked] = useState(false);
   
   // Prevent hydration mismatch for random order ID
   useEffect(() => {
@@ -42,12 +44,7 @@ export default function CheckoutPage() {
   const selectedPlan = useMemo(() => paymentPlans.find(p => p.id === planId), [planId, paymentPlans]);
   const currentCountryConfig = useMemo(() => countryConfigs.find(c => c.code === countryCode), [countryCode, countryConfigs]);
 
-  /**
-   * GRANULAR TAX CALCULATION
-   * Replaced flat rate with Item-Category logic.
-   */
   const taxCalculation = useMemo(() => {
-    // 1. Prepare items including plan if exists
     const itemsToTax = [...cart];
     if (selectedPlan) {
       itemsToTax.push({
@@ -58,28 +55,53 @@ export default function CheckoutPage() {
         categoryId: 'service'
       } as any);
     }
-
     return TaxEngine.calculateOrderTax(itemsToTax, countryCode as CountryCode, taxRules);
   }, [cart, selectedPlan, countryCode, taxRules]);
 
   const totalYield = taxCalculation.totalAmount;
 
   /**
-   * ATOMIC INVENTORY LOCKING + PRICE LOCKING
+   * 🛡️ FRAUD & INVENTORY PROTOCOL
    */
   const handleLockInventory = async () => {
     if (cart.length > 0) {
-      toast({ title: "Securing Artifacts", description: "Verifying atomic availability in global registry..." });
+      toast({ title: "Maison Security Audit", description: "Evaluating acquisition risk profile..." });
       
+      // 1. Evaluate Fraud Risk
+      const riskAnalysis = RiskEngine.evaluateAcquisitionRisk(
+        null, // No VIP session mock
+        cart,
+        countryCode as CountryCode,
+        { attemptCount: 1, ipHub: countryCode.toUpperCase() }
+      );
+
+      recordFraudLog(RiskEngine.createLog(currentUser?.id || 'guest', riskAnalysis));
+
+      if (riskAnalysis.action === 'block') {
+        setFraudBlocked(true);
+        toast({
+          variant: "destructive",
+          title: "Institutional Hold",
+          description: "This acquisition intent has been flagged by Maison security. Please contact a specialist.",
+        });
+        return;
+      }
+
+      if (riskAnalysis.action === 'flag') {
+        toast({
+          title: "Enhanced Verification",
+          description: "Due to acquisition magnitude, a specialist review is active.",
+        });
+      }
+
+      // 2. Lock Inventory
+      toast({ title: "Securing Artifacts", description: "Verifying atomic availability in global registry..." });
       const lockRes = await apiOrchestrator.lockInventory(cart[0].id, currentUser?.id || 'guest');
       
       if (lockRes.status === 'success') {
         setInventoryLockId(lockRes.data.lock_id);
-        
-        // 🔒 Institutional Price Locking
         const currentHubRate = fxRates.find(r => r.currencyCode === currentCountryConfig?.currency)?.rate || 1;
         setLockedFXRate(currentHubRate);
-        
         setStep(2);
       } else {
         toast({ variant: "destructive", title: "Allocation Conflict", description: lockRes.error });
@@ -91,7 +113,6 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setIsSettling(true);
-    
     const idempotencyKey = `maison_set_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
     try {
@@ -118,7 +139,7 @@ export default function CheckoutPage() {
           status: selectedGateway === 'BANK_TRANSFER' ? 'pending' : 'paid',
           date: new Date().toISOString(),
           taxAmount: taxCalculation.totalTax,
-          taxRate: taxCalculation.totalTax / taxCalculation.subtotal * 100, // Weighted average
+          taxRate: taxCalculation.totalTax / taxCalculation.subtotal * 100,
           complianceCertified: true,
           brandId: activeBrandId,
           gateway: selectedGateway,
@@ -161,6 +182,25 @@ export default function CheckoutPage() {
       });
     }
   };
+
+  if (fraudBlocked) {
+    return (
+      <div className="container mx-auto px-6 py-40 flex flex-col items-center justify-center space-y-12 animate-fade-in">
+        <div className="p-12 bg-red-50 border border-red-100 rounded-full shadow-inner text-red-600">
+          <AlertTriangle className="w-20 h-20" />
+        </div>
+        <div className="text-center space-y-4">
+          <h1 className="text-5xl font-headline font-bold italic tracking-tight">Security Hold</h1>
+          <p className="text-gray-500 font-light italic max-w-md mx-auto">
+            "Institutional protocols require a private dialogue for this acquisition. Please contact our global concierge."
+          </p>
+        </div>
+        <Button onClick={() => router.push(`/${countryCode}/contact`)} size="lg" className="rounded-none bg-black hover:bg-plum px-16 h-16 text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl transition-all">
+          CONTACT CONCIERGE
+        </Button>
+      </div>
+    );
+  }
 
   if (cart.length === 0 && !selectedPlan && step !== 3) {
     router.push(`/${countryCode}/cart`);

@@ -630,7 +630,8 @@ export type JobType =
   | 'METRICS_AGG' 
   | 'FX_SYNC'
   | 'CLEANUP'
-  | 'SEO_SYNC';
+  | 'SEO_SYNC'
+  | 'FRAUD_AUDIT';
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';
 
@@ -663,7 +664,7 @@ export interface MaisonMetric {
 
 export interface MaisonAlert {
   id: string;
-  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai';
+  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   triggeredAt: string;
@@ -681,6 +682,26 @@ export interface SystemHealthScore {
     ai: number;
   };
   lastUpdated: string;
+}
+
+/** 🛡️ FRAUD DETECTION TYPES */
+
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface FraudLog {
+  id: string;
+  userId: string;
+  orderId?: string;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  reason: string;
+  actionTaken: 'allow' | 'flag' | 'block';
+  timestamp: string;
+  metadata: {
+    ipHub?: string;
+    attemptCount?: number;
+    magnitude?: number;
+  };
 }
 
 export interface ProductExtended {

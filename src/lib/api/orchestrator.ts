@@ -3,10 +3,11 @@
  * Simulates real-world backend behavior including latency, idempotency, and semantic search.
  */
 
-import { CountryCode, PaymentGateway, TransactionStatus } from '../types';
+import { CountryCode, PaymentGateway, TransactionStatus, RiskLevel } from '../types';
 import { StockManager } from '../inventory/stockManager';
 import { applyAdvancedSearch } from '../search/engine';
 import { RecommendationEngine, RecommendationNode } from '../ai-autopilot/ai-recommendation-engine';
+import { RiskEngine, RiskAnalysis } from '../fraud/risk-engine';
 
 export interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -21,6 +22,31 @@ class MockApiOrchestrator {
 
   private async simulate() {
     await new Promise(resolve => setTimeout(resolve, this.latency));
+  }
+
+  /**
+   * 🛡️ FRAUD DETECTION API
+   */
+  async evaluateFraudRisk(params: {
+    userId: string;
+    cart: any[];
+    country: CountryCode;
+    metadata: any;
+  }): Promise<ApiResponse<RiskAnalysis>> {
+    await this.simulate();
+    
+    // In a real system, we'd fetch the user and attempt history
+    const analysis = RiskEngine.evaluateAcquisitionRisk(
+      null, // User simulation
+      params.cart,
+      params.country,
+      params.metadata
+    );
+
+    return {
+      status: 'success',
+      data: analysis
+    };
   }
 
   /**
