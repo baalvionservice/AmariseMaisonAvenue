@@ -3,7 +3,18 @@ export type LanguageCode = 'en' | 'ar' | 'hi' | 'fr';
 
 export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
-export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
+export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE' | 'VERIFIED' | 'EXPIRED';
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  planId: string;
+  planName: string;
+  status: SubscriptionStatus;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  amount: number;
+}
 
 export type TaxType = 'GST' | 'VAT' | 'SALES_TAX';
 

@@ -3,7 +3,7 @@ import {
   Editorial, MaisonStory, CustomerServiceInfo, VipClient, AdminAccount, 
   Vendor, Campaign, AuditLog, CustomerSegment, SupportTicket, SupportStats,
   MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice,
-  Affiliate, ReturnRequest, CountryCode
+  Affiliate, ReturnRequest, CountryCode, PaymentPlan, FXRate, TaxRule, Subscription
 } from './types';
 
 export const COUNTRIES: Record<string, Country> = {
@@ -207,9 +207,65 @@ export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
 };
 
 export const VIP_CLIENTS: VipClient[] = [
-  { id: 'vip-1', name: 'Julian Vandervilt', email: 'julian@vandervilt.com', tier: 'Diamond', loyaltyPoints: 12500, totalSpend: 250000, lastPurchase: '2024-03-10', isSubscriber: true, subscriptionPlan: 'Maison Privé', brandId: 'amarise-luxe', status: 'verified', walletBalance: 12500.50, walletHistory: [], liveRequests: [], certificates: [] },
-  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28', isSubscriber: false, brandId: 'amarise-luxe', walletBalance: 500, walletHistory: [], liveRequests: [], certificates: [] },
-  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14', isSubscriber: true, subscriptionPlan: 'Atelier Reserve', brandId: 'amarise-luxe', walletBalance: 42000, walletHistory: [], liveRequests: [], certificates: [] }
+  { 
+    id: 'u-client-1', 
+    name: 'Julian Vandervilt', 
+    email: 'julian@vandervilt.com', 
+    tier: 'Diamond', 
+    loyaltyPoints: 12500, 
+    totalSpend: 250000, 
+    lastPurchase: '2024-03-10', 
+    isSubscriber: true, 
+    subscriptionPlan: 'Maison Gold', 
+    brandId: 'amarise-luxe', 
+    status: 'verified', 
+    walletBalance: 12500.50, 
+    walletHistory: [
+      { id: 'w-1', type: 'Deposit', amount: 5000, description: 'Treasury Funding', timestamp: '2024-03-01T10:00:00Z' },
+      { id: 'w-2', type: 'Service Fee', amount: -250, description: 'Live Curatorial Session', timestamp: '2024-03-10T14:30:00Z' }
+    ], 
+    liveRequests: [], 
+    certificates: [
+      { id: 'cert-11', artifactName: 'Hermès Birkin 25 Gold', provenanceScore: 100, status: 'Verified', imageUrl: 'https://madisonavenuecouture.com/cdn/shop/products/Hermes_Birkin_25_White_and_Etoupe_Clemence_Brushed_Gold_Hardware_1.jpg?v=1691512345&width=1000' }
+    ] 
+  },
+  { id: 'vip-2', name: 'Sophia Chen', email: 'sophia@lux.net', tier: 'Gold', loyaltyPoints: 4200, totalSpend: 85000, lastPurchase: '2024-02-28', isSubscriber: false, brandId: 'amarise-luxe', status: 'verified', walletBalance: 500, walletHistory: [], liveRequests: [], certificates: [] },
+  { id: 'vip-3', name: 'Alexander Cross', email: 'a.cross@heritage.com', tier: 'Diamond', loyaltyPoints: 18000, totalSpend: 420000, lastPurchase: '2024-03-14', isSubscriber: true, subscriptionPlan: 'Atelier Reserve', brandId: 'amarise-luxe', status: 'verified', walletBalance: 42000, walletHistory: [], liveRequests: [], certificates: [] }
+];
+
+export const PAYMENT_PLANS: PaymentPlan[] = [
+  { id: 'plan-silver', name: 'Silver Member', price: 500, currency: 'USD', interval: 'yearly', tier: 'Silver', features: ['Curatorial Access', 'Standard Shipping', 'Digital Provenance'] },
+  { id: 'plan-gold', name: 'Maison Gold', price: 2500, currency: 'USD', interval: 'yearly', tier: 'Gold', isPopular: true, features: ['Priority Viewings', 'White-Glove Dispatch', 'Annual Heritage Report'] },
+  { id: 'plan-diamond', name: 'Atelier Diamond', price: 10000, currency: 'USD', interval: 'yearly', tier: 'Diamond', features: ['Private Salon Keys', 'Investment Advisory', 'Bespoke Sourcing', 'Unlimited Live Ateliers'] }
+];
+
+export const SUBSCRIPTIONS: Subscription[] = [
+  {
+    id: 'sub-1',
+    userId: 'u-client-1',
+    planId: 'plan-gold',
+    planName: 'Maison Gold',
+    status: 'ACTIVE',
+    currentPeriodStart: '2024-01-01T00:00:00Z',
+    currentPeriodEnd: '2025-01-01T00:00:00Z',
+    amount: 2500
+  }
+];
+
+export const FX_RATES: FXRate[] = [
+  { currencyCode: 'USD', baseCurrency: 'USD', rate: 1, spread: 0, lastUpdated: '2024-03-15T12:00:00Z', source: 'Maison Core' },
+  { currencyCode: 'GBP', baseCurrency: 'USD', rate: 0.79, spread: 0.02, lastUpdated: '2024-03-15T12:00:00Z', source: 'Maison Core' },
+  { currencyCode: 'AED', baseCurrency: 'USD', rate: 3.67, spread: 0.01, lastUpdated: '2024-03-15T12:00:00Z', source: 'Maison Core' },
+  { currencyCode: 'INR', baseCurrency: 'USD', rate: 83.2, spread: 0.03, lastUpdated: '2024-03-15T12:00:00Z', source: 'Maison Core' },
+  { currencyCode: 'SGD', baseCurrency: 'USD', rate: 1.34, spread: 0.02, lastUpdated: '2024-03-15T12:00:00Z', source: 'Maison Core' }
+];
+
+export const TAX_RULES: TaxRule[] = [
+  { id: 'tax-us-gen', country: 'us', taxType: 'SALES_TAX', category: 'general', rate: 8.875, isInclusive: false, lastUpdated: '2024-03-15T12:00:00Z' },
+  { id: 'tax-uk-gen', country: 'uk', taxType: 'VAT', category: 'general', rate: 20, isInclusive: true, lastUpdated: '2024-03-15T12:00:00Z' },
+  { id: 'tax-ae-gen', country: 'ae', taxType: 'VAT', category: 'general', rate: 5, isInclusive: true, lastUpdated: '2024-03-15T12:00:00Z' },
+  { id: 'tax-in-gen', country: 'in', taxType: 'GST', category: 'general', rate: 18, isInclusive: true, lastUpdated: '2024-03-15T12:00:00Z' },
+  { id: 'tax-sg-gen', country: 'sg', taxType: 'GST', category: 'general', rate: 9, isInclusive: true, lastUpdated: '2024-03-15T12:00:00Z' }
 ];
 
 export const AFFILIATES: Affiliate[] = [

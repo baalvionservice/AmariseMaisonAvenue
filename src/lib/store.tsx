@@ -9,7 +9,7 @@ import {
   CMSSection, Collection, Editorial, SEOMetadata, SalesScript,
   Appointment, Invoice, Affiliate, ReturnRequest, MaisonError, BrandIntegrityIssue,
   WorkflowTask, AIModuleStatus, AIActionLog, AISuggestion, Department, Category,
-  BackgroundJob, AuditLogEntry, Shipment
+  BackgroundJob, AuditLogEntry, Shipment, PaymentPlan, Subscription, FXRate, TaxRule
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -28,7 +28,11 @@ import {
   SUPPORT_STATS as INITIAL_SUPPORT_STATS,
   VENDORS,
   DEPARTMENTS,
-  CATEGORIES
+  CATEGORIES,
+  PAYMENT_PLANS,
+  SUBSCRIPTIONS,
+  FX_RATES,
+  TAX_RULES
 } from './mock-data';
 import { MOCK_SESSION_USER, MaisonUser } from './permissions/mock-users';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
@@ -60,6 +64,10 @@ interface AppContextType {
   leadConversations: LeadConversation[];
   activeHub: CountryCode | 'global';
   currentLanguage: SupportedLanguage;
+  paymentPlans: PaymentPlan[];
+  subscriptions: Subscription[];
+  fxRates: FXRate[];
+  taxRules: TaxRule[];
   
   // Scoped Data
   scopedProducts: Product[];
@@ -151,8 +159,6 @@ interface AppContextType {
   addTicketMessage: (id: string, text: string, sender: string) => void;
   updateTicketStatus: (id: string, status: any) => void;
   getLocalizedPrice: (price: number) => string;
-  fxRates: any[];
-  taxRules: any[];
   activeVendor: any | null;
   setActiveVendor: (v: any | null) => void;
   vendors: any[];
@@ -329,6 +335,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     leadConversations,
     activeHub,
     currentLanguage,
+    paymentPlans: PAYMENT_PLANS,
+    subscriptions: SUBSCRIPTIONS,
+    fxRates: FX_RATES,
+    taxRules: TAX_RULES,
     scopedProducts,
     scopedTransactions,
     scopedNotifications,
@@ -354,8 +364,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     apiLogs: [],
     indexingStatus: INITIAL_INDEXING,
     systemHealth: obsEngine.calculateHealth(activeHub === 'global' ? 'global' : activeHub),
-    fxRates: [],
-    taxRules: [],
     activeVendor,
     vendors: VENDORS,
     messagingTemplates: ACQUISITION_SCRIPTS,
