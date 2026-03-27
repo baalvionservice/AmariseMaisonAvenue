@@ -6,17 +6,19 @@
 import { eventBus } from './bus';
 import { StockManager } from '../inventory/stockManager';
 import { sendEmailMock } from '../notifications/mock-engine';
+import { workerEngine } from '../reliability/worker-engine';
 
 /**
  * Initialize all core platform handlers
+ * This unifies the previously disconnected logic chains.
  */
 export function initializeGlobalHandlers() {
   
-  // 1. Payment Success Reactions
+  // 1. Payment Reactions
   eventBus.subscribe('payment_success', async (event) => {
     const { orderId, amount, userId } = event.payload;
     
-    // Trigger Order Confirmation
+    // Step A: Trigger Order Confirmation
     await eventBus.publish({
       type: 'order_confirmed',
       source: 'orders',
@@ -24,38 +26,56 @@ export function initializeGlobalHandlers() {
       payload: { orderId, status: 'PAID' }
     });
 
-    // Send Receipt Notification
-    sendEmailMock('client', `Payment of ${amount} confirmed for Order ${orderId}.`, event.countryCode);
+    // Step B: Initialize Dispatch Job
+    workerEngine.enqueue({
+      type: 'NOTIF_DISPATCH',
+      country: event.countryCode,
+      payload: { userId, template: 'order_confirmation', orderId }
+    });
+
+    // Step C: Legacy Mock Notification
+    sendEmailMock('client', `Maison Settlement Confirmed: ${amount} for Order ${orderId}.`, event.countryCode);
+  });
+
+  eventBus.subscribe('payment_failed', async (event) => {
+    const { productId, quantity, orderId } = event.payload;
+    
+    // Step A: Auto-release stock back to the archive
+    StockManager.releaseStock(productId, quantity);
+    
+    // Step B: Fail Order
+    await eventBus.publish({
+      type: 'order_failed',
+      source: 'orders',
+      countryCode: event.countryCode,
+      payload: { orderId, reason: 'Settlement Rejected' }
+    });
   });
 
   // 2. Inventory Management
   eventBus.subscribe('inventory_locked', async (event) => {
-    console.log(`%c[INVENTORY] Lock secured for artifact ${event.payload.productId}`, "color: #3B82F6;");
-  });
-
-  // 3. AI Insights
-  eventBus.subscribe('order_confirmed', async (event) => {
-    // Analytics & AI trigger
+    // Log scarcity signals for AI
     await eventBus.publish({
       type: 'ai_insight_generated',
-      source: 'ai',
+      source: 'inventory',
       countryCode: event.countryCode,
       payload: { 
-        insight: `High-value purchase detected in ${event.countryCode}. User segment migration suggested.`,
-        confidence: 0.98
+        insight: `Inventory Contention Spike: ${event.payload.productId}`,
+        confidence: 0.95
       }
     });
   });
 
-  // 4. Failure Recovery
-  eventBus.subscribe('payment_failed', async (event) => {
-    const { productId, quantity } = event.payload;
-    
-    // Auto-release stock back to the archive
-    StockManager.releaseStock(productId, quantity);
-    
-    console.warn(`%c[RECOVERY] Payment failed. Artifact ${productId} restored to registry.`, "color: #ef4444;");
+  // 3. Logistics Pipeline
+  eventBus.subscribe('shipment_dispatched', async (event) => {
+    const { orderId, trackingId } = event.payload;
+    sendEmailMock('client', `Institutional Dispatch Protocol Active. Tracking: ${trackingId}`, event.countryCode);
   });
 
-  console.log("%c[SYSTEM] Global Event Handlers Initialized.", "color: #10b981; font-weight: bold;");
+  // 4. AI Strategic Signals
+  eventBus.subscribe('ai_insight_generated', async (event) => {
+    console.log(`%c[AI AUTOPILOT] 🧠 Strategic Insight: ${event.payload.insight}`, "color: #3B82F6;");
+  });
+
+  console.log("%c[INTEGRATION] 🔗 Global Event Handlers Active.", "color: #10b981; font-weight: bold;");
 }

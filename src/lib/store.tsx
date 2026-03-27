@@ -8,7 +8,8 @@ import {
   MaisonMetric, MaisonAlert, SystemHealthScore, FraudLog, DynamicPrice,
   CMSSection, Collection, Editorial, SEOMetadata, SalesScript,
   Appointment, Invoice, Affiliate, ReturnRequest, MaisonError, BrandIntegrityIssue,
-  WorkflowTask, AIModuleStatus, AIActionLog, AISuggestion, Department, Category
+  WorkflowTask, AIModuleStatus, AIActionLog, AISuggestion, Department, Category,
+  BackgroundJob
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -34,6 +35,9 @@ import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { SupportedLanguage } from './i18n/config';
+import { eventBus } from './events/bus';
+import { initializeGlobalHandlers } from './events/handlers';
+import { workerEngine } from './reliability/worker-engine';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -71,6 +75,8 @@ interface AppContextType {
   scopedAuditLogs: any[];
   scopedFraudLogs: FraudLog[];
   scopedPricingOptimizations: DynamicPrice[];
+  scopedEvents: any[];
+  scopedJobs: BackgroundJob[];
 
   // Support
   supportStats: any;
@@ -155,6 +161,7 @@ interface AppContextType {
   setActiveBrand: (id: string) => void;
   seoRegistry: SEOMetadata[];
   socialMetrics: Record<string, any>;
+  publishEvent: (type: any, source: any, payload: any) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -220,6 +227,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     performance: { autoScalingStatus: 'Optimized' }
   });
 
+  useEffect(() => {
+    initializeGlobalHandlers();
+  }, []);
+
   const activeHub = useMemo(() => {
     if (!currentUser) return 'global';
     if (currentUser.role === 'super_admin') return adminJurisdiction;
@@ -243,6 +254,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedInquiries = useMemo(() => 
     activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub || i.country === 'global'),
   [privateInquiries, activeHub]);
+
+  const scopedEvents = useMemo(() => {
+    const logs = eventBus.getLogs();
+    return activeHub === 'global' ? logs : logs.filter(e => e.countryCode === activeHub);
+  }, [activeHub, transactions]); // Re-calculate when transactions shift
+
+  const scopedJobs = useMemo(() => {
+    const logs = workerEngine.getRegistry();
+    return activeHub === 'global' ? logs : logs.filter(j => j.country === activeHub);
+  }, [activeHub, transactions]);
 
   const value: AppContextType = {
     countryConfigs,
@@ -278,6 +299,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     scopedAuditLogs: [],
     scopedFraudLogs: fraudLogs,
     scopedPricingOptimizations: pricingOptimizations,
+    scopedEvents,
+    scopedJobs,
     supportStats: INITIAL_SUPPORT_STATS,
     aiModules,
     aiLogs,
@@ -367,7 +390,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setGlobalSyncHistory(prev => [session, ...prev]);
     },
     setActiveVendor,
-    setActiveBrand: setActiveBrandId
+    setActiveBrand: setActiveBrandId,
+    publishEvent: (type, source, payload) => {
+      eventBus.publish({ type, source, countryCode: activeHub as any, payload });
+    }
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

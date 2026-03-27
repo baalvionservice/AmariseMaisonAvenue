@@ -456,6 +456,23 @@ export interface AISuggestion {
   timestamp: string;
 }
 
+export type JobStatus = 'pending' | 'running' | 'retrying' | 'completed' | 'failed';
+export type JobType = 'PAYMENT_VERIFY' | 'INVENTORY_TTL' | 'NOTIF_DISPATCH' | 'METRICS_SYNC' | 'AUDIT_SYNC';
+
+export interface BackgroundJob {
+  id: string;
+  type: JobType;
+  payload: any;
+  status: JobStatus;
+  retryCount: number;
+  maxRetries: number;
+  nextRunAt: string;
+  error?: string;
+  country: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface City {
   id: string;
   name: string;

@@ -44,7 +44,7 @@ class WorkerEngine {
     console.log(`%c[WORKER ENQUEUED] ⏳ ${job.type} | ID: ${job.id}`, 'color: #7E3F98; font-weight: bold;');
     
     // Simulate immediate processing for mock environment
-    setTimeout(() => this.processJob(job.id), 1000);
+    setTimeout(() => this.processJob(job.id), 1500);
     
     return job.id;
   }
@@ -77,14 +77,14 @@ class WorkerEngine {
 
   private async executeJobLogic(job: BackgroundJob) {
     // Artificial latency
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Simulated fail-points for demo
-    if (job.type === 'NOTIF_DISPATCH' && Math.random() > 0.7) {
+    if (job.type === 'NOTIF_DISPATCH' && Math.random() > 0.8) {
       throw new Error("SMTP_GATEWAY_TIMEOUT");
     }
     
-    if (job.type === 'PAYMENT_VERIFY' && Math.random() > 0.8) {
+    if (job.type === 'PAYMENT_VERIFY' && Math.random() > 0.9) {
       throw new Error("GATEWAY_WEBHOOK_CONGESTION");
     }
   }
@@ -96,7 +96,7 @@ class WorkerEngine {
       job.retryCount++;
       job.status = 'retrying';
       
-      // Exponential Backoff Logic: delay = 2^count * 1000ms
+      // Exponential Backoff Logic: delay = 2^count * 2000ms
       const delay = Math.pow(2, job.retryCount) * 2000;
       const nextRun = new Date(Date.now() + delay);
       job.nextRunAt = nextRun.toISOString();

@@ -19,12 +19,14 @@ export type MaisonEventType =
   | 'inventory_confirmed'
   | 'refund_initiated'
   | 'notification_dispatched'
-  | 'ai_insight_generated';
+  | 'ai_insight_generated'
+  | 'shipment_dispatched'
+  | 'shipment_delivered';
 
 export interface MaisonEvent<T = any> {
   id: string;
   type: MaisonEventType;
-  source: 'orders' | 'payments' | 'inventory' | 'notifications' | 'ai' | 'analytics';
+  source: 'orders' | 'payments' | 'inventory' | 'notifications' | 'ai' | 'analytics' | 'logistics';
   countryCode: CountryCode | 'global';
   payload: T;
   status: EventStatus;
