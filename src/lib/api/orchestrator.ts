@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview BAALVION / AMARISÉ - API Orchestrator (Mock)
  * Simulates real-world backend behavior including latency, idempotency, and semantic search.
@@ -7,6 +6,7 @@
 import { CountryCode, PaymentGateway, TransactionStatus } from '../types';
 import { StockManager } from '../inventory/stockManager';
 import { applyAdvancedSearch } from '../search/engine';
+import { RecommendationEngine, RecommendationNode } from '../ai-autopilot/ai-recommendation-engine';
 
 export interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -24,17 +24,23 @@ class MockApiOrchestrator {
   }
 
   /**
-   * 🛍️ PRODUCT APIs
+   * 🤖 AI RECOMMENDATION API
    */
-  async getProducts(filters: any): Promise<ApiResponse<any>> {
+  async getRecommendations(params: {
+    userId: string;
+    country: CountryCode;
+    history: any[];
+    cart: any[];
+    registry: any[];
+  }): Promise<ApiResponse<RecommendationNode[]>> {
     await this.simulate();
-    return {
-      status: 'success',
-      data: {
-        items: [], 
-        count: 0
-      }
-    };
+    const data = await RecommendationEngine.getPersonalizedResonance(
+      params.history,
+      params.cart,
+      params.registry,
+      params.country
+    );
+    return { status: 'success', data };
   }
 
   /**
