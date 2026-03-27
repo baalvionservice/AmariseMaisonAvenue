@@ -637,3 +637,25 @@ export interface CMSSection {
   name: string;
   visible: boolean;
 }
+
+export interface Inventory {
+  productId: string;
+  variantId: string;
+  country: CountryCode;
+  totalStock: number;
+  reservedStock: number;
+  availableStock: number;
+  updatedAt: string;
+}
+
+export interface InventoryLock {
+  id: string;
+  productId: string;
+  variantId: string;
+  userId: string;
+  orderId?: string;
+  status: 'LOCKED' | 'RELEASED' | 'EXPIRED' | 'CONFIRMED';
+  quantity: number;
+  expiresAt: string;
+  createdAt: string;
+}

@@ -1,9 +1,10 @@
 /**
  * @fileOverview BAALVION / AMARISÉ - API Orchestrator (Mock)
- * Simulates real-world backend behavior including latency, idempotency, and errors.
+ * Simulates real-world backend behavior including latency, idempotency, and inventory locking.
  */
 
 import { CountryCode, PaymentGateway, TransactionStatus } from '../types';
+import { StockManager } from '../inventory/stockManager';
 
 export interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -28,7 +29,7 @@ class MockApiOrchestrator {
     return {
       status: 'success',
       data: {
-        items: [], // Would fetch from INITIAL_PRODUCTS
+        items: [], 
         count: 0
       }
     };
@@ -36,21 +37,28 @@ class MockApiOrchestrator {
 
   /**
    * 📦 INVENTORY APIs (Atomic Locking)
+   * Prevents overselling by reserving stock for 15 minutes.
    */
-  async lockInventory(variantId: string, userId: string): Promise<ApiResponse<any>> {
+  async lockInventory(variantId: string, userId: string, quantity: number = 1): Promise<ApiResponse<any>> {
     await this.simulate();
-    // Simulation: 10% chance item was just taken by another VIP
-    if (Math.random() < 0.1) {
+    
+    // In production, this would be a Firestore Transaction
+    // For mock, we use the StockManager utility
+    const result = StockManager.reserveStock({ id: variantId, stock: 1, name: "Luxury Artifact" } as any, userId, quantity);
+
+    if (!result.success) {
       return {
         status: 'error',
-        error: 'CONFLICT: Artifact locked by another collector node.',
+        error: result.message,
         code: 409
       };
     }
+
     return {
       status: 'success',
       data: {
-        lock_id: `lock_${Math.random().toString(36).substr(2, 5)}`,
+        lock_id: result.lockId,
+        expires_at: new Date(Date.now() + 15 * 60000).toISOString(),
         ttl_minutes: 15
       }
     };

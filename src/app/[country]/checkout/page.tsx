@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -12,6 +11,7 @@ import { Check, ShieldCheck, Truck, CreditCard, Lock, ArrowRight, ChevronRight, 
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { paymentService } from '@/lib/services/paymentService';
+import { apiOrchestrator } from '@/lib/api/orchestrator';
 import { PaymentGateway } from '@/lib/types';
 
 export default function CheckoutPage() {
@@ -28,6 +28,7 @@ export default function CheckoutPage() {
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('STRIPE');
   const [isSettling, setIsSettling] = useState(false);
   const [orderRef, setOrderRef] = useState('');
+  const [inventoryLockId, setInventoryLockId] = useState<string | null>(null);
   
   // Prevent hydration mismatch for random order ID
   useEffect(() => {
@@ -45,6 +46,28 @@ export default function CheckoutPage() {
   const subtotal = itemsValue + planValue;
   const taxAmount = subtotal * (currentCountryConfig?.taxRate || 0) / 100;
   const totalYield = subtotal + taxAmount;
+
+  /**
+   * ATOMIC INVENTORY LOCKING
+   * Transition from Step 1 to Step 2 requires securing the artifacts.
+   */
+  const handleLockInventory = async () => {
+    if (cart.length > 0) {
+      toast({ title: "Securing Artifacts", description: "Verifying atomic availability in global registry..." });
+      
+      // Simulate multi-item locking
+      const lockRes = await apiOrchestrator.lockInventory(cart[0].id, currentUser?.id || 'guest');
+      
+      if (lockRes.status === 'success') {
+        setInventoryLockId(lockRes.data.lock_id);
+        setStep(2);
+      } else {
+        toast({ variant: "destructive", title: "Allocation Conflict", description: lockRes.error });
+      }
+    } else {
+      setStep(2);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     setIsSettling(true);
@@ -172,7 +195,7 @@ export default function CheckoutPage() {
                   <div className="pt-12 border-t border-border flex justify-end">
                     <Button 
                       className="h-20 px-16 bg-black text-white hover:bg-plum rounded-none text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl disabled:opacity-30"
-                      onClick={() => setStep(2)}
+                      onClick={handleLockInventory}
                       disabled={!firstName || !lastName}
                     >
                       CONTINUE TO SETTLEMENT <ArrowRight className="ml-4 w-4 h-4" />
@@ -187,6 +210,19 @@ export default function CheckoutPage() {
                     <h2 className="text-4xl font-headline font-bold italic tracking-tight">Vault Authorization</h2>
                     <p className="text-sm text-gray-500 font-light italic">Select your preferred global settlement gateway.</p>
                   </div>
+
+                  {inventoryLockId && (
+                    <div className="p-4 bg-emerald-50 border border-emerald-100 flex items-center justify-between">
+                       <div className="flex items-center space-x-3 text-emerald-600">
+                          <ShieldCheck className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Archive Reservation Active</span>
+                       </div>
+                       <div className="flex items-center space-x-2 text-[9px] font-bold text-emerald-400">
+                          <Lock className="w-3 h-3" />
+                          <span>Expires in 14:59</span>
+                       </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <GatewayCard 
