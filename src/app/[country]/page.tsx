@@ -54,7 +54,6 @@ export default function HomePage() {
   const infoSell = placeholderData.placeholderImages.find(img => img.id === 'home-info-sell')?.imageUrl;
   const infoShowroom = placeholderData.placeholderImages.find(img => img.id === 'home-info-showrooms')?.imageUrl;
 
-  // Specific "New Arrival" artifacts inspired by the reference image
   const newArrivals = [
     {
       id: 'prod-11',
@@ -94,9 +93,7 @@ export default function HomePage() {
           className="object-cover"
           data-ai-hint="luxury fashion"
         />
-        
         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-        
         <div className="relative z-10 text-center space-y-8 lg:space-y-12 max-w-5xl px-6 lg:mt-20">
           <div className="space-y-4 lg:space-y-6">
             <span className="text-[10px] lg:text-[12px] font-bold tracking-[0.6em] text-white uppercase drop-shadow-md">
@@ -106,11 +103,9 @@ export default function HomePage() {
               Amarisé Maison
             </h1>
           </div>
-          
           <p className="text-lg md:text-2xl lg:text-3xl text-white/90 font-light italic max-w-3xl mx-auto leading-relaxed font-headline drop-shadow-lg">
             "Curating the world's most significant artifacts. A dialogue between human brilliance and the absolute standard of the archive."
           </p>
-          
           <div className="pt-8 lg:pt-16 flex flex-col sm:flex-row items-center justify-center gap-6 lg:gap-10">
             <Link href={`/${countryCode}/category/hermes`}>
               <Button className="bg-white text-black hover:bg-black hover:text-white px-12 lg:px-24 h-16 lg:h-20 rounded-none text-[10px] lg:text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl">
@@ -166,7 +161,6 @@ export default function HomePage() {
       <section className="container mx-auto px-6 lg:px-12 py-24 lg:py-32 max-w-[1600px] space-y-16">
         <div className="text-center space-y-8">
           <h2 className="text-5xl lg:text-6xl font-headline font-medium text-gray-900 tracking-tight">New Arrivals</h2>
-          
           <div className="flex items-center justify-center space-x-12 border-b border-gray-100 pb-1">
             {['HERMÈS', 'CHANEL', 'OTHER BRANDS', 'VIEW ALL'].map((tab) => (
               <button 
@@ -185,7 +179,6 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-
         <div className="relative group px-12">
           <button className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all bg-white z-10">
             <ChevronLeft className="w-4 h-4" />
@@ -193,17 +186,11 @@ export default function HomePage() {
           <button className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all bg-white z-10">
             <ChevronRight className="w-4 h-4" />
           </button>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
             {newArrivals.map((prod) => (
               <div key={prod.id} className="flex flex-col items-center text-center space-y-8 group/card cursor-pointer">
                 <div className="relative aspect-[4/5] w-full bg-white flex items-center justify-center p-8 overflow-hidden">
-                  <Image 
-                    src={prod.imageUrl} 
-                    alt={prod.name} 
-                    fill 
-                    className="object-contain transition-transform duration-[2s] group-hover/card:scale-105" 
-                  />
+                  <Image src={prod.imageUrl} alt={prod.name} fill className="object-contain transition-transform duration-[2s] group-hover/card:scale-105" />
                   <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors">
                     <Heart className="w-5 h-5" />
                   </button>
@@ -225,15 +212,8 @@ export default function HomePage() {
       {/* 5. 100% Authenticity Guarantee Section */}
       <section className="flex flex-col lg:flex-row min-h-[500px] lg:h-[600px] overflow-hidden bg-black relative">
         <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
-          <Image 
-            src={authImage}
-            alt="Amarisé Authenticity Guarantee"
-            fill
-            className="object-cover"
-            data-ai-hint="luxury bag"
-          />
+          <Image src={authImage} alt="Amarisé Authenticity Guarantee" fill className="object-cover" data-ai-hint="luxury bag" />
         </div>
-
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:block">
           <div className="w-16 h-20 relative flex items-center justify-center">
             <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full text-white fill-none stroke-current stroke-[2px]">
@@ -246,12 +226,9 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
         <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center lg:items-start justify-center text-center lg:text-left space-y-8">
           <div className="space-y-4">
-            <h2 className="text-4xl lg:text-6xl font-headline font-medium tracking-tight">
-              100% Authenticity Guarantee
-            </h2>
+            <h2 className="text-4xl lg:text-6xl font-headline font-medium tracking-tight">100% Authenticity Guarantee</h2>
             <p className="text-sm lg:text-base font-body font-light text-gray-300 leading-relaxed max-w-md">
               Every piece is authenticated and certified by our in-house team of luxury experts.
             </p>
@@ -262,27 +239,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Institutional Information Matrix */}
+      {/* 6. Institutional Information Matrix (First Instance) */}
       <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-          <InfoBlock 
-            imageUrl={infoAuth!}
-            title="100% Authenticity Guarantee"
-            description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process."
-            href={`/${countryCode}/customer-service`}
-          />
-          <InfoBlock 
-            imageUrl={infoSell!}
-            title="Sell To Us"
-            description="Sell or consign your bag to us. Receive a fast quote by our advisors."
-            href={`/${countryCode}/how-to-sell`}
-          />
-          <InfoBlock 
-            imageUrl={infoShowroom!}
-            title="Visit Our Showrooms"
-            description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing."
-            href={`/${countryCode}/appointments`}
-          />
+          <InfoBlock imageUrl={infoAuth!} title="100% Authenticity Guarantee" description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process." href={`/${countryCode}/customer-service`} />
+          <InfoBlock imageUrl={infoSell!} title="Sell To Us" description="Sell or consign your bag to us. Receive a fast quote by our advisors." href={`/${countryCode}/how-to-sell`} />
+          <InfoBlock imageUrl={infoShowroom!} title="Visit Our Showrooms" description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing." href={`/${countryCode}/appointments`} />
         </div>
       </section>
 
@@ -310,13 +272,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="lg:w-1/2 relative min-h-[400px] lg:min-h-auto bg-muted overflow-hidden">
-          <Image 
-            src={liveImage}
-            alt="Amarisé Maison Live Archive Preview"
-            fill
-            className="object-cover grayscale-[20%] transition-all duration-[3s] hover:grayscale-0 hover:scale-105"
-            data-ai-hint="luxury handbags"
-          />
+          <Image src={liveImage} alt="Amarisé Maison Live Archive Preview" fill className="object-cover grayscale-[20%] transition-all duration-[3s] hover:grayscale-0 hover:scale-105" data-ai-hint="luxury handbags" />
           <div className="absolute inset-0 bg-black/10" />
         </div>
       </section>
@@ -338,53 +294,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 9. Repeated Informational Matrix */}
+      {/* 9. Institutional Information Matrix (Second Instance) */}
       <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-          <InfoBlock 
-            imageUrl={infoAuth!}
-            title="100% Authenticity Guarantee"
-            description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process."
-            href={`/${countryCode}/customer-service`}
-          />
-          <InfoBlock 
-            imageUrl={infoSell!}
-            title="Sell To Us"
-            description="Sell or consign your bag to us. Receive a fast quote by our advisors."
-            href={`/${countryCode}/how-to-sell`}
-          />
-          <InfoBlock 
-            imageUrl={infoShowroom!}
-            title="Visit Our Showrooms"
-            description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing."
-            href={`/${countryCode}/appointments`}
-          />
+          <InfoBlock imageUrl={infoAuth!} title="100% Authenticity Guarantee" description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process." href={`/${countryCode}/customer-service`} />
+          <InfoBlock imageUrl={infoSell!} title="Sell To Us" description="Sell or consign your bag to us. Receive a fast quote by our advisors." href={`/${countryCode}/how-to-sell`} />
+          <InfoBlock imageUrl={infoShowroom!} title="Visit Our Showrooms" description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing." href={`/${countryCode}/appointments`} />
         </div>
       </section>
 
       {/* 10. Our Mission Section (Dual-Panel) */}
       <section className="flex flex-col lg:flex-row min-h-[600px] overflow-hidden bg-black">
         <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
-          <Image 
-            src={missionImage}
-            alt="Maison Amarisé Our Mission"
-            fill
-            className="object-cover"
-            data-ai-hint="luxury fashion"
-          />
+          <Image src={missionImage} alt="Maison Amarisé Our Mission" fill className="object-cover" data-ai-hint="luxury fashion" />
         </div>
-
         <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col justify-center space-y-10">
           <div className="space-y-6">
-            <h2 className="text-4xl lg:text-5xl font-headline font-medium tracking-tight italic">
-              Our Mission
-            </h2>
+            <h2 className="text-4xl lg:text-5xl font-headline font-medium tracking-tight italic">Our Mission</h2>
             <div className="space-y-8 max-w-xl">
               <p className="text-sm lg:text-base font-body font-light leading-relaxed text-gray-300">
-                At Amarisé Maison Avenue, we specialize in the rare, the iconic, and the extraordinary. As the leading global curator of Hermès and Chanel artifacts, we offer a curated selection of investment-worthy pieces with unmatched access and authenticity. We believe in empowering and inspiring connoisseurs to express themselves through fashion, confidence, and bold individuality. Every artifact in our collection tells a story of heritage, craftsmanship, and timeless style. Founded in 1924, our company is driven by a passion for luxury and a commitment to trust. With private showrooms in New York, London, and Dubai, we're thrilled to bring the world's most coveted artifacts to you. Whether you're collecting or simply falling in love, our pieces are meant to be worn, treasured, and passed down to the next generation.
+                At Amarisé Maison Avenue, we specialize in the rare, the iconic, and the extraordinary. As the leading global curator of Hermès and Chanel artifacts, we offer a curated selection of investment-worthy pieces with unmatched access and authenticity. We believe in empowering and inspiring connoisseurs to express themselves through fashion, confidence, and bold individuality.
               </p>
               <p className="text-sm lg:text-base font-body font-light leading-relaxed text-gray-300">
-                From rare Hermès bags, to shoes and fine jewelry, we curate the most comprehensive stock of new and never worn accessories, in stock and in your hands the very next day. We specialize in your favorite Hermès Birkin, Kelly, Constance and Picotin series as well as a wide assortment of Hermès accessories, scarves and jewelry. As you search for your next designer acquisition, gift or investment piece, we aim to be your trusted advisor, dedicated to finding authentic luxury designer bags and accessories matching the style and sophistication you so well deserve. Welcome to the art of the selection.
+                From rare Hermès bags, to shoes and fine jewelry, we curate the most comprehensive stock of new and never worn accessories, in stock and in your hands the very next day. Welcome to the art of the selection.
               </p>
             </div>
           </div>
@@ -396,13 +328,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 11. As Seen In Press Marquee (Sliding) */}
+      {/* 11. As Seen In Press Marquee */}
       <section className="bg-white py-24 border-t border-gray-50 overflow-hidden">
         <div className="container mx-auto px-6 mb-16 text-center space-y-4">
           <h2 className="text-4xl md:text-5xl font-headline font-medium text-gray-900 italic">As Seen In</h2>
         </div>
-        
-        {/* Infinite Sliding Marquee */}
         <div className="relative flex overflow-x-hidden border-y border-gray-100 py-12">
           <div className="animate-marquee flex items-center whitespace-nowrap space-x-20 lg:space-x-40">
             <PressLogo name="Bloomberg" className="font-sans font-black tracking-tighter text-3xl" />
@@ -410,7 +340,6 @@ export default function HomePage() {
             <PressLogo name="NEW YORK POST" className="font-sans font-black italic tracking-tighter text-3xl" />
             <PressLogo name="THE WALL STREET JOURNAL." className="font-headline font-bold text-2xl" />
             <PressLogo name="BUSINESS INSIDER" className="font-sans font-black tracking-tighter text-2xl" />
-            {/* Duplicated for seamless loop */}
             <PressLogo name="Bloomberg" className="font-sans font-black tracking-tighter text-3xl" />
             <PressLogo name="COVETEUR" className="font-sans font-bold tracking-[0.2em] text-2xl" />
             <PressLogo name="NEW YORK POST" className="font-sans font-black italic tracking-tighter text-3xl" />
@@ -418,7 +347,6 @@ export default function HomePage() {
             <PressLogo name="BUSINESS INSIDER" className="font-sans font-black tracking-tighter text-2xl" />
           </div>
         </div>
-
         <div className="mt-16 text-center">
           <Link href={`/${countryCode}/journal`} className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 hover:text-black transition-colors border-b border-gray-200 pb-1">
             SEE ALL PRESS
@@ -426,7 +354,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 12. Institutional Trust Footer */}
+      {/* 12. VIP Email Registry Section */}
+      <section className="bg-[#f8f8f8] py-24 border-t border-gray-100">
+        <div className="container mx-auto px-6 max-w-4xl text-center space-y-8">
+          <div className="space-y-4">
+            <h3 className="text-3xl lg:text-4xl font-headline font-medium italic text-gray-900">Join the VIP Email List</h3>
+            <p className="text-sm lg:text-base font-body font-light text-gray-500 leading-relaxed max-w-2xl mx-auto">
+              Join our VIP email list and get first access new product launches and all the latest updates from Madison Avenue Couture!
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto w-full pt-4">
+            <form className="flex flex-col sm:flex-row gap-0 border border-gray-200 bg-white shadow-sm overflow-hidden">
+              <input 
+                type="email" 
+                placeholder="Enter your email address" 
+                className="flex-1 h-16 px-8 text-sm font-light italic outline-none border-none bg-transparent placeholder:text-gray-300"
+                required
+              />
+              <button 
+                type="submit"
+                className="h-16 px-12 bg-white text-gray-900 font-bold text-[11px] tracking-[0.3em] uppercase transition-all hover:bg-gray-50 border-l border-gray-100 group"
+              >
+                <span className="border-b border-gray-900 pb-0.5 group-hover:border-plum transition-all">SUBMIT</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* 13. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
@@ -466,13 +422,7 @@ function PressLogo({ name, className }: { name: string, className?: string }) {
 function CuratorialBlock({ imageUrl, title, subtitle, href, hint }: { imageUrl: string, title: string, subtitle: string, href: string, hint: string }) {
   return (
     <Link href={href} className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-muted shadow-sm">
-      <Image 
-        src={imageUrl} 
-        alt={title} 
-        fill 
-        className="object-cover transition-transform duration-[5s] group-hover:scale-110" 
-        data-ai-hint={hint}
-      />
+      <Image src={imageUrl} alt={title} fill className="object-cover transition-transform duration-[5s] group-hover:scale-110" data-ai-hint={hint} />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
       <div className="absolute inset-x-0 bottom-0 p-8 lg:p-12 text-center text-white space-y-2 lg:space-y-3 translate-y-2 group-hover:translate-y-0 transition-transform duration-700">
         <h3 className="text-2xl lg:text-4xl font-headline font-medium italic tracking-tight">{title}</h3>
@@ -486,12 +436,7 @@ function InfoBlock({ imageUrl, title, description, href }: { imageUrl: string, t
   return (
     <div className="flex flex-col items-center text-center space-y-8 group">
       <div className="relative aspect-square w-full overflow-hidden bg-muted border border-gray-100 shadow-sm">
-        <Image 
-          src={imageUrl} 
-          alt={title} 
-          fill 
-          className="object-cover transition-transform duration-[2s] group-hover:scale-105" 
-        />
+        <Image src={imageUrl} alt={title} fill className="object-cover transition-transform duration-[2s] group-hover:scale-105" />
         <div className="absolute inset-0 bg-black/[0.02]" />
       </div>
       <div className="space-y-4 max-w-sm px-4">
