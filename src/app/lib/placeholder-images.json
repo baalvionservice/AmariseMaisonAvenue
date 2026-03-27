@@ -78,6 +78,24 @@
       "description": "Authenticity Guarantee Visual",
       "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720",
       "imageHint": "luxury bag"
+    },
+    {
+      "id": "home-info-auth",
+      "description": "Informational Grid: Authenticity",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Authenticity_1.jpg?v=1770664405&width=800",
+      "imageHint": "hermes boxes"
+    },
+    {
+      "id": "home-info-sell",
+      "description": "Informational Grid: Sell To Us",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Sell_1.jpg?v=1770664405&width=800",
+      "imageHint": "exotic bags"
+    },
+    {
+      "id": "home-info-showrooms",
+      "description": "Informational Grid: Showrooms",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Showroom_1.jpg?v=1770664405&width=800",
+      "imageHint": "luxury interior"
     }
   ]
 }

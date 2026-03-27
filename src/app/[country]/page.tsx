@@ -49,6 +49,10 @@ export default function HomePage() {
   const gridArrivals = placeholderData.placeholderImages.find(img => img.id === 'home-grid-arrivals')?.imageUrl;
   const gridVisit = placeholderData.placeholderImages.find(img => img.id === 'home-grid-visit')?.imageUrl;
 
+  const infoAuth = placeholderData.placeholderImages.find(img => img.id === 'home-info-auth')?.imageUrl;
+  const infoSell = placeholderData.placeholderImages.find(img => img.id === 'home-info-sell')?.imageUrl;
+  const infoShowroom = placeholderData.placeholderImages.find(img => img.id === 'home-info-showrooms')?.imageUrl;
+
   // Specific "New Arrival" artifacts inspired by the reference image
   const newArrivals = [
     {
@@ -230,7 +234,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Tactical Shield Icon (Overlapping the border) */}
+        {/* Tactical Shield Icon */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:block">
           <div className="w-16 h-20 relative flex items-center justify-center">
             <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full text-white fill-none stroke-current stroke-[2px]">
@@ -260,7 +264,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Amarisé Maison Avenue Live Section */}
+      {/* 6. Institutional Information Matrix */}
+      <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+          <InfoBlock 
+            imageUrl={infoAuth!}
+            title="100% Authenticity Guarantee"
+            description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process."
+            href={`/${countryCode}/customer-service`}
+          />
+          <InfoBlock 
+            imageUrl={infoSell!}
+            title="Sell To Us"
+            description="Sell or consign your bag to us. Receive a fast quote by our advisors."
+            href={`/${countryCode}/how-to-sell`}
+          />
+          <InfoBlock 
+            imageUrl={infoShowroom!}
+            title="Visit Our Showrooms"
+            description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing."
+            href={`/${countryCode}/appointments`}
+          />
+        </div>
+      </section>
+
+      {/* 7. Amarisé Maison Avenue Live Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-6">
@@ -295,7 +323,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. Tactical Ticker */}
+      {/* 8. Tactical Ticker */}
       <section className="bg-black py-5 border-y border-white/10">
         <div className="container mx-auto flex items-center justify-center space-x-16">
            <div className="flex items-center space-x-4 text-gold">
@@ -312,108 +340,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. Dual-Persona Acquisition Matrix */}
-      <section className="container mx-auto px-6 py-40 max-w-[1600px]">
-        <div className="text-center space-y-24">
-          <div className="space-y-8 max-w-4xl mx-auto">
-            <div className="inline-flex items-center justify-center p-6 bg-plum/5 rounded-full mb-4">
-              <FlaskConical className="w-10 h-10 text-plum" />
-            </div>
-            <h3 className="text-6xl md:text-7xl font-headline font-bold italic text-gray-900 tracking-tighter">The Acquisition Strategy</h3>
-            <p className="text-2xl text-gray-500 font-light italic leading-relaxed">
-              Our digital presence is architected around two core flows optimized for technical transparency and narrative exclusivity.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 px-6">
-            <Link href={`/${countryCode}/product/prod-11`} className="group relative p-16 lg:p-24 bg-white border border-border hover:border-black transition-all text-left space-y-10 shadow-sm overflow-hidden">
-              <div className="absolute top-0 right-0 p-16 lg:p-24 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                 <Eye className="w-80 h-80 text-black" />
-              </div>
-              <div className="flex items-center justify-between relative z-10">
-                <div className="p-6 bg-ivory border border-border rounded-none text-gray-400 group-hover:text-black transition-colors">
-                   <Eye className="w-8 h-8" />
-                </div>
-                <span className="text-[11px] font-bold uppercase tracking-[0.5em] text-gray-300">Design A</span>
-              </div>
-              <div className="space-y-6 relative z-10">
-                <h4 className="text-5xl font-headline font-bold italic text-gray-900 leading-tight">The Institutional Registry</h4>
-                <p className="text-lg text-gray-500 font-light italic leading-relaxed">
-                  Normal Collector Flow: High-density technical data grid optimized for marketplace trust and absolute asset transparency.
-                </p>
-              </div>
-              <div className="pt-12 flex items-center text-[11px] font-bold tracking-[0.5em] uppercase text-plum group-hover:translate-x-6 transition-transform relative z-10">
-                AUDIT REGISTRY VIEW <ArrowRight className="w-5 h-5 ml-4" />
-              </div>
-            </Link>
-
-            <Link href={`/${countryCode}/private-order/prod-11`} className="group relative p-16 lg:p-24 bg-[#0A0A0B] border border-white/5 hover:border-gold transition-all text-left space-y-10 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 p-16 lg:p-24 opacity-10 group-hover:opacity-20 transition-opacity">
-                 <Crown className="w-80 h-80 text-gold" />
-              </div>
-              <div className="flex items-center justify-between relative z-10">
-                <div className="p-6 bg-white/5 border border-white/10 rounded-none text-gold">
-                   <Lock className="w-8 h-8" />
-                </div>
-                <span className="text-[11px] font-bold uppercase tracking-[0.5em] text-white/20">Design B</span>
-              </div>
-              <div className="space-y-6 relative z-10">
-                <h4 className="text-5xl font-headline font-bold italic text-white leading-tight">The Private Salon</h4>
-                <p className="text-lg text-white/40 font-light italic leading-relaxed">
-                  Elite Client Flow: Cinematic, narrative-first design reserved for high-value VIP artifacts and bespoke curatorial briefs.
-                </p>
-              </div>
-              <div className="pt-12 flex items-center text-[11px] font-bold tracking-[0.5em] uppercase text-gold group-hover:translate-x-6 transition-transform relative z-10">
-                AUDIT SALON VIEW <ArrowRight className="ml-4 w-5 h-5" />
-              </div>
-            </Link>
-          </div>
+      {/* 9. Repeated Informational Matrix */}
+      <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+          <InfoBlock 
+            imageUrl={infoAuth!}
+            title="100% Authenticity Guarantee"
+            description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process."
+            href={`/${countryCode}/customer-service`}
+          />
+          <InfoBlock 
+            imageUrl={infoSell!}
+            title="Sell To Us"
+            description="Sell or consign your bag to us. Receive a fast quote by our advisors."
+            href={`/${countryCode}/how-to-sell`}
+          />
+          <InfoBlock 
+            imageUrl={infoShowroom!}
+            title="Visit Our Showrooms"
+            description="New York City & Palm Beach. Make an appointment, or to schedule a virtual showing."
+            href={`/${countryCode}/appointments`}
+          />
         </div>
-      </section>
-
-      {/* 9. Rare Archive Grid */}
-      <section className="bg-ivory/30 py-60 border-y border-border">
-         <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
-            <div className="flex flex-col md:row items-end justify-between gap-12">
-               <div className="space-y-6">
-                  <div className="flex items-center space-x-4 text-gold">
-                     <Sparkles className="w-6 h-6" />
-                     <span className="text-[12px] font-bold tracking-[0.6em] uppercase">The Selection</span>
-                  </div>
-                  <h3 className="text-6xl md:text-8xl font-headline font-bold italic tracking-tighter text-gray-900 leading-[0.9]">Rare Archive Entries</h3>
-               </div>
-               <Link href={`/${countryCode}/category/hermes`} className="text-[11px] font-bold tracking-[0.5em] uppercase text-black hover:text-plum transition-all border-b-2 border-black pb-3 flex items-center">
-                 VIEW FULL REGISTRY <ArrowRight className="w-4 h-4 ml-3" />
-               </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-24">
-               {products.slice(0, 3).map((prod, idx) => (
-                 <Link key={prod.id} href={`/${countryCode}/product/${prod.id}`} className="group space-y-12 block">
-                    <div className="relative aspect-[3/4] bg-white border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center p-16 luxury-reveal">
-                       <div className="w-full h-full relative">
-                          <Image 
-                            src={prod.imageUrl} 
-                            alt={prod.name} 
-                            fill 
-                            className="object-contain p-8 transition-transform duration-[3s] group-hover:scale-110" 
-                          />
-                       </div>
-                       <div className="absolute inset-0 bg-black/[0.02] group-hover:bg-transparent transition-colors" />
-                    </div>
-                    <div className="space-y-6 text-center">
-                       <span className="text-[11px] font-bold tracking-[0.6em] text-gray-400 uppercase">0{idx + 1} / {prod.categoryId.toUpperCase()} REGISTRY</span>
-                       <h4 className="text-3xl font-headline font-bold italic text-gray-900 group-hover:text-plum transition-colors duration-700 leading-tight px-12">{prod.name}</h4>
-                       <div className="flex items-center justify-center space-x-6 pt-6">
-                          <div className="h-[1.5px] w-12 bg-gray-100 group-hover:w-20 group-hover:bg-plum transition-all duration-1000" />
-                          <span className="text-lg font-bold tracking-tighter tabular-nums text-gray-900">${prod.basePrice.toLocaleString()}</span>
-                          <div className="h-[1.5px] w-12 bg-gray-100 group-hover:w-20 group-hover:bg-plum transition-all duration-1000" />
-                       </div>
-                    </div>
-                 </Link>
-               ))}
-            </div>
-         </div>
       </section>
 
       {/* 10. Institutional Trust Footer */}
@@ -464,5 +412,30 @@ function CuratorialBlock({ imageUrl, title, subtitle, href, hint }: { imageUrl: 
         <p className="text-[10px] lg:text-[12px] font-body font-light italic opacity-80 tracking-wide">{subtitle}</p>
       </div>
     </Link>
+  );
+}
+
+function InfoBlock({ imageUrl, title, description, href }: { imageUrl: string, title: string, description: string, href: string }) {
+  return (
+    <div className="flex flex-col items-center text-center space-y-8 group">
+      <div className="relative aspect-square w-full overflow-hidden bg-muted border border-gray-100 shadow-sm">
+        <Image 
+          src={imageUrl} 
+          alt={title} 
+          fill 
+          className="object-cover transition-transform duration-[2s] group-hover:scale-105" 
+        />
+        <div className="absolute inset-0 bg-black/[0.02]" />
+      </div>
+      <div className="space-y-4 max-w-sm px-4">
+        <h3 className="text-3xl font-headline font-bold italic text-gray-900 tracking-tight leading-tight">{title}</h3>
+        <p className="text-sm font-light text-gray-500 italic leading-relaxed">{description}</p>
+      </div>
+      <Link href={href}>
+        <Button className="bg-black text-white hover:bg-plum h-12 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em] transition-all shadow-xl">
+          READ MORE
+        </Button>
+      </Link>
+    </div>
   );
 }
