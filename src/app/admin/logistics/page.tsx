@@ -71,7 +71,7 @@ export default function LogisticsHub() {
         </div>
         <div className="flex items-center space-x-4">
            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-none h-10 px-6 rounded-none text-[10px] font-bold uppercase tracking-widest">
-             Hub Node: {activeHub?.toUpperCase() || 'GLOBAL'}
+             Hub Node: {(activeHub || '').toUpperCase()}
            </Badge>
         </div>
       </header>
@@ -109,7 +109,7 @@ export default function LogisticsHub() {
                          <TableCell>
                             <div className="flex flex-col">
                                <span className="text-xs font-bold text-white/80 uppercase">Order: {shipment.orderId}</span>
-                               <span className="text-[8px] text-white/20 uppercase tracking-widest">{shipment.country.toUpperCase()} Hub Node</span>
+                               <span className="text-[8px] text-white/20 uppercase tracking-widest">{(shipment.country || '').toUpperCase()} Hub Node</span>
                             </div>
                          </TableCell>
                          <TableCell className="text-[10px] font-bold text-white/40 uppercase">{shipment.courierName}</TableCell>
@@ -118,7 +118,7 @@ export default function LogisticsHub() {
                               shipment.status === 'delivered' ? "bg-emerald-500/10 text-emerald-400" :
                               shipment.status === 'failed' ? "bg-red-500/10 text-red-500" :
                               "bg-blue-500/10 text-blue-400"
-                            )}>{shipment.status.replace('_', ' ')}</Badge>
+                            )}>{(shipment.status || '').replace('_', ' ')}</Badge>
                          </TableCell>
                          <TableCell className="text-right pr-8">
                             <div className="flex justify-end space-x-2">

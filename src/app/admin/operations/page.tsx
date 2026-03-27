@@ -57,7 +57,7 @@ export default function OperationsHub() {
     e.preventDefault();
     if (!intakeData.productId) return;
     performWarehouseIntake(intakeData.productId, parseInt(intakeData.quantity), intakeData.reason);
-    toast({ title: "Registry Synchronized", description: `${intakeData.quantity} units added to the ${activeHub?.toUpperCase()} archive.` });
+    toast({ title: "Registry Synchronized", description: `${intakeData.quantity} units added to the ${(activeHub || '').toUpperCase()} archive.` });
     setIntakeData({ productId: '', quantity: '1', reason: 'Institutional Sourcing' });
   };
 
@@ -74,7 +74,7 @@ export default function OperationsHub() {
         </div>
         <div className="flex items-center space-x-4">
            <Badge variant="outline" className="bg-plum/10 text-plum border-plum/20 h-10 px-6 rounded-none text-[10px] font-bold uppercase tracking-widest">
-             Node: {activeHub?.toUpperCase() || 'GLOBAL'}
+             Node: {(activeHub || '').toUpperCase() || 'GLOBAL'}
            </Badge>
         </div>
       </header>
@@ -240,7 +240,7 @@ export default function OperationsHub() {
                     {warehouseLogs.length === 0 && (
                       <TableRow>
                          <TableCell colSpan={5} className="py-40 text-center opacity-20">
-                            <History className="w-12 h-12 mx-auto mb-4" />
+                            <History size={48} className="mx-auto mb-4" />
                             <p className="text-[10px] font-bold uppercase tracking-widest">No movement history recorded</p>
                          </TableCell>
                       </TableRow>

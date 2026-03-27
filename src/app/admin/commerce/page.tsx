@@ -63,8 +63,8 @@ export default function CommerceCommandHub() {
 
   const filteredProducts = useSearch(scopedProducts, searchQuery);
   const filteredOrders = scopedTransactions.filter(t => 
-    t.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.id.toLowerCase().includes(searchQuery.toLowerCase())
+    (t.clientName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.id || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const stats = useMemo(() => ({
@@ -255,7 +255,7 @@ export default function CommerceCommandHub() {
                          <TableCell>
                             <div className="flex flex-col">
                                <span className="text-xs font-bold text-white/80 uppercase">{order.clientName}</span>
-                               <span className="text-[8px] text-white/20 uppercase tracking-widest">{order.country.toUpperCase()} HUB</span>
+                               <span className="text-[8px] text-white/20 uppercase tracking-widest">{(order.country || '').toUpperCase()} HUB</span>
                             </div>
                          </TableCell>
                          <TableCell>

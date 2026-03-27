@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -52,7 +51,6 @@ export default function AIControlPanel() {
   const { 
     scopedFraudLogs, 
     scopedPricingOptimizations, 
-    activeHub, 
     optimizeRegistryPricing,
     adminJurisdiction 
   } = useAppStore();
@@ -249,7 +247,7 @@ export default function AIControlPanel() {
                                <TableCell className="pl-8">
                                   <div className="flex flex-col">
                                      <span className="text-xs font-bold text-white uppercase tracking-tight">{price.productId}</span>
-                                     <span className="text-[8px] text-white/20 uppercase tracking-widest">{price.country.toUpperCase()} HUB</span>
+                                     <span className="text-[8px] text-white/20 uppercase tracking-widest">{(price.country || '').toUpperCase()} HUB</span>
                                   </div>
                                </TableCell>
                                <TableCell>
@@ -358,8 +356,8 @@ export default function AIControlPanel() {
                     {logs.map(log => (
                       <TableRow key={log.id} className="hover:bg-white/5 transition-colors border-white/5 h-12">
                          <TableCell className="pl-8 text-[9px] font-mono text-white/20">{new Date(log.timestamp).toLocaleTimeString()}</TableCell>
-                         <TableCell><Badge variant="outline" className="text-[7px] border-white/10 text-plum uppercase">{log.moduleId}</Badge></TableCell>
-                         <TableCell className="text-xs font-light italic text-white/60">"{log.action}"</TableCell>
+                         <TableCell><Badge variant="outline" className="text-[7px] border-white/10 text-blue-400 uppercase">{log.moduleId}</Badge></TableCell>
+                         <TableCell className="text-xs font-light italic text-white/60">"{(log.action || '').replace('_', ' ')}"</TableCell>
                          <TableCell className="text-right pr-8 font-mono text-[9px] text-emerald-400">14ms</TableCell>
                       </TableRow>
                     ))}

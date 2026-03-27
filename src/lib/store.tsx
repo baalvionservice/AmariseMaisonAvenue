@@ -9,7 +9,7 @@ import {
   CMSSection, Collection, Editorial, SEOMetadata, SalesScript,
   Appointment, Invoice, Affiliate, ReturnRequest, MaisonError, BrandIntegrityIssue,
   WorkflowTask, AIModuleStatus, AIActionLog, AISuggestion, Department, Category,
-  BackgroundJob
+  BackgroundJob, AuditLogEntry, Shipment
 } from './types';
 import { 
   PRODUCTS as INITIAL_PRODUCTS, 
@@ -38,6 +38,8 @@ import { SupportedLanguage } from './i18n/config';
 import { eventBus } from './events/bus';
 import { initializeGlobalHandlers } from './events/handlers';
 import { workerEngine } from './reliability/worker-engine';
+import { obsEngine } from './observability/engine';
+import { DynamicPricingEngine } from './ai-autopilot/dynamic-pricing-engine';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -71,8 +73,8 @@ interface AppContextType {
   scopedBrandIntegrity: BrandIntegrityIssue[];
   scopedWorkflows: WorkflowTask[];
   scopedReturns: ReturnRequest[];
-  scopedShipments: any[];
-  scopedAuditLogs: any[];
+  scopedShipments: Shipment[];
+  scopedAuditLogs: AuditLogEntry[];
   scopedFraudLogs: FraudLog[];
   scopedPricingOptimizations: DynamicPrice[];
   scopedEvents: any[];
@@ -90,6 +92,7 @@ interface AppContextType {
   integrations: any[];
   apiLogs: any[];
   indexingStatus: any;
+  systemHealth: SystemHealthScore;
   
   // Actions
   setCurrentUser: (user: MaisonUser | null) => void;
@@ -162,6 +165,9 @@ interface AppContextType {
   seoRegistry: SEOMetadata[];
   socialMetrics: Record<string, any>;
   publishEvent: (type: any, source: any, payload: any) => void;
+  recordLog: (action: string, entity: string, country: string, before?: any, after?: any, reason?: string) => void;
+  isShowcaseMode: boolean;
+  setShowcaseMode: (val: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -171,6 +177,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [adminJurisdiction, setAdminJurisdiction] = useState<CountryCode | 'global'>('global');
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
   const [activeBrandId, setActiveBrandId] = useState('amarise-luxe');
+  const [isShowcaseMode, setShowcaseMode] = useState(true);
   
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({
     ...p,
@@ -195,8 +202,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [fraudLogs, setFraudLogs] = useState<FraudLog[]>([]);
   const [pricingOptimizations, setPricingOptimizations] = useState<DynamicPrice[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
-  const [shipments, setShipments] = useState<any[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const [returns, setReturns] = useState<ReturnRequest[]>(INITIAL_RETURNS);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [aiModules, setAiModules] = useState<AIModuleStatus[]>([
     { id: 'ai-sales', name: 'AI Sales Agent', enabled: true, level: 'assisted' },
     { id: 'ai-content', name: 'Content Narrator', enabled: true, level: 'auto' },
@@ -255,15 +263,52 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub || i.country === 'global'),
   [privateInquiries, activeHub]);
 
+  const scopedErrors = useMemo(() => 
+    activeHub === 'global' ? maisonErrors : maisonErrors.filter(e => e.country === activeHub),
+  [maisonErrors, activeHub]);
+
+  const scopedAlerts = useMemo(() => 
+    activeHub === 'global' ? alerts : alerts.filter(a => a.country === activeHub),
+  [alerts, activeHub]);
+
+  const scopedAuditLogs = useMemo(() => 
+    activeHub === 'global' ? auditLogs : auditLogs.filter(l => l.country === activeHub),
+  [auditLogs, activeHub]);
+
+  const scopedFraudLogs = useMemo(() => 
+    activeHub === 'global' ? fraudLogs : fraudLogs.filter(l => l.metadata?.hub === activeHub),
+  [fraudLogs, activeHub]);
+
+  const scopedPricingOptimizations = useMemo(() => 
+    activeHub === 'global' ? pricingOptimizations : pricingOptimizations.filter(p => p.country === activeHub),
+  [pricingOptimizations, activeHub]);
+
   const scopedEvents = useMemo(() => {
     const logs = eventBus.getLogs();
     return activeHub === 'global' ? logs : logs.filter(e => e.countryCode === activeHub);
-  }, [activeHub, transactions]); // Re-calculate when transactions shift
+  }, [activeHub, transactions]);
 
   const scopedJobs = useMemo(() => {
     const logs = workerEngine.getRegistry();
     return activeHub === 'global' ? logs : logs.filter(j => j.country === activeHub);
   }, [activeHub, transactions]);
+
+  const recordLog = (action: string, entity: string, country: string, before?: any, after?: any, reason?: string) => {
+    const entry: AuditLogEntry = {
+      id: `aud-${Date.now()}`,
+      actorName: currentUser?.name || 'System',
+      actorRole: currentUser?.role || 'SYSTEM',
+      country,
+      action,
+      entity,
+      severity: 'low',
+      beforeState: before,
+      afterState: after,
+      reason,
+      timestamp: new Date().toISOString()
+    };
+    setAuditLogs(prev => [entry, ...prev]);
+  };
 
   const value: AppContextType = {
     countryConfigs,
@@ -288,17 +333,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     scopedTransactions,
     scopedNotifications,
     scopedInquiries,
-    scopedErrors: maisonErrors,
-    scopedAlerts: alerts,
+    scopedErrors,
+    scopedAlerts,
     scopedMetrics: metrics,
     scopedCertificates: activeVip?.certificates || [],
     scopedBrandIntegrity: brandIntegrityIssues,
     scopedWorkflows: [],
     scopedReturns: returns,
     scopedShipments: shipments,
-    scopedAuditLogs: [],
-    scopedFraudLogs: fraudLogs,
-    scopedPricingOptimizations: pricingOptimizations,
+    scopedAuditLogs,
+    scopedFraudLogs,
+    scopedPricingOptimizations,
     scopedEvents,
     scopedJobs,
     supportStats: INITIAL_SUPPORT_STATS,
@@ -308,6 +353,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     integrations: [],
     apiLogs: [],
     indexingStatus: INITIAL_INDEXING,
+    systemHealth: obsEngine.calculateHealth(activeHub === 'global' ? 'global' : activeHub),
     fxRates: [],
     taxRules: [],
     activeVendor,
@@ -319,6 +365,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     activeBrandId,
     seoRegistry,
     socialMetrics,
+    isShowcaseMode,
+    setShowcaseMode,
 
     setCurrentUser,
     setAdminJurisdiction,
@@ -327,7 +375,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAdminViewMode: (mode) => setGlobalSettings(p => ({ ...p, adminViewMode: mode })),
     markNotificationRead: (id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n)),
     updateTransactionStatus: (id, status) => setTransactions(prev => prev.map(t => t.id === id ? { ...t, status } : t)),
-    upsertProduct: (p) => setProducts(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? p : i) : [p, ...prev]),
+    upsertProduct: (p) => setProducts(prev => {
+      const exists = prev.find(i => i.id === p.id);
+      if (exists) {
+        recordLog('Product Update', 'Registry', 'global', exists, p);
+        return prev.map(i => i.id === p.id ? p : i);
+      }
+      recordLog('Product Creation', 'Registry', 'global', null, p);
+      return [p, ...prev];
+    }),
     addToCart: (p) => setCart(prev => {
       const existing = prev.find(item => item.id === p.id);
       if (existing) return prev.map(item => item.id === p.id ? { ...item, quantity: item.quantity + 1 } : item);
@@ -365,9 +421,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runWorkflowTask: (id) => {},
     runWorkflowSequence: (n, c) => {},
     setLanguage: (l) => { setCurrentLanguage(l); i18n.setLanguage(l); },
-    optimizeRegistryPricing: (h) => {},
+    optimizeRegistryPricing: (hub) => {
+      const suggestions = DynamicPricingEngine.auditRegistryPricing(products, privateInquiries, hub);
+      setPricingOptimizations(prev => [...suggestions, ...prev]);
+    },
     updateShipmentStatus: (id, status) => setShipments(prev => prev.map(s => s.id === id ? { ...s, status } : s)),
-    createShipment: (oid, uid, c) => setShipments(prev => [{ id: `shp-${Date.now()}`, orderId: oid, userId: uid, country: c, status: 'pending', trackingId: `TRK-${Date.now()}`, courierName: 'Maison Courier' }, ...prev]),
+    createShipment: (oid, uid, c) => setShipments(prev => [{ id: `shp-${Date.now()}`, orderId: oid, userId: uid, country: c, status: 'pending', trackingId: `TRK-${Date.now()}`, courierName: 'Maison Courier', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), history: [] } as Shipment, ...prev]),
     upsertAppointment: (a) => {},
     upsertTemplate: (t) => {},
     upsertSEOMetadata: (m) => setSeoRegistry(prev => prev.find(i => i.path === m.path) ? prev.map(i => i.path === m.path ? m : i) : [m, ...prev]),
@@ -376,7 +435,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     trackShare: (id, c) => {},
     toggleLike: (id, c) => {},
     markAlertRead: (id) => {},
-    updateInventory: (id, h, adj) => setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: p.stock + adj } : p)),
+    updateInventory: (id, h, adj) => setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: Math.max(0, p.stock + adj) } : p)),
     refundTransaction: (id, r) => setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: 'Refunded' } : t)),
     toggleEmergencyMode: () => setGlobalSettings(prev => ({ ...prev, emergencyMode: !prev.emergencyMode })),
     triggerReindex: (t) => {},
@@ -393,7 +452,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setActiveBrand: setActiveBrandId,
     publishEvent: (type, source, payload) => {
       eventBus.publish({ type, source, countryCode: activeHub as any, payload });
-    }
+    },
+    recordLog
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

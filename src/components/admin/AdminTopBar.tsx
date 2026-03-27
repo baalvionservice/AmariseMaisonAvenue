@@ -120,7 +120,7 @@ export function AdminTopBar() {
           <div className="flex items-center space-x-4 pl-4 border-l border-white/5 shrink-0">
              <div className="flex flex-col items-end hidden 2xl:flex min-w-0">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-white truncate max-w-[100px]">{currentUser?.name}</span>
-                <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/20 truncate">{currentUser?.role.replace('_', ' ')}</span>
+                <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/20 truncate">{(currentUser?.role || '').replace('_', ' ').toUpperCase()}</span>
              </div>
              <div className="w-9 h-9 bg-white/5 border border-white/10 rounded-none flex items-center justify-center font-bold text-xs hover:border-blue-500 transition-colors cursor-pointer">
                {currentUser?.name.charAt(0) || 'A'}

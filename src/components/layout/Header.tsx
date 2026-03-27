@@ -31,7 +31,6 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { i18n } from '@/lib/i18n/engine';
 import { SupportedLanguage } from '@/lib/i18n/config';
 
@@ -65,7 +64,6 @@ export const Header = () => {
     i18n.t("slides.spring")
   ];
 
-  // Mock translations for slides since they are dynamic
   const getSlideText = (idx: number) => {
     if (idx === 0) return currentLanguage === 'ar' ? "جلسات تقييم خاصة متاحة في نيويورك ولندن" : "PRIVATE CURATORIAL SESSIONS AVAILABLE IN NYC & LONDON";
     return currentLanguage === 'ar' ? "سجل أرشيف ربيع ١٩٢٤ متاح الآن" : "THE SPRING 1924 ARCHIVE REGISTRY IS NOW ACTIVE";
@@ -78,13 +76,13 @@ export const Header = () => {
   const isAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'country_admin';
 
   const navLinks: NavLink[] = [
-    { id: 'new', name: i18n.t('nav.new'), href: `/${countryCode}/category/new-arrivals` },
+    { id: 'new', name: 'NEW ARRIVALS', href: `/${countryCode}/category/new-arrivals` },
     { id: 'hermes', name: 'HERMÈS', href: `/${countryCode}/category/hermes` },
     { id: 'chanel', name: 'CHANEL', href: `/${countryCode}/category/chanel` },
     { id: 'goyard', name: 'GOYARD', href: `/${countryCode}/category/goyard` },
     { id: 'other', name: 'OTHER BRANDS', href: `/${countryCode}/category/other-brands` },
-    { id: 'jewelry', name: i18n.t('nav.jewelry'), href: `/${countryCode}/category/jewelry` },
-    { id: 'live', name: 'AMARISÉ LIVE', href: `/${countryCode}/account/live` },
+    { id: 'jewelry', name: 'JEWELRY', href: `/${countryCode}/category/jewelry` },
+    { id: 'live', name: 'LIVE SHOP', href: `/${countryCode}/account/live` },
     { id: 'journal', name: 'BLOG', href: `/${countryCode}/journal` },
   ];
 

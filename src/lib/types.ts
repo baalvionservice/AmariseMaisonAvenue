@@ -671,3 +671,73 @@ export interface IndexingLog {
   duration: string;
   status: string;
 }
+
+export type ShipmentStatus = 'pending' | 'packed' | 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned';
+
+export interface Shipment {
+  id: string;
+  orderId: string;
+  userId: string;
+  country: CountryCode;
+  courierName: string;
+  trackingId: string;
+  status: ShipmentStatus;
+  createdAt: string;
+  updatedAt: string;
+  history: {
+    status: ShipmentStatus;
+    location: string;
+    timestamp: string;
+    message: string;
+  }[];
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actorName: string;
+  actorRole: string;
+  country: string;
+  action: string;
+  entity: string;
+  severity: 'low' | 'medium' | 'high';
+  beforeState?: any;
+  afterState?: any;
+  reason?: string;
+  timestamp: string;
+}
+
+export interface ProductExtended {
+  collectorValue: string;
+  marketRange: string;
+  investmentInsight: string;
+  scarcityTag: string;
+  priceVisible: boolean;
+}
+
+export interface MaisonService {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  priceRange: string;
+  features: string[];
+  imageUrl: string;
+  brandId: string;
+  isGlobal: boolean;
+}
+
+export interface MaisonReport {
+  id: string;
+  title: string;
+  summary: string;
+  date: string;
+  author: string;
+  isPremium: boolean;
+  previewImage: string;
+  brandId: string;
+}
+
+export interface RiskLevel {
+  score: number;
+  level: 'low' | 'medium' | 'high' | 'critical';
+}

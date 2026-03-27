@@ -19,7 +19,9 @@ import {
   ArrowDownRight,
   Clock,
   Terminal,
-  Zap
+  Zap,
+  XCircle,
+  ArrowLeft
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,9 +56,9 @@ export default function AuditCommandHub() {
   const selectedLog = scopedAuditLogs.find(l => l.id === selectedLogId);
 
   const filteredLogs = scopedAuditLogs.filter(l => 
-    l.actorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    l.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    l.entity.toLowerCase().includes(searchQuery.toLowerCase())
+    (l.actorName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (l.action || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (l.entity || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -174,13 +176,13 @@ export default function AuditCommandHub() {
                           <TableCell>
                              <div className="flex flex-col">
                                 <span className="text-xs font-bold text-white/80 uppercase">{log.actorName}</span>
-                                <span className="text-[8px] text-white/20 uppercase tracking-widest">{log.actorRole} • {log.country.toUpperCase()}</span>
+                                <span className="text-[8px] text-white/20 uppercase tracking-widest">{log.actorRole} • {(log.country || '').toUpperCase()}</span>
                              </div>
                           </TableCell>
                           <TableCell>
                              <Badge variant="outline" className="text-[7px] border-white/10 text-plum uppercase">{log.entity}</Badge>
                           </TableCell>
-                          <TableCell className="text-xs font-light italic text-white/60">"{log.action}"</TableCell>
+                          <TableCell className="text-xs font-light italic text-white/60">"{(log.action || '').replace('_', ' ')}"</TableCell>
                           <TableCell className="text-right pr-8">
                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 group-hover:text-blue-400 group-hover:bg-blue-500/5 transition-all">
                                 <Terminal size={14} />
@@ -244,45 +246,4 @@ function PolicyStat({ label, val }: { label: string, val: string }) {
        <span className="text-sm font-bold text-white tabular uppercase">{val}</span>
     </div>
   );
-}
-
-function XCircle(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="m15 9-6 6" />
-      <path d="m9 9 6 6" />
-    </svg>
-  )
-}
-
-function ArrowLeft(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m12 19-7-7 7-7" />
-      <path d="M19 12H5" />
-    </svg>
-  )
 }

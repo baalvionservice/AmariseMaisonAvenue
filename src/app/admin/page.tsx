@@ -71,7 +71,7 @@ export default function ExecutiveDashboard() {
              <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Maison Executive Terminal</span>
           </div>
           <h1 className="text-5xl font-headline font-bold italic tracking-tight text-white uppercase leading-none">
-            {isGlobal ? 'Global Master' : `${jurisdiction.toUpperCase()} Node`} Pulse
+            {isGlobal ? 'Global Master' : `${(jurisdiction || '').toUpperCase()} Node`} Pulse
           </h1>
           <p className="text-sm text-white/40 font-light italic">Orchestrating yield, risk, and integrity across the network.</p>
         </div>
@@ -142,8 +142,8 @@ export default function ExecutiveDashboard() {
                  <AreaChart data={chartData}>
                     <defs>
                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15}/>
-                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#3B82F6" stopOpacity0.15}/>
+                          <stop offset="95%" stopColor="#3B82F6" stopOpacity0}/>
                        </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
@@ -207,7 +207,7 @@ export default function ExecutiveDashboard() {
                        <TableCell className="pl-8">
                           <div className="flex items-center space-x-4">
                              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-[10px] text-white/40 group-hover:text-blue-400 transition-colors">
-                                {hub.code.toUpperCase()}
+                                {(hub.code || '').toUpperCase()}
                              </div>
                              <span className="text-sm font-bold text-white tracking-tight">{hub.name} Hub</span>
                           </div>

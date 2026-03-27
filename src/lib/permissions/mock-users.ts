@@ -67,7 +67,7 @@ export const users: MaisonUser[] = [
     id: "u-op-us",
     name: "US Registry Operator",
     email: "ops.us@amarise-luxe.com",
-    role: ROLES.OPERATOR,
+    role: ROLES.OPERATIONS_ADMIN,
     country: "us",
   },
 ];

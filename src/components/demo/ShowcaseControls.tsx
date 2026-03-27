@@ -54,6 +54,7 @@ export function ShowcaseControls() {
   const currentCountry = (country as string) || 'us';
 
   const handleCountrySwitch = (code: string) => {
+    if (!pathname) return;
     const newPath = pathname.replace(`/${currentCountry}`, `/${code}`);
     router.push(newPath);
   };
@@ -154,7 +155,7 @@ export function ShowcaseControls() {
                     )}
                   >
                     <span className="truncate">{user.name}</span>
-                    <span className="opacity-60 text-[7px] mt-1">{user.role.replace('_', ' ').toUpperCase()}</span>
+                    <span className="opacity-60 text-[7px] mt-1">{(user.role || '').replace('_', ' ').toUpperCase()}</span>
                   </button>
                 ))}
               </div>
