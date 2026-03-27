@@ -224,7 +224,6 @@ export default function HomePage() {
 
       {/* 5. 100% Authenticity Guarantee Section */}
       <section className="flex flex-col lg:flex-row min-h-[500px] lg:h-[600px] overflow-hidden bg-black relative">
-        {/* Left Side: Visual Panel */}
         <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
           <Image 
             src={authImage}
@@ -235,7 +234,6 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Tactical Shield Icon */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:block">
           <div className="w-16 h-20 relative flex items-center justify-center">
             <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full text-white fill-none stroke-current stroke-[2px]">
@@ -249,7 +247,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Right Side: Narrative Panel */}
         <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center lg:items-start justify-center text-center lg:text-left space-y-8">
           <div className="space-y-4">
             <h2 className="text-4xl lg:text-6xl font-headline font-medium tracking-tight">
@@ -367,18 +364,16 @@ export default function HomePage() {
 
       {/* 10. Our Mission Section (Dual-Panel) */}
       <section className="flex flex-col lg:flex-row min-h-[600px] overflow-hidden bg-black">
-        {/* Left Side: Cinematic Mission Visual */}
         <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
           <Image 
             src={missionImage}
             alt="Maison Amarisé Our Mission"
             fill
             className="object-cover"
-            data-ai-hint="luxury fashion mission"
+            data-ai-hint="luxury fashion"
           />
         </div>
 
-        {/* Right Side: Narrative Panel */}
         <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col justify-center space-y-10">
           <div className="space-y-6">
             <h2 className="text-4xl lg:text-5xl font-headline font-medium tracking-tight italic">
@@ -401,7 +396,37 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 11. Institutional Trust Footer */}
+      {/* 11. As Seen In Press Marquee (Sliding) */}
+      <section className="bg-white py-24 border-t border-gray-50 overflow-hidden">
+        <div className="container mx-auto px-6 mb-16 text-center space-y-4">
+          <h2 className="text-4xl md:text-5xl font-headline font-medium text-gray-900 italic">As Seen In</h2>
+        </div>
+        
+        {/* Infinite Sliding Marquee */}
+        <div className="relative flex overflow-x-hidden border-y border-gray-100 py-12">
+          <div className="animate-marquee flex items-center whitespace-nowrap space-x-20 lg:space-x-40">
+            <PressLogo name="Bloomberg" className="font-sans font-black tracking-tighter text-3xl" />
+            <PressLogo name="COVETEUR" className="font-sans font-bold tracking-[0.2em] text-2xl" />
+            <PressLogo name="NEW YORK POST" className="font-sans font-black italic tracking-tighter text-3xl" />
+            <PressLogo name="THE WALL STREET JOURNAL." className="font-headline font-bold text-2xl" />
+            <PressLogo name="BUSINESS INSIDER" className="font-sans font-black tracking-tighter text-2xl" />
+            {/* Duplicated for seamless loop */}
+            <PressLogo name="Bloomberg" className="font-sans font-black tracking-tighter text-3xl" />
+            <PressLogo name="COVETEUR" className="font-sans font-bold tracking-[0.2em] text-2xl" />
+            <PressLogo name="NEW YORK POST" className="font-sans font-black italic tracking-tighter text-3xl" />
+            <PressLogo name="THE WALL STREET JOURNAL." className="font-headline font-bold text-2xl" />
+            <PressLogo name="BUSINESS INSIDER" className="font-sans font-black tracking-tighter text-2xl" />
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <Link href={`/${countryCode}/journal`} className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 hover:text-black transition-colors border-b border-gray-200 pb-1">
+            SEE ALL PRESS
+          </Link>
+        </div>
+      </section>
+
+      {/* 12. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
@@ -430,6 +455,14 @@ export default function HomePage() {
   );
 }
 
+function PressLogo({ name, className }: { name: string, className?: string }) {
+  return (
+    <span className={cn("text-gray-900 opacity-80 hover:opacity-100 transition-opacity cursor-default select-none", className)}>
+      {name}
+    </span>
+  );
+}
+
 function CuratorialBlock({ imageUrl, title, subtitle, href, hint }: { imageUrl: string, title: string, subtitle: string, href: string, hint: string }) {
   return (
     <Link href={href} className="group relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-muted shadow-sm">
@@ -440,10 +473,7 @@ function CuratorialBlock({ imageUrl, title, subtitle, href, hint }: { imageUrl: 
         className="object-cover transition-transform duration-[5s] group-hover:scale-110" 
         data-ai-hint={hint}
       />
-      {/* Dynamic Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-      
-      {/* Content Overlay */}
       <div className="absolute inset-x-0 bottom-0 p-8 lg:p-12 text-center text-white space-y-2 lg:space-y-3 translate-y-2 group-hover:translate-y-0 transition-transform duration-700">
         <h3 className="text-2xl lg:text-4xl font-headline font-medium italic tracking-tight">{title}</h3>
         <p className="text-[10px] lg:text-[12px] font-body font-light italic opacity-80 tracking-wide">{subtitle}</p>
