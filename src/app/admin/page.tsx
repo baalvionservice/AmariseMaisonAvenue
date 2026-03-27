@@ -14,6 +14,7 @@ import {
   ArrowUpRight, 
   ArrowDownRight,
   ChevronRight,
+  ArrowRight,
   Target,
   Clock,
   LayoutDashboard,
