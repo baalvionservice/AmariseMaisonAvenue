@@ -183,9 +183,16 @@ export default function CheckoutPage() {
     }
   };
 
+  // Redirection logic moved to useEffect to prevent "Cannot update a component while rendering another" error.
+  useEffect(() => {
+    if (cart.length === 0 && !selectedPlan && step !== 3) {
+      router.push(`/${countryCode}/cart`);
+    }
+  }, [cart.length, selectedPlan, step, router, countryCode]);
+
   if (fraudBlocked) {
     return (
-      <div className="container mx-auto px-6 py-40 flex flex-col items-center justify-center space-y-12 animate-fade-in">
+      <div className="container mx-auto px-6 py-40 flex flex-col items-center justify-center space-y-12 animate-fade-in text-center">
         <div className="p-12 bg-red-50 border border-red-100 rounded-full shadow-inner text-red-600">
           <AlertTriangle className="w-20 h-20" />
         </div>
@@ -203,7 +210,6 @@ export default function CheckoutPage() {
   }
 
   if (cart.length === 0 && !selectedPlan && step !== 3) {
-    router.push(`/${countryCode}/cart`);
     return null;
   }
 
