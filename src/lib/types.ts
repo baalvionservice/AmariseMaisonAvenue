@@ -481,6 +481,7 @@ export interface SystemLog {
   responseData?: any;
   status: 'success' | 'failure';
   error?: string;
+  level?: 'info' | 'warn' | 'error';
   timestamp: string;
   country: string;
 }
@@ -695,11 +696,12 @@ export interface MaisonMetric {
   source: string;
   country: CountryCode | 'global';
   tags?: Record<string, string>;
+  type?: 'performance' | 'business' | 'AI' | 'operational';
 }
 
 export interface MaisonAlert {
   id: string;
-  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud' | 'pricing';
+  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud' | 'pricing' | 'operational';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   triggeredAt: string;
@@ -715,6 +717,7 @@ export interface SystemHealthScore {
     api: number;
     inventory: number;
     ai: number;
+    operational: number;
   };
   lastUpdated: string;
 }
