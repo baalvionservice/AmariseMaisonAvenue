@@ -72,6 +72,12 @@
       "description": "Visit Us Curatorial Block",
       "imageUrl": "https://picsum.photos/seed/amarise-visit/800/1000",
       "imageHint": "luxury boutique"
+    },
+    {
+      "id": "home-authenticity-banner",
+      "description": "Authenticity Guarantee Visual",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720",
+      "imageHint": "luxury bag"
     }
   ]
 }

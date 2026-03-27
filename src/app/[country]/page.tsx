@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -42,6 +43,7 @@ export default function HomePage() {
 
   const heroImage = placeholderData.placeholderImages.find(img => img.id === 'home-hero-banner-main')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964';
   const liveImage = placeholderData.placeholderImages.find(img => img.id === 'madave-live-section')?.imageUrl || 'https://picsum.photos/seed/amarise-live/1200/800';
+  const authImage = placeholderData.placeholderImages.find(img => img.id === 'home-authenticity-banner')?.imageUrl || 'https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720';
   
   const gridSpring = placeholderData.placeholderImages.find(img => img.id === 'home-grid-spring')?.imageUrl;
   const gridArrivals = placeholderData.placeholderImages.find(img => img.id === 'home-grid-arrivals')?.imageUrl;
@@ -180,7 +182,6 @@ export default function HomePage() {
         </div>
 
         <div className="relative group px-12">
-          {/* Navigation Arrows */}
           <button className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all bg-white z-10">
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -216,7 +217,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Amarisé Maison Avenue Live Section */}
+      {/* 5. 100% Authenticity Guarantee Section */}
+      <section className="flex flex-col lg:flex-row min-h-[500px] lg:h-[600px] overflow-hidden bg-black relative">
+        {/* Left Side: Visual Panel */}
+        <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto overflow-hidden">
+          <Image 
+            src={authImage}
+            alt="Amarisé Authenticity Guarantee"
+            fill
+            className="object-cover"
+            data-ai-hint="luxury bag"
+          />
+        </div>
+
+        {/* Tactical Shield Icon (Overlapping the border) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:block">
+          <div className="w-16 h-20 relative flex items-center justify-center">
+            <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full text-white fill-none stroke-current stroke-[2px]">
+              <path d="M50 5 L10 25 L10 60 C10 85 50 115 50 115 C50 115 90 85 90 60 L90 25 L50 5 Z" />
+            </svg>
+            <div className="relative z-10 flex flex-col items-center leading-none text-white font-bold text-[10px] tracking-tighter">
+              <span>A</span>
+              <div className="w-6 h-px bg-white/40 my-0.5 rotate-[-45deg]" />
+              <span>G</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Narrative Panel */}
+        <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center lg:items-start justify-center text-center lg:text-left space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-4xl lg:text-6xl font-headline font-medium tracking-tight">
+              100% Authenticity Guarantee
+            </h2>
+            <p className="text-sm lg:text-base font-body font-light text-gray-300 leading-relaxed max-w-md">
+              Every piece is authenticated and certified by our in-house team of luxury experts.
+            </p>
+          </div>
+          <Button className="bg-white text-black hover:bg-gray-200 h-14 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em] transition-all">
+            LEARN MORE
+          </Button>
+        </div>
+      </section>
+
+      {/* 6. Amarisé Maison Avenue Live Section */}
       <section className="flex flex-col lg:flex-row min-h-[600px] border-b border-border overflow-hidden bg-black">
         <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10 group luxury-reveal">
           <div className="space-y-6">
@@ -251,7 +295,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Tactical Ticker */}
+      {/* 7. Tactical Ticker */}
       <section className="bg-black py-5 border-y border-white/10">
         <div className="container mx-auto flex items-center justify-center space-x-16">
            <div className="flex items-center space-x-4 text-gold">
@@ -268,7 +312,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. Dual-Persona Acquisition Matrix */}
+      {/* 8. Dual-Persona Acquisition Matrix */}
       <section className="container mx-auto px-6 py-40 max-w-[1600px]">
         <div className="text-center space-y-24">
           <div className="space-y-8 max-w-4xl mx-auto">
@@ -327,7 +371,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. Rare Archive Grid */}
+      {/* 9. Rare Archive Grid */}
       <section className="bg-ivory/30 py-60 border-y border-border">
          <div className="container mx-auto px-12 max-w-[1600px] space-y-32">
             <div className="flex flex-col md:row items-end justify-between gap-12">
@@ -372,7 +416,7 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* 9. Institutional Trust Footer */}
+      {/* 10. Institutional Trust Footer */}
       <section className="bg-white py-80 text-center">
         <div className="max-w-5xl mx-auto space-y-24 px-12">
            <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
