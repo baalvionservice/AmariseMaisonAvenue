@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -12,94 +11,77 @@ import {
   Target, 
   Truck, 
   CreditCard, 
-  Search, 
-  ShieldAlert, 
   ShieldCheck, 
   FlaskConical,
   ChevronRight,
   LogOut,
-  Settings,
-  Briefcase,
   Bell,
-  MessageSquare,
-  LifeBuoy,
-  BarChart3,
-  Cpu,
-  Settings2,
-  PlayCircle,
-  Database,
-  Megaphone,
-  UserCircle,
   Activity,
-  Gauge,
-  Shield,
-  Video,
+  UserCircle,
   Award,
   ExternalLink,
   ClipboardList,
-  BarChart
+  BarChart,
+  MapPin,
+  Cpu,
+  FileText,
+  Lock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/lib/store';
 
 /**
- * AdminSidebar: Institutional Navigation Matrix
- * Standardized for Super Admin, Hub Lead, and Partner Atelier personas.
+ * AdminSidebar: Layered Institutional Navigation Matrix
+ * Restructured into clear Tactical Layers (Global, Regional, Functional).
  */
 export function AdminSidebar() {
   const pathname = usePathname();
   const { country } = useParams();
+  const { adminJurisdiction, currentUser } = useAppStore();
   const countryCode = (country as string) || 'us';
 
   const menuGroups = [
     {
-      title: "Tactical",
+      title: "Tactical Layer 1 & 2",
       items: [
-        { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
-        { icon: <BarChart />, label: "Audit Summary", href: "/admin/audit-summary" },
+        { icon: <LayoutDashboard />, label: "Master Terminal", href: "/admin" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
-        { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
-        { icon: <Activity />, label: "Observability", href: "/admin/observability" },
       ]
     },
     {
-      title: "Operations Hub",
+      title: "Tactical Layer 3",
       items: [
-        { icon: <Package />, label: "Atelier CMS", href: "/admin/content" },
-        { icon: <Truck />, label: "Logistics", href: "/admin/logistics" },
-        { icon: <ClipboardList />, label: "Consignments", href: "/admin/operations" },
-        { icon: <Award />, label: "Heritage Bureau", href: "/admin/heritage-archive" },
+        { 
+          icon: <MapPin />, 
+          label: `${adminJurisdiction === 'global' ? 'USA' : adminJurisdiction.toUpperCase()} Hub`, 
+          href: `/admin/country/${adminJurisdiction === 'global' ? 'us' : adminJurisdiction}` 
+        },
       ]
     },
     {
-      title: "Acquisition",
+      title: "Tactical Layer 4",
+      items: [
+        { icon: <Package />, label: "Commerce Hub", href: "/admin/commerce" },
+        { icon: <CreditCard />, label: "Finance Hub", href: "/admin/finance" },
+        { icon: <Truck />, label: "Logistics Matrix", href: "/admin/logistics" },
+        { icon: <Zap />, label: "AI Control", href: "/admin/ai" },
+        { icon: <Activity />, label: "Observability", href: "/admin/observability" },
+        { icon: <ShieldCheck />, label: "Audit Registry", href: "/admin/audit" },
+      ]
+    },
+    {
+      title: "Layer 5 & Support",
       items: [
         { icon: <Target />, label: "Sales CRM", href: "/admin/sales" },
-        { icon: <BarChart3 />, label: "Revenue Matrix", href: "/admin/revenue" },
-        { icon: <CreditCard />, label: "Treasury", href: "/admin/finance" },
-      ]
-    },
-    {
-      title: "Market Integrity",
-      items: [
-        { icon: <UserCircle />, label: "Partner Hub", href: "/admin/vendor" },
-        { icon: <Megaphone />, label: "Marketing", href: "/admin/marketing" },
-        { icon: <Activity />, label: "Integrations", href: "/admin/integrations" },
-      ]
-    },
-    {
-      title: "Infrastructure",
-      items: [
-        { icon: <FlaskConical />, label: "QA Stress Lab", href: "/admin/qa" },
-        { icon: <Bell />, label: "Alerts", href: "/admin/notifications" },
-        { icon: <ShieldAlert />, label: "Anomalies", href: "/admin/errors" },
-        { icon: <ShieldCheck />, label: "Audit Log", href: "/admin/compliance" },
+        { icon: <UserCircle />, label: "Partner Portal", href: "/admin/vendor" },
+        { icon: <FlaskConical />, label: "Automation Lab", href: "/admin/qa" },
       ]
     }
   ];
 
   return (
-    <aside className="w-72 bg-[#111113] border-r border-white/5 flex flex-col z-50 h-full shrink-0">
-      <div className="p-10 border-b border-white/5">
+    <aside className="w-72 bg-[#0A0A0B] border-r border-white/5 flex flex-col z-50 h-full shrink-0">
+      <div className="p-10 border-b border-white/5 bg-black">
         <Link href="/admin">
           <div className="font-headline text-3xl font-bold tracking-tighter text-white flex items-center group">
             AMARISÉ <span className="text-plum text-[10px] font-bold tracking-[0.4em] ml-2 opacity-60">CORE</span>
@@ -136,19 +118,17 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="p-6 border-t border-white/5 space-y-2 bg-[#0A0A0B]">
+      <div className="p-6 border-t border-white/5 space-y-2 bg-black">
         <Link href={`/${countryCode}`}>
           <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-blue-400/60 hover:text-blue-400 transition-colors border-none bg-transparent outline-none cursor-pointer">
             <ExternalLink size={16} />
             <span>Maison Storefront</span>
           </button>
         </Link>
-        <Link href={`/${countryCode}`}>
-          <button className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors border-none bg-transparent outline-none cursor-pointer">
-            <LogOut size={16} />
-            <span>Exit Node</span>
-          </button>
-        </Link>
+        <button onClick={() => window.location.href = `/${countryCode}`} className="w-full flex items-center space-x-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-red-500/40 hover:text-red-500 transition-colors border-none bg-transparent outline-none cursor-pointer">
+          <LogOut size={16} />
+          <span>Exit Node</span>
+        </button>
       </div>
     </aside>
   );

@@ -1,45 +1,42 @@
 /**
  * @fileOverview Granular Permission Definitions for the Maison Platform.
+ * Restructured for Layered Tactical Nodes.
  */
 
 export const PERMISSIONS = {
-  // Global & Analytics
-  VIEW_DASHBOARD: "view_dashboard",
-  VIEW_AUDIT_LOGS: "view_audit_logs",
+  // Layer 1: Global Master
+  VIEW_GLOBAL_HUD: "view_global_hud",
+  OVERRIDE_SYSTEM: "override_system",
 
-  // AI Autopilot
+  // Layer 2: Global Configuration
+  MANAGE_HUBS: "manage_hubs",
+  CONFIGURE_BRAND: "configure_brand",
+
+  // Layer 3: Regional Hubs
+  VIEW_COUNTRY_DASH: "view_country_dash",
+  MANAGE_REGIONAL_OPS: "manage_regional_ops",
+
+  // Layer 4: Functional Modules
+  ACCESS_COMMERCE: "access_commerce",
+  ACCESS_FINANCE: "access_finance",
+  ACCESS_LOGISTICS: "access_logistics",
   ACCESS_AI: "access_ai",
-  CONTROL_AI: "control_ai",
+  ACCESS_OBSERVABILITY: "access_observability",
+  ACCESS_AUDIT: "access_audit",
 
-  // Sales & CRM
-  VIEW_LEADS: "view_leads",
-  MANAGE_LEADS: "manage_leads",
-  DISPATCH_WHATSAPP: "dispatch_whatsapp",
+  // Layer 5: Support & Partners
+  ACCESS_CRM: "access_crm",
+  ACCESS_VENDOR: "access_vendor",
+  ACCESS_AUTOMATION: "access_automation",
 
-  // Content & CMS
-  CREATE_CONTENT: "create_content",
-  EDIT_CONTENT: "edit_content",
-  PUBLISH_CONTENT: "publish_content",
-  DELETE_CONTENT: "delete_content",
-
-  // SEO Authority
-  ACCESS_SEO: "access_seo",
-  MANAGE_METADATA: "manage_metadata",
-
-  // Monetization & Finance
-  VIEW_REVENUE: "view_revenue",
-  CONTROL_PRICING: "control_pricing",
-  MANAGE_INVOICES: "manage_invoices",
-
-  // Inventory & Listings
-  CREATE_LISTING: "create_listing",
-  EDIT_LISTING: "edit_listing",
-  DELETE_LISTING: "delete_listing",
-
-  // Vendor Specific
-  MANAGE_OWN_LISTINGS: "manage_own_listings",
-
-  // Client Specific
+  // Generic Actions
+  CREATE: "create",
+  EDIT: "edit",
+  DELETE: "delete",
+  PUBLISH: "publish",
+  APPROVE: "approve",
+  
+  // Specific
   VIEW_OWN_ACTIVITY: "view_own_activity",
 } as const;
 
