@@ -72,6 +72,36 @@
       "description": "Default High-Fidelity Product Placeholder",
       "imageUrl": "https://picsum.photos/seed/amarise-artifact/800/1000",
       "imageHint": "luxury artifact"
+    },
+    {
+      "id": "mega-new-arrivals",
+      "description": "New Arrivals Mega Menu Image",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Hermes_New_Arrivals_Mega_Menu_Banner.jpg?v=1691512345&width=1000",
+      "imageHint": "luxury bags"
+    },
+    {
+      "id": "mega-hermes",
+      "description": "Hermes Mega Menu Image",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Hermes_Bestsellers_Mega_Menu_Banner.jpg?v=1691512345&width=1000",
+      "imageHint": "hermes collection"
+    },
+    {
+      "id": "mega-chanel",
+      "description": "Chanel Mega Menu Image",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Chanel_Mega_Menu_Banner.jpg?v=1691512345&width=1000",
+      "imageHint": "chanel collection"
+    },
+    {
+      "id": "mega-goyard",
+      "description": "Goyard Mega Menu Image",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Goyard_Mega_Menu_Banner.jpg?v=1691512345&width=1000",
+      "imageHint": "goyard bags"
+    },
+    {
+      "id": "mega-jewelry",
+      "description": "Jewelry Mega Menu Image",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Jewelry_Mega_Menu_Banner.jpg?v=1691512345&width=1000",
+      "imageHint": "luxury jewelry"
     }
   ]
 }

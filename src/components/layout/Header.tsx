@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { 
@@ -18,7 +19,8 @@ import {
   Sparkles,
   MapPin,
   Briefcase,
-  Languages
+  Languages,
+  ArrowRight
 } from 'lucide-react';
 import { COUNTRIES } from '@/lib/mock-data';
 import { useAppStore } from '@/lib/store';
@@ -33,12 +35,187 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { i18n } from '@/lib/i18n/engine';
 import { SupportedLanguage } from '@/lib/i18n/config';
+import Image from 'next/image';
+import placeholderData from '@/app/lib/placeholder-images.json';
 
 interface NavLink {
   name: string;
   href: string;
   id: string;
 }
+
+const MEGA_MENU_DATA: Record<string, any> = {
+  'new': {
+    title: 'NEW ARRIVALS',
+    subtitle: 'Hermès New Arrivals',
+    imageId: 'mega-new-arrivals',
+    sections: [
+      {
+        title: 'New Arrivals',
+        links: [
+          { name: 'Hermès', href: '/category/hermes' },
+          { name: 'Chanel', href: '/category/chanel' },
+          { name: 'Other Brands', href: '/category/other-brands' },
+          { name: 'Jewelry', href: '/category/jewelry' },
+        ]
+      }
+    ]
+  },
+  'hermes': {
+    title: 'Valentine’s Day Edit',
+    subtitle: 'Hermès Bestsellers',
+    imageId: 'mega-hermes',
+    sections: [
+      {
+        title: 'Handbags',
+        links: [
+          { name: 'Birkin', href: '/category/hermes' },
+          { name: 'Kelly', href: '/category/hermes' },
+          { name: 'Constance', href: '/category/hermes' },
+          { name: 'Evelyne', href: '/category/hermes' },
+          { name: 'Picotin', href: '/category/hermes' },
+          { name: 'Lindy', href: '/category/hermes' },
+          { name: 'Herbag', href: '/category/hermes' },
+          { name: 'Other Bags', href: '/category/hermes' },
+          { name: 'All Hermès Bags', href: '/category/hermes' },
+        ]
+      },
+      {
+        title: 'Accessories',
+        links: [
+          { name: 'Wallets', href: '/category/hermes' },
+          { name: 'Watches', href: '/category/hermes' },
+          { name: 'Belts', href: '/category/hermes' },
+          { name: 'Charms', href: '/category/hermes' },
+          { name: 'Scarves', href: '/category/hermes' },
+          { name: 'Shoes', href: '/category/hermes' },
+          { name: 'Jewelry', href: '/category/hermes' },
+        ]
+      },
+      {
+        title: 'Curations',
+        links: [
+          { name: 'New Arrivals', href: '/category/new-arrivals' },
+          { name: 'Best Sellers', href: '/category/hermes' },
+          { name: 'Exotic Handbags', href: '/category/hermes' },
+          { name: 'Rare & Unique Bags', href: '/category/hermes' },
+          { name: 'HSS Horseshoe Stamp Bags', href: '/category/hermes' },
+          { name: 'Pre-Owned & Vintage Handbags', href: '/category/hermes' },
+          { name: 'Home Goods', href: '/category/hermes' },
+          { name: 'Atelier Bags', href: '/category/hermes' },
+          { name: 'Palm Beach Collection', href: '/category/hermes' },
+          { name: 'Bag Besties & Organizers', href: '/category/hermes' },
+        ]
+      }
+    ]
+  },
+  'chanel': {
+    title: 'CHANEL CLASSIC BAGS',
+    subtitle: 'Discover the Beauty of Chanel',
+    imageId: 'mega-chanel',
+    sections: [
+      {
+        title: 'Handbags',
+        links: [
+          { name: 'Classic Flap Bags', href: '/category/chanel' },
+          { name: 'Chanel 22 Bags', href: '/category/chanel' },
+          { name: 'Chanel 25 Bags', href: '/category/chanel' },
+          { name: 'Totes', href: '/category/chanel' },
+          { name: 'Boy Bags', href: '/category/chanel' },
+          { name: 'Wallet on Chains', href: '/category/chanel' },
+          { name: 'Fashion & Runway Bags', href: '/category/chanel' },
+          { name: 'All Chanel Bags', href: '/category/chanel' },
+        ]
+      },
+      {
+        title: 'Accessories',
+        links: [
+          { name: 'Wallets', href: '/category/chanel' },
+          { name: 'Shoes', href: '/category/chanel' },
+          { name: 'Jewelry', href: '/category/chanel' },
+        ]
+      },
+      {
+        title: 'Curations',
+        links: [
+          { name: 'Vintage', href: '/category/chanel' },
+          { name: 'Contemporary', href: '/category/chanel' },
+          { name: 'Vintage Handbags', href: '/category/chanel' },
+          { name: 'Pre-Owned Handbags', href: '/category/chanel' },
+        ]
+      }
+    ]
+  },
+  'goyard': {
+    title: 'The Saigon Bag',
+    subtitle: 'Iconic Style',
+    imageId: 'mega-goyard',
+    sections: [
+      {
+        title: 'Handbags',
+        links: [
+          { name: 'Saint Louis', href: '/category/goyard' },
+          { name: 'Saigon', href: '/category/goyard' },
+          { name: 'Anjou', href: '/category/goyard' },
+          { name: 'Artois', href: '/category/goyard' },
+          { name: 'Other', href: '/category/goyard' },
+          { name: 'All Goyard Bags', href: '/category/goyard' },
+        ]
+      }
+    ]
+  },
+  'other': {
+    title: 'New Bags From THE ROW',
+    subtitle: 'Other Brands',
+    imageId: 'mega-new-arrivals',
+    sections: [
+      {
+        title: 'Brands',
+        links: [
+          { name: 'The Row', href: '/category/other-brands' },
+          { name: 'Louis Vuitton', href: '/category/other-brands' },
+          { name: 'Christian Dior', href: '/category/other-brands' },
+          { name: 'Fendi', href: '/category/other-brands' },
+          { name: 'Loro Piana', href: '/category/other-brands' },
+        ]
+      }
+    ]
+  },
+  'jewelry': {
+    title: 'Van Cleef & Arpels NEW ARRIVALS',
+    subtitle: 'Jewelry',
+    imageId: 'mega-jewelry',
+    sections: [
+      {
+        title: 'Fine Jewelry',
+        links: [
+          { name: 'Vintage', href: '/category/jewelry' },
+          { name: 'Contemporary', href: '/category/jewelry' },
+          { name: 'Costume Jewelry', href: '/category/jewelry' },
+          { name: 'New Arrivals', href: '/category/new-arrivals' },
+        ]
+      },
+      {
+        title: 'Category',
+        links: [
+          { name: 'Earrings', href: '/category/jewelry' },
+          { name: 'Bracelets', href: '/category/jewelry' },
+          { name: 'Necklaces', href: '/category/jewelry' },
+          { name: 'Rings', href: '/category/jewelry' },
+          { name: 'Watches', href: '/category/jewelry' },
+        ]
+      },
+      {
+        title: 'Brand',
+        links: [
+          { name: 'Hermès', href: '/category/jewelry' },
+          { name: 'Tiffany', href: '/category/jewelry' },
+          { name: 'Van Cleef & Arpels', href: '/category/jewelry' },
+        ]
+      }
+    ]
+  }
+};
 
 export const Header = () => {
   const [mounted, setMounted] = useState(false);
@@ -58,11 +235,6 @@ export const Header = () => {
   
   const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;
   const wishlistCount = mounted ? wishlist.length : 0;
-
-  const slides = [
-    i18n.t("slides.viewing"),
-    i18n.t("slides.spring")
-  ];
 
   const getSlideText = (idx: number) => {
     if (idx === 0) return currentLanguage === 'ar' ? "جلسات تقييم خاصة متاحة في نيويورك ولندن" : "PRIVATE CURATORIAL SESSIONS AVAILABLE IN NYC & LONDON";
@@ -91,13 +263,13 @@ export const Header = () => {
       {/* 1. Ticker Hub */}
       <div className="hidden sm:flex bg-[#fcfcfc] text-gray-500 h-10 items-center justify-center px-6 text-[9px] tracking-[0.4em] font-bold uppercase border-b border-gray-100">
         <div className="flex items-center space-x-10">
-          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === 0 ? slides.length-1 : s-1)} aria-label="Prev">
+          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === 0 ? 1 : s-1)} aria-label="Prev">
             <ChevronLeft className="w-3 h-3" />
           </button>
           <div className="overflow-hidden relative flex items-center justify-center min-w-[300px] lg:min-w-[500px]">
             <span className="animate-fade-in text-center" key={activeSlide}>{getSlideText(activeSlide)}</span>
           </div>
-          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === slides.length-1 ? 0 : s+1)} aria-label="Next">
+          <button className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer" onClick={() => setActiveSlide(s => s === 1 ? 0 : s+1)} aria-label="Next">
             <ChevronRight className="w-3 h-3" />
           </button>
         </div>
@@ -118,133 +290,136 @@ export const Header = () => {
           )}
         </div>
         
-        <nav className="flex items-center space-x-10">
-          <Link href={`/${countryCode}/account/login`} className="hover:text-gold transition-colors font-light italic lowercase">{i18n.t('common.login')}</Link>
-          
-          <div className="flex items-center space-x-6 border-l border-white/10 pl-8">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-2 hover:opacity-80 transition-all bg-transparent border-none outline-none cursor-pointer">
-                  <Languages className="w-3.5 h-3.5 text-gray-500" />
-                  <span className="text-[10px] text-white uppercase tracking-widest">{currentLanguage}</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border-gray-100 w-40 p-2 shadow-luxury rounded-none">
-                {[
-                  { code: 'en', label: 'English' },
-                  { code: 'ar', label: 'العربية' },
-                  { code: 'hi', label: 'हिन्दी' },
-                  { code: 'fr', label: 'Français' }
-                ].map((lang) => (
-                  <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code as SupportedLanguage)} className={cn("cursor-pointer rounded-none mb-1", currentLanguage === lang.code ? "bg-black text-white" : "hover:bg-ivory")}>
-                    <span className="text-[10px] font-bold uppercase tracking-widest">{lang.label}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {mounted && (
+          <nav className="flex items-center space-x-10">
+            <Link href={`/${countryCode}/account/login`} className="hover:text-gold transition-colors font-light italic lowercase">{i18n.t('common.login')}</Link>
+            
+            <div className="flex items-center space-x-6 border-l border-white/10 pl-8">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-2 hover:opacity-80 transition-all bg-transparent border-none outline-none cursor-pointer">
+                    <Languages className="w-3.5 h-3.5 text-gray-500" />
+                    <span className="text-[10px] text-white uppercase tracking-widest">{currentLanguage}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-white border-gray-100 w-40 p-2 shadow-luxury rounded-none">
+                  {[
+                    { code: 'en', label: 'English' },
+                    { code: 'ar', label: 'العربية' },
+                    { code: 'hi', label: 'हिन्दी' },
+                    { code: 'fr', label: 'Français' }
+                  ].map((lang) => (
+                    <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code as SupportedLanguage)} className={cn("cursor-pointer rounded-none mb-1", currentLanguage === lang.code ? "bg-black text-white" : "hover:bg-ivory")}>
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{lang.label}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-3 hover:opacity-80 transition-all group bg-transparent border-none outline-none cursor-pointer">
-                  <Globe className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors" />
-                  <span className="text-[10px] text-white uppercase tracking-[0.2em]">{currentCountry.name}</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white border-gray-100 w-64 p-3 shadow-luxury rounded-none">
-                {Object.values(COUNTRIES).map((c) => (
-                  <DropdownMenuItem key={c.code} onClick={() => handleCountryChange(c.code)} className={cn("cursor-pointer p-4 rounded-none mb-1", countryCode === c.code ? "bg-black text-white" : "hover:bg-ivory")}>
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center space-x-4">
-                        <span className="text-lg">{c.flag}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest">{c.name} Hub</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-3 hover:opacity-80 transition-all group bg-transparent border-none outline-none cursor-pointer">
+                    <Globe className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors" />
+                    <span className="text-[10px] text-white uppercase tracking-[0.2em]">{currentCountry.name}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-white border-gray-100 w-64 p-3 shadow-luxury rounded-none">
+                  {Object.values(COUNTRIES).map((c) => (
+                    <DropdownMenuItem key={c.code} onClick={() => handleCountryChange(c.code)} className={cn("cursor-pointer p-4 rounded-none mb-1", countryCode === c.code ? "bg-black text-white" : "hover:bg-ivory")}>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center space-x-4">
+                          <span className="text-lg">{c.flag}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest">{c.name} Hub</span>
+                        </div>
+                        {countryCode === c.code && <ShieldCheck className="w-3.5 h-3.5 text-gold" />}
                       </div>
-                      {countryCode === c.code && <ShieldCheck className="w-3.5 h-3.5 text-gold" />}
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </nav>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </nav>
+        )}
       </div>
 
       {/* 3. Brand Core */}
       <div className="h-20 lg:h-28 border-b border-gray-100 px-6 lg:px-12 flex items-center justify-between relative bg-white">
-        {/* Mobile Menu Trigger */}
         <div className="lg:hidden flex items-center">
-          <Sheet>
-            <SheetTrigger asChild>
-              <button className="p-2 -ml-2 bg-transparent border-none outline-none cursor-pointer" aria-label="Open Maison Menu">
-                <Menu className="w-6 h-6 stroke-[1.5px]" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side={currentLanguage === 'ar' ? "right" : "left"} className="w-full sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl">
-              <SheetHeader className="p-8 border-b border-gray-50 text-left shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">Maison Archive</SheetTitle>
-                    <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">{i18n.t('nav.archive')}</p>
+          {mounted && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <button className="p-2 -ml-2 bg-transparent border-none outline-none cursor-pointer" aria-label="Open Maison Menu">
+                  <Menu className="w-6 h-6 stroke-[1.5px]" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side={currentLanguage === 'ar' ? "right" : "left"} className="w-full sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl">
+                <SheetHeader className="p-8 border-b border-gray-50 text-left shrink-0">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">Maison Archive</SheetTitle>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">{i18n.t('nav.archive')}</p>
+                    </div>
+                    <SheetClose asChild>
+                      <button className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
+                        <X className="w-5 h-5 text-gray-400" />
+                      </button>
+                    </SheetClose>
                   </div>
-                  <SheetClose asChild>
-                    <button className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                      <X className="w-5 h-5 text-gray-400" />
-                    </button>
-                  </SheetClose>
-                </div>
-              </SheetHeader>
+                </SheetHeader>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <div className="p-8 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">Departments</p>
-                  {navLinks.map(link => (
-                    <SheetClose asChild key={link.id}>
-                      <Link href={link.href} className="block group">
-                        <div className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
-                          {link.name}
-                          <ChevronRight className={cn("w-4 h-4 text-gray-200 group-hover:text-plum transition-all", currentLanguage === 'ar' ? "rotate-180" : "")} />
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                  <div className="p-8 space-y-1">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">Departments</p>
+                    {navLinks.map(link => (
+                      <SheetClose asChild key={link.id}>
+                        <Link href={link.href} className="block group">
+                          <div className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
+                            {link.name}
+                            <ChevronRight className={cn("w-4 h-4 text-gray-200 group-hover:text-plum transition-all", currentLanguage === 'ar' ? "rotate-180" : "")} />
+                          </div>
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
+
+                  <div className="px-8 py-10 bg-ivory/50 border-y border-gray-50 space-y-1">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6 px-2">Collector Services</p>
+                    <SheetClose asChild>
+                      <Link href={`/${countryCode}/account`} className="block group">
+                        <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                          <User className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm font-bold uppercase tracking-widest text-gray-700">My Dashboard</span>
                         </div>
                       </Link>
                     </SheetClose>
-                  ))}
+                    <SheetClose asChild>
+                      <Link href={`/${countryCode}/how-to-sell`} className="block group">
+                        <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                          <Briefcase className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Consign Artifacts</span>
+                        </div>
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link href={`/${countryCode}/appointments`} className="block group">
+                        <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
+                          <MapPin className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Book Private Salon</span>
+                        </div>
+                      </Link>
+                    </SheetClose>
+                  </div>
                 </div>
 
-                <div className="px-8 py-10 bg-ivory/50 border-y border-gray-50 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6 px-2">Collector Services</p>
-                  <SheetClose asChild>
-                    <Link href={`/${countryCode}/account`} className="block group">
-                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                        <User className="w-5 h-5 text-gray-400" />
-                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">My Dashboard</span>
-                      </div>
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link href={`/${countryCode}/how-to-sell`} className="block group">
-                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                        <Briefcase className="w-5 h-5 text-gray-400" />
-                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Consign Artifacts</span>
-                      </div>
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link href={`/${countryCode}/appointments`} className="block group">
-                      <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                        <MapPin className="w-5 h-5 text-gray-400" />
-                        <span className="text-sm font-bold uppercase tracking-widest text-gray-700">Book Private Salon</span>
-                      </div>
-                    </Link>
-                  </SheetClose>
+                <div className="p-10 border-t border-gray-50 bg-white shrink-0 text-center space-y-4">
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="font-headline text-2xl font-bold tracking-[0.05em] text-gray-900">AMARISÉ</span>
+                    <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-gray-300 mt-1 italic">Maison Avenue</span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="p-10 border-t border-gray-50 bg-white shrink-0 text-center space-y-4">
-                <div className="flex flex-col items-center justify-center">
-                  <span className="font-headline text-2xl font-bold tracking-[0.05em] text-gray-900">AMARISÉ</span>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-gray-300 mt-1 italic">Maison Avenue</span>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -273,6 +448,7 @@ export const Header = () => {
         </div>
       </div>
 
+      {/* Main Nav with Mega Menu Capability */}
       <nav className="h-16 bg-white border-b border-gray-100 px-12 hidden lg:flex items-center justify-center space-x-16">
         {navLinks.map((link) => (
           <div 
@@ -296,6 +472,60 @@ export const Header = () => {
           </div>
         ))}
       </nav>
+
+      {/* Mega Menu Container */}
+      <AnimatePresence>
+        {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-2xl z-[40] font-body overflow-hidden"
+            onMouseEnter={() => setHoveredLink(hoveredLink)}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <div className="container mx-auto px-12 py-16 grid grid-cols-4 gap-12 max-w-[1600px]">
+              {/* Links Sections */}
+              <div className="col-span-3 grid grid-cols-3 gap-8">
+                {MEGA_MENU_DATA[hoveredLink].sections.map((section: any, idx: number) => (
+                  <div key={idx} className="space-y-6">
+                    <h4 className="text-[11px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">{section.title}</h4>
+                    <ul className="space-y-3">
+                      {section.links.map((sub: any, sIdx: number) => (
+                        <li key={sIdx}>
+                          <Link 
+                            href={`/${countryCode}${sub.href}`} 
+                            className="text-[13px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
+                            onClick={() => setHoveredLink(null)}
+                          >
+                            {sub.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {/* Featured Visual */}
+              <div className="col-span-1 flex flex-col space-y-6 items-center text-center">
+                <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
+                  <Image 
+                    src={placeholderData.placeholderImages.find(i => i.id === MEGA_MENU_DATA[hoveredLink].imageId)?.imageUrl || ''}
+                    alt={MEGA_MENU_DATA[hoveredLink].title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">{MEGA_MENU_DATA[hoveredLink].title}</h5>
+                  <p className="text-[11px] text-gray-400 italic font-light">{MEGA_MENU_DATA[hoveredLink].subtitle}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isSearchOpen && (
