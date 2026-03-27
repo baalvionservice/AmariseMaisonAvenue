@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -35,7 +36,8 @@ import {
   Video,
   Award,
   ExternalLink,
-  ClipboardList
+  ClipboardList,
+  BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -53,6 +55,7 @@ export function AdminSidebar() {
       title: "Tactical",
       items: [
         { icon: <LayoutDashboard />, label: "Terminal", href: "/admin" },
+        { icon: <BarChart />, label: "Audit Summary", href: "/admin/audit-summary" },
         { icon: <Globe />, label: "Global Matrix", href: "/admin/super" },
         { icon: <Zap />, label: "AI Dashboard", href: "/admin/ai-dashboard" },
         { icon: <Activity />, label: "Observability", href: "/admin/observability" },
