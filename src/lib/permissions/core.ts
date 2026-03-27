@@ -1,5 +1,5 @@
 import { rolePermissions } from "./rolePermissions";
-import { MaisonUser } from "../rbac/mock-users";
+import { MaisonUser } from "./mock-users";
 import { Permission } from "./engine";
 
 /**
@@ -19,7 +19,7 @@ export function canPerform(user: MaisonUser | null, permission: string, resource
   
   if (perms.includes(permission as Permission)) {
     // 2. Check geographic jurisdiction
-    if (user.role === "super_admin" || user.country === "GLOBAL") {
+    if (user.role === "super_admin" || user.country.toLowerCase() === "global") {
       return true;
     }
     // Regional admins/operators are strictly isolated to their country code

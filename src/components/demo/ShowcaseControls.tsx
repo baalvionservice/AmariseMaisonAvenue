@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { COUNTRIES } from '@/lib/mock-data';
-import { users as RBAC_USERS } from '@/lib/rbac/mock-users';
+import { users as RBAC_USERS } from '@/lib/permissions/mock-users';
 import { Button } from '@/components/ui/button';
 import { 
   Globe, 
@@ -62,7 +62,6 @@ export function ShowcaseControls() {
     const user = RBAC_USERS.find(u => u.id === userId);
     if (user) {
       setCurrentUser(user);
-      recordLog(`Persona Switched: ${user.name}`, 'System');
       
       // Auto-route based on persona for better switching experience
       if (user.role === 'super_admin' || user.role === 'country_admin') {
@@ -88,7 +87,7 @@ export function ShowcaseControls() {
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end space-y-4">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button className="w-16 h-16 bg-gold text-gray-900 rounded-full shadow-luxury flex items-center justify-center transition-all hover:scale-110 active:scale-95 group relative hover:shadow-gold-glow">
+          <button className="w-16 h-16 bg-gold text-gray-900 rounded-full shadow-luxury flex items-center justify-center transition-all hover:scale-110 active:scale-95 group relative hover:shadow-gold-glow border-none outline-none cursor-pointer">
             <Settings2 className={cn("w-7 h-7 transition-transform duration-500", isOpen && "rotate-180")} />
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-plum opacity-75"></span>
@@ -100,7 +99,7 @@ export function ShowcaseControls() {
           <div className="p-6 bg-gold/10 border-b border-border">
              <div className="flex justify-between items-center mb-1">
                 <h3 className="text-sm font-headline font-bold text-gray-900 uppercase tracking-widest">Maison Command Hub</h3>
-                <button onClick={() => setIsOpen(false)}><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
+                <button onClick={() => setIsOpen(false)} className="border-none bg-transparent cursor-pointer"><X className="w-4 h-4 text-gray-400 hover:text-plum" /></button>
              </div>
              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Universal Platform Control • Level 3 SECURE</p>
           </div>
@@ -150,7 +149,7 @@ export function ShowcaseControls() {
                     key={user.id}
                     onClick={() => handlePersonaSwitch(user.id)}
                     className={cn(
-                      "p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex flex-col justify-between transition-all rounded-none",
+                      "p-3 border text-[9px] font-bold uppercase tracking-widest text-left flex flex-col justify-between transition-all rounded-none outline-none cursor-pointer",
                       currentUser?.id === user.id ? "bg-plum text-white border-plum shadow-md" : "bg-ivory border-border text-gray-400 hover:bg-plum/5 hover:text-plum"
                     )}
                   >
@@ -173,7 +172,7 @@ export function ShowcaseControls() {
                     key={code}
                     onClick={() => handleCountrySwitch(code)}
                     className={cn(
-                      "h-10 border text-[10px] font-bold uppercase tracking-widest transition-all",
+                      "h-10 border text-[10px] font-bold uppercase tracking-widest transition-all rounded-none outline-none cursor-pointer",
                       currentCountry === code ? "bg-gold border-gold text-gray-900" : "bg-ivory border-border text-gray-400 hover:bg-gold hover:text-gray-900"
                     )}
                   >
@@ -185,7 +184,7 @@ export function ShowcaseControls() {
           </div>
 
           <div className="bg-ivory p-6 border-t border-border flex justify-between items-center">
-             <button onClick={() => setShowcaseMode(false)} className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-destructive font-black transition-colors">
+             <button onClick={() => setShowcaseMode(false)} className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-destructive font-black transition-colors border-none bg-transparent outline-none cursor-pointer">
                EXIT AUDIT MODE
              </button>
              <div className="flex items-center space-x-2 text-emerald-500">
@@ -204,7 +203,7 @@ function DomainLink({ icon, label, href, color, onClick }: { icon: any, label: s
   return (
     <button 
       onClick={() => { onClick(); router.push(href); }}
-      className="flex flex-col items-center justify-center p-4 bg-white border border-border hover:border-black transition-all group shadow-sm aspect-square"
+      className="flex flex-col items-center justify-center p-4 bg-white border border-border hover:border-black transition-all group shadow-sm aspect-square rounded-none outline-none cursor-pointer"
     >
       <span className={cn("transition-transform group-hover:scale-110 mb-2", color)}>
         {React.cloneElement(icon as React.ReactElement, { size: 24 })}

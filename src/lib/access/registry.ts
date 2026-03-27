@@ -4,7 +4,7 @@
  */
 
 import { canPerform } from "../permissions/core";
-import { MaisonUser } from "../rbac/mock-users";
+import { MaisonUser } from "../permissions/mock-users";
 
 export interface GuardResponse {
   success: boolean;
@@ -31,7 +31,7 @@ export function guardAction(
  */
 export function isCountryAllowed(user: MaisonUser | null, resourceCountry: string): boolean {
   if (!user) return false;
-  if (user.role === "super_admin" || user.country === "GLOBAL") return true;
+  if (user.role === "super_admin" || user.country.toLowerCase() === "global") return true;
   return user.country.toLowerCase() === resourceCountry.toLowerCase();
 }
 

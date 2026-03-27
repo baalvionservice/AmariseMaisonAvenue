@@ -1,27 +1,43 @@
+
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import placeholderData from '@/app/lib/placeholder-images.json';
 
 interface PlaceholderImageProps {
+  id?: string;
+  alt?: string;
   className?: string;
+  priority?: boolean;
 }
 
 /**
- * PlaceholderImage: Institutional placeholder for product artifacts.
- * Ensures layout stability and accessibility while visuals are in transition.
+ * PlaceholderImage: The Institutional Visual Hub.
+ * Resolves high-fidelity assets from the Maison registry.
  */
-export function PlaceholderImage({ className }: PlaceholderImageProps) {
+export function PlaceholderImage({ 
+  id = 'product-luxury-default', 
+  alt = 'Amarisé Maison Artifact',
+  className,
+  priority = false
+}: PlaceholderImageProps) {
+  const asset = placeholderData.placeholderImages.find(img => img.id === id) || 
+                placeholderData.placeholderImages.find(img => img.id === 'product-luxury-default');
+
+  if (!asset) return null;
+
   return (
-    <div
-      className={cn(
-        "bg-[#ffffff] flex items-center justify-center text-[#ccc] text-[10px] font-bold uppercase tracking-[0.2em] text-center p-6 border border-border/40 select-none",
-        className
-      )}
-      aria-label="Lens Opening Placeholder"
-      role="img"
-    >
-      Lens Opening Placeholder
+    <div className={cn("relative overflow-hidden bg-[#fcfcfc]", className)}>
+      <Image
+        src={asset.imageUrl}
+        alt={alt}
+        fill
+        priority={priority}
+        className="object-cover"
+        data-ai-hint={asset.imageHint}
+      />
     </div>
   );
 }

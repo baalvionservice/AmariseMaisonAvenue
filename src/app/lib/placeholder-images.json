@@ -2,46 +2,10 @@
 {
   "placeholderImages": [
     {
-      "id": "hero-main",
-      "description": "Maison Amarisé Global Flagship Avenue",
-      "imageUrl": "https://picsum.photos/seed/amarise-avenue-hq/2560/1440",
-      "imageHint": "luxury storefront"
-    },
-    {
-      "id": "editorial-artisanal",
-      "description": "Master Artisan at Work",
-      "imageUrl": "https://picsum.photos/seed/amarise-artisanal/1440/1920",
-      "imageHint": "fashion atelier"
-    },
-    {
-      "id": "editorial-city-london",
-      "description": "London Heritage Edit",
-      "imageUrl": "https://picsum.photos/seed/amarise-london-edit/1600/900",
-      "imageHint": "london luxury"
-    },
-    {
-      "id": "collection-heritage",
-      "description": "The Heritage Series",
-      "imageUrl": "https://picsum.photos/seed/heritage-luxe/1920/1080",
-      "imageHint": "vintage jewelry"
-    },
-    {
-      "id": "home-hero-auction",
-      "description": "Maison Amarisé Heritage Auction Horizon",
-      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/SpringAuction_3.jpg?v=1772147453&width=1440",
-      "imageHint": "luxury auction"
-    },
-    {
-      "id": "home-mastery",
-      "description": "Artisanal Mastery Detail",
-      "imageUrl": "https://picsum.photos/seed/amarise-mastery/1200/1500",
-      "imageHint": "haute couture"
-    },
-    {
-      "id": "home-salon-invite",
-      "description": "Private Salon Environment",
-      "imageUrl": "https://picsum.photos/seed/amarise-salon-interior/1600/1000",
-      "imageHint": "exclusive interior"
+      "id": "home-hero-banner-main",
+      "description": "Maison Amarisé Primary Heritage Banner",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964",
+      "imageHint": "luxury banner"
     },
     {
       "id": "madave-live-section",
@@ -50,10 +14,16 @@
       "imageHint": "luxury handbags"
     },
     {
-      "id": "home-hero-banner-main",
-      "description": "Maison Amarisé Primary Heritage Banner",
-      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Web_Banner_2.png?v=1773688964",
-      "imageHint": "luxury banner"
+      "id": "home-authenticity-banner",
+      "description": "Authenticity Guarantee Visual",
+      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720",
+      "imageHint": "luxury bag"
+    },
+    {
+      "id": "home-mission-banner",
+      "description": "Maison Mission Statement Visual",
+      "imageUrl": "https://picsum.photos/seed/amarise-mission/1200/800",
+      "imageHint": "luxury fashion"
     },
     {
       "id": "home-grid-spring",
@@ -74,12 +44,6 @@
       "imageHint": "luxury boutique"
     },
     {
-      "id": "home-authenticity-banner",
-      "description": "Authenticity Guarantee Visual",
-      "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Rectangle_257_fa9c3862-a0f7-426e-9a6a-582562bce41f.jpg?v=1770664405&width=720",
-      "imageHint": "luxury bag"
-    },
-    {
       "id": "home-info-auth",
       "description": "Informational Grid: Authenticity",
       "imageUrl": "https://madisonavenuecouture.com/cdn/shop/files/Authenticity_1.jpg?v=1770664405&width=800",
@@ -98,10 +62,16 @@
       "imageHint": "luxury interior"
     },
     {
-      "id": "home-mission-banner",
-      "description": "Maison Mission Statement Visual",
-      "imageUrl": "https://picsum.photos/seed/amarise-mission/1200/800",
+      "id": "maison-popup-invitation",
+      "description": "Private Invitation Popup Visual",
+      "imageUrl": "https://picsum.photos/seed/amarise-invitation/1200/1500",
       "imageHint": "luxury fashion"
+    },
+    {
+      "id": "product-luxury-default",
+      "description": "Default High-Fidelity Product Placeholder",
+      "imageUrl": "https://picsum.photos/seed/amarise-artifact/800/1000",
+      "imageHint": "luxury artifact"
     }
   ]
 }

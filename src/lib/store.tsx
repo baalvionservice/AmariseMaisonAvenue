@@ -2,14 +2,13 @@
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { 
-  CartItem, Product, Collection, Category, Department, City, BuyingGuide, Editorial, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentGateway, Subscription, SubscriptionStatus, CountryConfig, BrandConfig, PaymentPlan
+  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig
 } from './types';
-import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES } from './mock-data';
+import { PRODUCTS as INITIAL_PRODUCTS, INITIAL_COLLECTIONS, INITIAL_CATEGORIES, INITIAL_DEPARTMENTS, INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
 import { ACQUISITION_SCRIPTS } from './mock-sales-system';
 import { COUNTRIES_CONFIG, BRANDS_CONFIG } from './mock-global-config';
-import { MOCK_SESSION_USER } from './rbac/mock-session';
-import { MaisonUser } from './rbac/mock-users';
+import { MOCK_SESSION_USER, MaisonUser } from './permissions/mock-users';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -123,6 +122,7 @@ interface AppContextType {
   runAllQATests: () => void;
   runStressTest: (loadSize: number, type: StressTest['type']) => void;
   executeSafeSync: (categories: SyncCategory[], targets: CountryCode[]) => void;
+  rollbackGlobalSync: (sessionId: string) => void;
   logAction: (action: string, entity: string, country?: string, severity?: AuditLogEntry['severity']) => void;
   triggerReindex: (type: string) => void;
   toggleEmergencyMode: () => void;
@@ -139,7 +139,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
-  const [countryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({ ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15 })));
+  const [countryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({ ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15, name: c.code.toUpperCase() })));
   const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, status: 'published', regions: ['us', 'uk', 'ae', 'in', 'sg'], currentVersion: 1, versionHistory: [] })));
   const [privateInquiries, setPrivateInquiries] = useState<PrivateInquiry[]>(MOCK_INQUIRIES.map(i => ({ ...i, brandId: activeBrandId })));
@@ -166,7 +166,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [apiLogs] = useState<ApiLog[]>(API_LOGS);
   const [indexingStatus] = useState<IndexingStatus>(INDEXING_STATUS);
   const [appointments] = useState<Appointment[]>(APPOINTMENTS);
-  const [invoices] = useState<Invoice[]>(INVOICES);
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [brandIntegrityIssues, setBrandIntegrityIssues] = useState<BrandIntegrityIssue[]>([]);
   const [automationRules] = useState<AutomationRule[]>([]);
@@ -177,16 +177,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [maisonErrors, setMaisonErrors] = useState<MaisonError[]>([]);
   const [stressTests, setStressTests] = useState<StressTest[]>([]);
   const [seoRegistry] = useState<SEOMetadata[]>([]);
-  const [affiliates] = useState<Affiliate[]>(AFFILIATES);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>(AFFILIATES);
   const [activeCampaigns, setActiveCampaigns] = useState<Campaign[]>(CAMPAIGNS);
   const [messagingTemplates] = useState<SalesScript[]>(ACQUISITION_SCRIPTS.map(s => ({ ...s, brandId: activeBrandId })));
   const [activeVip, setActiveVip] = useState<VipClient | null>(vipClients[0]);
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(vendors[0]);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({ theme: { primary: '#000000', accent: '#D4AF37', fontFamily: 'Alegreya' }, seo: { defaultTitle: 'AMARISÉ MAISON', defaultDesc: 'Global Acquisition House', sitemapUrl: '/sitemap.xml' }, payments: { cards: true, wallets: true, crypto: false }, compliance: { gdprEnabled: true, ccpaEnabled: true, pciStatus: 'Optimal' }, performance: { cdnEnabled: true, cachingEnabled: true, autoScalingStatus: 'Ready' }, emergencyMode: false, isGuideMode: false, adminViewMode: 'advanced' });
 
-  const activeHub = useMemo(() => (!currentUser ? 'global' : currentUser.role === 'super_admin' ? adminJurisdiction : currentUser.country as CountryCode), [currentUser, adminJurisdiction]);
+  const activeHub = useMemo(() => (!currentUser ? 'global' : currentUser.role === 'super_admin' ? adminJurisdiction : currentUser.country.toLowerCase() as CountryCode), [currentUser, adminJurisdiction]);
 
-  // Scoped Data Logic: Super Admin sees all, Regional Hubs are isolated
+  // Scoped Data Logic
   const scopedProducts = useMemo(() => activeHub === 'global' ? products : products.filter(p => p.regions.includes(activeHub as any) || p.isGlobal), [products, activeHub]);
   const scopedInquiries = useMemo(() => activeHub === 'global' ? privateInquiries : privateInquiries.filter(i => i.country.toLowerCase() === activeHub.toLowerCase()), [privateInquiries, activeHub]);
   const scopedEditorials = useMemo(() => activeHub === 'global' ? EDITOR_INITIAL : EDITOR_INITIAL.filter(e => e.country === activeHub || e.isGlobal), [activeHub]);
@@ -204,9 +204,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const scopedLiveRequests = useMemo(() => activeHub === 'global' ? (activeVip?.liveRequests || []) : (activeVip?.liveRequests || []).filter(r => (r as any).country === activeHub), [activeVip, activeHub]);
   const scopedCertificates = useMemo(() => activeHub === 'global' ? (activeVip?.certificates || []) : (activeVip?.certificates || []).filter(c => c.country === activeHub), [activeVip, activeHub]);
 
-  const logAction = (action: string, entity: string, countryCode = 'global', severity: AuditLogEntry['severity'] = 'low') => {
+  const logAction = (action: string, entity: string, countryCodeStr = 'global', severity: AuditLogEntry['severity'] = 'low') => {
     if (!currentUser) return;
-    setAuditRegistry(prev => [{ id: `aud-${Date.now()}`, actorId: currentUser.id, actorName: currentUser.name, actorRole: currentUser.role, country: countryCode, action, entity, timestamp: new Date().toISOString(), severity, brandId: activeBrandId }, ...prev]);
+    setAuditRegistry(prev => [{ id: `aud-${Date.now()}`, actorId: currentUser.id, actorName: currentUser.name, actorRole: currentUser.role, country: countryCodeStr, action, entity, timestamp: new Date().toISOString(), severity, brandId: activeBrandId }, ...prev]);
   };
 
   const value = useMemo(() => ({
@@ -225,7 +225,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     runAllQATests: () => { qaTests.forEach(t => { setQaTests(prev => prev.map(item => item.id === t.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setQaTests(prev => prev.map(item => item.id === t.id ? { ...item, status: 'passed', lastRun: new Date().toISOString() } : item)); }, 2000); }); },
     runStressTest: (loadSize: number, type: StressTest['type']) => { const id = `stress-${Date.now()}`; setStressTests(prev => [{ id, name: `${type} High-Frequency Simulation`, loadSize, type, status: 'running', metrics: { processedCount: 0, errorCount: 0, failureCount: 0 }, logs: [], country: 'global' }, ...prev]); let processed = 0; const interval = setInterval(() => { processed += Math.floor(loadSize / 5); if (processed >= loadSize) { clearInterval(interval); setStressTests(prev => prev.map(t => t.id === id ? { ...t, status: 'passed', metrics: { ...t.metrics, processedCount: loadSize, durationMs: 1420 }, logs: [...t.logs, { message: 'Load simulation complete. System stable.', timestamp: new Date().toISOString() }] } : t)); } else { setStressTests(prev => prev.map(t => t.id === id ? { ...t, metrics: { ...t.metrics, processedCount: processed } } : t)); } }, 500); },
     executeSafeSync: (cats: SyncCategory[], targets: CountryCode[]) => { const sessionId = `sync-${Date.now()}`; logAction('Global Sync Initiated', `Session: ${sessionId}`, 'global', 'medium'); setTimeout(() => { setGlobalSyncHistory(prev => [{ id: sessionId, timestamp: new Date().toISOString(), categories: cats, targets, actorName: currentUser?.name || 'System', status: 'applied', snapshotBefore: { products: [], seo: [], config: [] } }, ...prev]); }, 2000); },
-    logAction, triggerReindex: () => {}, toggleEmergencyMode: () => setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})), runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); }
+    rollbackGlobalSync: (id: string) => setGlobalSyncHistory(prev => prev.map(s => s.id === id ? {...s, status: 'rolled_back'} : s)),
+    logAction, triggerReindex: (type: string) => logAction('Re-index Triggered', type), toggleEmergencyMode: () => setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})), runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); }
   }), [countryConfigs, brandConfigs, activeBrandId, currentUser, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { memo, useMemo } from 'react';
@@ -39,7 +40,11 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
     <article className="group relative flex flex-col bg-transparent overflow-hidden h-full luxury-reveal">
       {/* 1. Visual Matrix */}
       <Link href={`/${countryCode}/${targetFlow}/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#fcfcfc] border border-gray-50 shadow-sm" aria-label={`Registry Details for ${product.name}`}>
-        <PlaceholderImage className="absolute inset-0 w-full h-full transition-transform duration-[3s] group-hover:scale-110" />
+        <PlaceholderImage 
+          id={product.isVip ? "home-mastery" : "product-luxury-default"} 
+          alt={product.name}
+          className="absolute inset-0 w-full h-full transition-transform duration-[3s] group-hover:scale-110" 
+        />
         
         {product.isVip && (
           <div className="absolute top-4 lg:top-8 left-4 lg:left-8 bg-black px-4 py-2 text-[8px] lg:text-[10px] font-bold tracking-[0.5em] text-white uppercase z-10 shadow-2xl luxury-blur bg-opacity-80 border border-white/10">
@@ -55,7 +60,6 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           <Heart className={cn("w-5 h-5 transition-colors", isWishlisted ? "fill-plum text-plum" : "text-gray-400")} />
         </button>
 
-        {/* Tactical Hover Reveal */}
         <div className="hidden lg:flex absolute inset-x-0 bottom-0 p-10 flex-col space-y-6 translate-y-full group-hover:translate-y-0 transition-transform duration-[0.8s] ease-[cubic-bezier(0.19,1,0.22,1)] bg-white/98 backdrop-blur-3xl z-20 border-t border-gray-100 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
           <div className="flex items-center space-x-4 text-[9px] font-bold uppercase tracking-[0.4em] text-plum mb-2">
              <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -82,7 +86,6 @@ export const ProductCard = memo(({ product }: ProductCardProps) => {
           <div className="w-10 lg:w-16 h-[1.5px] bg-gray-100 group-hover:w-24 group-hover:bg-plum transition-all duration-1000" />
         </div>
 
-        {/* Mobile Action Path */}
         <div className="lg:hidden pt-4">
            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-plum flex items-center justify-center border-b border-plum/20 pb-1.5 mx-auto w-fit">
              Registry Details <ArrowRight className="w-3 h-3 ml-3" />
