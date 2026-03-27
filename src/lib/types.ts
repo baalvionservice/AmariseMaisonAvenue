@@ -5,6 +5,15 @@ export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
 export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
 
+export interface FXRate {
+  currencyCode: string;
+  baseCurrency: string; // usually USD
+  rate: number;
+  spread: number; // Maison markup
+  lastUpdated: string;
+  source: string;
+}
+
 export interface PaymentPlan {
   id: string;
   name: string;
@@ -73,6 +82,7 @@ export interface Transaction {
   taxAmount?: number;
   netAmount?: number;
   gateway?: PaymentGateway;
+  lockedRate?: number; // Captured FX rate at checkout
   fulfillmentSteps?: {
     step: FulfillmentStep;
     timestamp: string;
@@ -307,6 +317,7 @@ export interface Invoice {
   complianceCertified: boolean;
   brandId: string;
   gateway?: PaymentGateway;
+  fxRate?: number;
 }
 
 export interface PrivateInquiry {
@@ -582,6 +593,7 @@ export type JobType =
   | 'EVENT_RETRY' 
   | 'NOTIF_DISPATCH' 
   | 'METRICS_AGG' 
+  | 'FX_SYNC'
   | 'CLEANUP';
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';

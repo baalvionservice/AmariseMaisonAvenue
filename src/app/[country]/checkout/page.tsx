@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { formatPrice } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,10 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { paymentService } from '@/lib/services/paymentService';
 import { apiOrchestrator } from '@/lib/api/orchestrator';
-import { PaymentGateway } from '@/lib/types';
+import { PaymentGateway, CountryCode } from '@/lib/types';
 
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs, fxRates, getLocalizedPrice } = useAppStore();
   const { country } = useParams();
   const searchParams = useSearchParams();
   const countryCode = (country as string) || 'us';
@@ -29,6 +28,7 @@ export default function CheckoutPage() {
   const [isSettling, setIsSettling] = useState(false);
   const [orderRef, setOrderRef] = useState('');
   const [inventoryLockId, setInventoryLockId] = useState<string | null>(null);
+  const [lockedFXRate, setLockedFXRate] = useState<number | null>(null);
   
   // Prevent hydration mismatch for random order ID
   useEffect(() => {
@@ -48,18 +48,23 @@ export default function CheckoutPage() {
   const totalYield = subtotal + taxAmount;
 
   /**
-   * ATOMIC INVENTORY LOCKING
-   * Transition from Step 1 to Step 2 requires securing the artifacts.
+   * ATOMIC INVENTORY LOCKING + PRICE LOCKING
+   * Transition from Step 1 to Step 2 requires securing the artifacts and the FX rate.
    */
   const handleLockInventory = async () => {
     if (cart.length > 0) {
       toast({ title: "Securing Artifacts", description: "Verifying atomic availability in global registry..." });
       
-      // Simulate multi-item locking
       const lockRes = await apiOrchestrator.lockInventory(cart[0].id, currentUser?.id || 'guest');
       
       if (lockRes.status === 'success') {
         setInventoryLockId(lockRes.data.lock_id);
+        
+        // 🔒 Institutional Price Locking
+        // Capture the current hub rate to prevent fluctuations during payment
+        const currentHubRate = fxRates.find(r => r.currencyCode === currentCountryConfig?.currency)?.rate || 1;
+        setLockedFXRate(currentHubRate);
+        
         setStep(2);
       } else {
         toast({ variant: "destructive", title: "Allocation Conflict", description: lockRes.error });
@@ -72,7 +77,6 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setIsSettling(true);
     
-    // Idempotency: Generating a unique key for this specific settlement session
     const idempotencyKey = `maison_set_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
     try {
@@ -102,7 +106,8 @@ export default function CheckoutPage() {
           taxRate: currentCountryConfig?.taxRate || 0,
           complianceCertified: true,
           brandId: activeBrandId,
-          gateway: selectedGateway
+          gateway: selectedGateway,
+          fxRate: lockedFXRate || 1
         });
 
         createTransaction({
@@ -120,7 +125,8 @@ export default function CheckoutPage() {
           brandId: activeBrandId,
           artifactName: selectedPlan ? selectedPlan.name : (cart[0]?.name || 'Atelier Bundle'),
           isProvenanceCertified: true,
-          gateway: selectedGateway
+          gateway: selectedGateway,
+          lockedRate: lockedFXRate || 1
         });
 
         setIsSettling(false);
@@ -219,7 +225,7 @@ export default function CheckoutPage() {
                        </div>
                        <div className="flex items-center space-x-2 text-[9px] font-bold text-emerald-400">
                           <Lock className="w-3 h-3" />
-                          <span>Expires in 14:59</span>
+                          <span>Price Locked @ {lockedFXRate?.toFixed(4)}</span>
                        </div>
                     </div>
                   )}
@@ -265,7 +271,7 @@ export default function CheckoutPage() {
                       className="w-full h-24 bg-plum text-white hover:bg-black rounded-none text-[12px] font-bold tracking-[0.5em] uppercase transition-all shadow-2xl"
                       onClick={handlePlaceOrder}
                     >
-                      {isSettling ? 'PROCESSING SETTLEMENT...' : `AUTHORIZE SETTLEMENT — ${formatPrice(totalYield, countryCode)}`}
+                      {isSettling ? 'PROCESSING SETTLEMENT...' : `AUTHORIZE SETTLEMENT — ${getLocalizedPrice(totalYield)}`}
                     </Button>
                     <button onClick={() => setStep(1)} className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 hover:text-black transition-colors self-center">
                       REVISE DISPATCH REGISTRY
@@ -289,7 +295,7 @@ export default function CheckoutPage() {
                         </div>
                         <span className="text-[9px] text-gray-400 font-bold uppercase">{selectedPlan.tier} Enrollment</span>
                       </div>
-                      <span className="font-bold text-sm tabular pl-4">${selectedPlan.price.toLocaleString()}</span>
+                      <span className="font-bold text-sm tabular pl-4">{getLocalizedPrice(selectedPlan.price)}</span>
                     </div>
                   )}
                   {cart.map(item => (
@@ -298,7 +304,7 @@ export default function CheckoutPage() {
                         <span className="block font-bold text-sm uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{item.name}</span>
                         <span className="text-[9px] text-gray-400 font-bold uppercase">Qty: {item.quantity}</span>
                       </div>
-                      <span className="font-bold text-sm tabular pl-4">{formatPrice(item.basePrice * item.quantity, countryCode)}</span>
+                      <span className="font-bold text-sm tabular pl-4">{getLocalizedPrice(item.basePrice * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
@@ -310,12 +316,12 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                     <span>{currentCountryConfig?.taxType || 'Jurisdictional Tax'} ({currentCountryConfig?.taxRate || 0}%)</span>
-                    <span className="text-gray-900 tabular">${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="text-gray-900 tabular">{getLocalizedPrice(taxAmount)}</span>
                   </div>
                   <div className="flex justify-between items-end pt-6 border-t border-border/10">
                     <span className="text-xl font-headline font-bold italic tracking-tight">Aggregate Yield</span>
                     <div className="text-right">
-                       <div className="text-3xl font-bold tabular leading-none">{formatPrice(totalYield, countryCode)}</div>
+                       <div className="text-3xl font-bold tabular leading-none">{getLocalizedPrice(totalYield)}</div>
                        <p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Total inclusive of all fees</p>
                     </div>
                   </div>

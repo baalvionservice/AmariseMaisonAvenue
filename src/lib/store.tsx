@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { 
-  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob
+  CartItem, Product, Collection, SocialMetrics, Vendor, Affiliate, ReturnRequest, Campaign, VipClient, GlobalSettings, CustomerSegment, SupportTicket, SupportStats, MaisonIntegration, ApiLog, IndexingStatus, IndexingLog, Appointment, Invoice, Transaction, PrivateInquiry, LeadConversation, SEOMetadata, SalesScript, AutomationRule, CountryCode, LanguageCode, AIModuleStatus, AIActionLog, AISuggestion, AIAutomationLevel, MaisonNotification, WorkflowTask, ApprovalRequest, AuditLogEntry, QATestCase, MaisonError, GlobalSyncSession, SyncCategory, StressTest, AdminViewMode, BrandIntegrityIssue, WalletTransaction, LiveRequest, MaisonCertificate, TransactionStatus, PaymentPlan, Subscription, CountryConfig, BrandConfig, Editorial, BuyingGuide, SystemLog, MaisonMetric, MaisonAlert, SystemHealthScore, BackgroundJob, FXRate
 } from './types';
 import { PRODUCTS as INITIAL_PRODUCTS, COLLECTIONS as INITIAL_COLLECTIONS, CATEGORIES as INITIAL_CATEGORIES, DEPARTMENTS as INITIAL_DEPARTMENTS, CITIES as INITIAL_CITIES, BUYING_GUIDES as INITIAL_GUIDES, EDITOR_INITIAL, VENDORS, AFFILIATES, RETURNS, CAMPAIGNS, VIP_CLIENTS, CUSTOMER_SEGMENTS, SUPPORT_TICKETS, SUPPORT_STATS, INTEGRATIONS, API_LOGS, INDEXING_STATUS, INDEXING_LOGS, APPOINTMENTS, INVOICES, formatPrice } from './mock-data';
 import { MOCK_INQUIRIES, MOCK_CONVERSATIONS } from './mock-sales';
@@ -15,6 +15,7 @@ import { obsEngine } from './observability/engine';
 import { workerEngine } from './reliability/worker-engine';
 import { i18n } from './i18n/engine';
 import { SupportedLanguage } from './i18n/config';
+import { FXEngine } from './finance/fx-engine';
 
 interface AppContextType {
   countryConfigs: CountryConfig[];
@@ -25,6 +26,7 @@ interface AppContextType {
   adminJurisdiction: CountryCode | 'global';
   globalSyncHistory: GlobalSyncSession[];
   paymentPlans: PaymentPlan[];
+  fxRates: FXRate[];
   scopedProducts: Product[];
   scopedInquiries: PrivateInquiry[];
   scopedEditorials: Editorial[];
@@ -146,6 +148,7 @@ interface AppContextType {
   recordMetric: (params: Omit<MaisonMetric, 'id' | 'timestamp'>) => void;
   resolveAlert: (id: string) => void;
   enqueueBackgroundJob: (type: BackgroundJob['type'], payload: any, maxRetries?: number) => void;
+  getLocalizedPrice: (amount: number, country?: CountryCode) => string;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -158,6 +161,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isShowcaseMode, setShowcaseMode] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
   const [globalSyncHistory, setGlobalSyncHistory] = useState<GlobalSyncSession[]>([]);
+  const [fxRates, setFXRates] = useState<FXRate[]>([
+    { currencyCode: 'USD', baseCurrency: 'USD', rate: 1, spread: 0, lastUpdated: new Date().toISOString(), source: 'Institutional Feed' },
+    { currencyCode: 'GBP', baseCurrency: 'USD', rate: 0.79, spread: 0.015, lastUpdated: new Date().toISOString(), source: 'Institutional Feed' },
+    { currencyCode: 'AED', baseCurrency: 'USD', rate: 3.67, spread: 0.02, lastUpdated: new Date().toISOString(), source: 'Institutional Feed' },
+    { currencyCode: 'INR', baseCurrency: 'USD', rate: 83.2, spread: 0.03, lastUpdated: new Date().toISOString(), source: 'Institutional Feed' },
+    { currencyCode: 'SGD', baseCurrency: 'USD', rate: 1.34, spread: 0.015, lastUpdated: new Date().toISOString(), source: 'Institutional Feed' }
+  ]);
   const [countryConfigs] = useState<CountryConfig[]>(COUNTRIES_CONFIG.map(c => ({ ...c, taxType: c.code === 'us' ? 'Sales Tax' : 'VAT', taxRate: 15, name: c.code.toUpperCase() })));
   const [brandConfigs] = useState<BrandConfig[]>(BRANDS_CONFIG);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS.map(p => ({ ...p, brandId: activeBrandId, status: 'published', regions: ['us', 'uk', 'ae', 'in', 'sg'], currentVersion: 1, versionHistory: [] })));
@@ -239,6 +249,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(lang);
   };
 
+  const getLocalizedPrice = (amount: number, countryCode?: CountryCode) => {
+    return FXEngine.formatLocalizedCurrency(amount, countryCode || (activeHub as CountryCode), fxRates);
+  };
+
   const recordLog = (action: string, type: SystemLog['type'], countryCodeStr = 'global', status: 'success' | 'failure' = 'success') => {
     const id = logger.log({ type, source: 'AppStore', action, country: countryCodeStr, status, userId: currentUser?.id });
     const registry = logger.getRegistry();
@@ -272,8 +286,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(() => ({
-    countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs,
-    setLanguage, setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(p => ({...p, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(p => ({...p, adminViewMode: v})),
+    countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs,
+    setLanguage, getLocalizedPrice, setCountryEnabled: () => {}, setCurrentUser, setAdminJurisdiction, setGuideMode: (v: boolean) => setGlobalSettings(p => ({...p, isGuideMode: v})), setAdminViewMode: (v: AdminViewMode) => setGlobalSettings(p => ({...p, adminViewMode: v})),
     upsertProduct: (p: Product, changeSummary = 'Modified Registry Entry') => {
       const before = products.find(i => i.id === p.id);
       setProducts(prev => prev.find(i => i.id === p.id) ? prev.map(i => i.id === p.id ? p : i) : [p, ...prev]);
@@ -340,7 +354,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     rollbackGlobalSync: (id: string) => setGlobalSyncHistory(prev => prev.map(s => s.id === id ? {...s, status: 'rolled_back'} : s)),
     recordLog, recordAudit, triggerReindex: (type: string) => recordLog('Re-index Triggered', 'system', 'global'), toggleEmergencyMode: () => { recordAudit({ action: 'Emergency Toggle', entity: 'System', severity: 'high', reason: 'Manual fail-safe trigger' }); setGlobalSettings(p => ({...p, emergencyMode: !p.emergencyMode})); }, runWorkflowTask: (taskId: string) => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'running' } : w)); setTimeout(() => { setWorkflows(prev => prev.map(w => w.id === taskId ? { ...w, status: 'complete', lastRun: new Date().toISOString() } : w)); }, 1500); }, runWorkflowSequence: (name: string, c?: string) => { workflows.forEach(w => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'running' } : item)); setTimeout(() => { setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: 'complete', lastRun: new Date().toISOString() } : item)); }, 1500); }); },
     recordMetric, resolveAlert: (id: string) => setAlerts(prev => prev.map(a => a.id === id ? {...a, status: 'resolved'} : a)), enqueueBackgroundJob
-  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs]);
+  }), [countryConfigs, brandConfigs, activeBrandId, currentUser, currentLanguage, adminJurisdiction, globalSyncHistory, paymentPlans, fxRates, scopedProducts, scopedInquiries, scopedEditorials, scopedBuyingGuides, scopedReturns, scopedNotifications, scopedApprovals, scopedAuditLogs, scopedWorkflows, scopedTransactions, scopedQATests, scopedErrors, scopedStressTests, scopedBrandIntegrity, scopedLiveRequests, scopedCertificates, scopedJobs, products, privateInquiries, leadConversations, messagingTemplates, notifications, workflows, approvalRequests, auditRegistry, cart, wishlist, socialMetrics, vendors, vipClients, globalSettings, supportTickets, supportStats, integrations, apiLogs, indexingStatus, appointments, invoices, transactions, customerSegments, brandIntegrityIssues, automationRules, aiModules, aiLogs, aiSuggestions, qaTests, maisonErrors, stressTests, seoRegistry, affiliates, activeCampaigns, isShowcaseMode, isCartOpen, activeVip, activeVendor, subscriptions, systemLogs, systemHealth, scopedAlerts, scopedMetrics, backgroundJobs]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
