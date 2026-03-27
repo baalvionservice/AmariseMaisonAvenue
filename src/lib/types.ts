@@ -631,7 +631,8 @@ export type JobType =
   | 'FX_SYNC'
   | 'CLEANUP'
   | 'SEO_SYNC'
-  | 'FRAUD_AUDIT';
+  | 'FRAUD_AUDIT'
+  | 'PRICING_OPTIMIZE';
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';
 
@@ -664,7 +665,7 @@ export interface MaisonMetric {
 
 export interface MaisonAlert {
   id: string;
-  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud';
+  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud' | 'pricing';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   triggeredAt: string;
@@ -701,6 +702,24 @@ export interface FraudLog {
     ipHub?: string;
     attemptCount?: number;
     magnitude?: number;
+  };
+}
+
+/** 💰 DYNAMIC PRICING TYPES */
+
+export interface DynamicPrice {
+  id: string;
+  productId: string;
+  basePrice: number;
+  adjustedPrice: number;
+  country: CountryCode;
+  reason: 'demand' | 'inventory' | 'competitor' | 'regional' | 'custom';
+  confidenceScore: number;
+  updatedAt: string;
+  metadata: {
+    demandSignal?: number;
+    stockLevel?: number;
+    isVipOverride?: boolean;
   };
 }
 

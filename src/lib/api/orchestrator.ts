@@ -1,13 +1,14 @@
 /**
  * @fileOverview BAALVION / AMARISÉ - API Orchestrator (Mock)
- * Simulates real-world backend behavior including latency, idempotency, and semantic search.
+ * Simulates real-world backend behavior including dynamic pricing and risk engines.
  */
 
-import { CountryCode, PaymentGateway, TransactionStatus, RiskLevel } from '../types';
+import { CountryCode, PaymentGateway, TransactionStatus, RiskLevel, DynamicPrice } from '../types';
 import { StockManager } from '../inventory/stockManager';
 import { applyAdvancedSearch } from '../search/engine';
 import { RecommendationEngine, RecommendationNode } from '../ai-autopilot/ai-recommendation-engine';
 import { RiskEngine, RiskAnalysis } from '../fraud/risk-engine';
+import { DynamicPricingEngine } from '../ai-autopilot/dynamic-pricing-engine';
 
 export interface ApiResponse<T> {
   status: 'success' | 'error';
@@ -25,6 +26,23 @@ class MockApiOrchestrator {
   }
 
   /**
+   * 💰 DYNAMIC PRICING API
+   */
+  async getDynamicPrice(productId: string, country: CountryCode, products: any[], inquiries: any[]): Promise<ApiResponse<DynamicPrice>> {
+    await this.simulate();
+    const product = products.find(p => p.id === productId);
+    if (!product) return { status: 'error', error: 'Artifact Not Found' };
+
+    const optimized = DynamicPricingEngine.optimizePrice(product, country, {
+      inquiryCount: inquiries.filter(i => i.productId === productId).length,
+      stockLevel: product.stock,
+      hubLiquidity: 0.8
+    });
+
+    return { status: 'success', data: optimized };
+  }
+
+  /**
    * 🛡️ FRAUD DETECTION API
    */
   async evaluateFraudRisk(params: {
@@ -35,9 +53,8 @@ class MockApiOrchestrator {
   }): Promise<ApiResponse<RiskAnalysis>> {
     await this.simulate();
     
-    // In a real system, we'd fetch the user and attempt history
     const analysis = RiskEngine.evaluateAcquisitionRisk(
-      null, // User simulation
+      null, 
       params.cart,
       params.country,
       params.metadata
@@ -71,7 +88,6 @@ class MockApiOrchestrator {
 
   /**
    * 🔍 AI SEARCH API
-   * Implements Semantic & Hybrid search logic.
    */
   async searchProductsSemantic(query: string, country: string, products: any[]): Promise<ApiResponse<any>> {
     await this.simulate();

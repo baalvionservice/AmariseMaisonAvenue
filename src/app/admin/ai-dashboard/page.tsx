@@ -15,7 +15,13 @@ import {
   Cpu,
   Settings,
   BrainCircuit,
-  Database
+  Database,
+  TrendingUp,
+  Tag,
+  AlertTriangle,
+  ArrowRight,
+  ShieldCheck,
+  Search
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,7 +56,7 @@ import { useToast } from '@/hooks/use-toast';
  */
 export default function AIDashboard() {
   const { modules, logs, runSequence } = useAI();
-  const { currentUser } = useAppStore();
+  const { currentUser, scopedPricingOptimizations, optimizeRegistryPricing, adminJurisdiction } = useAppStore();
   const { toast } = useToast();
 
   const stats = useMemo(() => {
@@ -64,6 +70,15 @@ export default function AIDashboard() {
       description: "AI is crafting market-specific SEO descriptors for the registry.",
     });
     runSequence('SEO Metadata Cycle', currentUser?.country);
+  };
+
+  const handlePricingCycle = () => {
+    const hub = adminJurisdiction === 'global' ? 'us' : adminJurisdiction;
+    optimizeRegistryPricing(hub as any);
+    toast({
+      title: "Neural Pricing Cycle Active",
+      description: `Optimizing artifact yield for the ${hub.toUpperCase()} hub based on scarcity signals.`,
+    });
   };
 
   if (!stats) return null;
@@ -81,6 +96,9 @@ export default function AIDashboard() {
           <p className="text-sm text-gray-500 font-light italic">Orchestrating high-volume curatorial and business logic.</p>
         </div>
         <div className="flex items-center space-x-4">
+           <Button variant="outline" className="h-14 px-8 rounded-none border-plum text-plum hover:bg-plum hover:text-white transition-all text-[10px] font-bold uppercase tracking-[0.4em]" onClick={handlePricingCycle}>
+             <Tag className="w-4 h-4 mr-3" /> NEURAL PRICING CYCLE
+           </Button>
            <Button className="h-14 px-10 rounded-none bg-plum text-white hover:bg-black transition-all text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl shadow-plum/20" onClick={handleBatchGeneration}>
              <Zap className="w-4 h-4 mr-3" /> BATCH GENERATE METADATA
            </Button>
@@ -90,6 +108,7 @@ export default function AIDashboard() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-white border-b border-border h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
           <TabsTrigger value="overview" className="tab-trigger">Efficiency Overview</TabsTrigger>
+          <TabsTrigger value="pricing" className="tab-trigger">Neural Pricing {scopedPricingOptimizations.length > 0 && <span className="ml-2 w-2 h-2 bg-plum rounded-full" />}</TabsTrigger>
           <TabsTrigger value="sentiment" className="tab-trigger">Market Sentiment</TabsTrigger>
           <TabsTrigger value="logs" className="tab-trigger">Automation Logs</TabsTrigger>
           <TabsTrigger value="parameters" className="tab-trigger">Neural Parameters</TabsTrigger>
@@ -148,6 +167,86 @@ export default function AIDashboard() {
                     </Button>
                  </Link>
               </Card>
+           </div>
+        </TabsContent>
+
+        <TabsContent value="pricing" className="space-y-12 animate-fade-in">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <div className="lg:col-span-8 space-y-8">
+                 <div className="bg-plum/5 p-8 border border-plum/10 space-y-4">
+                    <div className="flex items-center space-x-3 text-plum">
+                       <TrendingUp className="w-5 h-5" />
+                       <h3 className="text-[10px] font-bold uppercase tracking-[0.4em]">Dynamic Value Optimization</h3>
+                    </div>
+                    <p className="text-xs text-slate-600 italic leading-relaxed">
+                      "AI analyzes registry scarcity and market resonance to protect Maison margins. Prices adjust within strictly governed integrity rails."
+                    </p>
+                 </div>
+
+                 <Card className="bg-white border-border shadow-luxury overflow-hidden">
+                    <Table>
+                       <TableHeader className="bg-ivory/50">
+                          <TableRow>
+                             <TableHead className="text-[9px] uppercase font-bold pl-8">Artifact</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold">Delta Logic</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold">Base Price</TableHead>
+                             <TableHead className="text-[9px] uppercase font-bold text-right pr-8">Optimized</TableHead>
+                          </TableRow>
+                       </TableHeader>
+                       <TableBody>
+                          {scopedPricingOptimizations.map(price => (
+                            <TableRow key={price.id} className="hover:bg-ivory/30 transition-colors group">
+                               <TableCell className="pl-8">
+                                  <div className="flex flex-col">
+                                     <span className="text-xs font-bold uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{price.productId}</span>
+                                     <span className="text-[8px] text-gray-400 uppercase tracking-widest">{price.country.toUpperCase()} HUB</span>
+                                  </div>
+                               </TableCell>
+                               <TableCell>
+                                  <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-plum/20 text-plum">
+                                     {price.reason}
+                                  </Badge>
+                               </TableCell>
+                               <TableCell><span className="text-xs text-gray-400 line-through tabular">${price.basePrice.toLocaleString()}</span></TableCell>
+                               <TableCell className="text-right pr-8">
+                                  <div className="flex flex-col items-end">
+                                     <span className={cn("text-sm font-bold tabular", price.adjustedPrice > price.basePrice ? "text-emerald-600" : "text-red-600")}>
+                                        ${price.adjustedPrice.toLocaleString()}
+                                     </span>
+                                     <span className="text-[7px] font-bold uppercase text-gray-300">Conf: {Math.round(price.confidenceScore * 100)}%</span>
+                                  </div>
+                               </TableCell>
+                            </TableRow>
+                          ))}
+                          {scopedPricingOptimizations.length === 0 && (
+                            <TableRow>
+                               <TableCell colSpan={4} className="py-40 text-center opacity-30">
+                                  <Tag className="w-12 h-12 mx-auto mb-4" />
+                                  <p className="text-sm font-bold uppercase tracking-widest italic">Neural Pricing Engine Standby</p>
+                               </TableCell>
+                            </TableRow>
+                          )}
+                       </TableBody>
+                    </Table>
+                 </Card>
+              </div>
+
+              <aside className="lg:col-span-4 space-y-8">
+                 <Card className="bg-black text-white p-10 space-y-8 shadow-2xl relative overflow-hidden rounded-none">
+                    <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><ShieldCheck className="w-32 h-32" /></div>
+                    <div className="space-y-4">
+                       <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold">Maison Integrity Rails</h4>
+                       <div className="space-y-6">
+                          <RailItem label="Maximum Scarcity Cap" val="+20%" />
+                          <RailItem label="Inventory Liquidate Cap" val="-30%" />
+                          <RailItem label="Stability Window" val="24 Hours" />
+                       </div>
+                    </div>
+                    <Button variant="outline" className="w-full border-white/20 text-white/60 h-12 rounded-none text-[9px] font-bold uppercase tracking-widest hover:bg-white hover:text-black">
+                       CONFIGURE SAFETY RAILS
+                    </Button>
+                 </Card>
+              </aside>
            </div>
         </TabsContent>
 
@@ -277,6 +376,15 @@ export default function AIDashboard() {
            </div>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function RailItem({ label, val }: { label: string, val: string }) {
+  return (
+    <div className="flex justify-between items-center border-b border-white/5 pb-3">
+       <span className="text-[9px] font-bold uppercase tracking-widest text-white/40">{label}</span>
+       <span className="text-[10px] font-bold text-white/80 tabular">{val}</span>
     </div>
   );
 }
