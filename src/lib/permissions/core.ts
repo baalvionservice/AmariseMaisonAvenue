@@ -4,27 +4,47 @@ import { Permission } from "./engine";
 
 /**
  * @fileOverview Refined core logic for permission validation and real-time access control.
+ * Handles both Functional (can I do X?) and Geographic (can I do X in Hub Y?) validation.
  */
 
 /**
- * Validates if a user can perform a specific action, considering role and geography.
+ * Functional permission check.
  */
-export function canPerform(user: MaisonUser | null, permission: string, resourceCountry?: string): boolean {
+export function hasFunctionPermission(user: MaisonUser | null, permission: string): boolean {
   if (!user) return false;
-
   const perms = rolePermissions[user.role] || [];
   
-  // 1. Check functional permission (Super Admin or wildcard override)
+  // Super Admin wildcard override
   if (perms.includes("*")) return true;
   
-  if (perms.includes(permission as Permission)) {
-    // 2. Check geographic jurisdiction
-    if (user.role === "super_admin" || user.country.toLowerCase() === "global") {
-      return true;
-    }
-    // Regional admins/operators are strictly isolated to their country code
-    return !resourceCountry || user.country.toLowerCase() === resourceCountry.toLowerCase();
+  return perms.includes(permission as Permission);
+}
+
+/**
+ * Geographic jurisdiction check.
+ */
+export function hasGeographicJurisdiction(user: MaisonUser | null, resourceCountry?: string): boolean {
+  if (!user) return false;
+  
+  // Super Admins and Global Operators bypass geographic isolation
+  if (user.role === "super_admin" || user.country.toLowerCase() === "global") {
+    return true;
   }
 
-  return false;
+  // Regional users are strictly isolated to their country code
+  if (resourceCountry) {
+    return user.country.toLowerCase() === resourceCountry.toLowerCase();
+  }
+
+  return true;
+}
+
+/**
+ * Combined Institutional Access Validation
+ */
+export function canPerform(user: MaisonUser | null, permission: string, resourceCountry?: string): boolean {
+  const funcOk = hasFunctionPermission(user, permission);
+  const geoOk = hasGeographicJurisdiction(user, resourceCountry);
+  
+  return funcOk && geoOk;
 }

@@ -4,11 +4,9 @@
  */
 
 export const PERMISSIONS = {
-  // Layer 1: Global Master
+  // Layer 1 & 2: Global Master & Configuration
   VIEW_GLOBAL_HUD: "view_global_hud",
   OVERRIDE_SYSTEM: "override_system",
-
-  // Layer 2: Global Configuration
   MANAGE_HUBS: "manage_hubs",
   CONFIGURE_BRAND: "configure_brand",
 
@@ -29,14 +27,15 @@ export const PERMISSIONS = {
   ACCESS_VENDOR: "access_vendor",
   ACCESS_AUTOMATION: "access_automation",
 
-  // Generic Actions
+  // Action Primitives
+  READ: "read",
   CREATE: "create",
   EDIT: "edit",
   DELETE: "delete",
   PUBLISH: "publish",
   APPROVE: "approve",
   
-  // Specific
+  // Scoped Actions
   VIEW_OWN_ACTIVITY: "view_own_activity",
 } as const;
 

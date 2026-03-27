@@ -1,6 +1,6 @@
 /**
  * @fileOverview Consolidated Institutional Access Registry.
- * Handles API guards, Country jurisdiction checks, and Route protection.
+ * High-level guard functions for components and actions.
  */
 
 import { canPerform } from "../permissions/core";
@@ -13,6 +13,7 @@ export interface GuardResponse {
 
 /**
  * Functional Action Guard
+ * Used to protect function calls within the app.
  */
 export function guardAction(
   user: MaisonUser | null,
@@ -20,23 +21,20 @@ export function guardAction(
   country?: string
 ): GuardResponse {
   const isAllowed = canPerform(user, permission, country);
+  
   if (!isAllowed) {
-    return { success: false, error: `Insufficient permissions for: ${permission}` };
+    return { 
+      success: false, 
+      error: `Security Violation: Insufficient clearance for ${permission} in ${country || 'Global'} node.` 
+    };
   }
+
   return { success: true };
 }
 
 /**
- * Geographic Jurisdiction Guard
- */
-export function isCountryAllowed(user: MaisonUser | null, resourceCountry: string): boolean {
-  if (!user) return false;
-  if (user.role === "super_admin" || user.country.toLowerCase() === "global") return true;
-  return user.country.toLowerCase() === resourceCountry.toLowerCase();
-}
-
-/**
  * Route Visibility Guard
+ * Used for high-level page and section protection.
  */
 export function guardPage(
   user: MaisonUser | null,
@@ -47,7 +45,7 @@ export function guardPage(
 }
 
 /**
- * Access Logging
+ * Access Auditing Utility
  */
 export function logAccessAttempt(
   user: MaisonUser | null,
@@ -57,6 +55,7 @@ export function logAccessAttempt(
 ) {
   const userName = user?.name || "Anonymous";
   const statusColor = status === "GRANTED" ? "color: #10b981;" : "color: #ef4444;";
+  
   console.log(
     `%c[SECURITY] %cStatus: ${status} %c| User: ${userName} | Perm: ${permission} | Node: ${country || "GLOBAL"}`,
     "color: #D4AF37; font-weight: bold;",

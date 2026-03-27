@@ -2,7 +2,7 @@ import { Role, ROLES } from "../roles/system";
 import { Permission, PERMISSIONS } from "./engine";
 
 /**
- * @fileOverview Definitive mapping of roles to their allowed tactical layers.
+ * @fileOverview Definitive mapping of roles to their allowed tactical layers and functional permissions.
  */
 
 export const rolePermissions: Record<Role, Permission[]> = {
@@ -13,7 +13,8 @@ export const rolePermissions: Record<Role, Permission[]> = {
     PERMISSIONS.MANAGE_HUBS,
     PERMISSIONS.CONFIGURE_BRAND,
     PERMISSIONS.ACCESS_AUDIT,
-    PERMISSIONS.ACCESS_OBSERVABILITY
+    PERMISSIONS.ACCESS_OBSERVABILITY,
+    PERMISSIONS.READ
   ],
 
   [ROLES.COUNTRY_ADMIN]: [
@@ -21,17 +22,22 @@ export const rolePermissions: Record<Role, Permission[]> = {
     PERMISSIONS.MANAGE_REGIONAL_OPS,
     PERMISSIONS.ACCESS_COMMERCE,
     PERMISSIONS.ACCESS_LOGISTICS,
-    PERMISSIONS.ACCESS_CRM
+    PERMISSIONS.ACCESS_CRM,
+    PERMISSIONS.READ,
+    PERMISSIONS.EDIT,
+    PERMISSIONS.APPROVE
   ],
 
   [ROLES.OPERATIONS_ADMIN]: [
     PERMISSIONS.ACCESS_COMMERCE,
     PERMISSIONS.ACCESS_LOGISTICS,
+    PERMISSIONS.READ,
     PERMISSIONS.EDIT
   ],
 
   [ROLES.FINANCE_ADMIN]: [
     PERMISSIONS.ACCESS_FINANCE,
+    PERMISSIONS.READ,
     PERMISSIONS.APPROVE
   ],
 
@@ -39,26 +45,31 @@ export const rolePermissions: Record<Role, Permission[]> = {
     PERMISSIONS.ACCESS_COMMERCE,
     PERMISSIONS.CREATE,
     PERMISSIONS.EDIT,
-    PERMISSIONS.PUBLISH
+    PERMISSIONS.PUBLISH,
+    PERMISSIONS.READ
   ],
 
   [ROLES.AI_ADMIN]: [
     PERMISSIONS.ACCESS_AI,
-    PERMISSIONS.ACCESS_OBSERVABILITY
+    PERMISSIONS.ACCESS_OBSERVABILITY,
+    PERMISSIONS.READ
   ],
 
   [ROLES.SUPPORT_ADMIN]: [
     PERMISSIONS.ACCESS_CRM,
-    PERMISSIONS.ACCESS_AUTOMATION
+    PERMISSIONS.ACCESS_AUTOMATION,
+    PERMISSIONS.READ
   ],
 
   [ROLES.VENDOR]: [
     PERMISSIONS.ACCESS_VENDOR,
     PERMISSIONS.CREATE,
-    PERMISSIONS.EDIT
+    PERMISSIONS.EDIT,
+    PERMISSIONS.READ
   ],
 
   [ROLES.CLIENT]: [
     PERMISSIONS.VIEW_OWN_ACTIVITY,
+    PERMISSIONS.READ
   ],
 };

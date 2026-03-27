@@ -15,13 +15,13 @@ export function useRBAC() {
     /**
      * Functional permission check.
      */
-    can: (permission: Permission, country?: string) => {
+    can: (permission: string, country?: string) => {
       return canPerform(currentUser, permission, country);
     },
     /**
      * UI Visibility helper.
      */
-    showIf: (permission: Permission, country?: string) => {
+    showIf: (permission: string, country?: string) => {
       return canPerform(currentUser, permission, country);
     },
     isSuperAdmin: currentUser?.role === 'super_admin'
