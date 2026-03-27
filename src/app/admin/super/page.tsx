@@ -1,41 +1,21 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   Globe, 
   ShieldCheck, 
-  LayoutDashboard, 
-  Settings, 
-  Briefcase, 
-  TrendingUp, 
-  Zap, 
   ChevronRight, 
   RefreshCcw,
-  Power,
-  CreditCard,
-  Target,
-  BarChart3,
+  Zap,
   Building2,
-  Users,
-  Box,
-  CheckCircle2,
-  AlertTriangle,
-  RotateCcw,
-  Search,
-  Activity,
-  History,
-  Lock,
-  ArrowRight,
-  ShieldAlert,
-  Download,
-  Filter,
-  Cpu,
   Database,
-  FlaskConical,
-  Palette,
-  Eye,
-  Type
+  Lock,
+  Flag,
+  Info,
+  Settings,
+  MoreVertical,
+  CheckCircle2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +23,6 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Table, 
   TableBody, 
@@ -52,90 +31,47 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
-import {
+import { 
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { SyncCategory, CountryCode, AdminViewMode } from '@/lib/types';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 /**
- * Global Matrix: Institutional Master Control
- * Centralizes oversight for the 1 Super Admin and 5 Hub leads.
+ * Global Matrix Hub: Tactical Layer 2.
+ * Management of market hubs, jurisdictional logic, and cross-market sync.
  */
-export default function SuperAdminHub() {
+export default function GlobalMatrixHub() {
   const { 
     countryConfigs, 
-    brandConfigs, 
     setCountryEnabled, 
-    products,
-    globalSyncHistory,
+    globalSyncHistory, 
     executeSafeSync,
-    rollbackGlobalSync,
-    currentUser,
-    privateInquiries,
-    invoices,
-    globalSettings,
-    updateGlobalSettings,
-    setAdminJurisdiction,
-    setGuideMode,
-    setAdminViewMode
+    adminJurisdiction 
   } = useAppStore();
 
   const [isSyncModalOpen, setIsSyncOpen] = useState(false);
-  const [selectedCats, setSyncCats] = useState<SyncCategory[]>(['products']);
-  const [selectedTargets, setSyncTargets] = useState<CountryCode[]>(['us', 'uk', 'ae', 'in', 'sg']);
 
-  const globalTotalRevenue = invoices.reduce((acc, inv) => acc + inv.amount, 0);
-  const globalLeads = privateInquiries.length;
-
-  const handleStartSync = () => {
-    executeSafeSync(selectedCats, selectedTargets);
-    setIsSyncOpen(false);
+  const handleToggleHub = (code: any, enabled: boolean) => {
+    setCountryEnabled(code, enabled);
   };
 
   return (
-    <div className="space-y-12 animate-fade-in">
-      {/* Global Safe Sync Modal */}
+    <div className="space-y-12 animate-fade-in font-body pb-20">
+      {/* Safe Sync Authorization */}
       <Dialog open={isSyncModalOpen} onOpenChange={setIsSyncOpen}>
-        <DialogContent className="max-w-3xl bg-white border-none shadow-2xl rounded-none p-0 overflow-hidden">
-           <div className="p-12 space-y-10 text-gray-900">
+        <DialogContent className="max-w-xl bg-white border-none shadow-2xl rounded-none p-0 overflow-hidden">
+           <div className="p-10 space-y-8">
               <div className="flex items-center space-x-4 text-plum">
                  <Zap className="w-6 h-6" />
-                 <h3 className="text-2xl font-headline font-bold italic uppercase tracking-widest">Safe Global Sync</h3>
+                 <h3 className="text-2xl font-headline font-bold italic uppercase tracking-widest text-gray-900">Global Master Sync</h3>
               </div>
               <p className="text-sm text-gray-500 font-light italic leading-relaxed">
-                "Authorizing a global override is a strategic action. Ensure all regional hubs are prepared for registry synchronization. This affects all 5 market jurisdictions."
+                "Authorizing a Master Sync will override regional registry nodes with the Paris Central Archive. This action is irreversible once committed to the ledger."
               </p>
-              
-              <div className="space-y-6">
-                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Target Jurisdictions</p>
-                 <div className="grid grid-cols-5 gap-4">
-                    {Object.values(countryConfigs).map(c => (
-                      <div key={c.code} className="flex flex-col items-center space-y-2 p-4 border border-border bg-ivory/50">
-                         <span className="text-xl">{c.symbol}</span>
-                         <span className="text-[9px] font-bold uppercase">{c.code}</span>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="pt-8 flex justify-end space-x-4">
+              <div className="pt-6 flex justify-end space-x-4">
                  <Button variant="ghost" onClick={() => setIsSyncOpen(false)} className="rounded-none text-[10px] font-bold uppercase">Cancel</Button>
-                 <Button className="bg-black text-white hover:bg-plum rounded-none h-12 px-10 font-bold uppercase tracking-widest transition-all" onClick={handleStartSync}>
-                    AUTHORIZE MASTER OVERRIDE
+                 <Button className="bg-black text-white hover:bg-plum rounded-none h-12 px-10 font-bold uppercase tracking-widest transition-all" onClick={() => executeSafeSync(['products'], ['us', 'ae', 'uk', 'in', 'sg'])}>
+                    AUTHORIZE MASTER SYNC
                  </Button>
               </div>
            </div>
@@ -144,16 +80,14 @@ export default function SuperAdminHub() {
 
       <header className="flex justify-between items-end border-b border-white/5 pb-12">
         <div className="space-y-2">
-          <div className="flex items-center space-x-3 mb-2">
-             <div className="p-2 bg-blue-500/10 rounded-none text-blue-500 border border-blue-500/20"><Globe className="w-5 h-5" /></div>
-             <nav className="text-[9px] font-bold uppercase tracking-[0.4em] text-white/30 flex items-center space-x-2">
-                <Link href="/admin" className="hover:text-white transition-colors">Terminal</Link>
-                <ChevronRight className="w-2.5 h-2.5" />
-                <span className="text-white">Global Orchestration</span>
-             </nav>
+          <div className="flex items-center space-x-3 mb-2 text-blue-400">
+             <Globe className="w-5 h-5" />
+             <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Tactical Layer 2</span>
           </div>
-          <h1 className="text-5xl font-headline font-bold italic tracking-tight text-white uppercase">Global Matrix</h1>
-          <p className="text-sm text-white/40 font-light italic">Institutional Master Control for the Global Super Admin.</p>
+          <h1 className="text-5xl font-headline font-bold italic tracking-tight text-white uppercase leading-none">
+            Global Matrix
+          </h1>
+          <p className="text-sm text-white/40 font-light italic">Orchestrating jurisdictional nodes and cross-market synchronization.</p>
         </div>
         <div className="flex items-center space-x-4">
            <Button className="h-14 px-10 rounded-none bg-blue-600 text-white hover:bg-blue-500 transition-all text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl shadow-blue-600/20" onClick={() => setIsSyncOpen(true)}>
@@ -162,174 +96,137 @@ export default function SuperAdminHub() {
         </div>
       </header>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="bg-transparent border-b border-white/5 h-14 w-full justify-start p-0 rounded-none space-x-12 mb-12">
-          <TabsTrigger value="overview" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Global Hub Status</TabsTrigger>
-          <TabsTrigger value="brand" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Brand Identity</TabsTrigger>
-          <TabsTrigger value="strategy" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Maison Principles</TabsTrigger>
-          <TabsTrigger value="infrastructure" className="tab-trigger-modern !text-white/40 data-[state=active]:!text-white data-[state=active]:!border-blue-600">Security Layers</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-12 animate-fade-in">
-           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <StatsTile label="Aggregate Yield" value={`$${(globalTotalRevenue / 1000).toFixed(1)}k`} trend="Live Matrix" />
-              <StatsTile label="Network Users" value="1.2M" trend="+14.2% Vol" />
-              <StatsTile label="Operational Hubs" value="05 / 05" trend="Optimal" />
-              <StatsTile label="System Integrity" value="VERIFIED" trend="Immutable" />
-           </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* Market Hub Matrix */}
+        <div className="lg:col-span-8 space-y-12">
+           <Card className="bg-[#111113] border-white/5 shadow-2xl overflow-hidden rounded-none">
+              <CardHeader className="border-b border-white/5 bg-white/5 p-8 flex flex-row items-center justify-between">
+                 <div>
+                    <CardTitle className="font-headline text-2xl text-white italic">Jurisdictional Nodes</CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest text-white/30">Active market hubs and settlement logic</CardDescription>
+                 </div>
+                 <Badge variant="outline" className="text-[8px] border-white/10 text-white/40 uppercase">5 Nodes Registered</Badge>
+              </CardHeader>
+              <div className="p-0">
+                 <Table>
+                    <TableHeader className="bg-white/5">
+                       <TableRow className="border-white/5">
+                          <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Market Hub</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-white/40">Currency & FX</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-white/40">Tax Protocol</TableHead>
+                          <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">Hub Status</TableHead>
+                       </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                       {countryConfigs.map(c => (
+                         <TableRow key={c.code} className="hover:bg-white/5 transition-colors border-white/5 h-20">
+                            <TableCell className="pl-8">
+                               <div className="flex items-center space-x-4">
+                                  <span className="text-xl">{c.symbol}</span>
+                                  <div className="flex flex-col">
+                                     <span className="text-xs font-bold text-white uppercase tracking-widest">{c.name} Hub</span>
+                                     <span className="text-[8px] text-white/20 font-mono">NODE_{c.code.toUpperCase()}</span>
+                                  </div>
+                               </div>
+                            </TableCell>
+                            <TableCell>
+                               <span className="text-xs font-bold text-white/60 tabular">{c.currency}</span>
+                            </TableCell>
+                            <TableCell>
+                               <Badge variant="outline" className="text-[7px] border-white/10 text-plum uppercase">{c.taxType} / {c.taxRate}%</Badge>
+                            </TableCell>
+                            <TableCell className="text-right pr-8">
+                               <Switch 
+                                checked={c.enabled} 
+                                onCheckedChange={(val) => handleToggleHub(c.code, val)}
+                                className="data-[state=checked]:bg-emerald-500"
+                               />
+                            </TableCell>
+                         </TableRow>
+                       ))}
+                    </TableBody>
+                 </Table>
+              </div>
+           </Card>
 
            <Card className="bg-[#111113] border-white/5 shadow-2xl overflow-hidden rounded-none">
-              <CardHeader className="border-b border-white/5 bg-white/5">
-                 <CardTitle className="font-headline text-2xl text-white">Regional Hub Matrix</CardTitle>
-                 <CardDescription className="text-[10px] uppercase tracking-widest text-white/30">Jurisdictional status and jurisdictional logic</CardDescription>
+              <CardHeader className="border-b border-white/5 bg-white/5 p-8 flex flex-row items-center justify-between">
+                 <CardTitle className="font-headline text-2xl text-white italic">Sync History</CardTitle>
+                 <Link href="/admin/audit">
+                    <Button variant="ghost" className="text-[9px] font-bold uppercase tracking-widest text-white/40 hover:text-white">View Full Audit <ArrowRight className="w-3 h-3 ml-2" /></Button>
+                 </Link>
               </CardHeader>
               <Table>
-                <TableHeader className="bg-white/5">
-                  <TableRow className="border-white/5">
-                    <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Market Hub</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-white/40">Jurisdiction Logic</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-white/40">Hub Lead</TableHead>
-                    <TableHead className="text-[9px] uppercase font-bold text-center text-white/40">Connectivity</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {countryConfigs.map(c => (
-                    <TableRow key={c.code} className="hover:bg-white/5 transition-colors border-white/5">
-                      <TableCell className="pl-8 font-bold text-xs uppercase tracking-widest text-white/80">{c.name} ({c.code.toUpperCase()})</TableCell>
-                      <TableCell className="text-[10px] font-bold text-white/30 italic">{c.taxType} / {c.currency} Settlement</TableCell>
-                      <TableCell className="text-[10px] font-bold text-white/60 uppercase tracking-tighter">Assigned: {c.code.toUpperCase()}_ADMIN</TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex justify-center items-center">
-                           <div className={cn("w-2 h-2 rounded-full", c.enabled ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-red-500")} />
-                        </div>
-                      </TableCell>
+                 <TableHeader className="bg-white/5">
+                    <TableRow className="border-white/5 h-10">
+                       <TableHead className="text-[9px] uppercase font-bold pl-8 text-white/40">Timestamp</TableHead>
+                       <TableHead className="text-[9px] uppercase font-bold text-white/40">Actor</TableHead>
+                       <TableHead className="text-[9px] uppercase font-bold text-white/40 text-center">Status</TableHead>
+                       <TableHead className="text-[9px] uppercase font-bold text-right pr-8 text-white/40">ID</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
+                 </TableHeader>
+                 <TableBody>
+                    {globalSyncHistory.map(sync => (
+                      <TableRow key={sync.id} className="border-white/5 hover:bg-white/[0.02] h-12">
+                         <TableCell className="pl-8 text-[9px] font-mono text-white/20">{new Date(sync.timestamp).toLocaleString()}</TableCell>
+                         <TableCell className="text-[10px] font-bold text-white/60 uppercase">{sync.actorName}</TableCell>
+                         <TableCell className="text-center">
+                            <Badge variant="outline" className="text-[7px] border-none bg-emerald-500/10 text-emerald-400 uppercase">{sync.status}</Badge>
+                         </TableCell>
+                         <TableCell className="text-right pr-8 font-mono text-[9px] text-white/10">{sync.id}</TableCell>
+                      </TableRow>
+                    ))}
+                    {globalSyncHistory.length === 0 && (
+                      <TableRow>
+                         <TableCell colSpan={4} className="py-20 text-center opacity-20">
+                            <RefreshCcw className="w-12 h-12 mx-auto mb-4" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest">No Master Sync Events Recorded</p>
+                         </TableCell>
+                      </TableRow>
+                    )}
+                 </TableBody>
               </Table>
            </Card>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="brand" className="space-y-12 animate-fade-in">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <Card className="bg-[#111113] border-white/5 p-10 space-y-10 rounded-none">
-                 <div className="flex items-center space-x-4 text-plum">
-                    <Palette className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic text-white uppercase tracking-widest">Brand Action Palette</h3>
-                 </div>
-                 <div className="grid grid-cols-1 gap-8">
-                    <div className="space-y-3">
-                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Primary Maison Color (Plum)</Label>
-                       <div className="flex space-x-4">
-                          <Input className="bg-white/5 border-white/10 h-12 text-white font-mono" value={globalSettings.theme.primary} onChange={e => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, primary: e.target.value}})} />
-                          <div className="w-12 h-12 shrink-0 border border-white/10" style={{ backgroundColor: globalSettings.theme.primary }} />
-                       </div>
-                    </div>
-                    <div className="space-y-3">
-                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Maison Accent Color (Gold)</Label>
-                       <div className="flex space-x-4">
-                          <Input className="bg-white/5 border-white/10 h-12 text-white font-mono" value={globalSettings.theme.accent} onChange={e => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, accent: e.target.value}})} />
-                          <div className="w-12 h-12 shrink-0 border border-white/10" style={{ backgroundColor: globalSettings.theme.accent }} />
-                       </div>
-                    </div>
-                 </div>
-              </Card>
-
-              <Card className="bg-[#111113] border-white/5 p-10 space-y-10 rounded-none">
-                 <div className="flex items-center space-x-4 text-white/60">
-                    <Type className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic text-white uppercase tracking-widest">Typography & Voice</h3>
-                 </div>
-                 <div className="space-y-8">
-                    <div className="space-y-3">
-                       <Label className="text-[10px] uppercase font-bold tracking-widest text-white/40">Global Font Family</Label>
-                       <Select value={globalSettings.theme.fontFamily} onValueChange={v => updateGlobalSettings({...globalSettings, theme: {...globalSettings.theme, fontFamily: v}})}>
-                          <SelectTrigger className="bg-white/5 border-white/10 h-12 text-white rounded-none">
-                             <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-[#111113] border-white/10 text-white">
-                             <SelectItem value="Alegreya">Alegreya (Institutional Heritage)</SelectItem>
-                             <SelectItem value="Inter">Inter (Technical Precision)</SelectItem>
-                             <SelectItem value="Playfair">Playfair (Classic Opulence)</SelectItem>
-                          </SelectContent>
-                       </Select>
-                    </div>
-                    <div className="p-6 bg-white/[0.02] border border-white/5 text-center">
-                       <p className={cn("text-2xl font-light italic leading-relaxed text-white/80", `font-${globalSettings.theme.fontFamily.toLowerCase()}`)}>
-                         "Luxury is a dialogue between human brilliance and the absolute standard of the archive."
-                       </p>
-                    </div>
-                 </div>
-              </Card>
-           </div>
-        </TabsContent>
-
-        <TabsContent value="strategy" className="animate-fade-in space-y-12">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-blue-600">
-                 <div className="flex items-center space-x-4 text-blue-500">
-                    <FlaskConical className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Dual-Persona Logic</h3>
-                 </div>
-                 <p className="text-sm text-white/40 font-light italic leading-relaxed">
-                   Determine the primary routing logic for the Maison. When active, high-value artifacts bypass the standard registry and route directly to the Private Salon environment for discreet dialogue.
+        <aside className="lg:col-span-4 space-y-8">
+           <Card className="bg-black text-white p-10 space-y-10 shadow-2xl relative overflow-hidden rounded-none border-none">
+              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
+                 <ShieldCheck className="w-40 h-40 text-blue-500" />
+              </div>
+              <div className="relative z-10 space-y-6">
+                 <h3 className="text-3xl font-headline font-bold italic tracking-tight leading-none">Hub Isolation Protocol</h3>
+                 <p className="text-sm font-light italic text-white/60 leading-relaxed">
+                   "Identity and data isolation are active across all hubs. No data leakage detected between UAE and US registry nodes."
                  </p>
-                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                    <div className="space-y-1">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Salon Routing Protocol</span>
-                       <p className="text-[9px] text-white/20 italic">Global enforcement for all 5 jurisdictions.</p>
-                    </div>
-                    <Switch checked={globalSettings.adminViewMode === 'advanced'} onCheckedChange={v => setAdminViewMode(v ? 'advanced' : 'simple')} className="data-[state=checked]:bg-blue-600" />
+                 <div className="space-y-6 pt-6 border-t border-white/10">
+                    <PolicyNode label="Cross-Market Access" val="BLOCKED" />
+                    <PolicyNode label="Global View Mode" val="ENABLED" />
+                    <PolicyNode label="Audit Integrity" val="100%" />
                  </div>
-              </Card>
+              </div>
+           </Card>
 
-              <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-plum">
-                 <div className="flex items-center space-x-4 text-plum">
-                    <Eye className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Maison Guide Mode</h3>
-                 </div>
-                 <p className="text-sm text-white/40 font-light italic leading-relaxed">
-                   Internal curatorial overlay for the public storefront. Displays registry scores, metadata audits, and acquisition signals directly on the artifact pages for internal review.
-                 </p>
-                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Audit Overlay Enabled</span>
-                    <Switch checked={globalSettings.isGuideMode} onCheckedChange={setGuideMode} className="data-[state=checked]:bg-plum" />
-                 </div>
-              </Card>
-           </div>
-        </TabsContent>
+           <Card className="bg-[#111113] border-white/5 p-8 space-y-6 rounded-none">
+              <div className="flex items-center space-x-3 text-gold">
+                 <Flag className="w-4 h-4" />
+                 <h4 className="text-[10px] font-bold uppercase tracking-widest">Compliance Signal</h4>
+              </div>
+              <p className="text-[10px] text-white/40 italic leading-relaxed">
+                "Hub logic for India (GST 18%) and UAE (VAT 5%) is synchronized with jurisdictional tax authorities."
+              </p>
+           </Card>
+        </aside>
+      </div>
+    </div>
+  );
+}
 
-        <TabsContent value="infrastructure" className="animate-fade-in space-y-12">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-white/20">
-                 <div className="flex items-center space-x-4 text-white/60">
-                    <Database className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Market Isolation</h3>
-                 </div>
-                 <p className="text-sm text-white/40 font-light italic leading-relaxed">
-                   Enforce strict regional hub context for registry memory. Prevents data leakage and ensures jurisdictional compliance for Country Admins.
-                 </p>
-                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Hub Isolation Active</span>
-                    <Switch defaultChecked className="data-[state=checked]:bg-blue-600" />
-                 </div>
-              </Card>
-
-              <Card className="bg-[#111113] border-white/5 shadow-2xl p-10 space-y-8 rounded-none border-l-4 border-l-red-600/40">
-                 <div className="flex items-center space-x-4 text-red-500">
-                    <ShieldAlert className="w-6 h-6" />
-                    <h3 className="text-xl font-headline font-bold italic uppercase tracking-widest text-white">Emergency Termination</h3>
-                 </div>
-                 <p className="text-sm text-white/40 font-light italic leading-relaxed">
-                   Master platform override. Activating this will immediately switch all regional market hubs to read-only mode and activate the Maintenance Overlay.
-                 </p>
-                 <Button variant="outline" className="w-full h-12 border-red-900/40 text-red-500 hover:bg-red-500 hover:text-white text-[9px] font-bold uppercase tracking-widest rounded-none transition-all">
-                    ACTIVATE MASTER KILL-SWITCH
-                 </Button>
-              </Card>
-           </div>
-        </TabsContent>
-      </Tabs>
+function PolicyNode({ label, val }: { label: string, val: string }) {
+  return (
+    <div className="flex justify-between items-center border-b border-white/5 pb-2">
+       <span className="text-[9px] font-bold uppercase tracking-widest text-white/30">{label}</span>
+       <span className="text-sm font-bold text-white tabular uppercase">{val}</span>
     </div>
   );
 }
@@ -338,7 +235,7 @@ function StatsTile({ label, value, trend }: { label: string, value: string, tren
   return (
     <Card className="bg-[#111113] border-white/5 shadow-xl p-8 space-y-4 group hover:border-blue-600/40 transition-all rounded-none">
        <div className="flex justify-between items-start">
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 group-hover:text-blue-400 transition-colors">{label}</span>
+          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20 group-hover:text-blue-400 transition-colors">{label}</span>
           <Badge variant="outline" className="text-[8px] uppercase border-blue-600/20 text-blue-400 rounded-none bg-blue-600/5">{trend}</Badge>
        </div>
        <div className="text-4xl font-headline font-bold italic text-white/90 group-hover:text-white">{value}</div>

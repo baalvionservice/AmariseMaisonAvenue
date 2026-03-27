@@ -65,80 +65,29 @@ export interface Payment {
   createdAt: string;
   updatedAt: string;
   metadata?: Record<string, any>;
+  country: CountryCode;
 }
 
-export interface PaymentLog {
-  id: string;
-  paymentId: string;
-  action: 'INIT' | 'WEBHOOK_RECEIVED' | 'SUCCESS' | 'FAILURE' | 'REFUND_INIT' | 'RECONCILIED';
-  rawPayload?: any;
-  metadata: Record<string, any>;
-  timestamp: string;
-}
-
-export interface Subscription {
-  id: string;
-  tenantId: string;
-  userId: string;
-  planId: string;
-  planName: string;
-  status: SubscriptionStatus;
-  currentPeriodEnd: string;
-  cancelAtPeriodEnd: boolean;
-  amount: number;
-  currency: string;
-}
-
-export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed' | 'Refunded';
-
-export type FulfillmentStep = 'Registry Confirmed' | 'Atelier Preparation' | 'Heritage Audit' | 'Institutional Dispatch' | 'White-Glove Delivery';
+export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed' | 'Refunded' | 'Confirmed' | 'Shipped' | 'Delivered';
 
 export interface Transaction {
   id: string;
-  country: string;
+  country: CountryCode;
   type: 'Sale' | 'Refund' | 'Payout' | 'Subscription';
   clientName: string;
-  vendorId?: string;
   amount: number;
+  netAmount?: number;
+  taxAmount?: number;
   currency: string;
   status: TransactionStatus;
   timestamp: string;
-  invoiceId?: string;
   brandId: string;
-  taxAmount?: number;
-  netAmount?: number;
-  gateway?: PaymentGateway;
-  lockedRate?: number; // Captured FX rate at checkout
-  fulfillmentSteps?: {
-    step: FulfillmentStep;
-    timestamp: string;
-    completed: boolean;
-  }[];
   artifactName?: string;
-  artifactSku?: string;
   isProvenanceCertified?: boolean;
-  refundReason?: string;
-  refundedAt?: string;
-}
-
-export type ShipmentStatus = 'pending' | 'packed' | 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned';
-
-export interface Shipment {
-  id: string;
-  orderId: string;
-  userId: string;
-  country: CountryCode;
-  courierName: string;
-  trackingId: string;
-  status: ShipmentStatus;
-  createdAt: string;
-  updatedAt: string;
-  history: {
-    status: ShipmentStatus;
-    location: string;
-    timestamp: string;
-    message: string;
-  }[];
+  invoiceId?: string;
+  gateway?: string;
+  lockedRate?: number;
+  fulfillmentSteps?: { step: string; timestamp: string; completed: boolean }[];
 }
 
 export interface Product {
@@ -153,50 +102,205 @@ export interface Product {
   isVip: boolean;
   rating: number;
   reviewsCount: number;
-  colors?: string[];
-  sizes?: string[];
   stock: number;
-  vendorId?: string;
   brandId: string;
-  countryCode?: CountryCode;
   isGlobal: boolean;
-  scope: 'global' | 'regional';
   regions: CountryCode[];
-  status: 'draft' | 'review' | 'verified' | 'published';
-  versionHistory: any[];
-  currentVersion: number;
-  conflictStrategy: 'global-priority' | 'regional-priority';
+  status: 'draft' | 'published';
   lastEditedRegion: CountryCode | 'global';
+  specialNotes?: string;
   condition?: string;
   conditionDetails?: string;
-  specialNotes?: string;
+  colors?: string[];
+  sizes?: string[];
+  vendorId?: string;
+  scope?: string;
+  currentVersion?: number;
+  conflictStrategy?: string;
+  versionHistory?: any[];
+  targetKeyword?: string;
   seoTitle?: string;
   seoDescription?: string;
-  targetKeyword?: string;
 }
 
-export interface CMSPage {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  language: LanguageCode;
-  country: CountryCode | 'global';
-  status: 'draft' | 'published';
-  createdAt: string;
-  updatedAt: string;
-  authorId: string;
-  seoId?: string;
+export interface CartItem extends Product {
+  quantity: number;
 }
 
-export interface Category {
+export interface CountryConfig {
+  code: CountryCode;
+  name: string;
+  enabled: boolean;
+  currency: string;
+  symbol: string;
+  locale: string;
+  taxType: TaxType;
+  taxRate: number;
+  messagingStrategy: 'Email' | 'WhatsApp' | 'Concierge';
+  pricingVisibility?: string;
+  featuredCategories?: string[];
+}
+
+export interface BrandConfig {
   id: string;
   name: string;
-  description?: string;
-  imageUrl?: string;
-  subcategories: string[];
-  departmentId: string;
+  domain: string;
+  theme: any;
+  enabled: boolean;
+}
+
+export interface GlobalSyncSession {
+  id: string;
+  timestamp: string;
+  categories: ('products' | 'seo' | 'config')[];
+  targets: CountryCode[];
+  actorName: string;
+  status: 'pending' | 'applied' | 'rolled_back';
+}
+
+export interface GlobalSettings {
+  theme: {
+    primary: string;
+    accent: string;
+    fontFamily: string;
+  };
+  emergencyMode: boolean;
+  isGuideMode: boolean;
+  adminViewMode: 'simple' | 'advanced';
+  performance?: any;
+  payments?: any;
+}
+
+export interface MaisonNotification {
+  id: string;
+  toRole: string;
+  country: CountryCode | 'global';
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'info' | 'alert' | 'success';
+}
+
+export type AdminViewMode = 'simple' | 'advanced';
+
+export interface VipClient {
+  id: string;
+  name: string;
+  email: string;
+  tier: 'Silver' | 'Gold' | 'Diamond';
+  loyaltyPoints: number;
+  totalSpend: number;
+  lastPurchase: string;
+  isSubscriber: boolean;
+  subscriptionPlan?: string;
+  brandId: string;
+  status: 'pending' | 'verified' | 'rejected';
+  walletBalance: number;
+  walletHistory: any[];
+  liveRequests: any[];
+  certificates: any[];
+}
+
+export interface SupportTicket {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerTier: string;
+  subject: string;
+  status: 'open' | 'resolved';
+  priority: 'low' | 'normal' | 'urgent';
+  category: string;
+  lastMessage: string;
+  updatedAt: string;
+  createdAt: string;
+  messages: { id: string; sender: string; text: string; timestamp: string }[];
+  brandId: string;
+}
+
+export interface PrivateInquiry {
+  id: string;
+  customerName: string;
+  email: string;
+  country: string;
+  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3';
+  intent: 'Personal' | 'Investment' | 'Collector' | 'Exploratory';
+  message: string;
+  contactMethod: 'WhatsApp' | 'Email';
+  status: 'new' | 'contacted' | 'qualifying' | 'presenting' | 'closing' | 'won';
+  leadTier: number;
+  timestamp: string;
+  productId?: string;
+  serviceId?: string;
   brandId?: string;
+}
+
+export interface LeadConversation {
+  id: string;
+  inquiryId: string;
+  status: 'active' | 'closed';
+  messages: { id: string; sender: 'client' | 'curator'; text: string; timestamp: string }[];
+}
+
+export interface MaisonMetric {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  timestamp: string;
+  source: string;
+  country: CountryCode | 'global';
+}
+
+export interface MaisonAlert {
+  id: string;
+  type: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  status: 'active' | 'resolved';
+  triggeredAt: string;
+  country: CountryCode | 'global';
+}
+
+export interface SystemHealthScore {
+  overall: number;
+  subsystems: {
+    payments: number;
+    api: number;
+    inventory: number;
+    ai: number;
+    operational: number;
+  };
+  lastUpdated: string;
+}
+
+export interface FraudLog {
+  id: string;
+  userId: string;
+  orderId?: string;
+  riskScore: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  reason: string;
+  actionTaken: string;
+  timestamp: string;
+  metadata?: any;
+}
+
+export interface DynamicPrice {
+  id: string;
+  productId: string;
+  basePrice: number;
+  adjustedPrice: number;
+  country: CountryCode;
+  reason: string;
+  confidenceScore: number;
+  updatedAt: string;
+  metadata?: any;
+}
+
+export interface CMSSection {
+  id: string;
+  visible: boolean;
+  content?: any;
 }
 
 export interface Collection {
@@ -204,8 +308,6 @@ export interface Collection {
   name: string;
   description: string;
   imageUrl: string;
-  departmentId?: string;
-  isPrivate?: boolean;
   brandId: string;
   isGlobal: boolean;
 }
@@ -216,17 +318,161 @@ export interface Editorial {
   excerpt: string;
   content: string;
   imageUrl: string;
-  category: 'Seasonal' | 'City Edit' | 'VIP Exclusive' | 'Artisanal';
+  category: string;
   country: string;
   author: string;
   date: string;
   isVip: boolean;
   featuredProducts: string[];
-  brandId: string;
-  isGlobal: boolean;
   targetKeyword?: string;
   metaDescription?: string;
   contentOutline?: string[];
+  brandId: string;
+  isGlobal: boolean;
+}
+
+export interface SEOMetadata {
+  id: string;
+  path: string;
+  title: string;
+  description: string;
+  keywords: string;
+  country: string;
+}
+
+export interface SalesScript {
+  id: string;
+  name: string;
+  stage: string;
+  template: string;
+  triggerKeywords?: string[];
+}
+
+export interface Appointment {
+  id: string;
+  customerId: string;
+  customerName: string;
+  type: 'Private Viewing' | 'Virtual Try-on' | 'Atelier Tour';
+  date: string;
+  time: string;
+  city: string;
+  status: 'pending' | 'confirmed' | 'canceled';
+  brandId: string;
+}
+
+export interface Invoice {
+  id: string;
+  orderId: string;
+  customerName: string;
+  amount: number;
+  currency: string;
+  status: 'issued' | 'paid' | 'pending';
+  date: string;
+  taxAmount: number;
+  taxRate: number;
+  complianceCertified: boolean;
+  brandId: string;
+  gateway?: string;
+  fxRate?: number;
+}
+
+export interface Affiliate {
+  id: string;
+  name: string;
+  tier: string;
+  referralCode: string;
+  salesGenerated: number;
+  commissionEarned: number;
+  status: string;
+  brandId: string;
+}
+
+export interface ReturnRequest {
+  id: string;
+  orderId: string;
+  productId: string;
+  reason: string;
+  status: 'pending' | 'received' | 'inspected' | 'restocked';
+  warehouseId: string;
+  requestedAt: string;
+  brandId: string;
+  country: string;
+}
+
+export interface MaisonError {
+  id: string;
+  type: string;
+  module: string;
+  message: string;
+  severity: string;
+  timestamp: string;
+  resolved: boolean;
+  country: string;
+}
+
+export interface BrandIntegrityIssue {
+  id: string;
+  productName: string;
+  issueType: string;
+  description: string;
+  severity: string;
+  status: 'pending' | 'fixed';
+  country: string;
+}
+
+export interface WorkflowTask {
+  id: string;
+  name: string;
+  module: string;
+  status: string;
+  logs: { id: string; message: string; timestamp: string }[];
+}
+
+export interface AIModuleStatus {
+  id: string;
+  name: string;
+  enabled: boolean;
+  level: 'manual' | 'assisted' | 'auto';
+}
+
+export interface AIActionLog {
+  id: string;
+  moduleId: string;
+  action: string;
+  details: string;
+  status: 'executed' | 'failed' | 'suggested';
+  timestamp: string;
+  confidence?: number;
+}
+
+export interface AISuggestion {
+  id: string;
+  moduleId: string;
+  type: string;
+  title: string;
+  description: string;
+  data: any;
+  status: 'pending' | 'approved' | 'rejected';
+  timestamp: string;
+}
+
+export interface City {
+  id: string;
+  name: string;
+  countryCode: string;
+  description: string;
+  heroImage: string;
+  featuredCollections: string[];
+  featuredProducts: string[];
+  office: {
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    mapUrl: string;
+    image: string;
+  };
+  trends: { title: string; description: string }[];
 }
 
 export interface BuyingGuide {
@@ -242,75 +488,123 @@ export interface BuyingGuide {
   country: string;
   date: string;
   author: string;
-  brandId: string;
-  isGlobal: boolean;
   targetKeyword?: string;
   metaDescription?: string;
   investmentOutlook?: string;
+  brandId: string;
+  isGlobal: boolean;
 }
 
-export interface VipClient {
+export interface Department {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  categories: string[];
+}
+
+export interface Category {
+  id: string;
+  departmentId: string;
+  name: string;
+  subcategories: string[];
+}
+
+export interface Country {
+  code: string;
+  name: string;
+  currency: string;
+  symbol: string;
+  locale: string;
+  flag: string;
+  office: {
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    mapUrl: string;
+    image: string;
+  };
+}
+
+export interface MaisonStory {
+  title: string;
+  subtitle: string;
+  history: { year: string; milestone: string; description: string }[];
+  philosophy: string;
+  craftsmanship: { title: string; description: string; imageUrl: string }[];
+  sustainability: string;
+  institutionalCharter: string;
+  brandId: string;
+}
+
+export interface CustomerServiceInfo {
+  shipping: string;
+  returns: string;
+  faqs: { question: string; answer: string }[];
+}
+
+export interface AdminAccount {
   id: string;
   name: string;
   email: string;
-  tier: 'Standard' | 'Silver' | 'Gold' | 'Diamond';
-  loyaltyPoints: number;
-  totalSpend: number;
-  lastPurchase?: string;
-  isSubscriber: boolean;
-  subscriptionPlan?: 'Maison Privé' | 'Atelier Reserve';
-  brandId: string;
-  status?: 'pending' | 'verified' | 'rejected';
-  walletBalance: number;
-  walletHistory: WalletTransaction[];
-  liveRequests: LiveRequest[];
-  certificates: MaisonCertificate[];
+  role: string;
+  permissions: string[];
+  status: string;
+  lastActive: string;
+  twoFactorEnabled: boolean;
 }
 
-export interface GlobalSettings {
-  theme: {
-    primary: string;
-    accent: string;
-    fontFamily: string;
-  };
-  seo: {
-    defaultTitle: string;
-    defaultDesc: string;
-    sitemapUrl: string;
-  };
-  payments: {
-    cards: boolean;
-    wallets: boolean;
-    crypto: boolean;
-  };
-  compliance: {
-    gdprEnabled: boolean;
-    ccpaEnabled: boolean;
-    pciStatus: 'Optimal' | 'Review Required';
-  };
-  performance: {
-    cdnEnabled: boolean;
-    cachingEnabled: boolean;
-    autoScalingStatus: string;
-  };
-  emergencyMode: boolean;
-  isGuideMode: boolean;
-  adminViewMode: 'simple' | 'advanced';
-}
-
-export interface SupportTicket {
+export interface Vendor {
   id: string;
-  customerId: string;
-  customerName: string;
-  customerTier: string;
-  subject: string;
-  status: 'open' | 'pending' | 'resolved' | 'escalated';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  name: string;
   category: string;
-  lastMessage: string;
-  updatedAt: string;
-  createdAt: string;
-  messages: any[];
+  performance: number;
+  productCount: number;
+  salesTotal: number;
+  status: string;
+  payoutSchedule: string;
+  joinedDate: string;
+  kpis: { returnRate: number; fulfillmentSpeed: string; rating: number };
+  brandId: string;
+}
+
+export interface Campaign {
+  id: string;
+  title: string;
+  type: string;
+  status: 'active' | 'scheduled' | 'completed';
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  market: string;
+  reach: number;
+  conversions: number;
+  roi: number;
+  predictedRoi: number;
+  abTestActive: boolean;
+  brandId: string;
+}
+
+export interface AuditLog {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action: string;
+  module: string;
+  timestamp: string;
+  ipAddress: string;
+  severity: string;
+}
+
+export interface CustomerSegment {
+  id: string;
+  name: string;
+  description: string;
+  userCount: number;
+  avgOrderValue: number;
+  tags: string[];
+  predictedChurn: number;
   brandId: string;
 }
 
@@ -330,7 +624,7 @@ export interface MaisonIntegration {
   status: string;
   lastSync: string;
   uptime: number;
-  brandId?: string;
+  brandId: string;
 }
 
 export interface ApiLog {
@@ -352,487 +646,6 @@ export interface IndexingStatus {
   autoSyncEnabled: boolean;
 }
 
-export interface Appointment {
-  id: string;
-  customerId: string;
-  customerName: string;
-  type: string;
-  date: string;
-  time: string;
-  city: string;
-  status: string;
-  brandId: string;
-}
-
-export interface Invoice {
-  id: string;
-  orderId: string;
-  customerName: string;
-  amount: number;
-  currency: string;
-  status: string;
-  date: string;
-  taxAmount: number;
-  taxRate: number;
-  complianceCertified: boolean;
-  brandId: string;
-  gateway?: PaymentGateway;
-  fxRate?: number;
-}
-
-export interface PrivateInquiry {
-  id: string;
-  productId?: string;
-  serviceId?: string;
-  customerName: string;
-  email: string;
-  country: string;
-  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3';
-  intent: string;
-  message?: string;
-  contactMethod: 'WhatsApp' | 'Email';
-  status: 'new' | 'contacted' | 'qualifying' | 'presenting' | 'closing' | 'won' | 'lost';
-  leadTier: 1 | 2 | 3;
-  timestamp: string;
-  brandId: string;
-}
-
-export interface LeadConversation {
-  id: string;
-  inquiryId: string;
-  messages: any[];
-  status: string;
-  brandId: string;
-}
-
-export interface SalesScript {
-  id: string;
-  name: string;
-  stage: string;
-  template: string;
-  brandId: string;
-  triggerKeywords?: string[];
-}
-
-export interface AutomationRule {
-  id: string;
-  name: string;
-  trigger: string;
-  action: string;
-  enabled: boolean;
-  brandId: string;
-}
-
-export interface AIModuleStatus {
-  id: string;
-  name: string;
-  enabled: boolean;
-  level: 'manual' | 'assisted' | 'auto';
-}
-
-export interface AIActionLog {
-  id: string;
-  moduleId: string;
-  action: string;
-  status: string;
-  timestamp: string;
-  details: string;
-  input?: any;
-  output?: any;
-  confidence?: number;
-  traceId?: string;
-}
-
-export interface AISuggestion {
-  id: string;
-  moduleId: string;
-  type: string;
-  title: string;
-  description: string;
-  data: any;
-  status: 'pending' | 'approved' | 'rejected';
-  timestamp: string;
-}
-
-export interface AuditLogEntry {
-  id: string;
-  actorId: string;
-  actorName: string;
-  actorRole: string;
-  country: string;
-  action: string;
-  entity: string;
-  entityId?: string;
-  timestamp: string;
-  severity: 'low' | 'medium' | 'high';
-  beforeState?: any;
-  afterState?: any;
-  reason?: string;
-  brandId?: string;
-}
-
-export interface SystemLog {
-  id: string;
-  type: 'api' | 'security' | 'inventory' | 'payment' | 'system' | 'event';
-  source: string;
-  userId?: string;
-  action: string;
-  requestData?: any;
-  responseData?: any;
-  status: 'success' | 'failure';
-  error?: string;
-  level?: 'info' | 'warn' | 'error';
-  timestamp: string;
-  country: string;
-}
-
-export interface QATestCase {
-  id: string;
-  name: string;
-  module: string;
-  status: string;
-  logs: any[];
-  country: string;
-  brandId: string;
-  lastRun?: string;
-}
-
-export interface MaisonError {
-  id: string;
-  module: string;
-  type: string;
-  country: string;
-  message: string;
-  resolved: boolean;
-  timestamp: string;
-  severity: string;
-  stackTrace?: string;
-}
-
-export interface StressTest {
-  id: string;
-  name: string;
-  loadSize: number;
-  type: string;
-  status: string;
-  metrics: any;
-  logs: any[];
-  country: string;
-}
-
-/**
- * 🔍 SEO AUTHORITY TYPES
- */
-export interface SEOMetadata {
-  id: string;
-  path: string;
-  language: LanguageCode;
-  country: CountryCode;
-  title: string;
-  description: string;
-  keywords: string;
-  h1: string;
-  canonicalUrl: string;
-  ogImage?: string;
-  hreflangs: { lang: string; url: string }[];
-  updatedAt: string;
-}
-
-export interface Vendor {
-  id: string;
-  name: string;
-  category: string;
-  performance: number;
-  salesTotal: number;
-  status: 'active' | 'pending' | 'rejected';
-  brandId?: string;
-  joinedDate?: string;
-  payoutSchedule?: string;
-  productCount?: number;
-  kpis?: any;
-}
-
-export interface BrandConfig {
-  id: string;
-  name: string;
-  domain: string;
-  theme: any;
-  enabled: boolean;
-}
-
-export interface CountryConfig {
-  code: CountryCode;
-  enabled: boolean;
-  currency: string;
-  symbol: string;
-  locale: string;
-  messagingStrategy: string;
-  pricingVisibility: string;
-  featuredCategories: string[];
-  taxType: string;
-  taxRate: number;
-  name: string;
-}
-
-export interface MaisonNotification {
-  id: string;
-  toRole: string;
-  country: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  type: 'info' | 'alert' | 'success';
-}
-
-export interface WorkflowTask {
-  id: string;
-  taskName: string;
-  status: string;
-  country: string;
-  lastRun?: string;
-}
-
-export interface ApprovalRequest {
-  id: string;
-  contentType: string;
-  contentId: string;
-  country: string;
-  status: string;
-}
-
-export interface BrandIntegrityIssue {
-  id: string;
-  productName: string;
-  issueType: string;
-  description: string;
-  country: string;
-  severity: string;
-  status: string;
-}
-
-export interface LiveRequest {
-  id: string;
-  productName: string;
-  status: string;
-  requestedAt: string;
-  scheduledAt?: string;
-  fee: number;
-}
-
-export interface MaisonCertificate {
-  id: string;
-  artifactName: string;
-  productId: string;
-  nfcSealId: string;
-  provenanceScore: number;
-  status: string;
-  imageUrl: string;
-  issueDate?: string;
-  clientName?: string;
-  country?: string;
-}
-
-export type AdminViewMode = 'simple' | 'advanced';
-
-export type SyncCategory = 'products' | 'seo' | 'config';
-
-export interface GlobalSyncSession {
-  id: string;
-  timestamp: string;
-  categories: SyncCategory[];
-  targets: CountryCode[];
-  snapshotBefore: any;
-  actorName: string;
-  status: string;
-}
-
-export interface WalletTransaction {
-  id: string;
-  type: 'Deposit' | 'Service Fee' | 'Acquisition' | 'Refund';
-  amount: number;
-  description: string;
-  timestamp: string;
-  status: 'Settled' | 'Pending';
-}
-
-/** 📊 BACKGROUND WORKER TYPES */
-
-export type JobType = 
-  | 'PAYMENT_VERIFY' 
-  | 'INVENTORY_TTL' 
-  | 'EVENT_RETRY' 
-  | 'NOTIF_DISPATCH' 
-  | 'METRICS_AGG' 
-  | 'FX_SYNC'
-  | 'CLEANUP'
-  | 'SEO_SYNC'
-  | 'FRAUD_AUDIT'
-  | 'PRICING_OPTIMIZE';
-
-export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'retrying';
-
-export interface BackgroundJob {
-  id: string;
-  type: JobType;
-  payload: any;
-  status: JobStatus;
-  retryCount: number;
-  maxRetries: number;
-  nextRunAt: string;
-  country: string;
-  error?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/** 📊 OBSERVABILITY TYPES */
-
-export interface MaisonMetric {
-  id: string;
-  name: string;
-  value: number;
-  unit: string;
-  timestamp: string;
-  source: string;
-  country: CountryCode | 'global';
-  tags?: Record<string, string>;
-  type?: 'performance' | 'business' | 'AI' | 'operational';
-}
-
-export interface MaisonAlert {
-  id: string;
-  type: 'system' | 'payment' | 'inventory' | 'api' | 'ai' | 'fraud' | 'pricing' | 'operational';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  message: string;
-  triggeredAt: string;
-  status: 'active' | 'resolved' | 'acknowledged';
-  country: CountryCode | 'global';
-  metadata?: any;
-}
-
-export interface SystemHealthScore {
-  overall: number;
-  subsystems: {
-    payments: number;
-    api: number;
-    inventory: number;
-    ai: number;
-    operational: number;
-  };
-  lastUpdated: string;
-}
-
-/** 🛡️ FRAUD DETECTION TYPES */
-
-export type RiskLevel = 'low' | 'medium' | 'high';
-
-export interface FraudLog {
-  id: string;
-  userId: string;
-  orderId?: string;
-  riskScore: number;
-  riskLevel: RiskLevel;
-  reason: string;
-  actionTaken: 'allow' | 'flag' | 'block';
-  timestamp: string;
-  metadata: {
-    ipHub?: string;
-    attemptCount?: number;
-    magnitude?: number;
-  };
-}
-
-/** 💰 DYNAMIC PRICING TYPES */
-
-export interface DynamicPrice {
-  id: string;
-  productId: string;
-  basePrice: number;
-  adjustedPrice: number;
-  country: CountryCode;
-  reason: 'demand' | 'inventory' | 'competitor' | 'regional' | 'custom';
-  confidenceScore: number;
-  updatedAt: string;
-  metadata: {
-    demandSignal?: number;
-    stockLevel?: number;
-    isVipOverride?: boolean;
-  };
-}
-
-export interface ProductExtended {
-  collectorValue: string;
-  marketRange: string;
-  investmentInsight: string;
-  scarcityTag: string;
-  priceVisible: boolean;
-}
-
-export interface MaisonService {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  priceRange: string;
-  features: string[];
-  imageUrl: string;
-  brandId: string;
-  isGlobal: boolean;
-}
-
-export interface MaisonReport {
-  id: string;
-  title: string;
-  summary: string;
-  date: string;
-  author: string;
-  isPremium: boolean;
-  previewImage: string;
-  brandId: string;
-}
-
-export interface Country {
-  code: string;
-  name: string;
-  currency: string;
-  symbol: string;
-  locale: string;
-  flag: string;
-  office: {
-    city: string;
-    address: string;
-    phone: string;
-    email: string;
-    mapUrl: string;
-    image: string;
-  }
-}
-
-export interface Department {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  categories: string[];
-}
-
-export interface MaisonStory {
-  title: string;
-  subtitle: string;
-  history: { year: string; milestone: string; description: string }[];
-  philosophy: string;
-  craftsmanship: { title: string; description: string; imageUrl: string }[];
-  sustainability: string;
-  institutionalCharter: string;
-  brandId: string;
-}
-
-export interface CustomerServiceInfo {
-  shipping: string;
-  returns: string;
-  faqs: { question: string; answer: string }[];
-}
-
 export interface IndexingLog {
   id: string;
   timestamp: string;
@@ -840,73 +653,4 @@ export interface IndexingLog {
   itemsAffected: number;
   duration: string;
   status: string;
-}
-
-export interface CMSSection {
-  id: string;
-  name: string;
-  visible: boolean;
-}
-
-export interface Inventory {
-  productId: string;
-  variantId: string;
-  country: CountryCode;
-  totalStock: number;
-  reservedStock: number;
-  availableStock: number;
-  updatedAt: string;
-}
-
-export interface InventoryLock {
-  id: string;
-  productId: string;
-  variantId: string;
-  userId: string;
-  orderId?: string;
-  status: 'LOCKED' | 'RELEASED' | 'EXPIRED' | 'CONFIRMED';
-  quantity: number;
-  expiresAt: string;
-  createdAt: string;
-}
-
-export interface WarehouseMovement {
-  id: string;
-  productId: string;
-  type: 'intake' | 'adjustment' | 'dispatch' | 'return';
-  quantity: number;
-  hub: CountryCode;
-  actorName: string;
-  reason: string;
-  timestamp: string;
-}
-
-export interface ReturnRequest {
-  id: string;
-  orderId: string;
-  productId: string;
-  reason: string;
-  status: 'pending' | 'authorized' | 'received' | 'inspected' | 'restocked' | 'rejected';
-  warehouseId: string;
-  requestedAt: string;
-  brandId: string;
-  country: CountryCode;
-}
-
-export interface Order {
-  id: string;
-  userId: string;
-  clientName: string;
-  country: CountryCode;
-  items: CartItem[];
-  totalAmount: number;
-  currency: string;
-  status: 'Pending' | 'Confirmed' | 'Processing' | 'Shipped' | 'Delivered' | 'Failed';
-  paymentStatus: PaymentStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CartItem extends Product {
-  quantity: number;
 }

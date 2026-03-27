@@ -21,7 +21,7 @@ export function hasFunctionPermission(user: MaisonUser | null, permission: strin
 }
 
 /**
- * Geographic jurisdiction check.
+ * Geographic jurisdiction check (Hub Isolation).
  */
 export function hasGeographicJurisdiction(user: MaisonUser | null, resourceCountry?: string): boolean {
   if (!user) return false;
@@ -46,5 +46,11 @@ export function canPerform(user: MaisonUser | null, permission: string, resource
   const funcOk = hasFunctionPermission(user, permission);
   const geoOk = hasGeographicJurisdiction(user, resourceCountry);
   
-  return funcOk && geoOk;
+  const granted = funcOk && geoOk;
+
+  if (!granted && user) {
+    console.warn(`%c[SECURITY] Access Denied: User ${user.name} on ${permission} in ${resourceCountry || 'global'} hub.`, "color: #ef4444; font-weight: bold;");
+  }
+
+  return granted;
 }
