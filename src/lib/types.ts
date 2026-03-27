@@ -5,6 +5,32 @@ export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
 export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
 
+export type TaxType = 'GST' | 'VAT' | 'SALES_TAX';
+
+export interface TaxRule {
+  id: string;
+  country: CountryCode;
+  taxType: TaxType;
+  category: string; // 'general', 'hermes', 'watches', 'jewelry'
+  rate: number; // percentage, e.g. 18
+  isInclusive: boolean;
+  lastUpdated: string;
+}
+
+export interface TaxCalculationResult {
+  subtotal: number;
+  totalTax: number;
+  totalAmount: number;
+  breakdown: {
+    itemId: string;
+    itemName: string;
+    itemPrice: number;
+    taxAmount: number;
+    taxRate: number;
+    taxType: TaxType;
+  }[];
+}
+
 export interface FXRate {
   currencyCode: string;
   baseCurrency: string; // usually USD

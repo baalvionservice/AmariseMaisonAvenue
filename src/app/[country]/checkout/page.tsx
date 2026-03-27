@@ -12,9 +12,10 @@ import { cn } from '@/lib/utils';
 import { paymentService } from '@/lib/services/paymentService';
 import { apiOrchestrator } from '@/lib/api/orchestrator';
 import { PaymentGateway, CountryCode } from '@/lib/types';
+import { TaxEngine } from '@/lib/finance/tax-engine';
 
 export default function CheckoutPage() {
-  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs, fxRates, getLocalizedPrice } = useAppStore();
+  const { cart, clearCart, createInvoice, createTransaction, activeBrandId, currentUser, paymentPlans, countryConfigs, fxRates, getLocalizedPrice, taxRules } = useAppStore();
   const { country } = useParams();
   const searchParams = useSearchParams();
   const countryCode = (country as string) || 'us';
@@ -41,15 +42,30 @@ export default function CheckoutPage() {
   const selectedPlan = useMemo(() => paymentPlans.find(p => p.id === planId), [planId, paymentPlans]);
   const currentCountryConfig = useMemo(() => countryConfigs.find(c => c.code === countryCode), [countryCode, countryConfigs]);
 
-  const itemsValue = cart.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
-  const planValue = selectedPlan?.price || 0;
-  const subtotal = itemsValue + planValue;
-  const taxAmount = subtotal * (currentCountryConfig?.taxRate || 0) / 100;
-  const totalYield = subtotal + taxAmount;
+  /**
+   * GRANULAR TAX CALCULATION
+   * Replaced flat rate with Item-Category logic.
+   */
+  const taxCalculation = useMemo(() => {
+    // 1. Prepare items including plan if exists
+    const itemsToTax = [...cart];
+    if (selectedPlan) {
+      itemsToTax.push({
+        id: selectedPlan.id,
+        name: selectedPlan.name,
+        basePrice: selectedPlan.price,
+        quantity: 1,
+        categoryId: 'service'
+      } as any);
+    }
+
+    return TaxEngine.calculateOrderTax(itemsToTax, countryCode as CountryCode, taxRules);
+  }, [cart, selectedPlan, countryCode, taxRules]);
+
+  const totalYield = taxCalculation.totalAmount;
 
   /**
    * ATOMIC INVENTORY LOCKING + PRICE LOCKING
-   * Transition from Step 1 to Step 2 requires securing the artifacts and the FX rate.
    */
   const handleLockInventory = async () => {
     if (cart.length > 0) {
@@ -61,7 +77,6 @@ export default function CheckoutPage() {
         setInventoryLockId(lockRes.data.lock_id);
         
         // 🔒 Institutional Price Locking
-        // Capture the current hub rate to prevent fluctuations during payment
         const currentHubRate = fxRates.find(r => r.currencyCode === currentCountryConfig?.currency)?.rate || 1;
         setLockedFXRate(currentHubRate);
         
@@ -102,8 +117,8 @@ export default function CheckoutPage() {
           currency: countryCode.toUpperCase(),
           status: selectedGateway === 'BANK_TRANSFER' ? 'pending' : 'paid',
           date: new Date().toISOString(),
-          taxAmount: taxAmount,
-          taxRate: currentCountryConfig?.taxRate || 0,
+          taxAmount: taxCalculation.totalTax,
+          taxRate: taxCalculation.totalTax / taxCalculation.subtotal * 100, // Weighted average
           complianceCertified: true,
           brandId: activeBrandId,
           gateway: selectedGateway,
@@ -116,8 +131,8 @@ export default function CheckoutPage() {
           type: selectedPlan ? 'Subscription' : 'Sale',
           clientName: customerName,
           amount: totalYield,
-          netAmount: subtotal,
-          taxAmount: taxAmount,
+          netAmount: taxCalculation.subtotal,
+          taxAmount: taxCalculation.totalTax,
           currency: countryCode.toUpperCase(),
           status: selectedGateway === 'BANK_TRANSFER' ? 'Pending' : 'Settled',
           timestamp: new Date().toISOString(),
@@ -286,43 +301,38 @@ export default function CheckoutPage() {
                 <h3 className="text-xl font-headline font-bold uppercase tracking-widest border-b border-border pb-6">Acquisition Context</h3>
                 
                 <div className="space-y-8 max-h-80 overflow-y-auto custom-scrollbar pr-4">
-                  {selectedPlan && (
-                    <div className="flex justify-between items-start group">
+                  {taxCalculation.breakdown.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start group">
                       <div className="space-y-1 flex-1">
+                        <span className="block font-bold text-sm uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{item.itemName}</span>
                         <div className="flex items-center space-x-2">
-                           <Ticket className="w-3.5 h-3.5 text-gold" />
-                           <span className="block font-bold text-sm uppercase tracking-tight text-gray-900">{selectedPlan.name}</span>
+                           <span className="text-[9px] text-gray-400 font-bold uppercase">Price: {getLocalizedPrice(item.itemPrice)}</span>
+                           <span className="text-[9px] text-plum font-bold uppercase">+{item.taxRate}% {item.taxType}</span>
                         </div>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase">{selectedPlan.tier} Enrollment</span>
                       </div>
-                      <span className="font-bold text-sm tabular pl-4">{getLocalizedPrice(selectedPlan.price)}</span>
-                    </div>
-                  )}
-                  {cart.map(item => (
-                    <div key={item.id} className="flex justify-between items-start group">
-                      <div className="space-y-1 flex-1">
-                        <span className="block font-bold text-sm uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">{item.name}</span>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase">Qty: {item.quantity}</span>
-                      </div>
-                      <span className="font-bold text-sm tabular pl-4">{getLocalizedPrice(item.basePrice * item.quantity)}</span>
+                      <span className="font-bold text-sm tabular pl-4">{getLocalizedPrice(item.itemPrice + item.taxAmount)}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="pt-10 border-t border-border space-y-4">
                   <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    <span>Dispatch Protocol</span>
-                    <span className="text-plum">Complimentary</span>
+                    <span>Registry Subtotal</span>
+                    <span className="text-gray-900 tabular">{getLocalizedPrice(taxCalculation.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    <span>{currentCountryConfig?.taxType || 'Jurisdictional Tax'} ({currentCountryConfig?.taxRate || 0}%)</span>
-                    <span className="text-gray-900 tabular">{getLocalizedPrice(taxAmount)}</span>
+                    <span>Aggregate Tax</span>
+                    <span className="text-plum font-bold tabular">+{getLocalizedPrice(taxCalculation.totalTax)}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    <span>Dispatch Protocol</span>
+                    <span className="text-emerald-600">Complimentary</span>
                   </div>
                   <div className="flex justify-between items-end pt-6 border-t border-border/10">
                     <span className="text-xl font-headline font-bold italic tracking-tight">Aggregate Yield</span>
                     <div className="text-right">
                        <div className="text-3xl font-bold tabular leading-none">{getLocalizedPrice(totalYield)}</div>
-                       <p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Total inclusive of all fees</p>
+                       <p className="text-[8px] text-gray-400 uppercase font-bold mt-1">Inclusive of Jurisdictional Tax</p>
                     </div>
                   </div>
                 </div>
