@@ -419,17 +419,17 @@ export const Header = () => {
               <Sheet>
                 <SheetTrigger asChild>
                   <button
-                    className="h-11 px-4 bg-black text-white text-label tracking-label uppercase font-bold hover:bg-body-text transition-colors"
+                    className="h-11 px-4 text-black bg-white text-label tracking-label uppercase font-bold hover:bg-neutral-400 transition-colors"
                     aria-label="Open Maison Menu"
                   >
-                    <Menu className="w-4 h-4" />
+                    <Menu className="w-5 h-5" />
                   </button>
                 </SheetTrigger>
                 <SheetContent
                   side={currentLanguage === "ar" ? "right" : "left"}
                   className="w-full sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl"
                 >
-                  <SheetHeader className="p-8 border-b border-gray-50 text-left shrink-0">
+                  <SheetHeader className="p-4 border-b border-gray-50 text-left shrink-0">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">
@@ -439,16 +439,16 @@ export const Header = () => {
                           {i18n.t("nav.archive")}
                         </p>
                       </div>
-                      <SheetClose asChild>
+                      {/* <SheetClose asChild>
                         <button className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
                           <X className="w-5 h-5 text-gray-400" />
                         </button>
-                      </SheetClose>
+                      </SheetClose> */}
                     </div>
                   </SheetHeader>
 
                   <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="p-8 space-y-1">
+                    <div className="p-4 space-y-1">
                       <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">
                         Departments
                       </p>
@@ -534,7 +534,7 @@ export const Header = () => {
             <nav className="flex items-center space-x-10">
               <Link
                 href={`/${countryCode}/account/login`}
-                className="hover:text-gold transition-colors font-light"
+                className="hidden md:flex hover:text-gold transition-colors font-light"
               >
                 {i18n.t("common.login")}
               </Link>
@@ -595,114 +595,111 @@ export const Header = () => {
           </div>
         </div>
 
- {/* Main Nav with Mega Menu Capability */}
- <nav
-        className="h-16 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
-        onMouseLeave={() => setHoveredLink(null)}
-      >
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center space-x-16">
-          {navLinks.map((link) => (
-            <div
-              key={link.id}
-              className="h-full flex items-center relative"
-              onMouseEnter={() => setHoveredLink(link.id)}
-            >
-              <Link
-                href={link.href}
-                className={cn(
-                  " tracking-label text-sm font-thin uppercase text-black hover:text-black transition-all relative py-2",
-                  hoveredLink === link.id && "text-black"
-                )}
+        {/* Main Nav with Mega Menu Capability */}
+        <nav
+          className="h-16 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
+          onMouseLeave={() => setHoveredLink(null)}
+        >
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center space-x-16">
+            {navLinks.map((link) => (
+              <div
+                key={link.id}
+                className="h-full flex items-center relative"
+                onMouseEnter={() => setHoveredLink(link.id)}
               >
-                {link.name}
-                <span
+                <Link
+                  href={link.href}
                   className={cn(
-                    "absolute -bottom-1 left-0 h-[2px] bg-black transition-all duration-500",
-                    hoveredLink === link.id ? "w-full" : "w-0"
+                    " tracking-label text-sm font-thin uppercase text-black hover:text-black transition-all relative py-2",
+                    hoveredLink === link.id && "text-black"
                   )}
-                />
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* Mega Menu Container */}
-        <AnimatePresence>
-          {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 right-0 w-full bg-white border-b border-gray-100 shadow-2xl z-[60] font-body overflow-hidden"
-              onMouseEnter={() => setHoveredLink(hoveredLink)}
-              onMouseLeave={() => setHoveredLink(null)}
-            >
-              <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-                <div
-                  className={`grid ${
-                    MEGA_MENU_DATA[hoveredLink].sections.length >= 3
-                      ? "grid-cols-4 gap-16"
-                      : "grid-cols-2 gap-4"
-                  }`}
                 >
-                  {/* Links Sections */}
-                  {MEGA_MENU_DATA[hoveredLink].sections.map(
-                    (section: any, idx: number) => (
-                      <div key={idx} className="space-y-6 ">
-                        <span className="text-[16px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">
-                          {section.title}
-                        </span>
-                        <ul className="space-y-3">
-                          {section.links.map((sub: any, sIdx: number) => (
-                            <li key={sIdx}>
-                              <Link
-                                href={`/${countryCode}${sub.href}`}
-                                className="text-[15px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
-                                onClick={() => setHoveredLink(null)}
-                              >
-                                {sub.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )
-                  )}
+                  {link.name}
+                  <span
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-[2px] bg-black transition-all duration-500",
+                      hoveredLink === link.id ? "w-full" : "w-0"
+                    )}
+                  />
+                </Link>
+              </div>
+            ))}
+          </div>
 
-                  {/* Featured Visual */}
-                  <div className="flex flex-col space-y-6 items-center text-center">
-                    <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
-                      <Image
-                        src={
-                          placeholderData.placeholderImages.find(
-                            (i) => i.id === MEGA_MENU_DATA[hoveredLink].imageId
-                          )?.imageUrl || ""
-                        }
-                        alt={MEGA_MENU_DATA[hoveredLink].title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">
-                        {MEGA_MENU_DATA[hoveredLink].title}
-                      </h5>
-                      <p className="text-[11px] text-gray-400 italic font-light">
-                        {MEGA_MENU_DATA[hoveredLink].subtitle}
-                      </p>
+          {/* Mega Menu Container */}
+          <AnimatePresence>
+            {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 right-0 w-full bg-white border-b border-gray-100 shadow-2xl z-[60] font-body overflow-hidden"
+                onMouseEnter={() => setHoveredLink(hoveredLink)}
+                onMouseLeave={() => setHoveredLink(null)}
+              >
+                <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+                  <div
+                    className={`grid ${
+                      MEGA_MENU_DATA[hoveredLink].sections.length >= 3
+                        ? "grid-cols-4 gap-16"
+                        : "grid-cols-2 gap-4"
+                    }`}
+                  >
+                    {/* Links Sections */}
+                    {MEGA_MENU_DATA[hoveredLink].sections.map(
+                      (section: any, idx: number) => (
+                        <div key={idx} className="space-y-6 ">
+                          <span className="text-[16px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">
+                            {section.title}
+                          </span>
+                          <ul className="space-y-3">
+                            {section.links.map((sub: any, sIdx: number) => (
+                              <li key={sIdx}>
+                                <Link
+                                  href={`/${countryCode}${sub.href}`}
+                                  className="text-[15px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
+                                  onClick={() => setHoveredLink(null)}
+                                >
+                                  {sub.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )
+                    )}
+
+                    {/* Featured Visual */}
+                    <div className="flex flex-col space-y-6 items-center text-center">
+                      <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
+                        <Image
+                          src={
+                            placeholderData.placeholderImages.find(
+                              (i) =>
+                                i.id === MEGA_MENU_DATA[hoveredLink].imageId
+                            )?.imageUrl || ""
+                          }
+                          alt={MEGA_MENU_DATA[hoveredLink].title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">
+                          {MEGA_MENU_DATA[hoveredLink].title}
+                        </h5>
+                        <p className="text-[11px] text-gray-400 italic font-light">
+                          {MEGA_MENU_DATA[hoveredLink].subtitle}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
-
-
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </nav>
       </div>
-
-     
 
       <AnimatePresence>
         {isSearchOpen && (
