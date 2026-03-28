@@ -1,9 +1,20 @@
-export type CountryCode = 'us' | 'uk' | 'ae' | 'in' | 'sg';
-export type LanguageCode = 'en' | 'ar' | 'hi' | 'fr';
+export type CountryCode = "us" | "uk" | "ae" | "in" | "sg";
+export type LanguageCode = "en" | "ar" | "hi" | "fr";
 
-export type PaymentGateway = 'STRIPE' | 'RAZORPAY' | 'PAYU' | 'BANK_TRANSFER';
-export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'DISPUTED';
-export type SubscriptionStatus = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE' | 'VERIFIED' | 'EXPIRED';
+export type PaymentGateway = "STRIPE" | "RAZORPAY" | "PAYU" | "BANK_TRANSFER";
+export type PaymentStatus =
+  | "PENDING"
+  | "SUCCESS"
+  | "FAILED"
+  | "REFUNDED"
+  | "DISPUTED";
+export type SubscriptionStatus =
+  | "ACTIVE"
+  | "PAST_DUE"
+  | "CANCELED"
+  | "INCOMPLETE"
+  | "VERIFIED"
+  | "EXPIRED";
 
 export interface Subscription {
   id: string;
@@ -16,7 +27,7 @@ export interface Subscription {
   amount: number;
 }
 
-export type TaxType = 'GST' | 'VAT' | 'SALES_TAX';
+export type TaxType = "GST" | "VAT" | "SALES_TAX";
 
 export interface TaxRule {
   id: string;
@@ -56,9 +67,9 @@ export interface PaymentPlan {
   name: string;
   price: number;
   currency: string;
-  interval: 'monthly' | 'yearly';
+  interval: "monthly" | "yearly";
   features: string[];
-  tier: 'Silver' | 'Gold' | 'Diamond';
+  tier: "Silver" | "Gold" | "Diamond";
   isPopular?: boolean;
 }
 
@@ -79,12 +90,21 @@ export interface Payment {
   country: CountryCode;
 }
 
-export type TransactionStatus = 'Pending' | 'Paid' | 'Processing' | 'Settled' | 'Closed' | 'Refunded' | 'Confirmed' | 'Shipped' | 'Delivered';
+export type TransactionStatus =
+  | "Pending"
+  | "Paid"
+  | "Processing"
+  | "Settled"
+  | "Closed"
+  | "Refunded"
+  | "Confirmed"
+  | "Shipped"
+  | "Delivered";
 
 export interface Transaction {
   id: string;
   country: CountryCode;
-  type: 'Sale' | 'Refund' | 'Payout' | 'Subscription';
+  type: "Sale" | "Refund" | "Payout" | "Subscription";
   clientName: string;
   amount: number;
   netAmount?: number;
@@ -117,8 +137,8 @@ export interface Product {
   brandId: string;
   isGlobal: boolean;
   regions: CountryCode[];
-  status: 'draft' | 'published';
-  lastEditedRegion: CountryCode | 'global';
+  status: "draft" | "published";
+  lastEditedRegion: CountryCode | "global";
   specialNotes?: string;
   condition?: string;
   conditionDetails?: string;
@@ -147,7 +167,7 @@ export interface CountryConfig {
   locale: string;
   taxType: TaxType;
   taxRate: number;
-  messagingStrategy: 'Email' | 'WhatsApp' | 'Concierge';
+  messagingStrategy: "Email" | "WhatsApp" | "Concierge";
   pricingVisibility?: string;
   featuredCategories?: string[];
 }
@@ -163,10 +183,10 @@ export interface BrandConfig {
 export interface GlobalSyncSession {
   id: string;
   timestamp: string;
-  categories: ('products' | 'seo' | 'config')[];
+  categories: ("products" | "seo" | "config")[];
   targets: CountryCode[];
   actorName: string;
-  status: 'pending' | 'applied' | 'rolled_back';
+  status: "pending" | "applied" | "rolled_back";
 }
 
 export interface GlobalSettings {
@@ -177,7 +197,7 @@ export interface GlobalSettings {
   };
   emergencyMode: boolean;
   isGuideMode: boolean;
-  adminViewMode: 'simple' | 'advanced';
+  adminViewMode: "simple" | "advanced";
   performance?: any;
   payments?: any;
 }
@@ -185,27 +205,27 @@ export interface GlobalSettings {
 export interface MaisonNotification {
   id: string;
   toRole: string;
-  country: CountryCode | 'global';
+  country: CountryCode | "global";
   message: string;
   timestamp: string;
   read: boolean;
-  type: 'info' | 'alert' | 'success';
+  type: "info" | "alert" | "success";
 }
 
-export type AdminViewMode = 'simple' | 'advanced';
+export type AdminViewMode = "simple" | "advanced";
 
 export interface VipClient {
   id: string;
   name: string;
   email: string;
-  tier: 'Silver' | 'Gold' | 'Diamond';
+  tier: "Silver" | "Gold" | "Diamond";
   loyaltyPoints: number;
   totalSpend: number;
   lastPurchase: string;
   isSubscriber: boolean;
   subscriptionPlan?: string;
   brandId: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: "pending" | "verified" | "rejected";
   walletBalance: number;
   walletHistory: any[];
   liveRequests: any[];
@@ -218,8 +238,8 @@ export interface SupportTicket {
   customerName: string;
   customerTier: string;
   subject: string;
-  status: 'open' | 'resolved';
-  priority: 'low' | 'normal' | 'urgent';
+  status: "open" | "resolved";
+  priority: "low" | "normal" | "urgent";
   category: string;
   lastMessage: string;
   updatedAt: string;
@@ -233,11 +253,11 @@ export interface PrivateInquiry {
   customerName: string;
   email: string;
   country: string;
-  budgetRange: 'Tier 1' | 'Tier 2' | 'Tier 3';
-  intent: 'Personal' | 'Investment' | 'Collector' | 'Exploratory';
+  budgetRange: "Tier 1" | "Tier 2" | "Tier 3";
+  intent: "Personal" | "Investment" | "Collector" | "Exploratory";
   message: string;
-  contactMethod: 'WhatsApp' | 'Email';
-  status: 'new' | 'contacted' | 'qualifying' | 'presenting' | 'closing' | 'won';
+  contactMethod: "WhatsApp" | "Email";
+  status: "new" | "contacted" | "qualifying" | "presenting" | "closing" | "won";
   leadTier: number;
   timestamp: string;
   productId?: string;
@@ -248,8 +268,13 @@ export interface PrivateInquiry {
 export interface LeadConversation {
   id: string;
   inquiryId: string;
-  status: 'active' | 'closed';
-  messages: { id: string; sender: 'client' | 'curator'; text: string; timestamp: string }[];
+  status: "active" | "closed";
+  messages: {
+    id: string;
+    sender: "client" | "curator";
+    text: string;
+    timestamp: string;
+  }[];
 }
 
 export interface MaisonMetric {
@@ -259,17 +284,17 @@ export interface MaisonMetric {
   unit: string;
   timestamp: string;
   source: string;
-  country: CountryCode | 'global';
+  country: CountryCode | "global";
 }
 
 export interface MaisonAlert {
   id: string;
   type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
-  status: 'active' | 'resolved';
+  status: "active" | "resolved";
   triggeredAt: string;
-  country: CountryCode | 'global';
+  country: CountryCode | "global";
 }
 
 export interface SystemHealthScore {
@@ -289,7 +314,7 @@ export interface FraudLog {
   userId: string;
   orderId?: string;
   riskScore: number;
-  riskLevel: 'low' | 'medium' | 'high';
+  riskLevel: "low" | "medium" | "high";
   reason: string;
   actionTaken: string;
   timestamp: string;
@@ -363,11 +388,11 @@ export interface Appointment {
   id: string;
   customerId: string;
   customerName: string;
-  type: 'Private Viewing' | 'Virtual Try-on' | 'Atelier Tour';
+  type: "Private Viewing" | "Virtual Try-on" | "Atelier Tour";
   date: string;
   time: string;
   city: string;
-  status: 'pending' | 'confirmed' | 'canceled';
+  status: "pending" | "confirmed" | "canceled";
   brandId: string;
 }
 
@@ -377,7 +402,7 @@ export interface Invoice {
   customerName: string;
   amount: number;
   currency: string;
-  status: 'issued' | 'paid' | 'pending';
+  status: "issued" | "paid" | "pending";
   date: string;
   taxAmount: number;
   taxRate: number;
@@ -403,7 +428,7 @@ export interface ReturnRequest {
   orderId: string;
   productId: string;
   reason: string;
-  status: 'pending' | 'received' | 'inspected' | 'restocked';
+  status: "pending" | "received" | "inspected" | "restocked";
   warehouseId: string;
   requestedAt: string;
   brandId: string;
@@ -427,7 +452,7 @@ export interface BrandIntegrityIssue {
   issueType: string;
   description: string;
   severity: string;
-  status: 'pending' | 'fixed';
+  status: "pending" | "fixed";
   country: string;
 }
 
@@ -443,7 +468,7 @@ export interface AIModuleStatus {
   id: string;
   name: string;
   enabled: boolean;
-  level: 'manual' | 'assisted' | 'auto';
+  level: "manual" | "assisted" | "auto";
 }
 
 export interface AIActionLog {
@@ -451,7 +476,7 @@ export interface AIActionLog {
   moduleId: string;
   action: string;
   details: string;
-  status: 'executed' | 'failed' | 'suggested';
+  status: "executed" | "failed" | "suggested";
   timestamp: string;
   confidence?: number;
 }
@@ -463,12 +488,22 @@ export interface AISuggestion {
   title: string;
   description: string;
   data: any;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   timestamp: string;
 }
 
-export type JobStatus = 'pending' | 'running' | 'retrying' | 'completed' | 'failed';
-export type JobType = 'PAYMENT_VERIFY' | 'INVENTORY_TTL' | 'NOTIF_DISPATCH' | 'METRICS_SYNC' | 'AUDIT_SYNC';
+export type JobStatus =
+  | "pending"
+  | "running"
+  | "retrying"
+  | "completed"
+  | "failed";
+export type JobType =
+  | "PAYMENT_VERIFY"
+  | "INVENTORY_TTL"
+  | "NOTIF_DISPATCH"
+  | "METRICS_SYNC"
+  | "AUDIT_SYNC";
 
 export interface BackgroundJob {
   id: string;
@@ -601,7 +636,7 @@ export interface Campaign {
   id: string;
   title: string;
   type: string;
-  status: 'active' | 'scheduled' | 'completed';
+  status: "active" | "scheduled" | "completed";
   discountValue: number;
   startDate: string;
   endDate: string;
@@ -683,7 +718,15 @@ export interface IndexingLog {
   status: string;
 }
 
-export type ShipmentStatus = 'pending' | 'packed' | 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed' | 'returned';
+export type ShipmentStatus =
+  | "pending"
+  | "packed"
+  | "dispatched"
+  | "in_transit"
+  | "out_for_delivery"
+  | "delivered"
+  | "failed"
+  | "returned";
 
 export interface Shipment {
   id: string;
@@ -710,7 +753,7 @@ export interface AuditLogEntry {
   country: string;
   action: string;
   entity: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
   beforeState?: any;
   afterState?: any;
   reason?: string;
@@ -750,5 +793,28 @@ export interface MaisonReport {
 
 export interface RiskLevel {
   score: number;
-  level: 'low' | 'medium' | 'high' | 'critical';
+  level: "low" | "medium" | "high" | "critical";
+}
+
+export type AIAutomationLevel = "manual" | "assisted" | "auto";
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  trigger: string;
+  action: string;
+  conditions: any[];
+}
+
+export interface SystemLog {
+  id: string;
+  level: "info" | "warn" | "error";
+  message: string;
+  timestamp: string;
+  module: string;
+  metadata?: any;
+  status?: "success" | "error";
+  type?: string;
+  action?: string;
 }

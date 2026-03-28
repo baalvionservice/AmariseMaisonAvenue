@@ -46,7 +46,7 @@ export default function CountryLayout({
       <CartSheet />
       <Header />
       {/* Optimized Content Offset for Responsive Tiered Header */}
-      <main id="main-content" className="min-h-screen pt-20 lg:pt-[260px] animate-fade-in relative bg-white">
+      <main id="main-content" className="min-h-screen animate-fade-in relative bg-white">
         {children}
       </main>
 

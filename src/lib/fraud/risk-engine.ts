@@ -3,13 +3,19 @@
  * Implements weighted heuristic logic for high-value acquisition security.
  */
 
-import { VipClient, CartItem, CountryCode, RiskLevel, FraudLog } from '../types';
+import {
+  VipClient,
+  CartItem,
+  CountryCode,
+  RiskLevel,
+  FraudLog,
+} from "../types";
 
 export interface RiskAnalysis {
   score: number;
-  level: RiskLevel;
+  level: "low" | "medium" | "high" | "critical";
   reason: string;
-  action: 'allow' | 'flag' | 'block';
+  action: "allow" | "flag" | "block";
 }
 
 export class RiskEngine {
@@ -39,14 +45,18 @@ export class RiskEngine {
     if (!user || user.totalSpend === 0) {
       score += 30;
       reasons.push("First-time collector node.");
-    } else if (user.tier === 'Diamond') {
+    } else if (user.tier === "Diamond") {
       score -= 40; // Trusted VIP discount
     }
 
     // 3. Jurisdictional Mismatch
     if (metadata.ipHub !== hub.toUpperCase()) {
       score += 40;
-      reasons.push(`Jurisdictional mismatch: IP Hub (${metadata.ipHub}) vs Market Hub (${hub.toUpperCase()}).`);
+      reasons.push(
+        `Jurisdictional mismatch: IP Hub (${
+          metadata.ipHub
+        }) vs Market Hub (${hub.toUpperCase()}).`
+      );
     }
 
     // 4. Velocity Tracking
@@ -57,23 +67,26 @@ export class RiskEngine {
 
     // Final Normalization
     const finalScore = Math.min(100, Math.max(0, score));
-    
-    let level: RiskLevel = 'low';
-    let action: 'allow' | 'flag' | 'block' = 'allow';
+
+    let level: "low" | "medium" | "high" | "critical" = "low";
+    let action: "allow" | "flag" | "block" = "allow";
 
     if (finalScore >= 71) {
-      level = 'high';
-      action = 'block';
+      level = "high";
+      action = "block";
     } else if (finalScore >= 31) {
-      level = 'medium';
-      action = 'flag';
+      level = "medium";
+      action = "flag";
     }
 
     return {
       score: finalScore,
       level,
-      reason: reasons.length > 0 ? reasons.join(" ") : "Transaction behavior optimal.",
-      action
+      reason:
+        reasons.length > 0
+          ? reasons.join(" ")
+          : "Transaction behavior optimal.",
+      action,
     };
   }
 
@@ -84,16 +97,16 @@ export class RiskEngine {
     userId: string,
     analysis: RiskAnalysis,
     orderId?: string
-  ): Omit<FraudLog, 'id'> {
+  ): Omit<FraudLog, "id"> {
     return {
       userId,
       orderId,
       riskScore: analysis.score,
-      riskLevel: analysis.level,
+      riskLevel: analysis.level === "critical" ? "high" : analysis.level,
       reason: analysis.reason,
       actionTaken: analysis.action,
       timestamp: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
   }
 }
