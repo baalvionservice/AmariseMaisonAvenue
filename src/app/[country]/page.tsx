@@ -417,7 +417,7 @@ export default function HomePage() {
           <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
             <ShieldCheck className="w-14 h-14 text-plum" />
           </div>
-          <h3 className="text-7xl md:text-8xl font-headline font-medium italic text-gray-900 tracking-tighter">
+          <h3 className="text-3xl md:text-8xl font-headline font-medium italic text-gray-900 tracking-tighter">
             Institutional Responsibility
           </h3>
           <p className="text-gray-500 font-light italic text-3xl font-headline">
