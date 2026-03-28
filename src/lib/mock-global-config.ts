@@ -1,79 +1,94 @@
-import { CountryConfig, BrandConfig } from './types';
+import { CountryConfig, BrandConfig } from "./types";
 
 export const COUNTRIES_CONFIG: CountryConfig[] = [
   {
-    code: 'us',
+    code: "us",
+    name: "United States",
     enabled: true,
-    currency: 'USD',
-    symbol: '$',
-    locale: 'en-US',
-    messagingStrategy: 'Email',
-    pricingVisibility: 'mixed',
-    featuredCategories: ['w-bags', 'wa-complications']
+    currency: "USD",
+    symbol: "$",
+    locale: "en-US",
+    taxType: "SALES_TAX",
+    taxRate: 8.5,
+    messagingStrategy: "Email",
+    pricingVisibility: "mixed",
+    featuredCategories: ["w-bags", "wa-complications"],
   },
   {
-    code: 'uk',
+    code: "uk",
+    name: "United Kingdom",
     enabled: true,
-    currency: 'GBP',
-    symbol: '£',
-    locale: 'en-GB',
-    messagingStrategy: 'Concierge',
-    pricingVisibility: 'gated',
-    featuredCategories: ['m-tailoring', 'wa-complications']
+    currency: "GBP",
+    symbol: "£",
+    locale: "en-GB",
+    taxType: "VAT",
+    taxRate: 20,
+    messagingStrategy: "Concierge",
+    pricingVisibility: "gated",
+    featuredCategories: ["m-tailoring", "wa-complications"],
   },
   {
-    code: 'ae',
+    code: "ae",
+    name: "United Arab Emirates",
     enabled: true,
-    currency: 'AED',
-    symbol: 'د.إ',
-    locale: 'ar-AE',
-    messagingStrategy: 'WhatsApp',
-    pricingVisibility: 'gated',
-    featuredCategories: ['j-high', 'w-bags']
+    currency: "AED",
+    symbol: "د.إ",
+    locale: "ar-AE",
+    taxType: "VAT",
+    taxRate: 5,
+    messagingStrategy: "WhatsApp",
+    pricingVisibility: "gated",
+    featuredCategories: ["j-high", "w-bags"],
   },
   {
-    code: 'in',
+    code: "in",
+    name: "India",
     enabled: true,
-    currency: 'INR',
-    symbol: '₹',
-    locale: 'en-IN',
-    messagingStrategy: 'WhatsApp',
-    pricingVisibility: 'public',
-    featuredCategories: ['j-high', 'm-tailoring']
+    currency: "INR",
+    symbol: "₹",
+    locale: "en-IN",
+    taxType: "GST",
+    taxRate: 18,
+    messagingStrategy: "WhatsApp",
+    pricingVisibility: "public",
+    featuredCategories: ["j-high", "m-tailoring"],
   },
   {
-    code: 'sg',
+    code: "sg",
+    name: "Singapore",
     enabled: true,
-    currency: 'SGD',
-    symbol: 'S$',
-    locale: 'en-SG',
-    messagingStrategy: 'Concierge',
-    pricingVisibility: 'mixed',
-    featuredCategories: ['wa-complications', 'w-bags']
-  }
+    currency: "SGD",
+    symbol: "S$",
+    locale: "en-SG",
+    taxType: "GST",
+    taxRate: 7,
+    messagingStrategy: "Concierge",
+    pricingVisibility: "mixed",
+    featuredCategories: ["wa-complications", "w-bags"],
+  },
 ];
 
 export const BRANDS_CONFIG: BrandConfig[] = [
   {
-    id: 'amarise-luxe',
-    name: 'AMARISÉ MAISON AVENUE',
-    domain: 'amarise-maison-avenue.com',
+    id: "amarise-luxe",
+    name: "AMARISÉ MAISON AVENUE",
+    domain: "amarise-maison-avenue.com",
     theme: {
-      primary: '#000000',
-      secondary: '#FAF9F6',
-      accent: '#D4AF37'
+      primary: "#000000",
+      secondary: "#FAF9F6",
+      accent: "#D4AF37",
     },
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'future-maison-1',
-    name: 'L’ATELIER D’OR',
-    domain: 'latelier-dor.com',
+    id: "future-maison-1",
+    name: "L’ATELIER D’OR",
+    domain: "latelier-dor.com",
     theme: {
-      primary: '#1A1A1A',
-      secondary: '#FFFFFF',
-      accent: '#C5A059'
+      primary: "#1A1A1A",
+      secondary: "#FFFFFF",
+      accent: "#C5A059",
     },
-    enabled: false
-  }
+    enabled: false,
+  },
 ];
