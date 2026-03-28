@@ -109,7 +109,7 @@ export default function HomePage() {
         <div className="relative z-10 text-center space-y-8 lg:space-y-12 max-w-5xl px-6">
           <div className="space-y-4">
             <span className="text-[10px] lg:text-[12px] font-bold tracking-[0.6em] text-white uppercase drop-shadow-md">
-              Est. 1924 | Paris
+              Newly Created
             </span>
             <h1 className="text-5xl md:text-7xl lg:text-[110px] font-headline font-medium text-white leading-[0.9] tracking-wide drop-shadow-2xl">
               Amarisé Maison

@@ -20,7 +20,7 @@ export const I18N_CONFIG: LocalizationConfig = {
       'nav.home': 'Home',
       'nav.archive': 'Registry',
       'nav.curation': 'Curation',
-      'nav.intelligence': 'Intelligence',
+      'nav.search': 'Search',
       'product.inquire': 'Inquire Privately',
       'product.add_to_bag': 'Add to Shopping Bag',
       'product.provenance': 'Provenance Verified',

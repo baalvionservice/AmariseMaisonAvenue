@@ -413,13 +413,13 @@ export const Header = () => {
         className="sticky top-0 z-50 h-20 lg:h-28 border-b border-border-color bg-white"
         onMouseLeave={() => setHoveredLink(null)}
       >
-        <div className=" px-4 sm:px-6 lg:px-8 flex items-center justify-between relative h-full">
+        <div className="px-1 py-4 sm:px-6 lg:px-8 flex items-center justify-between w-full relative h-fit gap-x-4">
           <div className="lg:hidden flex items-center">
             {mounted && (
               <Sheet>
                 <SheetTrigger asChild>
                   <button
-                    className="h-11 px-4 text-black bg-white text-label tracking-label uppercase font-bold hover:bg-neutral-400 transition-colors"
+                    className="h-11 px-2 text-black bg-white text-label tracking-label uppercase font-bold hover:bg-neutral-400 transition-colors"
                     aria-label="Open Maison Menu"
                   >
                     <Menu className="w-5 h-5" />
@@ -427,39 +427,23 @@ export const Header = () => {
                 </SheetTrigger>
                 <SheetContent
                   side={currentLanguage === "ar" ? "right" : "left"}
-                  className="w-full sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl"
+                  className="w-[90%] sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl"
                 >
-                  <SheetHeader className="p-4 border-b border-gray-50 text-left shrink-0">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900 leading-none">
-                          Maison Archive
-                        </SheetTitle>
-                        <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">
-                          {i18n.t("nav.archive")}
-                        </p>
-                      </div>
-                      {/* <SheetClose asChild>
-                        <button className="p-2 hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                          <X className="w-5 h-5 text-gray-400" />
-                        </button>
-                      </SheetClose> */}
-                    </div>
-                  </SheetHeader>
-
-                  <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="p-4 space-y-1">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-plum mb-6 px-2">
-                        Departments
-                      </p>
+                  <div className="flex-1 p-2 overflow-y-auto custom-scrollbar">
+                    <SheetClose asChild>
+                      <button className=" hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
+                        <X className="w-8 h-8 text-black" />
+                      </button>
+                    </SheetClose>
+                    <div className=" space-y-1">
                       {navLinks.map((link) => (
                         <SheetClose asChild key={link.id}>
                           <Link href={link.href} className="block group">
-                            <div className="w-full text-left py-4 px-2 text-base font-bold tracking-[0.3em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
+                            <div className="w-full text-left py-3 px-2 text-[15px] font-bold tracking-[0.1em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
                               {link.name}
                               <ChevronRight
                                 className={cn(
-                                  "w-4 h-4 text-gray-200 group-hover:text-plum transition-all",
+                                  "w-4 h-4 text-gray-400 group-hover:text-plum transition-all",
                                   currentLanguage === "ar" ? "rotate-180" : ""
                                 )}
                               />
@@ -528,6 +512,22 @@ export const Header = () => {
                 </SheetContent>
               </Sheet>
             )}
+            <Link
+              href={`/${countryCode}/wishlist`}
+              className="relative md:hidden p-2  hover:text-black"
+            >
+              <Heart
+                className={cn(
+                  "w-5 h-5 transition-colors",
+                  wishlistCount > 0 && "fill-black text-black"
+                )}
+              />
+              {wishlistCount > 0 && (
+                <span className="absolute top-0 right-0 bg-black text-white text-[7px] w-4 h-4 rounded-full flex items-center justify-center shadow-lg font-bold border border-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
           </div>
 
           {mounted && (
@@ -553,20 +553,20 @@ export const Header = () => {
               </span>
             </Link>
           </div>
-          <div className="flex items-center space-x-1 lg:space-x-10">
+          <div className="flex items-center space-x-1 lg:space-x-6 text-black">
             <button
-              className="p-2 text-gray-400 hover:text-black hidden sm:flex items-center bg-transparent border-none outline-none cursor-pointer"
+              className="pr-2 md:inline-flex  justify-start md:items-center  md:border-b text-start border-black text-black hover:text-black flex items-center bg-transparent  outline-none cursor-pointer"
               onClick={() => setIsSearchOpen(true)}
             >
               <Search className="w-5 h-5 stroke-[1.5px]" />
-              <span className="ml-3 text-[10px] font-bold uppercase tracking-[0.3em] hidden lg:block">
-                {i18n.t("nav.intelligence")}
+              <span className="ml-2 text-[13px]  text-neutral-600 font-bold  hidden lg:block">
+                {i18n.t("nav.search")}
               </span>
             </button>
 
             <Link
               href={`/${countryCode}/wishlist`}
-              className="relative p-2 text-gray-400 hover:text-black"
+              className="relative p-2 hidden md:flex hover:text-black"
             >
               <Heart
                 className={cn(
@@ -583,9 +583,9 @@ export const Header = () => {
 
             <Link
               href={`/${countryCode}/cart`}
-              className="relative p-2 text-gray-400 hover:text-black"
+              className="relative p-2  hover:text-black"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5  text-black" />
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-plum text-white text-[7px] w-4 h-4 rounded-full flex items-center justify-center shadow-lg font-bold border border-white">
                   {cartCount}
@@ -597,7 +597,7 @@ export const Header = () => {
 
         {/* Main Nav with Mega Menu Capability */}
         <nav
-          className="h-16 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
+          className="h-14 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
           onMouseLeave={() => setHoveredLink(null)}
         >
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center space-x-16">
@@ -726,7 +726,7 @@ export const Header = () => {
                   <X className="w-8 h-8 lg:w-12 lg:h-12 stroke-[1px] text-gray-300 group-hover:text-black transition-colors" />
                 </button>
               </div>
-              <div className="relative border-b border-gray-100 pb-4 lg:pb-8">
+              <div className="relative lg:border-b md:border-gray-100 pb-4 lg:pb-8">
                 <Search
                   className={cn(
                     "absolute top-1/2 -translate-y-1/2 w-6 h-6 lg:w-12 lg:h-12 text-gray-200",
