@@ -1,12 +1,11 @@
+"use client";
 
-'use client';
-
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
 /**
  * HowToSellPage: Replicated "Sell or Consign" Informational Page.
@@ -14,7 +13,7 @@ import { ChevronRight } from 'lucide-react';
  */
 export default function HowToSellPage() {
   const { country } = useParams();
-  const countryCode = (country as string) || 'us';
+  const countryCode = (country as string) || "us";
 
   return (
     <div className="bg-white min-h-screen animate-fade-in font-body">
@@ -27,22 +26,22 @@ export default function HowToSellPage() {
               Sell or Consign with <br /> Amarisé Maison
             </h1>
             <p className="text-sm md:text-base font-light leading-relaxed text-gray-300 max-w-md italic">
-              We offer the most personalized way to sell or consign your designer bags or jewelry. Earn up to 85% of the market price for your mint, new, vintage, or pre-owned items.
+              We offer the most personalized way to sell or consign your
+              designer bags or jewelry. Earn up to 85% of the market price for
+              your mint, new, vintage, or pre-owned items.
             </p>
           </div>
 
           <div className="space-y-6 pt-4">
             <Link href={`/${countryCode}/sell`}>
-              <Button 
-                className="h-14 px-12 bg-[#E1D3DC] text-gray-900 hover:bg-[#D8C4D1] rounded-none text-[10px] font-bold tracking-[0.3em] uppercase transition-all shadow-xl"
-              >
+              <Button className="h-14 px-12 bg-[#E1D3DC] text-gray-900 hover:bg-[#D8C4D1] rounded-none text-[10px] font-bold tracking-[0.3em] uppercase transition-all shadow-xl">
                 START SELLING
               </Button>
             </Link>
-            
+
             <div className="block">
-              <Link 
-                href={`/${countryCode}/sell`} 
+              <Link
+                href={`/${countryCode}/sell`}
                 className="text-[10px] font-bold tracking-[0.2em] text-white hover:text-gold transition-colors uppercase border-b border-white/20 pb-1"
               >
                 LOGIN TO OUR SELLING PORTAL
@@ -53,8 +52,8 @@ export default function HowToSellPage() {
 
         {/* Right Panel: Visual Resonance */}
         <div className="w-full md:w-[55%] relative h-[400px] md:h-auto overflow-hidden">
-          <Image 
-            src="https://madisonavenuecouture.com/cdn/shop/files/Consign_Landing_Page_Banner_1.jpg?v=1691512345&width=1440" 
+          <Image
+            src="https://picsum.photos/seed/amarise-consign/1440/960"
             alt="Maison Amarisé Heritage Collection - Hermès Series"
             fill
             className="object-cover transition-transform duration-[5s] hover:scale-105"
@@ -71,10 +70,19 @@ export default function HowToSellPage() {
         <div className="text-center space-y-12">
           <div className="max-w-4xl mx-auto space-y-8">
             <p className="text-[13px] md:text-base text-gray-600 font-light leading-relaxed italic text-justify md:text-center">
-              If you're looking to sell or consign your designer bag, jewelry or accessories, entrust it to the care and knowledge of people who know luxury — Amarisé Maison. We are one of the leading sellers and buyers of Hermès and Chanel handbags and accessories in the secondary market. We bring our years of experience and expertise buying and selling designer bags to evaluate your bags so that we can offer you the best price. We specialize in selling store-fresh luxury bags, so we prefer to purchase never worn bags outright. We also accept recently produced and vintage pre-owned bags in excellent to like new condition, jewelry and accessories.
+              If you're looking to sell or consign your designer bag, jewelry or
+              accessories, entrust it to the care and knowledge of people who
+              know luxury — Amarisé Maison. We are one of the leading sellers
+              and buyers of Hermès and Chanel handbags and accessories in the
+              secondary market. We bring our years of experience and expertise
+              buying and selling designer bags to evaluate your bags so that we
+              can offer you the best price. We specialize in selling store-fresh
+              luxury bags, so we prefer to purchase never worn bags outright. We
+              also accept recently produced and vintage pre-owned bags in
+              excellent to like new condition, jewelry and accessories.
             </p>
           </div>
-          
+
           <div className="pt-8">
             <div className="h-px w-24 bg-gold mx-auto opacity-30" />
           </div>
@@ -92,7 +100,10 @@ export default function HowToSellPage() {
             {/* Step 1 */}
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]"
+                >
                   <path d="M20 40 L80 40 L85 85 L15 85 Z" />
                   <path d="M35 40 C35 25, 65 25, 65 40" />
                   <path d="M45 40 L45 50 M55 40 L55 50" />
@@ -107,7 +118,10 @@ export default function HowToSellPage() {
             {/* Step 2 */}
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]"
+                >
                   <path d="M20 50 L20 85 L80 85 L80 50" />
                   <path d="M20 50 L10 35 L50 35 L50 50" />
                   <path d="M80 50 L90 35 L50 35" />
@@ -123,12 +137,29 @@ export default function HowToSellPage() {
             {/* Step 3 */}
             <div className="flex flex-col items-center space-y-12 group">
               <div className="relative w-48 h-48 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="w-full h-full text-gray-900 fill-none stroke-current stroke-[0.5px]"
+                >
                   <path d="M30 70 C20 70, 10 60, 10 50 C10 40, 20 30, 35 30" />
                   <path d="M70 70 C80 70, 90 60, 90 50 C90 40, 80 30, 65 30" />
-                  <rect x="35" y="35" width="30" height="15" rx="1" transform="rotate(-15 50 42)" />
+                  <rect
+                    x="35"
+                    y="35"
+                    width="30"
+                    height="15"
+                    rx="1"
+                    transform="rotate(-15 50 42)"
+                  />
                   <rect x="35" y="45" width="30" height="15" rx="1" />
-                  <rect x="35" y="55" width="30" height="15" rx="1" transform="rotate(15 50 62)" />
+                  <rect
+                    x="35"
+                    y="55"
+                    width="30"
+                    height="15"
+                    rx="1"
+                    transform="rotate(15 50 62)"
+                  />
                 </svg>
               </div>
               <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-900 uppercase">
@@ -142,12 +173,18 @@ export default function HowToSellPage() {
       {/* 4. Final Step Gateway */}
       <section className="bg-ivory py-24 border-t border-gray-100">
         <div className="container mx-auto px-6 text-center space-y-8">
-          <h3 className="text-2xl font-headline font-bold italic text-gray-900">Ready to begin your consignment?</h3>
+          <h3 className="text-2xl font-headline font-bold italic text-gray-900">
+            Ready to begin your consignment?
+          </h3>
           <p className="text-sm text-gray-500 font-light max-w-xl mx-auto italic">
-            "Every artifact has a story. Our curators ensure yours finds its next rightful guardian with absolute transparency."
+            "Every artifact has a story. Our curators ensure yours finds its
+            next rightful guardian with absolute transparency."
           </p>
           <Link href={`/${countryCode}/sell`}>
-            <Button variant="outline" className="rounded-none border-gray-900 h-14 px-16 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black hover:text-white transition-all">
+            <Button
+              variant="outline"
+              className="rounded-none border-gray-900 h-14 px-16 text-[10px] tracking-[0.3em] font-bold uppercase hover:bg-black hover:text-white transition-all"
+            >
               PROCEED TO SELL PORTAL
             </Button>
           </Link>

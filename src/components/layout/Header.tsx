@@ -286,7 +286,7 @@ export const Header = () => {
     <>
       <header className="bg-white" onMouseLeave={() => setHoveredLink(null)}>
         {/* 1. Ticker Hub */}
-        <div className="hidden sm:flex bg-cream text-muted-text h-10 items-center justify-center  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase border-b border-border-color">
+        <div className="hidden sm:flex bg-cream text-muted-text h-9 items-center justify-center  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase border-b border-border-color">
           <div className="flex items-center space-x-10">
             <button
               className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer"
@@ -311,7 +311,7 @@ export const Header = () => {
         </div>
 
         {/* 2. Institutional Passport (Utility Bar) */}
-        <div className="hidden md:flex bg-black text-white h-9 items-center justify-between  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase">
+        <div className="hidden md:flex bg-black text-white h-12 items-center justify-between  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-3">
               <ShieldCheck className="w-3.5 h-3.5 text-gold" />
@@ -594,11 +594,10 @@ export const Header = () => {
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Main Nav with Mega Menu Capability */}
-      <nav
-        className="h-16 bg-white border-b border-border-color hidden lg:flex items-center justify-center space-x-16"
+ {/* Main Nav with Mega Menu Capability */}
+ <nav
+        className="h-16 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
         onMouseLeave={() => setHoveredLink(null)}
       >
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center space-x-16">
@@ -611,7 +610,7 @@ export const Header = () => {
               <Link
                 href={link.href}
                 className={cn(
-                  "text-label tracking-label font-bold uppercase text-body-text hover:text-black transition-all relative py-2",
+                  " tracking-label text-sm font-thin uppercase text-black hover:text-black transition-all relative py-2",
                   hoveredLink === link.id && "text-black"
                 )}
               >
@@ -625,74 +624,85 @@ export const Header = () => {
               </Link>
             </div>
           ))}
-        </div>  
+        </div>
+
+        {/* Mega Menu Container */}
+        <AnimatePresence>
+          {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-full left-0 right-0 w-full bg-white border-b border-gray-100 shadow-2xl z-[60] font-body overflow-hidden"
+              onMouseEnter={() => setHoveredLink(hoveredLink)}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+                <div
+                  className={`grid ${
+                    MEGA_MENU_DATA[hoveredLink].sections.length >= 3
+                      ? "grid-cols-4 gap-16"
+                      : "grid-cols-2 gap-4"
+                  }`}
+                >
+                  {/* Links Sections */}
+                  {MEGA_MENU_DATA[hoveredLink].sections.map(
+                    (section: any, idx: number) => (
+                      <div key={idx} className="space-y-6 ">
+                        <span className="text-[16px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">
+                          {section.title}
+                        </span>
+                        <ul className="space-y-3">
+                          {section.links.map((sub: any, sIdx: number) => (
+                            <li key={sIdx}>
+                              <Link
+                                href={`/${countryCode}${sub.href}`}
+                                className="text-[15px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
+                                onClick={() => setHoveredLink(null)}
+                              >
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  )}
+
+                  {/* Featured Visual */}
+                  <div className="flex flex-col space-y-6 items-center text-center">
+                    <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
+                      <Image
+                        src={
+                          placeholderData.placeholderImages.find(
+                            (i) => i.id === MEGA_MENU_DATA[hoveredLink].imageId
+                          )?.imageUrl || ""
+                        }
+                        alt={MEGA_MENU_DATA[hoveredLink].title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">
+                        {MEGA_MENU_DATA[hoveredLink].title}
+                      </h5>
+                      <p className="text-[11px] text-gray-400 italic font-light">
+                        {MEGA_MENU_DATA[hoveredLink].subtitle}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* Mega Menu Container */}
-      <AnimatePresence>
-        {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-2xl z-[40] font-body overflow-hidden"
-            onMouseEnter={() => setHoveredLink(hoveredLink)}
-            onMouseLeave={() => setHoveredLink(null)}
-          >
-            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 grid grid-cols-4 gap-12">
-              {/* Links Sections */}
-              <div className="col-span-3 grid grid-cols-3 gap-8">
-                {MEGA_MENU_DATA[hoveredLink].sections.map(
-                  (section: any, idx: number) => (
-                    <div key={idx} className="space-y-6">
-                      <h4 className="text-[11px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">
-                        {section.title}
-                      </h4>
-                      <ul className="space-y-3">
-                        {section.links.map((sub: any, sIdx: number) => (
-                          <li key={sIdx}>
-                            <Link
-                              href={`/${countryCode}${sub.href}`}
-                              className="text-[13px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
-                              onClick={() => setHoveredLink(null)}
-                            >
-                              {sub.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )
-                )}
-              </div>
 
-              {/* Featured Visual */}
-              <div className="col-span-1 flex flex-col space-y-6 items-center text-center">
-                <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
-                  <Image
-                    src={
-                      placeholderData.placeholderImages.find(
-                        (i) => i.id === MEGA_MENU_DATA[hoveredLink].imageId
-                      )?.imageUrl || ""
-                    }
-                    alt={MEGA_MENU_DATA[hoveredLink].title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">
-                    {MEGA_MENU_DATA[hoveredLink].title}
-                  </h5>
-                  <p className="text-[11px] text-gray-400 italic font-light">
-                    {MEGA_MENU_DATA[hoveredLink].subtitle}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
+
+     
 
       <AnimatePresence>
         {isSearchOpen && (

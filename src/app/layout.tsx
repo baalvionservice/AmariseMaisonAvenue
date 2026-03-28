@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from "@/lib/store";
@@ -11,14 +11,6 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const cormorantGaramond = Cormorant_Garamond({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-cormorant",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
-});
-
 export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
@@ -27,7 +19,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://amarise-maison-avenue.com"),
+  metadataBase: new URL("https://www.amarisemaisonavenue.com/"),
   title: {
     default: "AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury",
     template: "%s | AMARISÉ MAISON AVENUE",
@@ -47,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AMARISÉ MAISON AVENUE | The Pinnacle of Global Luxury",
     description: "Curating the world's most exquisite treasures since 1924.",
-    url: "https://amarise-maison-avenue.com",
+    url: "https://www.amarisemaisonavenue.com/",
     siteName: "Amarisé Maison Avenue",
     type: "website",
     images: [
@@ -84,10 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${cormorantGaramond.variable} light scroll-smooth`}
-    >
+    <html lang="en" className={`${inter.variable} light scroll-smooth`}>
       <head>
         <link rel="preconnect" href="https://picsum.photos" />
         <link rel="preconnect" href="https://madisonavenuecouture.com" />

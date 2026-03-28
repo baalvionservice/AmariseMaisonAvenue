@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from "next";
 
 /**
  * Institutional Robots Exclusion Protocol
@@ -8,22 +8,22 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: '*',
-        allow: '/',
+        userAgent: "*",
+        allow: "/",
         disallow: [
-          '/admin/', 
-          '/checkout/', 
-          '/account/', 
-          '/inquiry/', 
-          '/private-order/'
+          "/admin/",
+          "/checkout/",
+          "/account/",
+          "/inquiry/",
+          "/private-order/",
         ],
       },
       {
-        userAgent: 'Googlebot',
-        allow: '/',
-        disallow: ['/admin/'],
-      }
+        userAgent: "Googlebot",
+        allow: "/",
+        disallow: ["/admin/"],
+      },
     ],
-    sitemap: 'https://amarise-maison-avenue.com/sitemap.xml',
+    sitemap: "https://www.amarisemaisonavenue.com//sitemap.xml",
   };
 }

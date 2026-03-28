@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ["Inter", "sans-serif"],
-        headline: ["Cormorant Garamond", "serif"],
+        body: ["Avenir", "sans-serif"],
+        headline: ["Ivy Ora", "serif"],
         mono: [
           "ui-monospace",
           "SFMono-Regular",

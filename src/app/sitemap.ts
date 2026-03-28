@@ -1,5 +1,12 @@
-import { MetadataRoute } from 'next';
-import { PRODUCTS, CATEGORIES, CITIES, BUYING_GUIDES, EDITOR_INITIAL, COUNTRIES } from '@/lib/mock-data';
+import { MetadataRoute } from "next";
+import {
+  PRODUCTS,
+  CATEGORIES,
+  CITIES,
+  BUYING_GUIDES,
+  EDITOR_INITIAL,
+  COUNTRIES,
+} from "@/lib/mock-data";
 
 /**
  * Institutional Sitemap Generator
@@ -7,7 +14,7 @@ import { PRODUCTS, CATEGORIES, CITIES, BUYING_GUIDES, EDITOR_INITIAL, COUNTRIES 
  * Enhanced with Multi-Language Hreflang logic for SEO authority.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://amarise-maison-avenue.com';
+  const baseUrl = "https://www.amarisemaisonavenue.com/";
   const countryCodes = Object.keys(COUNTRIES);
 
   const routes: MetadataRoute.Sitemap = [];
@@ -17,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     routes.push({
       url: `${baseUrl}/${code}`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1,
     });
 
@@ -26,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       routes.push({
         url: `${baseUrl}/${code}/city/${city.id}`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: "weekly",
         priority: 0.9,
       });
     });
@@ -36,27 +43,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
       routes.push({
         url: `${baseUrl}/${code}/category/${cat.id}`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: "daily",
         priority: 0.8,
       });
     });
 
     // 4. Curatorial Intelligence (Guides)
-    BUYING_GUIDES.filter(g => g.country === code).forEach((guide) => {
+    BUYING_GUIDES.filter((g) => g.country === code).forEach((guide) => {
       routes.push({
         url: `${baseUrl}/${code}/buying-guide/${guide.id}`,
         lastModified: new Date(),
-        changeFrequency: 'monthly',
+        changeFrequency: "monthly",
         priority: 0.7,
       });
     });
 
     // 5. Editorial Archives (The Journal)
-    EDITOR_INITIAL.filter(ed => ed.country === code).forEach((ed) => {
+    EDITOR_INITIAL.filter((ed) => ed.country === code).forEach((ed) => {
       routes.push({
         url: `${baseUrl}/${code}/journal/${ed.id}`,
         lastModified: new Date(),
-        changeFrequency: 'monthly',
+        changeFrequency: "monthly",
         priority: 0.6,
       });
     });
@@ -67,7 +74,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       routes.push({
         url: `${baseUrl}/${code}/product/${prod.id}`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: "daily",
         priority: 0.5,
       });
     });
