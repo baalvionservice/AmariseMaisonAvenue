@@ -7,7 +7,7 @@ import { PRODUCTS, CATEGORIES, CITIES, BUYING_GUIDES, EDITOR_INITIAL, COUNTRIES 
  * Enhanced with Multi-Language Hreflang logic for SEO authority.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://amarise-maison-avenue.com';
+  const baseUrl = 'https://www.amarisemaisonavenue.com';
   const countryCodes = Object.keys(COUNTRIES);
 
   const routes: MetadataRoute.Sitemap = [];
