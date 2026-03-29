@@ -1,162 +1,287 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { COUNTRIES } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowRight,
-  ShieldCheck,
-  Zap,
-  Globe,
-  ChevronLeft,
-  ChevronRight,
   Heart,
+  Search,
+  ShoppingBag,
+  User,
+  Phone,
+  Mail,
+  ChevronDown,
+  Menu,
+  X,
+  Star,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import placeholderData from "@/app/lib/placeholder-images.json";
 
-/**
- * Maison Homepage: Institutional Discovery Hub.
- * Sanitzed and optimized for high-fidelity performance.
- */
+/* ─────────────────────────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────────────────────────── */
+
+const NAV_LINKS = [
+  { label: "NEW ARRIVALS", href: "#" },
+  { label: "HERMÈS", href: "#" },
+  { label: "CHANEL", href: "#" },
+  { label: "GOYARD", href: "#" },
+  { label: "OTHER BRANDS", href: "#" },
+  { label: "JEWELRY", href: "#" },
+  { label: "LIVE SHOP", href: "#" },
+  { label: "BLOG", href: "#" },
+];
+
+const PRESS_LOGOS = [
+  "Business Insider",
+  "Barron's",
+  "WWD",
+  "Bloomberg",
+  "Coveteur",
+  "New York Post",
+  "The Wall Street Journal",
+];
+
+const NEW_ARRIVALS = [
+  {
+    id: "1",
+    name: "Hermès Kelly Sellier 25 Craie Epsom Electrum Hardware",
+    price: 34500,
+    image: "https://picsum.photos/seed/mac-kelly-craie/600/750",
+  },
+  {
+    id: "2",
+    name: "Hermès Kelly Sellier 20 Jaune Mango Epsom Palladium Hardware",
+    price: 32500,
+    image: "https://picsum.photos/seed/mac-kelly-yellow/600/750",
+  },
+  {
+    id: "3",
+    name: "Hermès Special Order (HSS) Birkin 30 Etoupe and Rose Sakura",
+    price: 34500,
+    image: "https://picsum.photos/seed/mac-birkin-hss/600/750",
+  },
+  {
+    id: "4",
+    name: "Hermès Kelly Sellier 25 Vert Amande Epsom Gold Hardware",
+    price: 24500,
+    image: "https://picsum.photos/seed/mac-kelly-green/600/750",
+  },
+  {
+    id: "5",
+    name: "Hermès Birkin 30 Rouge H Togo Gold Hardware",
+    price: 28500,
+    image: "https://picsum.photos/seed/mac-birkin-rouge/600/750",
+  },
+  {
+    id: "6",
+    name: "Hermès Constance 18 Etoupe Epsom Palladium Hardware",
+    price: 22500,
+    image: "https://picsum.photos/seed/mac-constance/600/750",
+  },
+  {
+    id: "7",
+    name: "Hermès Picotin Lock 22 Vert Bosphore Clemence Gold",
+    price: 6800,
+    image: "https://picsum.photos/seed/mac-picotin/600/750",
+  },
+  {
+    id: "8",
+    name: "Hermès Lindy 26 Bleu Lin Swift Palladium Hardware",
+    price: 14500,
+    image: "https://picsum.photos/seed/mac-lindy/600/750",
+  },
+];
+
+const ARRIVAL_TABS = ["Hermès", "Chanel", "Other Brands", "View All"];
+
+const FOOTER_COLS = [
+  {
+    title: "Customer Care",
+    links: ["Contact Us", "My Account", "Shipping", "Returns", "FAQ"],
+  },
+  {
+    title: "About",
+    links: [
+      "About Us",
+      "Visit Us",
+      "Message From Our Founder",
+      "Affiliates",
+      "Blog",
+      "Press",
+    ],
+  },
+  {
+    title: "Shop With Us",
+    links: [
+      "Authenticity Guarantee",
+      "Condition Descriptions",
+      "In-Home Services",
+      "Concierge Services",
+      "Catalog",
+      "MadAve Live",
+    ],
+  },
+  {
+    title: "Sell With Us",
+    links: ["How to Sell or Consign", "Submit an Item"],
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────────
+   MAIN PAGE
+───────────────────────────────────────────────────────────────── */
+
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || "us";
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
-  const [activeNewArrivalTab, setActiveNewArrivalTab] = useState("HERMÈS");
+
+  const [activeTab, setActiveTab] = useState("Hermès");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const toggleWishlist = (id: string) =>
+    setWishlist((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
 
   const heroImage =
     placeholderData.placeholderImages.find(
       (img) => img.id === "home-hero-banner-main"
-    )?.imageUrl || "";
-  const liveImage =
-    placeholderData.placeholderImages.find(
-      (img) => img.id === "madave-live-section"
-    )?.imageUrl || "";
+    )?.imageUrl || "https://picsum.photos/seed/mac-hero/1600/900";
+
   const authImage =
     placeholderData.placeholderImages.find(
       (img) => img.id === "home-authenticity-banner"
-    )?.imageUrl || "";
+    )?.imageUrl || "https://picsum.photos/seed/mac-auth/900/600";
+
   const missionImage =
     placeholderData.placeholderImages.find(
       (img) => img.id === "home-mission-banner"
-    )?.imageUrl || "";
+    )?.imageUrl || "https://picsum.photos/seed/mac-mission/900/600";
 
-  const gridSpring = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-grid-spring"
-  )?.imageUrl;
-  const gridArrivals = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-grid-arrivals"
-  )?.imageUrl;
-  const gridVisit = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-grid-visit"
-  )?.imageUrl;
+  const liveImage =
+    placeholderData.placeholderImages.find(
+      (img) => img.id === "madave-live-section"
+    )?.imageUrl || "https://picsum.photos/seed/mac-live/900/600";
 
-  const infoAuth = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-info-auth"
-  )?.imageUrl;
-  const infoSell = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-info-sell"
-  )?.imageUrl;
-  const infoShowroom = placeholderData.placeholderImages.find(
-    (img) => img.id === "home-info-showrooms"
-  )?.imageUrl;
+  const gridImages = {
+    spring:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-grid-spring"
+      )?.imageUrl || "https://picsum.photos/seed/mac-grid-spring/600/750",
+    arrivals:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-grid-arrivals"
+      )?.imageUrl || "https://picsum.photos/seed/mac-grid-arrivals/600/750",
+    visit:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-grid-visit"
+      )?.imageUrl || "https://picsum.photos/seed/mac-grid-visit/600/750",
+  };
 
-  const newArrivals = [
-    {
-      id: "prod-11",
-      name: "Hermès Kelly Sellier 25 Craie Epsom Electrum Hardware",
-      price: 34500,
-      imageUrl: "https://picsum.photos/seed/hermes-kelly-craie/1000/1200",
-    },
-    {
-      id: "prod-kelly-yellow",
-      name: "Hermès Kelly Sellier 20 Jaune Mango Epsom Palladium Hardware",
-      price: 32500,
-      imageUrl: "https://picsum.photos/seed/hermes-kelly-yellow/1000/1200",
-    },
-    {
-      id: "prod-birkin-hss",
-      name: "Hermès Special Order (HSS) Birkin 30 Etoupe and Rose Sakura",
-      price: 34500,
-      imageUrl: "https://picsum.photos/seed/hermes-birkin-hss/1000/1200",
-    },
-    {
-      id: "prod-kelly-green",
-      name: "Hermès Kelly Sellier 25 Vert Amande Epsom Gold Hardware",
-      price: 24500,
-      imageUrl: "https://picsum.photos/seed/hermes-kelly-green/1000/1200",
-    },
-  ];
+  const infoImages = {
+    auth:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-info-auth"
+      )?.imageUrl || "https://picsum.photos/seed/mac-info-auth/500/500",
+    sell:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-info-sell"
+      )?.imageUrl || "https://picsum.photos/seed/mac-info-sell/500/500",
+    showroom:
+      placeholderData.placeholderImages.find(
+        (img) => img.id === "home-info-showrooms"
+      )?.imageUrl || "https://picsum.photos/seed/mac-info-showroom/500/500",
+  };
+
+  const visibleProducts =
+    activeTab === "View All" ? NEW_ARRIVALS : NEW_ARRIVALS.slice(0, 4);
 
   return (
-    <div className="bg-white min-h-screen pb-40 animate-fade-in font-body">
-      {/* 1. Heritage Hero */}
-      <section className="relative h-[65vh] lg:h-[85vh] w-full flex items-center justify-center overflow-hidden bg-white">
+    <div className="bg-white min-h-screen font-sans">
+     
+
+      
+
+      {/* ── HERO BANNER ── */}
+      <section className="relative w-full overflow-hidden" style={{ height: "clamp(380px, 70vh, 780px)" }}>
         <Image
           src={heroImage}
-          alt="Heritage Hero"
+          alt="Spring Collection"
           fill
           priority
-          className="object-cover"
+          className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-black/5" />
-        <div className="relative z-10 text-center space-y-8 lg:space-y-12 max-w-5xl px-6">
-          <div className="space-y-4">
-            <span className="text-[10px] lg:text-[12px] font-bold tracking-[0.6em] text-white uppercase drop-shadow-md">
-              Newly Created
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-[110px] font-headline font-medium text-white leading-[0.9] tracking-wide drop-shadow-2xl">
-              Amarisé Maison
-            </h1>
-          </div>
-          <p className="text-lg md:text-2xl text-white/90 font-light  max-w-3xl mx-auto leading-relaxed font-headline">
-            "Curating the world's most significant artifacts."
+        {/* Subtle dark overlay */}
+        <div className="absolute inset-0 bg-black/20" />
+
+        {/* Text overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 space-y-4">
+          <span className="text-[10px] lg:text-[11px] font-semibold tracking-[0.5em] uppercase text-white/90 drop-shadow">
+            Newly Curated
+          </span>
+          <h1 className="text-[42px] sm:text-[60px] lg:text-[80px] xl:text-[96px] font-serif font-normal text-white leading-none tracking-tight drop-shadow-2xl">
+            Spring Collection
+          </h1>
+          <p className="text-[13px] lg:text-[15px] text-white/85 font-light tracking-wide max-w-sm">
+            The season's most coveted pieces
           </p>
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href={`/${countryCode}/category/hermes`}>
-              <Button className="bg-white text-black hover:bg-black hover:text-white px-12 lg:px-24 h-16 lg:h-20 rounded-none text-[10px] font-bold uppercase tracking-[0.4em]">
-                EXPLORE ARCHIVE
-              </Button>
-            </Link>
-          </div>
+          <Link
+            href={`/${countryCode}/category/spring-edit`}
+            className="mt-4 inline-block bg-white text-black text-[10px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-black hover:text-white transition-colors duration-200"
+          >
+            SHOP NOW
+          </Link>
         </div>
       </section>
 
-      {/* 2. Tactical Bar */}
+      {/* ── ANNOUNCEMENT BAR ── */}
       <Link
-        href={`/${countryCode}/category/hermes`}
-        className="block bg-[#262626] hover:bg-black transition-colors py-5 border-b border-white/5"
+        href={`/${countryCode}/category/hermes-birkin`}
+        className="block bg-[#2b2b2b] hover:bg-black transition-colors duration-200 py-4 px-4 text-center"
       >
-        <div className="container mx-auto px-6 text-center">
-          <span className="text-[9px] md:text-[11px] font-bold tracking-[0.35em] text-white uppercase">
-            SHOP OUR COLLECTION OF NEW HERMÈS BIRKIN BAGS
-          </span>
-        </div>
+        <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.35em] uppercase text-white">
+          Shop our collection of new Hermès Birkin Bags
+        </span>
       </Link>
 
-      {/* 3. Curatorial Grid */}
-      <section className="container mx-auto px-6 lg:px-12 py-12 lg:py-20 max-w-[1600px]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
-          <CuratorialBlock
-            imageUrl={gridSpring!}
-            title="Spring Edit"
-            subtitle="Refresh Your Closet"
-            href={`/${countryCode}/category/spring-edit`}
+      {/* ── 3-COLUMN CURATORIAL GRID ── */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+          <CuratorialCard
+            imageUrl={gridImages.spring}
+            eyebrow="Van Cleef & Arpels"
+            title="Van Cleef & Arpels"
+            subtitle="Shop Fine Jewelry"
+            href={`/${countryCode}/category/van-cleef`}
           />
-          <CuratorialBlock
-            imageUrl={gridArrivals!}
+          <CuratorialCard
+            imageUrl={gridImages.arrivals}
+            eyebrow="New"
             title="Hermès New Arrivals"
             subtitle="Just Arrived Bags"
             href={`/${countryCode}/category/hermes`}
           />
-          <CuratorialBlock
-            imageUrl={gridVisit!}
+          <CuratorialCard
+            imageUrl={gridImages.visit}
+            eyebrow="Showrooms"
             title="Visit Us"
             subtitle="Shop In Person"
             href={`/${countryCode}/contact`}
@@ -164,290 +289,313 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. New Arrivals */}
-      <section className="container mx-auto px-6 lg:px-12 py-24 max-w-[1600px] space-y-16">
-        <div className="text-center space-y-8">
-          <h2 className="text-5xl lg:text-6xl font-headline font-medium text-gray-900 tracking-tight">
+      {/* ── NEW ARRIVALS ── */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        {/* Header */}
+        <div className="flex flex-col items-center mb-10">
+          <h2 className="text-[26px] sm:text-[32px] lg:text-[40px] font-serif font-normal text-gray-900 mb-6 tracking-tight">
             New Arrivals
           </h2>
-          <div className="flex items-center justify-center space-x-12 border-b border-gray-100 pb-1">
-            {["HERMÈS", "CHANEL", "OTHER BRANDS", "VIEW ALL"].map((tab) => (
+          {/* Tabs */}
+          <div className="flex items-end gap-6 sm:gap-10 border-b border-gray-200 w-full max-w-xl justify-center">
+            {ARRIVAL_TABS.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveNewArrivalTab(tab)}
+                onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "pb-4 text-[11px] font-bold tracking-[0.2em] transition-all relative uppercase outline-none",
-                  activeNewArrivalTab === tab
+                  "pb-3 text-[11px] font-semibold tracking-[0.15em] uppercase transition-all relative whitespace-nowrap outline-none",
+                  activeTab === tab
                     ? "text-black"
-                    : "text-gray-400 hover:text-black"
+                    : "text-gray-400 hover:text-gray-700"
                 )}
               >
                 {tab}
-                {activeNewArrivalTab === tab && (
+                {activeTab === tab && (
                   <motion.div
-                    layoutId="arrival-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[1px] bg-black"
+                    layoutId="mac-tab-underline"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"
                   />
                 )}
               </button>
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
-          {newArrivals.map((prod) => (
-            <div
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-10 lg:gap-x-8 lg:gap-y-14">
+          {visibleProducts.map((prod) => (
+            <ProductCard
               key={prod.id}
-              className="flex flex-col items-center text-center space-y-8 group cursor-pointer"
-            >
-              <div className="relative aspect-[4/5] w-full bg-white flex items-center justify-center p-8 overflow-hidden border border-gray-50 shadow-sm">
-                <Image
-                  src={prod.imageUrl}
-                  alt={prod.name}
-                  fill
-                  className="object-contain transition-transform duration-[2s] group-hover:scale-105"
-                />
-                <button className="absolute top-4 right-4 text-gray-300 hover:text-black transition-colors">
-                  <Heart className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="space-y-3 px-4">
-                <h3 className="text-[12px] font-light text-gray-600 uppercase tracking-widest leading-relaxed line-clamp-2">
-                  {prod.name}
-                </h3>
-                <p className="text-[14px] font-bold text-gray-900">
-                  ${prod.price.toLocaleString()}
-                </p>
-              </div>
-            </div>
+              product={prod}
+              isWishlisted={wishlist.includes(prod.id)}
+              onWishlistToggle={() => toggleWishlist(prod.id)}
+              countryCode={countryCode}
+            />
           ))}
         </div>
-      </section>
 
-      {/* 5. Authenticity Dual-Panel */}
-      <section className="flex flex-col lg:flex-row min-h-[500px] overflow-hidden bg-black relative">
-        <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto">
-          <Image src={authImage} alt="Auth" fill className="object-cover" />
-        </div>
-        <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center lg:items-start justify-center text-center lg:text-left space-y-8">
-          <h2 className="text-4xl lg:text-6xl font-headline font-medium tracking-tight">
-            100% Authenticity Guarantee
-          </h2>
-          <p className="text-sm font-light text-gray-300 max-w-md">
-            Every piece is authenticated by our in-house team of luxury experts.
-          </p>
-          <Button className="bg-white text-black hover:bg-gray-200 h-14 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em]">
-            LEARN MORE
-          </Button>
-        </div>
-      </section>
-
-      {/* 6. Info Matrix (First) */}
-      <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-          <InfoBlock
-            imageUrl={infoAuth!}
-            title="Authenticity"
-            description="Trusted seller of new and pre-owned Hermès bags."
-            href={`/${countryCode}/customer-service`}
-          />
-          <InfoBlock
-            imageUrl={infoSell!}
-            title="Sell To Us"
-            description="Sell or consign your bag. Receive a fast quote."
-            href={`/${countryCode}/how-to-sell`}
-          />
-          <InfoBlock
-            imageUrl={infoShowroom!}
-            title="Visit Us"
-            description="New York City and Palm Beach showrooms."
-            href={`/${countryCode}/appointments`}
-          />
-        </div>
-      </section>
-
-      {/* 7. Live Section */}
-      <section className="flex flex-col lg:flex-row min-h-[600px] overflow-hidden bg-black border-b border-white/5">
-        <div className="lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col items-center justify-center text-center space-y-10">
-          <h2 className="text-4xl lg:text-6xl font-headline font-medium italic uppercase leading-tight">
-            Amarisé Maison <br /> Avenue Live
-          </h2>
-          <p className="text-xs lg:text-sm text-gray-400 italic">
-            Experience the absolute standard of discovery with our live shopping
-            events.
-          </p>
-          <Link href={`/${countryCode}/account/live`}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white border-b border-white/20 pb-2">
-              ENTER LIVE ATELIER
-            </span>
+        {/* View All link */}
+        <div className="text-center mt-12">
+          <Link
+            href={`/${countryCode}/category/hermes`}
+            className="inline-block text-[11px] font-bold tracking-[0.35em] uppercase text-black border-b-2 border-black pb-1 hover:opacity-60 transition-opacity"
+          >
+            VIEW ALL NEW ARRIVALS
           </Link>
         </div>
-        <div className="lg:w-1/2 relative min-h-[400px]">
+      </section>
+
+      {/* ── 100% AUTHENTICITY DUAL-PANEL ── */}
+      <section className="flex flex-col lg:flex-row overflow-hidden">
+        {/* Image side */}
+        <div className="w-full lg:w-1/2 relative" style={{ minHeight: "400px" }}>
           <Image
-            src={liveImage}
-            alt="Live"
-            fill
-            className="object-cover grayscale-[20%]"
-          />
-        </div>
-      </section>
-
-      {/* 8. Ticker */}
-      <section className="bg-black py-5 border-y border-white/10">
-        <div className="container mx-auto flex items-center justify-center space-x-16">
-          <div className="flex items-center space-x-4 text-gold">
-            <Zap className="w-4 h-4 animate-pulse" />
-            <span className="text-[10px] font-bold tracking-[0.5em] uppercase">
-              REGISTRY SYNC: ACTIVE
-            </span>
-          </div>
-          <p className="text-white/40 text-[10px] font-bold tracking-[0.4em] uppercase hidden md:block">
-            Heritage Series Syncing in {currentCountry.name} Hub
-          </p>
-          <div className="hidden lg:flex items-center space-x-4 text-white/20">
-            <Globe className="w-4 h-4" />
-            <span className="text-[10px] font-bold tracking-[0.4em] uppercase">
-              GLOBAL NODES: 05 / 05
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. Info Matrix (Second - As Requested) */}
-      <section className="container mx-auto px-6 lg:px-12 py-32 max-w-[1600px]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-          <InfoBlock
-            imageUrl={infoAuth!}
-            title="Authenticity"
-            description="Trusted seller of new and pre-owned Hermès bags."
-            href={`/${countryCode}/customer-service`}
-          />
-          <InfoBlock
-            imageUrl={infoSell!}
-            title="Sell To Us"
-            description="Sell or consign your bag. Receive a fast quote."
-            href={`/${countryCode}/how-to-sell`}
-          />
-          <InfoBlock
-            imageUrl={infoShowroom!}
-            title="Visit Us"
-            description="New York City and Palm Beach showrooms."
-            href={`/${countryCode}/appointments`}
-          />
-        </div>
-      </section>
-
-      {/* 10. Our Mission */}
-      <section className="flex flex-col lg:flex-row min-h-[600px] overflow-hidden bg-black">
-        <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto">
-          <Image
-            src={missionImage}
-            alt="Mission"
+            src={authImage}
+            alt="100% Authenticity Guarantee"
             fill
             className="object-cover"
           />
         </div>
-        <div className="w-full lg:w-1/2 bg-black text-white p-12 lg:p-24 flex flex-col justify-center space-y-10">
-          <h2 className="text-4xl lg:text-5xl font-headline font-medium italic">
-            Our Mission
+        {/* Text side */}
+        <div className="w-full lg:w-1/2 bg-[#1a1a1a] text-white flex flex-col items-center lg:items-start justify-center px-10 sm:px-16 lg:px-20 xl:px-28 py-16 lg:py-24 space-y-6 text-center lg:text-left">
+          {/* Auth badge */}
+          <div className="flex items-center gap-2 mb-2">
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+          </div>
+          <h2 className="text-[30px] sm:text-[38px] lg:text-[48px] font-serif font-normal leading-tight tracking-tight">
+            100% Authenticity Guarantee
           </h2>
-          <p className="text-sm lg:text-base font-light text-gray-300 leading-relaxed">
-            At Amarisé Maison Avenue, we specialize in the rare, the iconic, and
-            the extraordinary.
+          <p className="text-[14px] text-gray-300 font-light leading-relaxed max-w-md">
+            Every piece is authenticated and certified by our in-house team of
+            luxury experts. We stand behind every single item we sell.
           </p>
-          <Link href={`/${countryCode}/about`}>
-            <Button className="bg-white text-black hover:bg-gray-200 h-14 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em]">
-              LEARN MORE
-            </Button>
+          <Link
+            href={`/${countryCode}/authenticity`}
+            className="inline-block mt-2 bg-white text-black text-[10px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-gray-100 transition-colors duration-200"
+          >
+            LEARN MORE
           </Link>
         </div>
       </section>
 
-      {/* 11. Press Marquee */}
-      <section className="bg-white py-24 overflow-hidden">
-        <h2 className="text-4xl md:text-5xl font-headline font-medium text-gray-900 text-center italic mb-16">
+      {/* ── 3-COLUMN INFO BLOCKS ── */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 lg:gap-16">
+          <InfoBlock
+            imageUrl={infoImages.auth}
+            title="100% Authenticity Guarantee"
+            description="The #1 Trusted Seller of New & Pre-Owned Hermès Bags. Learn about our authentication process."
+            href={`/${countryCode}/authenticity`}
+          />
+          <InfoBlock
+            imageUrl={infoImages.sell}
+            title="Sell To Us"
+            description="Sell or consign your bag to us. Receive a fast quote by our advisors."
+            href={`/${countryCode}/sell`}
+          />
+          <InfoBlock
+            imageUrl={infoImages.showroom}
+            title="Visit Our Showrooms"
+            description="New York City & Palm Beach. Make an appointment, or schedule a virtual showing."
+            href={`/${countryCode}/appointments`}
+          />
+        </div>
+      </section>
+
+      {/* ── OUR MISSION ── */}
+      <section className="flex flex-col lg:flex-row overflow-hidden border-t border-gray-100">
+        {/* Image side */}
+        <div className="w-full lg:w-1/2 relative order-2 lg:order-1" style={{ minHeight: "420px" }}>
+          <Image
+            src={missionImage}
+            alt="Our Mission"
+            fill
+            className="object-cover"
+          />
+        </div>
+        {/* Text side */}
+        <div className="w-full lg:w-1/2 order-1 lg:order-2 bg-white flex flex-col justify-center px-10 sm:px-16 lg:px-20 xl:px-28 py-16 lg:py-24 space-y-6">
+          <h2 className="text-[26px] sm:text-[32px] lg:text-[38px] font-serif font-normal text-gray-900 tracking-tight">
+            Our Mission
+          </h2>
+          <p className="text-[13px] lg:text-[14px] text-gray-600 font-light leading-[1.85] max-w-lg">
+            At Madison Avenue Couture, we specialize in the rare, the iconic,
+            and the extraordinary. As the leading U.S. reseller of Hermès and
+            Chanel handbags, we offer a curated selection of investment-worthy
+            pieces with unmatched access and authenticity.
+          </p>
+          <p className="text-[13px] lg:text-[14px] text-gray-600 font-light leading-[1.85] max-w-lg">
+            We believe in empowering and inspiring women to express themselves
+            through fashion, confidence, and bold individuality. Every bag in
+            our collection tells a story of heritage, craftsmanship, and
+            timeless style.
+          </p>
+          <Link
+            href={`/${countryCode}/about`}
+            className="inline-block text-[11px] font-bold tracking-[0.35em] uppercase text-black border-b-2 border-black pb-1 hover:opacity-60 transition-opacity self-start"
+          >
+            LEARN MORE
+          </Link>
+        </div>
+      </section>
+
+      {/* ── AS SEEN IN (Press Marquee) ── */}
+      <section className="py-14 lg:py-20 border-t border-gray-100 overflow-hidden">
+        <h2 className="text-[22px] sm:text-[28px] font-serif font-normal text-gray-900 text-center mb-10 tracking-tight">
           As Seen In
         </h2>
-        <div className="animate-marquee flex items-center whitespace-nowrap space-x-20 lg:space-x-40 py-12 border-y border-gray-100">
-          {["Bloomberg", "COVETEUR", "WSJ", "BUSINESS INSIDER", "VOGUE"].map(
-            (p) => (
+        <div className="relative overflow-hidden">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-20 lg:w-40 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 lg:w-40 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="flex animate-[marquee_28s_linear_infinite] whitespace-nowrap items-center border-y border-gray-100 py-5">
+            {[...PRESS_LOGOS, ...PRESS_LOGOS].map((logo, i) => (
               <span
-                key={p}
-                className="text-gray-900 opacity-80 text-2xl font-bold uppercase tracking-widest"
+                key={i}
+                className="mx-10 lg:mx-16 text-[15px] sm:text-[18px] lg:text-[20px] font-bold uppercase tracking-[0.15em] text-gray-800 opacity-70"
               >
-                {p}
+                {logo}
               </span>
-            )
-          )}
-          {["Bloomberg", "COVETEUR", "WSJ", "BUSINESS INSIDER", "VOGUE"].map(
-            (p) => (
-              <span
-                key={p + "2"}
-                className="text-gray-900 opacity-80 text-2xl font-bold uppercase tracking-widest"
-              >
-                {p}
-              </span>
-            )
-          )}
+            ))}
+          </div>
+        </div>
+        <div className="text-center mt-8">
+          <Link
+            href="#"
+            className="text-[11px] font-bold tracking-[0.35em] uppercase text-black border-b-2 border-black pb-1 hover:opacity-60 transition-opacity"
+          >
+            SEE ALL PRESS
+          </Link>
         </div>
       </section>
 
-      {/* 12. VIP Email */}
-      <section className="bg-[#f8f8f8] py-24 border-t border-gray-100">
-        <div className="container mx-auto px-6 max-w-4xl text-center space-y-8">
-          <h3 className="text-3xl lg:text-4xl font-headline font-medium italic text-gray-900">
+      {/* ── MADAVE LIVE ── */}
+      <section className="flex flex-col lg:flex-row min-h-[400px] lg:min-h-[500px] overflow-hidden bg-[#0e0e0e] border-t border-white/5">
+        {/* Text side */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center text-center px-10 py-16 lg:py-24 space-y-6">
+          <span className="text-[10px] font-bold tracking-[0.6em] uppercase text-white/50">
+            Shop Live
+          </span>
+          <h2 className="text-[30px] sm:text-[40px] lg:text-[52px] font-serif font-normal text-white leading-tight italic tracking-tight">
+            MadAve Live
+          </h2>
+          <p className="text-[13px] text-gray-400 font-light max-w-xs leading-relaxed">
+            Experience the thrill of live luxury shopping. Discover new arrivals
+            in real time with our expert advisors.
+          </p>
+          <Link
+            href={`/${countryCode}/live`}
+            className="inline-block mt-2 bg-white text-black text-[10px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-gray-100 transition-colors"
+          >
+            VIEW LIVE SHOP
+          </Link>
+        </div>
+        {/* Image side */}
+        <div className="w-full lg:w-1/2 relative" style={{ minHeight: "300px" }}>
+          <Image
+            src={liveImage}
+            alt="MadAve Live"
+            fill
+            className="object-cover opacity-80"
+          />
+        </div>
+      </section>
+
+      {/* ── VIP EMAIL SIGNUP ── */}
+      <section className="bg-[#f7f6f4] py-14 lg:py-20 border-t border-gray-200">
+        <div className="max-w-2xl mx-auto px-6 text-center space-y-5">
+          <h3 className="text-[22px] sm:text-[28px] font-serif font-normal text-gray-900 tracking-tight">
             Join the VIP Email List
           </h3>
-          <form className="max-w-2xl mx-auto flex border border-gray-200 bg-white">
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="flex-1 h-16 px-8 text-sm italic outline-none"
-              required
-            />
-            <button className="h-16 px-12 bg-white text-gray-900 font-bold text-[11px] uppercase border-l border-gray-100">
-              SUBMIT
-            </button>
-          </form>
+          <p className="text-[13px] text-gray-500 font-light">
+            Get first access to new product launches and all the latest updates
+            from Madison Avenue Couture.
+          </p>
+          {subscribed ? (
+            <p className="text-[13px] font-semibold text-green-700 tracking-wide">
+              You have successfully subscribed!
+            </p>
+          ) : (
+            <div className="flex border border-gray-300 bg-white max-w-md mx-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="flex-1 h-[50px] px-5 text-[13px] outline-none placeholder:text-gray-400 bg-white"
+              />
+              <button
+                onClick={() => {
+                  if (email) setSubscribed(true);
+                }}
+                className="h-[50px] px-7 bg-black text-white font-bold text-[10px] uppercase tracking-[0.3em] hover:bg-gray-800 transition-colors shrink-0"
+              >
+                SUBMIT
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* 13. Institutional Trust Footer */}
-      <section className="bg-white py-80 text-center">
-        <div className="max-w-5xl mx-auto space-y-24 px-12">
-          <div className="inline-flex items-center justify-center p-10 bg-[#f9f7f9] rounded-full border border-plum/10 shadow-lg">
-            <ShieldCheck className="w-14 h-14 text-plum" />
-          </div>
-          <h3 className="text-3xl md:text-8xl font-headline font-medium italic text-gray-900 tracking-tighter">
-            Institutional Responsibility
-          </h3>
-          <p className="text-gray-500 font-light italic text-3xl font-headline">
-            "Every enrollment in our network is audited against the Global
-            Heritage Charter."
-          </p>
-        </div>
-      </section>
+      
+
+      {/* ── MARQUEE KEYFRAME ── */}
+      <style jsx global>{`
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-function CuratorialBlock({ imageUrl, title, subtitle, href }: any) {
+/* ─────────────────────────────────────────────────────────────────
+   SUB-COMPONENTS
+───────────────────────────────────────────────────────────────── */
+
+function CuratorialCard({
+  imageUrl,
+  eyebrow,
+  title,
+  subtitle,
+  href,
+}: {
+  imageUrl: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  href: string;
+}) {
   return (
     <Link
       href={href}
-      className="group relative aspect-[4/5] overflow-hidden bg-muted shadow-sm"
+      className="group relative block overflow-hidden bg-gray-100"
+      style={{ aspectRatio: "3/4" }}
     >
       <Image
         src={imageUrl}
         alt={title}
         fill
-        className="object-cover transition-transform duration-[5s] group-hover:scale-110"
+        className="object-cover transition-transform duration-[4s] ease-out group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="absolute inset-x-0 bottom-0 p-8 lg:p-12 text-center text-white space-y-2">
-        <h3 className="text-2xl lg:text-4xl font-headline font-medium  tracking-wide">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+      {/* Text */}
+      <div className="absolute bottom-5 left-0 right-0 p-6 lg:p-8 space-y-3 text-white text-center">
+       
+        <h3 className="text-[18px] sm:text-[20px] lg:text-[28px] tracking-wider font-serif font-normal leading-snug mb-0.5">
           {title}
         </h3>
-        <p className="text-[17px] font-light tracking-wide">
+        <p className="text-[15px] text-white/80 font-light tracking-wide">
           {subtitle}
         </p>
       </div>
@@ -455,27 +603,103 @@ function CuratorialBlock({ imageUrl, title, subtitle, href }: any) {
   );
 }
 
-function InfoBlock({ imageUrl, title, description, href }: any) {
+function ProductCard({
+  product,
+  isWishlisted,
+  onWishlistToggle,
+  countryCode,
+}: {
+  product: { id: string; name: string; price: number; image: string };
+  isWishlisted: boolean;
+  onWishlistToggle: () => void;
+  countryCode: string;
+}) {
   return (
-    <div className="flex flex-col items-center text-center space-y-8 group">
-      <div className="relative aspect-square w-full overflow-hidden bg-muted border border-gray-100 shadow-sm">
+    <div className="group flex flex-col">
+      {/* Image */}
+      <Link
+        href={`/${countryCode}/product/${product.id}`}
+        className="relative overflow-hidden bg-[#f9f9f9] block"
+        style={{ aspectRatio: "4/5" }}
+      >
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-contain p-4 sm:p-6 transition-transform duration-[2.5s] ease-out group-hover:scale-105"
+        />
+        {/* Wishlist button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            onWishlistToggle();
+          }}
+          className="absolute top-3 right-3 p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
+        >
+          <Heart
+            className={cn(
+              "w-3.5 h-3.5 transition-colors",
+              isWishlisted ? "fill-black text-black" : "text-gray-500"
+            )}
+          />
+        </button>
+      </Link>
+
+      {/* Info */}
+      <div className="pt-4 space-y-1.5 text-center">
+        <p className="text-[11px] text-gray-500 uppercase tracking-[0.12em] leading-relaxed line-clamp-2 font-light">
+          {product.name}
+        </p>
+        <p className="text-[13px] font-semibold text-gray-900 tracking-wide">
+          ${product.price.toLocaleString()}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function InfoBlock({
+  imageUrl,
+  title,
+  description,
+  href,
+}: {
+  imageUrl: string;
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center group gap-5">
+      {/* Square image */}
+      <Link
+        href={href}
+        className="relative w-full overflow-hidden bg-gray-100 block"
+        style={{ aspectRatio: "1/1" }}
+      >
         <Image
           src={imageUrl}
           alt={title}
           fill
-          className="object-cover transition-transform duration-[2s] group-hover:scale-105"
+          className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105"
         />
-      </div>
-      <div className="space-y-4 max-w-sm">
-        <h3 className="text-3xl font-headline font-bold italic text-gray-900">
+      </Link>
+
+      {/* Text */}
+      <div className="space-y-2 max-w-xs">
+        <h3 className="text-[15px] lg:text-[17px] font-serif font-normal text-gray-900 leading-snug">
           {title}
         </h3>
-        <p className="text-sm font-light text-gray-500 italic">{description}</p>
+        <p className="text-[12px] text-gray-500 font-light leading-relaxed">
+          {description}
+        </p>
       </div>
-      <Link href={href}>
-        <Button className="bg-black text-white hover:bg-plum h-12 px-12 rounded-none text-[10px] font-bold uppercase tracking-[0.3em]">
-          READ MORE
-        </Button>
+
+      <Link
+        href={href}
+        className="text-[10px] font-bold tracking-[0.35em] uppercase text-black border-b border-black pb-0.5 hover:opacity-50 transition-opacity"
+      >
+        READ MORE
       </Link>
     </div>
   );

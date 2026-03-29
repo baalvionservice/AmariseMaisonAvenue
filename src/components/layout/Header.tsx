@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -11,13 +11,6 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Globe,
-  User,
-  LayoutDashboard,
-  MapPin,
-  Briefcase,
-  Languages,
 } from "lucide-react";
 import { COUNTRIES } from "@/lib/mock-data";
 import { useAppStore } from "@/lib/store";
@@ -30,15 +23,11 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { i18n } from "@/lib/i18n/engine";
-import { SupportedLanguage } from "@/lib/i18n/config";
 import Image from "next/image";
 import placeholderData from "@/app/lib/placeholder-images.json";
 
@@ -48,11 +37,19 @@ interface NavLink {
   id: string;
 }
 
+const CURRENCIES = [
+  { code: "USD", label: "USD", flag: "🇺🇸" },
+  { code: "EUR", label: "EUR", flag: "🇪🇺" },
+  { code: "GBP", label: "GBP", flag: "🇬🇧" },
+  { code: "CHF", label: "CHF", flag: "🇨🇭" },
+];
+
 const MEGA_MENU_DATA: Record<string, any> = {
   new: {
     title: "NEW ARRIVALS",
     subtitle: "Hermès New Arrivals",
     imageId: "mega-new-arrivals",
+    collectionHref: "/category/new-arrivals",
     sections: [
       {
         title: "New Arrivals",
@@ -66,9 +63,10 @@ const MEGA_MENU_DATA: Record<string, any> = {
     ],
   },
   hermes: {
-    title: "Valentine’s Day Edit",
+    title: "Valentine's Day Edit",
     subtitle: "Hermès Bestsellers",
     imageId: "mega-hermes",
+    collectionHref: "/category/hermes",
     sections: [
       {
         title: "Handbags",
@@ -117,6 +115,7 @@ const MEGA_MENU_DATA: Record<string, any> = {
     title: "CHANEL CLASSIC BAGS",
     subtitle: "Discover the Beauty of Chanel",
     imageId: "mega-chanel",
+    collectionHref: "/category/chanel",
     sections: [
       {
         title: "Handbags",
@@ -154,6 +153,7 @@ const MEGA_MENU_DATA: Record<string, any> = {
     title: "The Saigon Bag",
     subtitle: "Iconic Style",
     imageId: "mega-goyard",
+    collectionHref: "/category/goyard",
     sections: [
       {
         title: "Handbags",
@@ -172,6 +172,7 @@ const MEGA_MENU_DATA: Record<string, any> = {
     title: "New Bags From THE ROW",
     subtitle: "Other Brands",
     imageId: "mega-new-arrivals",
+    collectionHref: "/category/other-brands",
     sections: [
       {
         title: "Brands",
@@ -189,6 +190,7 @@ const MEGA_MENU_DATA: Record<string, any> = {
     title: "Van Cleef & Arpels NEW ARRIVALS",
     subtitle: "Jewelry",
     imageId: "mega-jewelry",
+    collectionHref: "/category/jewelry",
     sections: [
       {
         title: "Fine Jewelry",
@@ -221,18 +223,36 @@ const MEGA_MENU_DATA: Record<string, any> = {
   },
 };
 
+// Promo ticker slides
+const TICKER_SLIDES = [
+  "Special Notice - Shipments to the Middle East are Running with Delays",
+  "Read Our 100% Authenticity Guarantee",
+  "Call to schedule an appointment in our NYC Showroom or Virtually via FaceTime",
+];
+
 export const Header = () => {
   const [mounted, setMounted] = useState(false);
   const params = useParams();
   const router = useRouter();
-  const { cart, wishlist, currentUser, currentLanguage, setLanguage } =
-    useAppStore();
+  const { cart, wishlist, currentUser } = useAppStore();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [activeCurrency, setActiveCurrency] = useState("USD");
+  const [searchQuery, setSearchQuery] = useState("");
+  const megaMenuRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Auto-rotate ticker
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((s) => (s + 1) % TICKER_SLIDES.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
   const countryCode = (params?.country as string) || "us";
@@ -240,16 +260,6 @@ export const Header = () => {
 
   const cartCount = mounted ? cart.reduce((acc, i) => acc + i.quantity, 0) : 0;
   const wishlistCount = mounted ? wishlist.length : 0;
-
-  const getSlideText = (idx: number) => {
-    if (idx === 0)
-      return currentLanguage === "ar"
-        ? "جلسات تقييم خاصة متاحة في نيويورك ولندن"
-        : "PRIVATE CURATORIAL SESSIONS AVAILABLE IN NYC & LONDON";
-    return currentLanguage === "ar"
-      ? "سجل أرشيف ربيع ١٩٢٤ متاح الآن"
-      : "THE SPRING 1924 ARCHIVE REGISTRY IS NOW ACTIVE";
-  };
 
   const handleCountryChange = (code: string) => {
     router.push(`/${code}`);
@@ -282,383 +292,381 @@ export const Header = () => {
     { id: "journal", name: "BLOG", href: `/${countryCode}/journal` },
   ];
 
+  const handleNavEnter = (id: string) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setHoveredLink(id);
+  };
+
+  const handleNavLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredLink(null);
+    }, 120);
+  };
+
+  const handleMegaEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+  };
+
+  const popularSearches = ["Birkin", "Hermès", "Kelly", "Chanel"];
+
   return (
     <>
-      <header className="bg-white" onMouseLeave={() => setHoveredLink(null)}>
-        {/* 1. Ticker Hub */}
-        <div className="hidden sm:flex bg-cream text-muted-text h-9 items-center justify-center  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase border-b border-border-color">
-          <div className="flex items-center space-x-10">
-            <button
-              className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer"
-              onClick={() => setActiveSlide((s) => (s === 0 ? 1 : s - 1))}
-              aria-label="Prev"
-            >
-              <ChevronLeft className="w-3 h-3" />
-            </button>
-            <div className="overflow-hidden relative flex items-center justify-center min-w-[300px] lg:min-w-[500px]">
-              <span className="animate-fade-in text-center" key={activeSlide}>
-                {getSlideText(activeSlide)}
-              </span>
-            </div>
-            <button
-              className="opacity-40 p-2 hover:text-black transition-colors bg-transparent border-none outline-none cursor-pointer"
-              onClick={() => setActiveSlide((s) => (s === 1 ? 0 : s + 1))}
-              aria-label="Next"
-            >
-              <ChevronRight className="w-3 h-3" />
-            </button>
+      {/* ─── LAYER 1: Announcement / Promo Ticker ─── */}
+      <div className="bg-cream text-black hidden sm:block">
+        <div className="flex items-center justify-center h-9 px-4 gap-4">
+          <button
+            className="opacity-50 hover:opacity-100 transition-opacity p-1"
+            onClick={() =>
+              setActiveSlide((s) =>
+                s === 0 ? TICKER_SLIDES.length - 1 : s - 1
+              )
+            }
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-3 h-3" />
+          </button>
+
+          <div className="overflow-hidden relative flex items-center justify-center min-w-[240px] sm:min-w-[460px] lg:min-w-[640px]">
+            <AnimatePresence mode="wait">
+              <motion.a
+                key={activeSlide}
+                href="#"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="text-[10px] sm:text-[11px] tracking-[0.18em] font-medium uppercase text-center block hover:underline"
+              >
+                {TICKER_SLIDES[activeSlide]}
+              </motion.a>
+            </AnimatePresence>
           </div>
+
+          <button
+            className="opacity-50 hover:opacity-100 transition-opacity p-1"
+            onClick={() =>
+              setActiveSlide((s) => (s + 1) % TICKER_SLIDES.length)
+            }
+            aria-label="Next"
+          >
+            <ChevronRight className="w-3 h-3" />
+          </button>
         </div>
+      </div>
 
-        {/* 2. Institutional Passport (Utility Bar) */}
-        <div className="hidden md:flex bg-black text-white h-12 items-center justify-between  px-4 sm:px-6 lg:px-8 text-label tracking-label font-bold uppercase">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-              <span className="opacity-90">{i18n.t("footer.charter")}</span>
-            </div>
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="text-blue-400 hover:text-white transition-colors border-l border-white/10 pl-6 flex items-center space-x-2"
-              >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>ADMIN MATRIX</span>
-              </Link>
-            )}
-          </div>
-          <div className="flex items-center space-x-6 border-l border-white/10 pl-8">
+      {/* ─── LAYER 2: Top Utility Bar ─── */}
+      {/* Desktop only */}
+      <div className="hidden lg:block bg-[#1a1a1a]">
+        <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-10">
+          <Link className="text-white" href={""}>
+            100% Authentic Guaranteed
+          </Link>
+          <div className="flex items-center divide-x divide-white/10">
+            <a
+              href="#"
+              className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
+            >
+              Sell
+            </a>
+            <a
+              href="#"
+              className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
+            >
+              Appointments
+            </a>
+            <a
+              href="#"
+              className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
+            >
+              Contact
+            </a>
+
+            {/* Currency switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-2 hover:opacity-80 transition-all bg-transparent border-none outline-none cursor-pointer">
-                  <Languages className="w-3.5 h-3.5 text-gray-500" />
-                  <span className="text-[10px] text-white uppercase tracking-widest">
-                    {currentLanguage}
+                <button className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase text-white/70 hover:text-white transition-colors font-medium pl-5 bg-transparent border-none outline-none cursor-pointer">
+                  <span className="text-sm leading-none">
+                    {CURRENCIES.find((c) => c.code === activeCurrency)?.flag}
                   </span>
+                  <span>{activeCurrency}</span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="bg-white border-gray-100 w-40 p-2 shadow-luxury rounded-none"
+                className="bg-white border border-gray-100 rounded-none shadow-lg min-w-[110px] p-1"
               >
-                {[
-                  { code: "en", label: "English" },
-                  { code: "ar", label: "العربية" },
-                  { code: "hi", label: "हिन्दी" },
-                  { code: "fr", label: "Français" },
-                ].map((lang) => (
-                  <DropdownMenuItem
-                    key={lang.code}
-                    onClick={() => setLanguage(lang.code as SupportedLanguage)}
-                    className={cn(
-                      "cursor-pointer rounded-none mb-1",
-                      currentLanguage === lang.code
-                        ? "bg-black text-white"
-                        : "hover:bg-ivory"
-                    )}
-                  >
-                    <span className="text-[10px] font-bold uppercase tracking-widest">
-                      {lang.label}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-3 hover:opacity-80 transition-all group bg-transparent border-none outline-none cursor-pointer">
-                  <Globe className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors" />
-                  <span className="text-[10px] text-white uppercase tracking-[0.2em]">
-                    {currentCountry.name}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-white border-gray-100 w-64 p-3 shadow-luxury rounded-none"
-              >
-                {Object.values(COUNTRIES).map((c) => (
+                {CURRENCIES.map((c) => (
                   <DropdownMenuItem
                     key={c.code}
-                    onClick={() => handleCountryChange(c.code)}
+                    onClick={() => setActiveCurrency(c.code)}
                     className={cn(
-                      "cursor-pointer p-4 rounded-none mb-1",
-                      countryCode === c.code
+                      "cursor-pointer rounded-none text-[11px] font-medium tracking-wider uppercase flex items-center gap-2 py-2",
+                      activeCurrency === c.code
                         ? "bg-black text-white"
-                        : "hover:bg-ivory"
+                        : "hover:bg-gray-50"
                     )}
                   >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center space-x-4">
-                        <span className="text-lg">{c.flag}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest">
-                          {c.name} Hub
-                        </span>
-                      </div>
-                      {countryCode === c.code && (
-                        <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-                      )}
-                    </div>
+                    <span>{c.flag}</span>
+                    <span>{c.code}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* 3. Brand Core - Sticky Section */}
-      <div
-        className="sticky top-0 z-50 h-20 lg:h-28 border-b border-border-color bg-white"
-        onMouseLeave={() => setHoveredLink(null)}
-      >
-        <div className="px-1 py-4 sm:px-6 lg:px-8 flex items-center justify-between w-full relative h-fit gap-x-4">
-          <div className="lg:hidden flex items-center">
-            {mounted && (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <button
-                    className="h-11 px-2 text-black bg-white text-label tracking-label uppercase font-bold hover:bg-neutral-400 transition-colors"
-                    aria-label="Open Maison Menu"
-                  >
-                    <Menu className="w-5 h-5" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent
-                  side={currentLanguage === "ar" ? "right" : "left"}
-                  className="w-[90%] sm:max-w-[440px] p-0 bg-white border-none rounded-none font-body flex flex-col h-full shadow-2xl"
-                >
-                  <div className="flex-1 p-2 overflow-y-auto custom-scrollbar">
-                    <SheetClose asChild>
-                      <button className=" hover:bg-gray-50 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                        <X className="w-8 h-8 text-black" />
+      {/* ─── LAYER 3: Brand Core (Sticky) ─── */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm">
+        {/* Brand Row */}
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-[64px] lg:h-[80px] gap-4">
+            {/* LEFT: Mobile hamburger + wishlist / Desktop: empty spacer */}
+            <div className=" flex lg:hidden items-center gap-2 min-w-[120px] lg:min-w-[200px]">
+              {/* Mobile hamburger */}
+              <div className="lg:hidden">
+                {mounted && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <button
+                        className="p-2 text-black hover:bg-gray-50 transition-colors rounded-sm"
+                        aria-label="Open menu"
+                      >
+                        <Menu className="w-5 h-5" />
                       </button>
-                    </SheetClose>
-                    <div className=" space-y-1">
-                      {navLinks.map((link) => (
-                        <SheetClose asChild key={link.id}>
-                          <Link href={link.href} className="block group">
-                            <div className="w-full text-left py-3 px-2 text-[15px] font-bold tracking-[0.1em] uppercase text-gray-900 group-hover:text-plum transition-colors flex items-center justify-between">
-                              {link.name}
-                              <ChevronRight
-                                className={cn(
-                                  "w-4 h-4 text-gray-400 group-hover:text-plum transition-all",
-                                  currentLanguage === "ar" ? "rotate-180" : ""
-                                )}
-                              />
-                            </div>
-                          </Link>
+                    </SheetTrigger>
+                    <SheetContent
+                      side="left"
+                      className="w-[88%] sm:max-w-[420px] p-0 bg-white border-none rounded-none flex flex-col h-full shadow-2xl"
+                    >
+                      {/* Close button row */}
+                      <div className="flex items-center px-5 py-4">
+                        <SheetClose asChild>
+                          <button className="p-1 -ml-1 hover:bg-gray-50 rounded-sm transition-colors">
+                            <X className="w-6 h-6 text-black" />
+                          </button>
                         </SheetClose>
-                      ))}
-                    </div>
+                      </div>
 
-                    <div className="px-8 py-10 bg-ivory/50 border-y border-gray-50 space-y-1">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.5em] text-gray-400 mb-6 px-2">
-                        Collector Services
-                      </p>
-                      <SheetClose asChild>
-                        <Link
-                          href={`/${countryCode}/account`}
-                          className="block group"
-                        >
-                          <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                            <User className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm font-bold uppercase tracking-widest text-gray-700">
-                              My Dashboard
-                            </span>
-                          </div>
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          href={`/${countryCode}/how-to-sell`}
-                          className="block group"
-                        >
-                          <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                            <Briefcase className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm font-bold uppercase tracking-widest text-gray-700">
-                              Consign Artifacts
-                            </span>
-                          </div>
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link
-                          href={`/${countryCode}/appointments`}
-                          className="block group"
-                        >
-                          <div className="w-full text-left py-4 px-2 flex items-center space-x-4">
-                            <MapPin className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm font-bold uppercase tracking-widest text-gray-700">
-                              Book Private Salon
-                            </span>
-                          </div>
-                        </Link>
-                      </SheetClose>
-                    </div>
-                  </div>
+                      <div className="flex-1 overflow-y-auto">
+                        {/* Primary nav links */}
+                        <nav className="border-t border-gray-100">
+                          {navLinks.map((link) => (
+                            <SheetClose asChild key={link.id}>
+                              <Link
+                                href={link.href}
+                                className="flex items-center justify-between px-5 py-[14px] border-b border-gray-100 text-[13px] font-semibold tracking-[0.12em] uppercase text-black hover:text-gray-500 transition-colors"
+                              >
+                                {link.name}
+                                <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                              </Link>
+                            </SheetClose>
+                          ))}
+                        </nav>
 
-                  <div className="p-10 border-t border-gray-50 bg-white shrink-0 text-center space-y-4">
-                    <div className="flex flex-col items-center justify-center">
-                      <span className="font-headline text-2xl font-bold tracking-[0.05em] text-gray-900">
-                        AMARISÉ
-                      </span>
-                      <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-gray-300 mt-1 italic">
-                        Maison Avenue
-                      </span>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            )}
-            <Link
-              href={`/${countryCode}/wishlist`}
-              className="relative md:hidden p-2  hover:text-black"
-            >
-              <Heart
-                className={cn(
-                  "w-5 h-5 transition-colors",
-                  wishlistCount > 0 && "fill-black text-black"
+                        {/* Secondary links */}
+                        <nav>
+                          {[
+                            {
+                              label: "SELL TO US",
+                              href: `/${countryCode}/how-to-sell`,
+                            },
+                            {
+                              label: "Appointments",
+                              href: `/${countryCode}/appointments`,
+                            },
+                            {
+                              label: "Shipping",
+                              href: `/${countryCode}/shipping`,
+                            },
+                            {
+                              label: "Return Policy",
+                              href: `/${countryCode}/return-policy`,
+                            },
+                            { label: "FAQ", href: `/${countryCode}/faq` },
+                            {
+                              label: "Authenticity Guarantee",
+                              href: `/${countryCode}/authenticity`,
+                            },
+                            {
+                              label: "Contact",
+                              href: `/${countryCode}/contact`,
+                            },
+                          ].map(({ label, href }) => (
+                            <SheetClose asChild key={label}>
+                              <Link
+                                href={href}
+                                className="flex items-center px-5 py-[11px] text-[13px] text-gray-700 hover:text-black transition-colors"
+                              >
+                                {label}
+                              </Link>
+                            </SheetClose>
+                          ))}
+                        </nav>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
                 )}
-              />
-              {wishlistCount > 0 && (
-                <span className="absolute top-0 right-0 bg-black text-white text-[7px] w-4 h-4 rounded-full flex items-center justify-center shadow-lg font-bold border border-white">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-          </div>
+              </div>
 
-          {mounted && (
-            <nav className="flex items-center space-x-10">
+              {/* Mobile: wishlist next to hamburger */}
               <Link
-                href={`/${countryCode}/account/login`}
-                className="hidden md:flex hover:text-gold transition-colors font-light"
+                href={`/${countryCode}/wishlist`}
+                className="relative p-2 lg:hidden hover:bg-gray-50 rounded-sm transition-colors"
               >
-                {i18n.t("common.login")}
-              </Link>
-            </nav>
-          )}
-
-          {/* logo */}
-
-          <div className="">
-            <Link href={`/${countryCode}`} className="group text-center block">
-              <span className="font-headline text-3xl lg:text-5xl font-medium tracking-[0.05em] text-black uppercase">
-                AMARISÉ{" "}
-                <span className="hidden lg:inline font-light italic text-3xl opacity-80 lowercase">
-                  Maison
-                </span>
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center space-x-1 lg:space-x-6 text-black">
-            <button
-              className="pr-2 md:inline-flex  justify-start md:items-center  md:border-b text-start border-black text-black hover:text-black flex items-center bg-transparent  outline-none cursor-pointer"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <Search className="w-5 h-5 stroke-[1.5px]" />
-              <span className="ml-2 text-[13px]  text-neutral-600 font-bold  hidden lg:block">
-                {i18n.t("nav.search")}
-              </span>
-            </button>
-
-            <Link
-              href={`/${countryCode}/wishlist`}
-              className="relative p-2 hidden md:flex hover:text-black"
-            >
-              <Heart
-                className={cn(
-                  "w-5 h-5 transition-colors",
-                  wishlistCount > 0 && "fill-black text-black"
+                <Heart
+                  className={cn(
+                    "w-5 h-5 transition-colors",
+                    wishlistCount > 0 ? "fill-black text-black" : "text-black"
+                  )}
+                />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {wishlistCount}
+                  </span>
                 )}
-              />
-              {wishlistCount > 0 && (
-                <span className="absolute top-0 right-0 bg-black text-white text-[7px] w-4 h-4 rounded-full flex items-center justify-center shadow-lg font-bold border border-white">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
+              </Link>
+            </div>
 
-            <Link
-              href={`/${countryCode}/cart`}
-              className="relative p-2  hover:text-black"
-            >
-              <ShoppingBag className="w-5 h-5  text-black" />
-              {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-plum text-white text-[7px] w-4 h-4 rounded-full flex items-center justify-center shadow-lg font-bold border border-white">
-                  {cartCount}
+            <div className="hidden lg:flex space-x-2 text-gray-600 text-[12px]">
+              <Link href={"/"}>Log In</Link>
+              <span>|</span>
+              <Link href={"/"}>Sign Up</Link>
+            </div>
+
+            {/* CENTER: Logo */}
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <Link href={`/${countryCode}`} className="block text-center">
+                <span className="text-[14px] sm:text-[22px] lg:text-[28px] font-bold tracking-[0.1em] uppercase text-black leading-none font-serif">
+                Amarisé Maison
                 </span>
-              )}
-            </Link>
+              </Link>
+            </div>
+
+            {/* RIGHT: search / wishlist / cart */}
+            <div className="flex items-center gap-4 min-w-[120px] lg:min-w-[200px] justify-end">
+              {/* Search button — icon + text + border-b on desktop */}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                aria-label="Search"
+                className="flex items-center gap-1.5 text-black hover:opacity-70  transition-opacity"
+              >
+                <Search className="w-4 h-4 stroke-[1.5]" />
+                <span className="hidden lg:block text-[13px] font-normal border-b border-black pb-px tracking-wide">
+                  Search
+                </span>
+              </button>
+
+              {/* Wishlist (desktop) */}
+              <Link
+                href={`/${countryCode}/wishlist`}
+                className="relative p-2 hidden lg:flex hover:opacity-70 transition-opacity"
+                aria-label="Wishlist"
+              >
+                <Heart
+                  className={cn(
+                    "w-5 h-5 transition-colors",
+                    wishlistCount > 0 ? "fill-black text-black" : "text-black"
+                  )}
+                />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Cart */}
+              <Link
+                href={`/${countryCode}/cart`}
+                className="relative p-2 hover:opacity-70 transition-opacity"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="w-5 h-5 text-black" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Main Nav with Mega Menu Capability */}
+        {/* ─── LAYER 4: Main Nav (Desktop) ─── */}
         <nav
-          className="h-14 bg-white border-b border-border-color hidden lg:flex items-center justify-center relative"
-          onMouseLeave={() => setHoveredLink(null)}
+          className="hidden lg:block  relative"
+          onMouseLeave={handleNavLeave}
         >
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center space-x-16">
-            {navLinks.map((link) => (
-              <div
-                key={link.id}
-                className="h-full flex items-center relative"
-                onMouseEnter={() => setHoveredLink(link.id)}
-              >
-                <Link
-                  href={link.href}
-                  className={cn(
-                    " tracking-label text-sm font-thin uppercase text-black hover:text-black transition-all relative py-2",
-                    hoveredLink === link.id && "text-black"
-                  )}
+          <div className="max-w-[1400px] mx-auto px-8">
+            <ul className="flex items-center justify-center h-11">
+              {navLinks.map((link) => (
+                <li
+                  key={link.id}
+                  className="h-full flex items-center"
+                  onMouseEnter={() => handleNavEnter(link.id)}
                 >
-                  {link.name}
-                  <span
+                  <Link
+                    href={link.href}
                     className={cn(
-                      "absolute -bottom-1 left-0 h-[2px] bg-black transition-all duration-500",
-                      hoveredLink === link.id ? "w-full" : "w-0"
+                      "relative h-full flex items-center px-4 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors duration-150",
+                      hoveredLink === link.id
+                        ? "text-black"
+                        : "text-black hover:text-black"
                     )}
-                  />
-                </Link>
-              </div>
-            ))}
+                  >
+                    {link.name}
+                    {/* Underline indicator */}
+                    <span
+                      className={cn(
+                        "absolute bottom-0 left-3 right-3 h-[2px] bg-black transition-all duration-300 origin-center",
+                        hoveredLink === link.id
+                          ? "scale-x-100 opacity-100"
+                          : "scale-x-0 opacity-0"
+                      )}
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Mega Menu Container */}
+          {/* ─── Mega Menu ─── */}
           <AnimatePresence>
             {hoveredLink && MEGA_MENU_DATA[hoveredLink] && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                ref={megaMenuRef}
+                initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 w-full bg-white border-b border-gray-100 shadow-2xl z-[60] font-body overflow-hidden"
-                onMouseEnter={() => setHoveredLink(hoveredLink)}
-                onMouseLeave={() => setHoveredLink(null)}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
+                className="absolute top-full left-0 right-0 w-full bg-white border-t border-gray-100 shadow-xl z-[60]"
+                onMouseEnter={handleMegaEnter}
+                onMouseLeave={handleNavLeave}
               >
-                <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+                <div className="max-w-[1100px] mx-auto px-8 py-10">
                   <div
-                    className={`grid ${
+                    className={cn(
+                      "grid gap-10",
                       MEGA_MENU_DATA[hoveredLink].sections.length >= 3
-                        ? "grid-cols-4 gap-16"
-                        : "grid-cols-2 gap-4"
-                    }`}
+                        ? "grid-cols-4"
+                        : "grid-cols-2"
+                    )}
                   >
-                    {/* Links Sections */}
+                    {/* Link columns */}
                     {MEGA_MENU_DATA[hoveredLink].sections.map(
                       (section: any, idx: number) => (
-                        <div key={idx} className="space-y-6 ">
-                          <span className="text-[16px] font-bold tracking-[0.3em] uppercase text-gray-900 border-b border-gray-50 pb-3">
+                        <div key={idx}>
+                          <p className="text-[10px] font-bold tracking-[0.35em] uppercase text-gray-900 mb-4 pb-2 border-b border-gray-100">
                             {section.title}
-                          </span>
-                          <ul className="space-y-3">
+                          </p>
+                          <ul className="space-y-2">
                             {section.links.map((sub: any, sIdx: number) => (
                               <li key={sIdx}>
                                 <Link
                                   href={`/${countryCode}${sub.href}`}
-                                  className="text-[15px] font-light text-gray-500 hover:text-plum transition-colors block py-1"
                                   onClick={() => setHoveredLink(null)}
+                                  className="text-[13px] text-gray-500 hover:text-black transition-colors block py-0.5"
                                 >
                                   {sub.name}
                                 </Link>
@@ -669,9 +677,9 @@ export const Header = () => {
                       )
                     )}
 
-                    {/* Featured Visual */}
-                    <div className="flex flex-col space-y-6 items-center text-center">
-                      <div className="relative aspect-[16/10] w-full bg-ivory border border-gray-50 overflow-hidden">
+                    {/* Featured image column */}
+                    <div className="flex flex-col gap-4">
+                      <div className="relative aspect-[4/3] w-full bg-gray-50 overflow-hidden">
                         <Image
                           src={
                             placeholderData.placeholderImages.find(
@@ -681,17 +689,24 @@ export const Header = () => {
                           }
                           alt={MEGA_MENU_DATA[hoveredLink].title}
                           fill
-                          className="object-cover"
+                          className="object-cover hover:scale-105 transition-transform duration-500"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <h5 className="text-[14px] font-headline font-bold uppercase tracking-widest text-gray-900 leading-tight">
+                      <div>
+                        <h5 className="text-[13px] font-bold uppercase tracking-[0.15em] text-gray-900 leading-snug">
                           {MEGA_MENU_DATA[hoveredLink].title}
                         </h5>
-                        <p className="text-[11px] text-gray-400 italic font-light">
+                        <p className="text-[11px] text-gray-400 mt-0.5 italic">
                           {MEGA_MENU_DATA[hoveredLink].subtitle}
                         </p>
                       </div>
+                      <Link
+                        href={`/${countryCode}${MEGA_MENU_DATA[hoveredLink].collectionHref}`}
+                        onClick={() => setHoveredLink(null)}
+                        className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase text-black border-b border-black pb-0.5 hover:opacity-60 transition-opacity w-fit"
+                      >
+                        Shop All
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -701,49 +716,86 @@ export const Header = () => {
         </nav>
       </div>
 
+      {/* ─── SEARCH OVERLAY ─── */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/98 backdrop-blur-3xl flex flex-col p-8 lg:p-24 font-body"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-white flex flex-col"
           >
-            <div className="container mx-auto max-w-[1600px]">
-              <div className="flex justify-between items-center mb-16 lg:mb-32">
-                <div className="space-y-2">
-                  <h2 className="font-headline text-3xl lg:text-6xl font-bold italic text-gray-900 tracking-tighter leading-tight">
-                    Archive Discovery
-                  </h2>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-400">
-                    {i18n.t("common.search")}
-                  </p>
+            {/* Search header */}
+            <div className="flex items-center border-b border-gray-100 px-6 lg:px-12 h-16 lg:h-20 gap-4">
+              <Search className="w-5 h-5 text-gray-400 shrink-0" />
+              <input
+                autoFocus
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="flex-1 bg-transparent text-base lg:text-xl font-medium text-gray-900 placeholder:text-gray-300 outline-none"
+              />
+              <button
+                onClick={() => {
+                  setIsSearchOpen(false);
+                  setSearchQuery("");
+                }}
+                className="p-2 hover:bg-gray-50 rounded-sm transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400 hover:text-black" />
+              </button>
+            </div>
+
+            {/* Search body */}
+            <div className="flex-1 overflow-y-auto px-6 lg:px-12 py-8 max-w-[800px] mx-auto w-full">
+              {/* Popular searches */}
+              <div className="mb-8">
+                <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-gray-400 mb-4">
+                  Popular Searches
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {popularSearches.map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => setSearchQuery(term)}
+                      className="px-4 py-2 border border-gray-200 text-[12px] font-medium tracking-wider uppercase text-gray-600 hover:border-black hover:text-black transition-colors rounded-sm"
+                    >
+                      {term}
+                    </button>
+                  ))}
                 </div>
-                <button
-                  onClick={() => setIsSearchOpen(false)}
-                  className="p-4 hover:scale-110 transition-transform group bg-transparent border-none outline-none cursor-pointer"
-                >
-                  <X className="w-8 h-8 lg:w-12 lg:h-12 stroke-[1px] text-gray-300 group-hover:text-black transition-colors" />
-                </button>
               </div>
-              <div className="relative lg:border-b md:border-gray-100 pb-4 lg:pb-8">
-                <Search
-                  className={cn(
-                    "absolute top-1/2 -translate-y-1/2 w-6 h-6 lg:w-12 lg:h-12 text-gray-200",
-                    currentLanguage === "ar" ? "right-0" : "left-0"
-                  )}
-                />
-                <input
-                  autoFocus
-                  type="text"
-                  placeholder={i18n.t("common.search")}
-                  className={cn(
-                    "w-full bg-transparent h-16 lg:h-24 text-2xl lg:text-8xl font-headline italic font-light outline-none focus:placeholder:opacity-0 transition-all text-gray-900",
-                    currentLanguage === "ar"
-                      ? "pr-10 lg:pr-24"
-                      : "pl-10 lg:pl-24"
-                  )}
-                />
+
+              {/* Trending placeholder */}
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-gray-400 mb-4">
+                  Trending
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[
+                    "Vintage Hermès Kelly",
+                    "Birkin 25",
+                    "Fauve Barenia",
+                    "Rouge Sellier Epsom",
+                    "Micro Picotin Lock",
+                    "Kelly Cut Biscuit",
+                    "Kelly Sellier 20 Black",
+                    "Birkin 30 Rouge H",
+                  ].map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => setSearchQuery(item)}
+                      className="text-left group"
+                    >
+                      <div className="aspect-square bg-gray-50 mb-2 group-hover:bg-gray-100 transition-colors" />
+                      <p className="text-[11px] text-gray-700 group-hover:text-black transition-colors leading-snug">
+                        {item}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>
