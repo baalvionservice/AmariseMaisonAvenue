@@ -35,7 +35,7 @@ function ProductCard({ product }: { product: Product }) {
           />
         </button>
 
-        <Link href={`/us/products/${product.id}`}>
+        <Link href={`/us/product/${product.id}`}>
           <Image
             fill
             src={product.imageUrl}
