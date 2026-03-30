@@ -216,12 +216,11 @@ export default function HomePage() {
 
   return (
     <div className="bg-white min-h-screen font-sans">
-     
-
-      
-
       {/* ── HERO BANNER ── */}
-      <section className="relative w-full overflow-hidden" style={{ height: "clamp(380px, 70vh, 780px)" }}>
+      <section
+        className="relative w-full overflow-hidden"
+        style={{ height: "clamp(380px, 70vh, 780px)" }}
+      >
         <Image
           src={heroImage}
           alt="Spring Collection"
@@ -234,18 +233,18 @@ export default function HomePage() {
 
         {/* Text overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 space-y-4">
-          <span className="text-[10px] lg:text-[11px] font-semibold tracking-[0.5em] uppercase text-white/90 drop-shadow">
+          <span className="text-[10px] lg:text-[13px] font-semibold tracking-[0.5em] uppercase text-white/90 drop-shadow">
             Newly Curated
           </span>
           <h1 className="text-[42px] sm:text-[60px] lg:text-[80px] xl:text-[96px] font-serif font-normal text-white leading-none tracking-tight drop-shadow-2xl">
-            Spring Collection
+            Spring <br /> Collection
           </h1>
-          <p className="text-[13px] lg:text-[15px] text-white/85 font-light tracking-wide max-w-sm">
+          <p className="text-[13px] lg:text-[18px] text-white/85 font-light tracking-wide max-w-sm">
             The season's most coveted pieces
           </p>
           <Link
             href={`/${countryCode}/category/spring-edit`}
-            className="mt-4 inline-block bg-white text-black text-[10px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-black hover:text-white transition-colors duration-200"
+            className="mt-4 inline-block bg-white text-black text-[12px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-black hover:text-white transition-colors duration-200"
           >
             SHOP NOW
           </Link>
@@ -297,7 +296,7 @@ export default function HomePage() {
             New Arrivals
           </h2>
           {/* Tabs */}
-          <div className="flex items-end gap-6 sm:gap-10 border-b border-gray-200 w-full max-w-xl justify-center">
+          <div className="flex items-end gap-6 sm:gap-10  w-full max-w-xl justify-center">
             {ARRIVAL_TABS.map((tab) => (
               <button
                 key={tab}
@@ -348,7 +347,10 @@ export default function HomePage() {
       {/* ── 100% AUTHENTICITY DUAL-PANEL ── */}
       <section className="flex flex-col lg:flex-row overflow-hidden">
         {/* Image side */}
-        <div className="w-full lg:w-1/2 relative" style={{ minHeight: "400px" }}>
+        <div
+          className="w-full lg:w-1/2 relative"
+          style={{ minHeight: "400px" }}
+        >
           <Image
             src={authImage}
             alt="100% Authenticity Guarantee"
@@ -409,7 +411,10 @@ export default function HomePage() {
       {/* ── OUR MISSION ── */}
       <section className="flex flex-col lg:flex-row overflow-hidden border-t border-gray-100">
         {/* Image side */}
-        <div className="w-full lg:w-1/2 relative order-2 lg:order-1" style={{ minHeight: "420px" }}>
+        <div
+          className="w-full lg:w-1/2 relative order-2 lg:order-1"
+          style={{ minHeight: "420px" }}
+        >
           <Image
             src={missionImage}
             alt="Our Mission"
@@ -473,47 +478,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── MADAVE LIVE ── */}
-      <section className="flex flex-col lg:flex-row min-h-[400px] lg:min-h-[500px] overflow-hidden bg-[#0e0e0e] border-t border-white/5">
-        {/* Text side */}
-        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center text-center px-10 py-16 lg:py-24 space-y-6">
-          <span className="text-[10px] font-bold tracking-[0.6em] uppercase text-white/50">
-            Shop Live
-          </span>
-          <h2 className="text-[30px] sm:text-[40px] lg:text-[52px] font-serif font-normal text-white leading-tight italic tracking-tight">
-            MadAve Live
-          </h2>
-          <p className="text-[13px] text-gray-400 font-light max-w-xs leading-relaxed">
-            Experience the thrill of live luxury shopping. Discover new arrivals
-            in real time with our expert advisors.
-          </p>
-          <Link
-            href={`/${countryCode}/live`}
-            className="inline-block mt-2 bg-white text-black text-[10px] font-bold tracking-[0.4em] uppercase px-10 h-12 leading-[48px] hover:bg-gray-100 transition-colors"
-          >
-            VIEW LIVE SHOP
-          </Link>
-        </div>
-        {/* Image side */}
-        <div className="w-full lg:w-1/2 relative" style={{ minHeight: "300px" }}>
-          <Image
-            src={liveImage}
-            alt="MadAve Live"
-            fill
-            className="object-cover opacity-80"
-          />
-        </div>
-      </section>
-
       {/* ── VIP EMAIL SIGNUP ── */}
-      <section className="bg-[#f7f6f4] py-14 lg:py-20 border-t border-gray-200">
+      <section className="bg-cream py-14 lg:py-20 border-t border-gray-200">
         <div className="max-w-2xl mx-auto px-6 text-center space-y-5">
           <h3 className="text-[22px] sm:text-[28px] font-serif font-normal text-gray-900 tracking-tight">
             Join the VIP Email List
           </h3>
-          <p className="text-[13px] text-gray-500 font-light">
-            Get first access to new product launches and all the latest updates
-            from Madison Avenue Couture.
+          <p className="text-[13px] text-gray-500 font-light text-balance">
+            Join our VIP email list and get first access new product launches
+            and all the latest updates from Amarisé Maison
+            !
           </p>
           {subscribed ? (
             <p className="text-[13px] font-semibold text-green-700 tracking-wide">
@@ -540,8 +514,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
-      
 
       {/* ── MARQUEE KEYFRAME ── */}
       <style jsx global>{`
@@ -591,7 +563,6 @@ function CuratorialCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
       {/* Text */}
       <div className="absolute bottom-5 left-0 right-0 p-6 lg:p-8 space-y-3 text-white text-center">
-       
         <h3 className="text-[18px] sm:text-[20px] lg:text-[28px] tracking-wider font-serif font-normal leading-snug mb-0.5">
           {title}
         </h3>
@@ -619,7 +590,7 @@ function ProductCard({
       {/* Image */}
       <Link
         href={`/${countryCode}/product/${product.id}`}
-        className="relative overflow-hidden bg-[#f9f9f9] block"
+        className="relative overflow-hidden bg-white block"
         style={{ aspectRatio: "4/5" }}
       >
         <Image
@@ -634,12 +605,12 @@ function ProductCard({
             e.preventDefault();
             onWishlistToggle();
           }}
-          className="absolute top-3 right-3 p-2 bg-white/90 rounded-full hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 p-2  rounded-full transition-all shadow-sm "
         >
           <Heart
             className={cn(
-              "w-3.5 h-3.5 transition-colors",
-              isWishlisted ? "fill-black text-black" : "text-gray-500"
+              "w-5 h-5 transition-colors",
+              isWishlisted ? "fill-red-500 text-red-500" : "text-black"
             )}
           />
         </button>
@@ -690,14 +661,14 @@ function InfoBlock({
         <h3 className="text-[15px] lg:text-[17px] font-serif font-normal text-gray-900 leading-snug">
           {title}
         </h3>
-        <p className="text-[12px] text-gray-500 font-light leading-relaxed">
+        <p className="text-[12px] text-black font-light leading-relaxed">
           {description}
         </p>
       </div>
 
       <Link
         href={href}
-        className="text-[10px] font-bold tracking-[0.35em] uppercase text-black border-b border-black pb-0.5 hover:opacity-50 transition-opacity"
+        className="text-[10px] tracking-[0.35em] uppercase text-white bg-black px-3 py-4 hover:text-black hover:bg-white hover:border font-bold hover:border-black hover:transition-colors"
       >
         READ MORE
       </Link>
