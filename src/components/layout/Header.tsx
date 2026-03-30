@@ -55,7 +55,6 @@ const MEGA_MENU_DATA: Record<string, any> = {
         title: "New Arrivals",
         links: [
           { name: "Hermès", href: "/category/hermes" },
-          { name: "Chanel", href: "/category/chanel" },
           { name: "Other Brands", href: "/category/other-brands" },
           { name: "Jewelry", href: "/category/jewelry" },
         ],
@@ -107,44 +106,6 @@ const MEGA_MENU_DATA: Record<string, any> = {
           { name: "Atelier Bags", href: "/category/hermes" },
           { name: "Palm Beach Collection", href: "/category/hermes" },
           { name: "Bag Besties & Organizers", href: "/category/hermes" },
-        ],
-      },
-    ],
-  },
-  chanel: {
-    title: "CHANEL CLASSIC BAGS",
-    subtitle: "Discover the Beauty of Chanel",
-    imageId: "mega-chanel",
-    collectionHref: "/category/chanel",
-    sections: [
-      {
-        title: "Handbags",
-        links: [
-          { name: "Classic Flap Bags", href: "/category/chanel" },
-          { name: "Chanel 22 Bags", href: "/category/chanel" },
-          { name: "Chanel 25 Bags", href: "/category/chanel" },
-          { name: "Totes", href: "/category/chanel" },
-          { name: "Boy Bags", href: "/category/chanel" },
-          { name: "Wallet on Chains", href: "/category/chanel" },
-          { name: "Fashion & Runway Bags", href: "/category/chanel" },
-          { name: "All Chanel Bags", href: "/category/chanel" },
-        ],
-      },
-      {
-        title: "Accessories",
-        links: [
-          { name: "Wallets", href: "/category/chanel" },
-          { name: "Shoes", href: "/category/chanel" },
-          { name: "Jewelry", href: "/category/chanel" },
-        ],
-      },
-      {
-        title: "Curations",
-        links: [
-          { name: "Vintage", href: "/category/chanel" },
-          { name: "Contemporary", href: "/category/chanel" },
-          { name: "Vintage Handbags", href: "/category/chanel" },
-          { name: "Pre-Owned Handbags", href: "/category/chanel" },
         ],
       },
     ],
@@ -276,7 +237,6 @@ export const Header = () => {
       href: `/${countryCode}/category/new-arrivals`,
     },
     { id: "hermes", name: "HERMÈS", href: `/${countryCode}/category/hermes` },
-    { id: "chanel", name: "CHANEL", href: `/${countryCode}/category/chanel` },
     { id: "goyard", name: "GOYARD", href: `/${countryCode}/category/goyard` },
     {
       id: "other",
@@ -307,13 +267,13 @@ export const Header = () => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
   };
 
-  const popularSearches = ["Birkin", "Hermès", "Kelly", "Chanel"];
+  const popularSearches = ["Birkin", "Hermès", "Kelly"];
 
   return (
     <>
       {/* ─── LAYER 1: Announcement / Promo Ticker ─── */}
       <div className="bg-cream text-black hidden sm:block">
-        <div className="flex items-center justify-center h-9 px-4 gap-4">
+        <div className="flex items-center justify-center h-7 px-4 gap-4">
           <button
             className="opacity-50 hover:opacity-100 transition-opacity p-1"
             onClick={() =>
@@ -357,11 +317,11 @@ export const Header = () => {
       {/* ─── LAYER 2: Top Utility Bar ─── */}
       {/* Desktop only */}
       <div className="hidden lg:block bg-[#1a1a1a]">
-        <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-10">
+        <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-9">
           <Link className="text-white" href={""}>
             100% Authentic Guaranteed
           </Link>
-          <div className="flex items-center divide-x divide-white/10">
+          <div className="flex items-center">
             <a
               href="#"
               className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
@@ -420,7 +380,7 @@ export const Header = () => {
       <div className="sticky top-0 z-50 bg-white shadow-sm">
         {/* Brand Row */}
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[64px] lg:h-[80px] gap-4">
+          <div className="flex items-center justify-between h-[64px] lg:h-[70px] gap-4">
             {/* LEFT: Mobile hamburger + wishlist / Desktop: empty spacer */}
             <div className=" flex lg:hidden items-center gap-2 min-w-[120px] lg:min-w-[200px]">
               {/* Mobile hamburger */}
@@ -549,10 +509,10 @@ export const Header = () => {
               <button
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search"
-                className="flex items-center gap-1.5 text-black hover:opacity-70  transition-opacity"
+                className="flex items-center gap-1.5 md:w-24 text-black hover:opacity-70 md:border-b md:border-black transition-opacity"
               >
-                <Search className="w-4 h-4 stroke-[1.5]" />
-                <span className="hidden lg:block text-[13px] font-normal border-b border-black pb-px tracking-wide">
+                <Search className="w-5 h-5 stroke-[1.5] md:mb-1 md:h-3 md:w-3" />
+                <span className="hidden lg:block text-[12px] font-normal  pb-px tracking-wide">
                   Search
                 </span>
               </button>
@@ -565,7 +525,7 @@ export const Header = () => {
               >
                 <Heart
                   className={cn(
-                    "w-5 h-5 transition-colors",
+                    "w-5 h-5 transition-colors stroke-1",
                     wishlistCount > 0 ? "fill-black text-black" : "text-black"
                   )}
                 />
@@ -582,7 +542,7 @@ export const Header = () => {
                 className="relative p-2 hover:opacity-70 transition-opacity"
                 aria-label="Cart"
               >
-                <ShoppingBag className="w-5 h-5 text-black" />
+                <ShoppingBag className="w-5 h-5  stroke-1 text-black" />
                 {cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                     {cartCount}
