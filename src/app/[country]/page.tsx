@@ -3,18 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { COUNTRIES } from "@/lib/mock-data";
-import { Button } from "@/components/ui/button";
 import {
   Heart,
-  Search,
-  ShoppingBag,
-  User,
-  Phone,
-  Mail,
-  ChevronDown,
-  Menu,
-  X,
   Star,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
@@ -22,6 +12,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import placeholderData from "@/app/lib/placeholder-images.json";
+import { VipEmailSignup } from "@/components/home/VipEmailSingup";
+import { PRODUCTS } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
 
 /* ─────────────────────────────────────────────────────────────────
    DATA
@@ -101,38 +94,7 @@ const NEW_ARRIVALS = [
 
 const ARRIVAL_TABS = ["Hermès", "Chanel", "Other Brands", "View All"];
 
-const FOOTER_COLS = [
-  {
-    title: "Customer Care",
-    links: ["Contact Us", "My Account", "Shipping", "Returns", "FAQ"],
-  },
-  {
-    title: "About",
-    links: [
-      "About Us",
-      "Visit Us",
-      "Message From Our Founder",
-      "Affiliates",
-      "Blog",
-      "Press",
-    ],
-  },
-  {
-    title: "Shop With Us",
-    links: [
-      "Authenticity Guarantee",
-      "Condition Descriptions",
-      "In-Home Services",
-      "Concierge Services",
-      "Catalog",
-      "MadAve Live",
-    ],
-  },
-  {
-    title: "Sell With Us",
-    links: ["How to Sell or Consign", "Submit an Item"],
-  },
-];
+
 
 /* ─────────────────────────────────────────────────────────────────
    MAIN PAGE
@@ -141,13 +103,9 @@ const FOOTER_COLS = [
 export default function HomePage() {
   const { country } = useParams();
   const countryCode = (country as string) || "us";
-  const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
 
   const [activeTab, setActiveTab] = useState("Hermès");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -212,7 +170,7 @@ export default function HomePage() {
   };
 
   const visibleProducts =
-    activeTab === "View All" ? NEW_ARRIVALS : NEW_ARRIVALS.slice(0, 4);
+    activeTab === "View All" ? PRODUCTS : PRODUCTS.slice(0, 4);
 
   return (
     <div className="bg-white min-h-screen font-sans">
@@ -478,42 +436,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── VIP EMAIL SIGNUP ── */}
-      <section className="bg-cream py-14 lg:py-20 border-t border-gray-200">
-        <div className="max-w-2xl mx-auto px-6 text-center space-y-5">
-          <h3 className="text-[22px] sm:text-[28px] font-serif font-normal text-gray-900 tracking-tight">
-            Join the VIP Email List
-          </h3>
-          <p className="text-[13px] text-gray-500 font-light text-balance">
-            Join our VIP email list and get first access new product launches
-            and all the latest updates from Amarisé Maison
-            !
-          </p>
-          {subscribed ? (
-            <p className="text-[13px] font-semibold text-green-700 tracking-wide">
-              You have successfully subscribed!
-            </p>
-          ) : (
-            <div className="flex border border-gray-300 bg-white max-w-md mx-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 h-[50px] px-5 text-[13px] outline-none placeholder:text-gray-400 bg-white"
-              />
-              <button
-                onClick={() => {
-                  if (email) setSubscribed(true);
-                }}
-                className="h-[50px] px-7 bg-black text-white font-bold text-[10px] uppercase tracking-[0.3em] hover:bg-gray-800 transition-colors shrink-0"
-              >
-                SUBMIT
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* ── MARQUEE KEYFRAME ── */}
       <style jsx global>{`
@@ -580,7 +502,7 @@ function ProductCard({
   onWishlistToggle,
   countryCode,
 }: {
-  product: { id: string; name: string; price: number; image: string };
+  product: Product;
   isWishlisted: boolean;
   onWishlistToggle: () => void;
   countryCode: string;
@@ -594,7 +516,7 @@ function ProductCard({
         style={{ aspectRatio: "4/5" }}
       >
         <Image
-          src={product.image}
+          src={product.imageUrl}
           alt={product.name}
           fill
           className="object-contain p-4 sm:p-6 transition-transform duration-[2.5s] ease-out group-hover:scale-105"
@@ -622,7 +544,7 @@ function ProductCard({
           {product.name}
         </p>
         <p className="text-[13px] font-semibold text-gray-900 tracking-wide">
-          ${product.price.toLocaleString()}
+          ${product.basePrice.toLocaleString()}
         </p>
       </div>
     </div>
@@ -675,3 +597,5 @@ function InfoBlock({
     </div>
   );
 }
+
+
