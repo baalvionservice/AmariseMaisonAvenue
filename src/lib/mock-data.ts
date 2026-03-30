@@ -319,7 +319,7 @@ const generateProducts = (): Product[] => {
     subcategoryId: "birkin-25cm",
     collectionId: "heritage",
     basePrice: 31741.89,
-    imageUrl: "https://picsum.photos/seed/hermes-birkin-25/1000/1200",
+    imageUrl: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
     isVip: true,
     rating: 5.0,
     reviewsCount: 1,
