@@ -128,7 +128,7 @@ function AccordionItem({
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between py-4 text-left"
       >
-        <span className="text-[13px] font-extrabold tracking-[0.25em] uppercase text-gray-900">
+        <span className="text-[13px] font-medium tracking-[0.25em] uppercase text-gray-900">
           {title}
         </span>
         {open ? (
