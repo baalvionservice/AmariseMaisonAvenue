@@ -397,25 +397,25 @@ export const Header = () => {
                     </SheetTrigger>
                     <SheetContent
                       side="left"
-                      className="w-[88%] sm:max-w-[420px] p-0 bg-white border-none rounded-none flex flex-col h-full shadow-2xl"
+                      className="w-[88%] gap-0 sm:max-w-[420px] p-0 bg-white border-none rounded-none flex flex-col h-full shadow-2xl"
                     >
                       {/* Close button row */}
-                      <div className="flex items-center px-5 py-4">
+                      <div className="flex items-center px-3 py-2">
                         <SheetClose asChild>
-                          <button className="p-1 -ml-1 hover:bg-gray-50 rounded-sm transition-colors">
-                            <X className="w-6 h-6 text-black" />
+                          <button className="py-1 -ml-1 hover:bg-gray-50 rounded-sm transition-colors">
+                            <X className="w-6 h-6 stroke-1 text-black" />
                           </button>
                         </SheetClose>
                       </div>
 
-                      <div className="flex-1 overflow-y-auto">
+                      <div className="flex-1 divide-y space-y-3 divide-gray-400 px-2 overflow-y-auto">
                         {/* Primary nav links */}
-                        <nav className="border-t border-gray-100">
+                        <nav className="">
                           {navLinks.map((link) => (
                             <SheetClose asChild key={link.id}>
                               <Link
                                 href={link.href}
-                                className="flex items-center justify-between px-5 py-[14px] border-b border-gray-100 text-[13px] font-semibold tracking-[0.12em] uppercase text-black hover:text-gray-500 transition-colors"
+                                className="flex items-center justify-between py-[12px] text-[13px] tracking-[0.12em] uppercase text-black hover:text-gray-500 transition-colors"
                               >
                                 {link.name}
                                 <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
@@ -456,7 +456,7 @@ export const Header = () => {
                             <SheetClose asChild key={label}>
                               <Link
                                 href={href}
-                                className="flex items-center px-5 py-[11px] text-[13px] text-gray-700 hover:text-black transition-colors"
+                                className="flex items-center py-[12px] text-[13px] text-gray-700 hover:text-black transition-colors"
                               >
                                 {label}
                               </Link>
