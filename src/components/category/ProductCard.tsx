@@ -24,14 +24,14 @@ export function ProductCard({ product, countryCode }: ProductCardProps) {
           src={product.imageUrl}
           alt={product.name}
           fill
-          className="object-contain p-6 transition-transform duration-700 "
+          className="object-contain md:p-6 transition-transform duration-700 "
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </div>
 
       {/* Product info */}
       <div className="text-center space-y-2.5 px-1">
-        <h3 className="text-[11px] font-light text-[#555] leading-[1.6] uppercase tracking-[0.06em] line-clamp-3">
+        <h3 className="text-[11px] text-balance font-light text-[#555] leading-[1.6] uppercase tracking-[0.06em] line-clamp-3">
           {product.name}
         </h3>
         <p className="text-[13.5px] font-semibold text-[#1a1a1a] tracking-tight">
