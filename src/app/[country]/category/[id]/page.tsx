@@ -63,16 +63,20 @@ export default function CategoryPage() {
       />
 
       {/* ── Page body ── */}
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12 pt-14 pb-28">
+      <div className="max-w-[1200px] mx-auto px-1 lg:px-12 pt-10 lg:pt-14 pb-28">
         <div className="flex flex-col lg:flex-row ">
+          <h1 className=" md:hidden text-[24px] font-medium text-[#1a1a1a] tracking-tight leading-none mb-[18px]">
+            Hermès Archive
+          </h1>
+
           {/* ── Left: Sidebar navigation ── */}
           <CategorySidebar categoryName={categoryName} />
 
           {/* ── Right: Main content area ── */}
-          <main className="flex-1 min-w-0 space-y-10 px-4">
+          <main className="flex-1 min-w-0 space-y-10 md:px-4">
             {/* Page heading */}
             <header>
-              <h1 className="text-[34px] font-medium text-[#1a1a1a] tracking-tight leading-none mb-[18px]">
+              <h1 className="hidden md:flex text-[34px] font-medium text-[#1a1a1a] tracking-tight leading-none mb-[18px]">
                 Hermès Archive
               </h1>
 

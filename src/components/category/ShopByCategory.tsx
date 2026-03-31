@@ -57,7 +57,6 @@ export function ShopByCategory({
 
   const cardWidth = "w-36";
   const imageSize = 300;
-  const padding = "p-3";
   const textSize = "text-sm";
 
   return (
@@ -73,7 +72,7 @@ export function ShopByCategory({
           onClick={() => scroll("left")}
           disabled={!canScrollLeft}
           className={cn(
-            "absolute left-5 z-10 w-8 h-8 rounded-full border flex items-center justify-center bg-white transition-all shadow-sm",
+            "hidden  absolute left-5 z-10 w-8 h-8 rounded-full border md:flex items-center justify-center bg-white transition-all shadow-sm",
             canScrollLeft
               ? "border-gray-300 text-gray-600 hover:border-gray-800 hover:text-gray-900"
               : "hidden border-gray-100 text-gray-200 cursor-not-allowed opacity-50"
@@ -125,7 +124,7 @@ export function ShopByCategory({
           onClick={() => scroll("right")}
           disabled={!canScrollRight}
           className={cn(
-            "absolute right-5 z-10 w-8 h-8 rounded-full border flex items-center justify-center bg-white transition-all shadow-sm",
+            "hidden absolute right-5 z-10 w-8 h-8 rounded-full border md:flex items-center justify-center bg-white transition-all shadow-sm",
             canScrollRight
               ? "border-gray-300 text-gray-600 hover:border-gray-800 hover:text-gray-900"
               : "hidden border-gray-100 text-gray-200 cursor-not-allowed opacity-50"

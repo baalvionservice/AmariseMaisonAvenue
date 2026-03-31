@@ -24,7 +24,7 @@ export function ProductGrid({ products, countryCode }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+    <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 md:gap-x-8 gap-y-16">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} countryCode={countryCode} />
       ))}

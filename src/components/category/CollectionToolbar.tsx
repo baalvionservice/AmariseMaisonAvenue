@@ -30,13 +30,13 @@ export function CollectionToolbar({
   return (
     <div className="space-y-4">
       {/* ── Top bar: count | filter | sort ── */}
-      <div className="flex items-center justify-between py-4 px-6 bg-[#f8f7f5]">
+      <div className="flex items-center justify-between py-4 md:px-6 bg-[#f8f7f5]">
         {/* Product count */}
-        <span className="text-[11px] font-semibold text-[#1a1a1a] uppercase tracking-[0.14em]">
+        <span className="hidden md:flex  w-full text-[11px] font-semibold text-[#1a1a1a] uppercase tracking-[0.14em]">
           {totalProducts} products
         </span>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center w-full md:w-56 justify-around md:gap-8">
           {/* Filter button */}
           <button
             onClick={onFilterOpen}
@@ -70,9 +70,13 @@ export function CollectionToolbar({
         </div>
       </div>
 
+      <span className="md:hidden w-full text-[10px]  text-[#1a1a1a]  tracking-[0.1em]">
+        {totalProducts} products
+      </span>
+
       {/* ── Active filter chips strip ── */}
       {(chips.length > 0 || hasPriceChip) && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="hidden md:flex flex-wrap items-center gap-2">
           {hasPriceChip && (
             <FilterChip
               label={`${formatPriceShort(state.priceMin)} –${formatPriceShort(

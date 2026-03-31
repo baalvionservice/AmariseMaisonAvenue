@@ -3,6 +3,7 @@
 import React, { useState, useRef, MouseEvent } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ImageZoomProps {
   src: string;
@@ -20,6 +21,7 @@ export function ImageZoom({
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile()
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -44,7 +46,8 @@ export function ImageZoom({
       ref={containerRef}
       className={cn(
         "relative overflow-hidden cursor-zoom-in bg-white border border-gray-50 shadow-sm",
-        className
+        className,
+        isMobile && "hidden"
       )}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}

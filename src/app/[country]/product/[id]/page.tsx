@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="bg-white max-w-[1200px] mx-auto min-h-screen px-3 pb-20 lg:pb-40 animate-fade-in font-body">
       {/* 1. Breadcrumbs */}
-      <nav className="hidden sm:block container mx-auto  lg:px-12 py-4 mb-4 max-w-[1600px]">
+      <nav className="block w-full container mx-auto  lg:px-12 py-4 mb-4 md:max-w-[1600px]">
         <div
           className="flex items-center space-x-2 text-[10px] lg:text-[11px] font-normal text-black
          tracking-widest"
@@ -92,7 +92,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             Home
           </Link>
           <ChevronRight className="w-2.5 h-2.5" />
-          <span className="text-gray-900 truncate font-bold">
+          <span className="text-gray-900  md:flex md:truncate font-bold">
             {product.name}
           </span>
         </div>

@@ -49,10 +49,12 @@ export function FilterSheet({ open, onClose, filter }: FilterSheetProps) {
         aria-hidden="true"
       />
 
-      {/* Slide-over panel — comes from the LEFT matching the screenshot */}
+      {/* Slide-over panel — responsive sheet */}
       <div
-        className={`fixed top-0 right-0 min-h-[100x] w-full max-w-[444px] bg-white z-[60] flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 left-0 sm:top-0 sm:right-0 sm:left-auto h-full w-[88%] sm:max-w-[444px] bg-white z-[60] flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
+          open
+            ? "translate-x-0 sm:translate-x-0"
+            : "-translate-x-full sm:translate-x-full"
         }`}
         role="dialog"
         aria-modal="true"
