@@ -199,7 +199,7 @@ export default function ProductInfoPanel() {
   const toggleWishlist = () => setIsWishlisted((w) => !w);
 
   return (
-    <div className="w-full lg:w-[600px] px-5 space-y-8">
+    <div className="w-full lg:w-[600px] mt-5 md:px-5 space-y-8">
       {/* ── Header ── */}
       <header className="space-y-3">
         <h1 className="text-2xl lg:text-[32px] font-serif font-normal text-gray-900 leading-[1.2] tracking-wide">
@@ -227,17 +227,17 @@ export default function ProductInfoPanel() {
 
       {/* ── CTA Buttons ── */}
       <div className="space-y-3">
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2">
           <button
             onClick={handleAddToCart}
-            className="flex-1 h-14 bg-black text-white text-[11px] font-bold tracking-[0.2em] uppercase transition-all hover:bg-gray-800"
+            className="flex-1 h-14 py-3 bg-black text-white text-[11px] font-bold tracking-[0.2em] uppercase transition-all hover:bg-gray-800"
           >
             ADD TO BAG
           </button>
           <button
             onClick={toggleWishlist}
             className={cn(
-              "flex-1 inline-flex items-center h-14 border-2 gap-2 border-gray-900 justify-center text-[11px] font-bold tracking-[0.2em] uppercase transition-all",
+              "flex-1 inline-flex py-3 items-center h-14 border-2 gap-2 border-gray-900 justify-center text-[11px] font-bold tracking-[0.2em] uppercase transition-all",
               isWishlisted
                 ? "bg-black text-white"
                 : "bg-transparent hover:bg-gray-50"
@@ -258,7 +258,7 @@ export default function ProductInfoPanel() {
           </span>
           <span className="text-gray-600 text-[14px] tracking-wide leading-snug">
             In stock &amp; available now with FREE Express shipping or pickup at
-            our{" "}
+            our{" "}  
             <a
               href="#"
               className="underline underline-offset-2 text-gray-800 hover:text-black"

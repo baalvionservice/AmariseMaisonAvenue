@@ -28,22 +28,20 @@ export function ProductGallery({
     <div className={className}>
       <div className="flex flex-col md:flex-row gap-10 max-w-[600px]">
         {/* Vertical Gallery Thumbnails */}
-        <div className="hidden xl:block">
-          <VerticalGallery
-            images={images}
-            productName={productName}
-            selectedIndex={selectedImageIndex}
-            onImageSelect={handleImageSelect}
-          />
-        </div>
+        <VerticalGallery
+          images={images}
+          productName={productName}
+          selectedIndex={selectedImageIndex}
+          onImageSelect={handleImageSelect}
+        />
 
         {/* Main Artifact Viewport */}
-        <ImageZoom
-          src={currentImage}
-          alt={productName}
-          className="flex-1 aspect-[4/5] luxury-reveal"
-          zoomScale={2.5}
-        />
+          <ImageZoom
+            src={currentImage}
+            alt={productName}
+            className="flex-1 aspect-[4/5] luxury-reveal"
+            zoomScale={2.5}
+          />
       </div>
     </div>
   );

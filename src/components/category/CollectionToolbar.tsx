@@ -70,7 +70,7 @@ export function CollectionToolbar({
         </div>
       </div>
 
-      <span className=" w-full text-[10px]  text-[#1a1a1a]  tracking-[0.1em]">
+      <span className="md:hidden w-full text-[10px]  text-[#1a1a1a]  tracking-[0.1em]">
         {totalProducts} products
       </span>
 
