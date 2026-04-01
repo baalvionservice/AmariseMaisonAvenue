@@ -47,137 +47,186 @@ const CURRENCIES = [
 const MEGA_MENU_DATA: Record<string, any> = {
   new: {
     title: "NEW ARRIVALS",
-    subtitle: "Hermès New Arrivals",
+    subtitle: "Shop the latest luxury pieces just in",
     imageId: "mega-new-arrivals",
-    collectionHref: "/category/new-arrivals",
+    collectionHref: "/category/new-arrivals-handbags",
     sections: [
       {
         title: "New Arrivals",
         links: [
-          { name: "Hermès", href: "/category/hermes" },
-          { name: "Other Brands", href: "/category/other-brands" },
-          { name: "Jewelry", href: "/category/jewelry" },
+          { name: "Hermès", href: "/category/new-arrivals-hermes" },
+          { name: "Chanel", href: "/category/new-arrivals-chanel-handbags-and-accessories" },
+          { name: "Other Brands", href: "/category/view-all-new-arrivals" },
+          { name: "Jewelry", href: "/category/jewelry-new-arrivals" },
         ],
       },
     ],
   },
   hermes: {
-    title: "Valentine's Day Edit",
-    subtitle: "Hermès Bestsellers",
+    title: "Hermès Bestsellers",
+    subtitle: "Rare & pre-owned Hermès in mint condition",
     imageId: "mega-hermes",
-    collectionHref: "/category/hermes",
+    collectionHref: "/category/hermes-handbags",
     sections: [
       {
         title: "Handbags",
         links: [
-          { name: "Birkin", href: "/category/hermes" },
-          { name: "Kelly", href: "/category/hermes" },
-          { name: "Constance", href: "/category/hermes" },
-          { name: "Evelyne", href: "/category/hermes" },
-          { name: "Picotin", href: "/category/hermes" },
-          { name: "Lindy", href: "/category/hermes" },
-          { name: "Herbag", href: "/category/hermes" },
-          { name: "Other Bags", href: "/category/hermes" },
-          { name: "All Hermès Bags", href: "/category/hermes" },
+          { name: "Birkin Bags", href: "/category/hermes-birkin-handbags" },
+          { name: "Kelly Bags", href: "/category/hermes-kelly-handbags" },
+          { name: "Constance Bags", href: "/category/hermes-constance-handbags" },
+          { name: "Evelyne Bags", href: "/category/hermes-evelyne-bags" },
+          { name: "Picotin Bags", href: "/category/hermes-picotin-bags" },
+          { name: "Lindy Bags", href: "/category/hermes-lindy-bags" },
+          { name: "Bolide Bags", href: "/category/hermes-bolide-bags" },
+          { name: "Herbag Collection", href: "/category/hermes-herbag-collection" },
+          { name: "Pochettes & Kelly Cuts", href: "/category/hermes-clutch" },
+          { name: "HSS Special Order Bags", href: "/category/hermes-hss-special-order-bags" },
+          { name: "All Hermès Bags", href: "/category/hermes-handbags" },
         ],
       },
       {
         title: "Accessories",
         links: [
-          { name: "Wallets", href: "/category/hermes" },
-          { name: "Watches", href: "/category/hermes" },
-          { name: "Belts", href: "/category/hermes" },
-          { name: "Charms", href: "/category/hermes" },
-          { name: "Scarves", href: "/category/hermes" },
-          { name: "Shoes", href: "/category/hermes" },
-          { name: "Jewelry", href: "/category/hermes" },
+          { name: "Wallets", href: "/category/hermes-wallets" },
+          { name: "Watches", href: "/category/watches" },
+          { name: "Belts", href: "/category/hermes-belts" },
+          { name: "Charms", href: "/category/hermes-charms" },
+          { name: "Scarves", href: "/category/hermes-scarves" },
+          { name: "Shoes", href: "/category/hermes-shoes" },
+          { name: "Jewelry", href: "/category/fine-jewelry" },
         ],
       },
       {
         title: "Curations",
         links: [
-          { name: "New Arrivals", href: "/category/new-arrivals" },
-          { name: "Best Sellers", href: "/category/hermes" },
-          { name: "Exotic Handbags", href: "/category/hermes" },
-          { name: "Rare & Unique Bags", href: "/category/hermes" },
-          { name: "HSS Horseshoe Stamp Bags", href: "/category/hermes" },
-          { name: "Pre-Owned & Vintage Handbags", href: "/category/hermes" },
-          { name: "Home Goods", href: "/category/hermes" },
-          { name: "Atelier Bags", href: "/category/hermes" },
-          { name: "Palm Beach Collection", href: "/category/hermes" },
-          { name: "Bag Besties & Organizers", href: "/category/hermes" },
+          { name: "New Arrivals", href: "/category/new-arrivals-handbags" },
+          { name: "Best Sellers", href: "/category/hermes-handbags" },
+          { name: "Exotic Handbags", href: "/category/hermes-exotic-handbags" },
+          { name: "Rare & Unique Bags", href: "/category/hermes-rare-handbags" },
+          { name: "HSS Horseshoe Stamp", href: "/category/hermes-hss-special-order-bags" },
+          { name: "Pre-Owned & Vintage", href: "/category/hermes-pre-owned-vintage" },
+          { name: "Bag Besties & Organizers", href: "/category/bag-besties-organizers" },
+        ],
+      },
+    ],
+  },
+  chanel: {
+    title: "Chanel — Timeless Elegance",
+    subtitle: "Authentic pre-owned Chanel classics",
+    imageId: "mega-new-arrivals",
+    collectionHref: "/category/chanel-bags",
+    sections: [
+      {
+        title: "Handbags",
+        links: [
+          { name: "Classic Flap Bags", href: "/category/chanel-flap-bags" },
+          { name: "Classic Mini Bags", href: "/category/chanel-classic-mini" },
+          { name: "Classic Small Bags", href: "/category/chanel-classic-small" },
+          { name: "Classic Medium Bags", href: "/category/chanel-classic-medium" },
+          { name: "Jumbo & Maxi Flaps", href: "/category/chanel-jumbo-maxi-flaps" },
+          { name: "Chanel 22 Bags", href: "/category/chanel-22-bags" },
+          { name: "Chanel 25 Bags", href: "/category/chanel-25-bags" },
+          { name: "Totes", href: "/category/chanel-tote" },
+          { name: "Wallet on Chain", href: "/category/chanel-wallet-on-chain" },
+          { name: "Fashion & Runway", href: "/category/chanel-fashion-runway-bags" },
+          { name: "All Chanel Bags", href: "/category/chanel-bags" },
+        ],
+      },
+      {
+        title: "Accessories",
+        links: [
+          { name: "Wallets", href: "/category/chanel-wallets" },
+          { name: "Shoes", href: "/category/chanel-shoes" },
+        ],
+      },
+      {
+        title: "Jewelry",
+        links: [
+          { name: "Vintage Chanel Jewelry", href: "/category/vintage-chanel-jewelry" },
+          { name: "Contemporary", href: "/category/chanel-contemporary-jewelry" },
+        ],
+      },
+      {
+        title: "Curations",
+        links: [
+          { name: "New Arrivals", href: "/category/new-arrivals-chanel-handbags-and-accessories" },
+          { name: "Best Sellers", href: "/category/chanel-bags" },
+          { name: "Pre-Owned & Vintage", href: "/category/chanel-pre-owned" },
         ],
       },
     ],
   },
   goyard: {
     title: "The Saigon Bag",
-    subtitle: "Iconic Style",
+    subtitle: "Discover Goyard's iconic collections",
     imageId: "mega-goyard",
     collectionHref: "/category/goyard",
     sections: [
       {
         title: "Handbags",
         links: [
-          { name: "Saint Louis", href: "/category/goyard" },
-          { name: "Saigon", href: "/category/goyard" },
-          { name: "Anjou", href: "/category/goyard" },
-          { name: "Artois", href: "/category/goyard" },
-          { name: "Other", href: "/category/goyard" },
+          { name: "Saint Louis", href: "/category/goyard-st-louis-bags" },
+          { name: "Saigon", href: "/category/goyard-saigon-bags" },
+          { name: "Anjou", href: "/category/goyard-anjou-bags" },
+          { name: "Artois", href: "/category/goyard-artois-bags" },
+          { name: "Other Styles", href: "/category/goyard-other-styles" },
           { name: "All Goyard Bags", href: "/category/goyard" },
         ],
       },
     ],
   },
   other: {
-    title: "New Bags From THE ROW",
-    subtitle: "Other Brands",
+    title: "Discover Other Luxury Brands",
+    subtitle: "Curated selection from top designers",
     imageId: "mega-new-arrivals",
-    collectionHref: "/category/other-brands",
+    collectionHref: "/category/other-bags-1",
     sections: [
       {
         title: "Brands",
         links: [
-          { name: "The Row", href: "/category/other-brands" },
-          { name: "Louis Vuitton", href: "/category/other-brands" },
-          { name: "Christian Dior", href: "/category/other-brands" },
-          { name: "Fendi", href: "/category/other-brands" },
-          { name: "Loro Piana", href: "/category/other-brands" },
+          { name: "The Row", href: "/category/the-row-bags" },
+          { name: "Louis Vuitton", href: "/category/louis-vuitton-bags" },
+          { name: "Christian Dior", href: "/category/christian-dior-bags" },
+          { name: "Fendi", href: "/category/fendi-bags" },
+          { name: "Loro Piana", href: "/category/loro-piana-bags" },
+          { name: "All Other Brands", href: "/category/other-bags-1" },
         ],
       },
     ],
   },
   jewelry: {
-    title: "Van Cleef & Arpels NEW ARRIVALS",
-    subtitle: "Jewelry",
+    title: "Van Cleef & Arpels New Arrivals",
+    subtitle: "Fine & costume jewelry, vintage & contemporary",
     imageId: "mega-jewelry",
     collectionHref: "/category/jewelry",
     sections: [
       {
         title: "Fine Jewelry",
         links: [
-          { name: "Vintage", href: "/category/jewelry" },
-          { name: "Contemporary", href: "/category/jewelry" },
-          { name: "Costume Jewelry", href: "/category/jewelry" },
-          { name: "New Arrivals", href: "/category/new-arrivals" },
+          { name: "Fine Jewelry", href: "/category/fine-jewelry" },
+          { name: "Vintage Jewelry", href: "/category/jewelry-vintage" },
+          { name: "Contemporary", href: "/category/jewelry-contemporary" },
+          { name: "Costume Jewelry", href: "/category/costume-jewelry" },
+          { name: "New Arrivals", href: "/category/jewelry-new-arrivals" },
         ],
       },
       {
         title: "Category",
         links: [
-          { name: "Earrings", href: "/category/jewelry" },
-          { name: "Bracelets", href: "/category/jewelry" },
-          { name: "Necklaces", href: "/category/jewelry" },
-          { name: "Rings", href: "/category/jewelry" },
-          { name: "Watches", href: "/category/jewelry" },
+          { name: "Earrings", href: "/category/fine-jewelry-earrings" },
+          { name: "Bracelets", href: "/category/fine-jewelry-bracelets" },
+          { name: "Necklaces", href: "/category/fine-jewelry-necklaces" },
+          { name: "Rings", href: "/category/fine-jewelry-rings" },
+          { name: "Watches", href: "/category/watches" },
         ],
       },
       {
         title: "Brand",
         links: [
-          { name: "Hermès", href: "/category/jewelry" },
-          { name: "Tiffany", href: "/category/jewelry" },
+          { name: "Hermès", href: "/category/hermes" },
+          { name: "Tiffany & Co.", href: "/category/jewelry" },
           { name: "Van Cleef & Arpels", href: "/category/jewelry" },
+          { name: "Chanel Jewelry", href: "/category/chanel" },
         ],
       },
     ],
@@ -234,21 +283,22 @@ export const Header = () => {
     {
       id: "new",
       name: "NEW ARRIVALS",
-      href: `/${countryCode}/category/new-arrivals`,
+      href: `/${countryCode}/category/new-arrivals-handbags`,
     },
-    { id: "hermes", name: "HERMÈS", href: `/${countryCode}/category/hermes` },
+    { id: "hermes", name: "HERMÈS", href: `/${countryCode}/category/hermes-handbags` },
+    { id: "chanel", name: "CHANEL", href: `/${countryCode}/category/chanel-bags` },
     { id: "goyard", name: "GOYARD", href: `/${countryCode}/category/goyard` },
     {
       id: "other",
       name: "OTHER BRANDS",
-      href: `/${countryCode}/category/other-brands`,
+      href: `/${countryCode}/category/other-bags-1`,
     },
     {
       id: "jewelry",
       name: "JEWELRY",
-      href: `/${countryCode}/category/jewelry`,
+      href: `/${countryCode}/category/fine-jewelry`,
     },
-    { id: "live", name: "LIVE SHOP", href: `/${countryCode}/account/live` },
+    { id: "live", name: "LIVE SHOP", href: `/${countryCode}/sell` },
     { id: "journal", name: "BLOG", href: `/${countryCode}/journal` },
   ];
 
@@ -318,24 +368,24 @@ export const Header = () => {
       {/* Desktop only */}
       <div className="hidden lg:block bg-[#1a1a1a]">
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between h-9">
-          <Link className="text-white" href={""}>
+          <Link className="text-white" href={`/${countryCode}/about`}>
             100% Authentic Guaranteed
           </Link>
           <div className="flex items-center">
             <a
-              href="#"
+              href={`/${countryCode}/how-to-sell`}
               className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
             >
               Sell
             </a>
             <a
-              href="#"
+              href={`/${countryCode}/appointments`}
               className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
             >
               Appointments
             </a>
             <a
-              href="#"
+              href={`/${countryCode}/contact`}
               className="text-[12px] tracking-[0.14em]  text-white hover:text-white transition-colors font-medium px-5"
             >
               Contact
@@ -489,9 +539,9 @@ export const Header = () => {
             </div>
 
             <div className="hidden lg:flex space-x-2 text-gray-600 text-[12px]">
-              <Link href={"/"}>Log In</Link>
+              <Link href={`/${countryCode}/account/login`}>Log In</Link>
               <span>|</span>
-              <Link href={"/"}>Sign Up</Link>
+              <Link href={`/${countryCode}/account/register`}>Sign Up</Link>
             </div>
 
             {/* CENTER: Logo */}
@@ -608,16 +658,20 @@ export const Header = () => {
                   <div
                     className={cn(
                       "grid gap-10",
-                      MEGA_MENU_DATA[hoveredLink].sections.length >= 3
-                        ? "grid-cols-4"
-                        : "grid-cols-2"
+                      MEGA_MENU_DATA[hoveredLink].sections.length >= 4
+                        ? "grid-cols-5":
+                        MEGA_MENU_DATA[hoveredLink].sections.length >= 3
+                        ? "grid-cols-4":
+                        MEGA_MENU_DATA[hoveredLink].sections.length >= 2
+                        ? "grid-cols-3":
+                        "grid-cols-2"
                     )}
                   >
                     {/* Link columns */}
                     {MEGA_MENU_DATA[hoveredLink].sections.map(
                       (section: any, idx: number) => (
                         <div key={idx}>
-                          <p className="text-[10px] font-bold tracking-[0.35em] uppercase text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-900 mb-4 pb-2 border-b border-gray-100">
                             {section.title}
                           </p>
                           <ul className="space-y-2">

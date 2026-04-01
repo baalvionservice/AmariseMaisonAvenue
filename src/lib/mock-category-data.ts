@@ -57,7 +57,7 @@ export interface SubItem {
       label: "HANDBAGS",
       items: [
         {
-          id: "birkin",
+          id: "hermes-birkin-handbags",
           label: "Birkin Bags",
           subItems: [
             { id: "birkin-25cm", label: "Birkin 25CM" },
@@ -68,7 +68,7 @@ export interface SubItem {
           ],
         },
         {
-          id: "kelly",
+          id: "hermes-kelly-handbags",
           label: "Kelly Bags",
           subItems: [
             { id: "kelly-20cm", label: "Kelly 20CM" },
@@ -79,7 +79,7 @@ export interface SubItem {
           ],
         },
         {
-          id: "constance",
+          id: "hermes-constance-handbags",
           label: "Constance Bags",
           subItems: [
             { id: "constance-18cm", label: "Constance 18CM" },
@@ -95,12 +95,13 @@ export interface SubItem {
         },
         { id: "picotin", label: "Picotin Bags" },
         { id: "lindy", label: "Lindy Bags" },
-        { id: "herbag", label: "Herbag Bags" },
+        { id: "bolide", label: "Bolide Bags" },
+        { id: "herbag", label: "Herbag Collection" },
         { id: "other-bags", label: "Other Bags" },
       ],
     },
     {
-      id: "accessories",
+      id: "hermes-accessories",
       label: "ACCESSORIES",
       items: [
         { id: "wallets", label: "Wallets" },
@@ -113,7 +114,7 @@ export interface SubItem {
       ],
     },
     {
-      id: "curations",
+      id: "hermes-curations",
       label: "CURATIONS",
       items: [
         { id: "new-arrivals", label: "New Arrivals" },
@@ -128,6 +129,177 @@ export interface SubItem {
       ],
     },
   ];
+  
+  // ─── Chanel Sidebar ───────────────────────────────────────────────────────────
+  
+  export const CHANEL_SIDEBAR: SidebarSection[] = [
+    {
+      id: "handbags",
+      label: "HANDBAGS",
+      items: [
+        {
+          id: "chanel-flap",
+          label: "Classic Flap Bags",
+          subItems: [
+            { id: "chanel-mini", label: "Classic Mini" },
+            { id: "chanel-small", label: "Classic Small" },
+            { id: "chanel-medium", label: "Classic Medium" },
+            { id: "chanel-jumbo", label: "Classic Jumbo & Maxi" },
+          ],
+        },
+        { id: "chanel-22", label: "Chanel 22 Bags" },
+        { id: "chanel-25", label: "Chanel 25 Bags" },
+        { id: "chanel-totes", label: "Totes" },
+        { id: "chanel-woc", label: "Wallet on Chain" },
+        { id: "chanel-runway", label: "Fashion & Runway Bags" },
+      ],
+    },
+    {
+      id: "curations",
+      label: "CURATIONS",
+      items: [
+        { id: "new-arrivals", label: "New Arrivals" },
+        { id: "chanel-vintage", label: "Vintage Chanel" },
+        { id: "chanel-rare", label: "Rare & Collectible" },
+        { id: "chanel-best-sellers", label: "Best Sellers" },
+      ],
+    },
+  ];
+  
+  // ─── Goyard Sidebar ───────────────────────────────────────────────────────────
+  
+  export const GOYARD_SIDEBAR: SidebarSection[] = [
+    {
+      id: "handbags",
+      label: "HANDBAGS",
+      items: [
+        {
+          id: "goyard-saint-louis",
+          label: "Saint Louis",
+          subItems: [
+            { id: "saint-louis-pm", label: "Saint Louis PM" },
+            { id: "saint-louis-gm", label: "Saint Louis GM" },
+          ],
+        },
+        {
+          id: "goyard-saigon",
+          label: "Saigon",
+          subItems: [
+            { id: "saigon-mini", label: "Saigon Mini" },
+            { id: "saigon-mm", label: "Saigon MM" },
+          ],
+        },
+        { id: "goyard-anjou", label: "Anjou" },
+        { id: "goyard-artois", label: "Artois" },
+        { id: "goyard-other", label: "Other Styles" },
+        { id: "goyard", label: "All Goyard Bags" },
+      ],
+    },
+    {
+      id: "curations",
+      label: "CURATIONS",
+      items: [
+        { id: "new-arrivals", label: "New Arrivals" },
+        { id: "goyard-best-sellers", label: "Best Sellers" },
+        { id: "goyard-vintage", label: "Vintage Goyard" },
+      ],
+    },
+  ];
+  
+  // ─── Jewelry Sidebar ──────────────────────────────────────────────────────────
+  
+  export const JEWELRY_SIDEBAR: SidebarSection[] = [
+    {
+      id: "type",
+      label: "TYPE",
+      items: [
+        { id: "fine-jewelry", label: "Fine Jewelry" },
+        { id: "costume-jewelry", label: "Costume Jewelry" },
+        { id: "jewelry-vintage", label: "Vintage" },
+        { id: "jewelry-contemporary", label: "Contemporary" },
+        { id: "jewelry-new-arrivals", label: "New Arrivals" },
+      ],
+    },
+    {
+      id: "category",
+      label: "CATEGORY",
+      items: [
+        { id: "fine-jewelry-earrings", label: "Earrings" },
+        { id: "fine-jewelry-bracelets", label: "Bracelets" },
+        { id: "fine-jewelry-necklaces", label: "Necklaces" },
+        { id: "fine-jewelry-rings", label: "Rings" },
+        { id: "watches", label: "Watches" },
+      ],
+    },
+    {
+      id: "brand",
+      label: "BRAND",
+      items: [
+        { id: "jewelry-hermes", label: "Hermès" },
+        { id: "jewelry-tiffany", label: "Tiffany & Co." },
+        { id: "jewelry-van-cleef", label: "Van Cleef & Arpels" },
+        { id: "jewelry-chanel", label: "Chanel" },
+        { id: "jewelry-cartier", label: "Cartier" },
+      ],
+    },
+  ];
+  
+  // ─── Other Brands Sidebar ─────────────────────────────────────────────────────
+  
+  export const OTHER_BRANDS_SIDEBAR: SidebarSection[] = [
+    {
+      id: "brands",
+      label: "BRANDS",
+      items: [
+        { id: "other-the-row", label: "The Row" },
+        { id: "other-louis-vuitton", label: "Louis Vuitton" },
+        { id: "other-christian-dior", label: "Christian Dior" },
+        { id: "other-fendi", label: "Fendi" },
+        { id: "other-loro-piana", label: "Loro Piana" },
+        { id: "other-bottega", label: "Bottega Veneta" },
+        { id: "other-prada", label: "Prada" },
+        { id: "other-celine", label: "Celine" },
+      ],
+    },
+    {
+      id: "curations",
+      label: "CURATIONS",
+      items: [
+        { id: "new-arrivals", label: "New Arrivals" },
+        { id: "other-best-sellers", label: "Best Sellers" },
+        { id: "other-vintage", label: "Vintage & Pre-Owned" },
+      ],
+    },
+  ];
+  
+  // ─── Category Sidebar Map ─────────────────────────────────────────────────────
+  
+  /** Maps a category URL slug prefix to its sidebar data */
+  export const CATEGORY_SIDEBAR_MAP: Record<string, SidebarSection[]> = {
+    hermes: HERMES_SIDEBAR,
+    chanel: CHANEL_SIDEBAR,
+    goyard: GOYARD_SIDEBAR,
+    jewelry: JEWELRY_SIDEBAR,
+    "fine-jewelry": JEWELRY_SIDEBAR,
+    "costume-jewelry": JEWELRY_SIDEBAR,
+    watches: JEWELRY_SIDEBAR,
+    "new-arrivals": HERMES_SIDEBAR, // fallback to Hermès for new arrivals
+  };
+  
+  /**
+   * Returns the sidebar data for a given category ID.
+   * Matches by exact key or by prefix (e.g. "hermes-birkin" → HERMES_SIDEBAR).
+   */
+  export function getCategorySidebar(id: string): SidebarSection[] | null {
+    if (!id) return null;
+    // Try exact match first
+    if (CATEGORY_SIDEBAR_MAP[id]) return CATEGORY_SIDEBAR_MAP[id];
+    // Try prefix match (e.g. "hermes-birkin" starts with "hermes")
+    for (const key of Object.keys(CATEGORY_SIDEBAR_MAP)) {
+      if (id.startsWith(key)) return CATEGORY_SIDEBAR_MAP[key];
+    }
+    return null;
+  }
   
   // ─── Filter Options ───────────────────────────────────────────────────────────
   
