@@ -36,7 +36,7 @@ export function CollectionToolbar({
           {totalProducts} products
         </span>
 
-        <div className="flex items-center w-full md:w-56 justify-around md:gap-8">
+        <div className="flex items-center w-full justify-around md:gap-8">
           {/* Filter button */}
           <button
             onClick={onFilterOpen}
