@@ -93,11 +93,11 @@ function SidebarSectionBlock({
         <Link href={`/${countryCode}/category/${section.id}`}>
           {section.label}
         </Link>
-        {open ? (
+        {section.items.length  >  0 && (open ? (
           <ChevronUp className="w-3.5 h-3.5 text-[#aaa] flex-shrink-0" />
         ) : (
           <ChevronDown className="w-3.5 h-3.5 text-[#aaa] flex-shrink-0" />
-        )}
+        ))}
       </button>
 
       {open && (

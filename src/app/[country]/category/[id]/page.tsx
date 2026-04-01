@@ -18,7 +18,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   "new-arrivals-handbags": "Hermès Handbags - New Arrivals",
   "new-arrivals-hermes": "Hermès Handbags - New Arrivals",
   "new-arrivals-chanel-handbags-and-accessories": "Chanel Bags - New Arrivals",
-  "view-all-new-arrivals": "New Arrivals",
+  "view-all-new-arrivals": "Other Brands - New Arrivals",
   "jewelry-new-arrivals": "Jewelry - New Arrivals",
 
   // Hermès Bags
