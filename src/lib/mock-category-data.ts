@@ -113,6 +113,19 @@ export interface SubItem {
       ],
     },
     {
+      id: "shoes",
+      label: "SHOES",
+      items: [
+        { id: "wallets", label: "Wallets" },
+        { id: "watches", label: "Watches" },
+        { id: "belts", label: "Belts" },
+        { id: "charms", label: "Charms" },
+        { id: "scarves", label: "Scarves" },
+        { id: "shoes", label: "Shoes" },
+        { id: "jewelry-acc", label: "Jewelry" },
+      ],
+    },
+    {
       id: "curations",
       label: "CURATIONS",
       items: [

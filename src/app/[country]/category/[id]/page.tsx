@@ -19,7 +19,7 @@ export default function CategoryPage() {
   const params = useParams();
   const countryCode = (params?.country as string) || "us";
   const id = params?.id as string;
-  const categoryName = id === "hermes" ? "Hermès" : "Atelier Registry";
+  const categoryName = id === "hermes" ? "Hermès" : id === "other-brands" ? null : "Atelier Registry";
 
   const [filterOpen, setFilterOpen] = useState(false);
   const filter = useFilter();
@@ -70,7 +70,8 @@ export default function CategoryPage() {
           </h1>
 
           {/* ── Left: Sidebar navigation ── */}
-          <CategorySidebar categoryName={categoryName} />
+
+          {categoryName && <CategorySidebar categoryName={categoryName} />}
 
           {/* ── Right: Main content area ── */}
           <main className="flex-1 min-w-0 space-y-10 md:px-4">
