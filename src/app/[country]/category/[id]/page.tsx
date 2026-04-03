@@ -1,14 +1,7 @@
-"use client";
 
-import { useState, useMemo } from "react";
-import { useParams } from "next/navigation";
-import { useFilter } from "@/hooks/useFilter";
-import { FilterSheet } from "@/components/category/FilterSheet";
-import { CategorySidebar } from "@/components/category/CatergorySidebar";
-import { CollectionToolbar } from "@/components/category/CollectionToolbar";
-import { PRODUCTS } from "@/lib/mock-data";
-import { ProductGrid } from "@/components/category/ProductGrid";
-import { ShopByCategory } from "@/components/category/ShopByCategory";
+import React from "react";
+import { Metadata } from "next";
+import CategoryPageClient from "@/components/category/CategoryPageClient";
 import { getCategorySidebar } from "@/lib/mock-category-data";
 
 // ── Category label map ────────────────────────────────────────────────────────
@@ -90,10 +83,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 function getCategoryLabel(id: string): string {
   if (!id) return "Collection";
-  
+
   // 1. Direct match
   if (CATEGORY_LABELS[id]) return CATEGORY_LABELS[id];
-  
+
   // 2. Heuristic formatting for unmatched IDs (e.g. "hermes-birkin-30cm")
   let result = id
     .split("-")
@@ -106,12 +99,12 @@ function getCategoryLabel(id: string): string {
 
   // Fix brand names
   result = result.replace(/Hermes/gi, "Hermès");
-  
+
   // Ensure "Bags" suffix if the category implies it but doesn't have it
   if (id.includes('handbags') || id.includes('bags')) {
-     result = result.replace('Handbags', 'Bags');
+    result = result.replace('Handbags', 'Bags');
   } else if (!result.includes('Bags') && !result.includes('Jewelry') && !result.includes('Watches') && !result.includes('Wallets') && !result.includes('Shoes') && !result.includes('Belts')) {
-     result += " Bags";
+    result += " Bags";
   }
 
   return result;
@@ -119,7 +112,7 @@ function getCategoryLabel(id: string): string {
 
 function getCategoryBrandName(id: string): string {
   if (!id) return "Collection";
-  
+
   const idLower = id.toLowerCase();
   if (idLower.startsWith("hermes") || idLower === "new-arrivals-handbags" || idLower === "bag-besties-organizers") {
     return "Hermès";
@@ -134,127 +127,53 @@ function getCategoryBrandName(id: string): string {
     return "Fine Jewelry";
   }
   if (
-    idLower === "other-bags-1" || 
+    idLower === "other-bags-1" ||
     idLower === "view-all-new-arrivals" ||
-    idLower.includes("row") || 
-    idLower.includes("dior") || 
-    idLower.includes("vuitton") || 
-    idLower.includes("fendi") || 
+    idLower.includes("row") ||
+    idLower.includes("dior") ||
+    idLower.includes("vuitton") ||
+    idLower.includes("fendi") ||
     idLower.includes("piana")
   ) {
     return "Other Brands";
   }
-  
+
   return "Collection";
 }
 
 // ── Data / hooks ──────────────────────────────────────────────────────────────
 
-export default function CategoryPage() {
-  const params = useParams();
-  const countryCode = (params?.country as string) || "us";
-  const id = params?.id as string;
+interface CategoryPageProps {
+  params: Promise<{
+    id: string;
+    country: string;
+  }>;
+}
 
-  const pageTitle = useMemo(() => getCategoryLabel(id), [id]);
-  const brandName = useMemo(() => getCategoryBrandName(id), [id]);
-  const sidebarSections = useMemo(() => getCategorySidebar(id), [id]);
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { id, country } = await params;
+  const pageTitle = getCategoryLabel(id);
+  const brandName = getCategoryBrandName(id);
 
-  const [filterOpen, setFilterOpen] = useState(false);
-  const filter = useFilter();
-
-  // Find if the current ID matches a section/item/subItem in the resolved sidebar
-  const findMatchingData = () => {
-    if (!sidebarSections) return null;
-    for (const section of sidebarSections) {
-      if (section.id === id) {
-        return { type: "section" as const, data: section };
-      }
-      for (const item of section.items) {
-        if (item.id === id) {
-          return { type: "item" as const, data: item };
-        }
-        if (item.subItems) {
-          for (const subItem of item.subItems) {
-            if (subItem.id === id) {
-              return { type: "subItem" as const, data: subItem, parent: item };
-            }
-          }
-        }
-      }
-    }
-    return null;
+  return {
+    title: `${pageTitle} | ${brandName} | AMARISÉ MAISON`,
+    description: `Discover our curated collection of ${pageTitle.toLowerCase()} from ${brandName}. Shop authentic luxury items with expert authentication and concierge service.`,
   };
+}
 
-  const matchingData = findMatchingData();
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { id, country } = await params;
+  const pageTitle = getCategoryLabel(id);
+  const brandName = getCategoryBrandName(id);
+  const sidebarSections = getCategorySidebar(id);
 
   return (
-    <div className="bg-white min-h-screen font-sans antialiased">
-      {/* ── Filter slide-over panel ── */}
-      <FilterSheet
-        open={filterOpen}
-        onClose={() => setFilterOpen(false)}
-        filter={filter}
-      />
-
-      {/* ── Page body ── */}
-      <div className="max-w-[1200px] mx-auto px-1 lg:px-12 pt-10 lg:pt-14 pb-28">
-        <div className="flex flex-col lg:flex-row ">
-          <h1 className=" md:hidden text-[24px] font-medium text-[#1a1a1a] tracking-tight leading-none mb-[18px]">
-            {pageTitle}
-          </h1>
-
-          {/* ── Left: Sidebar navigation ── */}
-          {sidebarSections && (
-            <CategorySidebar
-              categoryName={brandName}
-              sections={sidebarSections}
-              countryCode={countryCode}
-            />
-          )}
-
-          {/* ── Right: Main content area ── */}
-          <main className="flex-1 min-w-0 space-y-10 md:px-4">
-            {/* Page heading */}
-            <header>
-              <h1 className="hidden md:flex text-[34px] font-medium text-[#1a1a1a] tracking-tight leading-none mb-[18px]">
-                {pageTitle}
-              </h1>
-
-              {/* Shop by Category Components based on matching data */}
-              {matchingData?.type === "section" && (
-                <ShopByCategory
-                  title="Shop by Style"
-                  items={matchingData.data.items}
-                  countryCode={countryCode}
-                  variant="style"
-                />
-              )}
-
-              {matchingData?.type === "item" && matchingData.data.subItems && (
-                <ShopByCategory
-                  title="Shop by Size"
-                  items={matchingData.data.subItems}
-                  countryCode={countryCode}
-                  variant="size"
-                />
-              )}
-
-              {/* Toolbar: product count + filter + sort + chips */}
-              <CollectionToolbar
-                totalProducts={PRODUCTS.length}
-                filter={filter}
-                onFilterOpen={() => setFilterOpen(true)}
-              />
-            </header>
-
-            {/* Product grid */}
-            <ProductGrid
-              products={PRODUCTS.slice(0, 50)}
-              countryCode={countryCode}
-            />
-          </main>
-        </div>
-      </div>
-    </div>
+    <CategoryPageClient
+      id={id}
+      country={country}
+      pageTitle={pageTitle}
+      brandName={brandName}
+      sidebarSections={sidebarSections}
+    />
   );
 }
