@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -25,9 +24,9 @@ export default function WishlistPage() {
         <p className="text-muted-foreground text-center max-w-md">
           Save your favorite pieces here to curate your ultimate luxury collection.
         </p>
-        <Button 
-          onClick={() => router.push(`/${countryCode}`)} 
-          size="lg" 
+        <Button
+          onClick={() => router.push(`/${countryCode}`)}
+          size="lg"
           className="rounded-none bg-primary hover:bg-secondary px-12 text-xs tracking-widest font-bold"
         >
           DISCOVER PIECES

@@ -1,15 +1,12 @@
-
-'use client';
-
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { 
-  Gift, 
-  Heart, 
-  Share2, 
-  Sparkles, 
+import {
+  Gift,
+  Heart,
+  Share2,
+  Sparkles,
   ChevronRight,
   Package,
   CheckCircle2
@@ -18,9 +15,21 @@ import { useAppStore } from '@/lib/store';
 import { ProductCard } from '@/components/product/ProductCard';
 import Link from 'next/link';
 
-export default function GiftRegistryPage() {
-  const { country } = useParams();
-  const countryCode = (country as string) || 'us';
+type GiftRegistryPageProps = {
+  params: {
+    country: string;
+  };
+};
+
+export async function generateMetadata({ params }: GiftRegistryPageProps): Promise<Metadata> {
+  return {
+    title: 'Private Gift Registry | AMARISÉ MAISON - Create Your Wishlist',
+    description: 'Create and share your luxury gift registry with friends and family. Curate your collection of fine artifacts for special occasions.',
+  };
+}
+
+export default function GiftRegistryPage({ params }: GiftRegistryPageProps) {
+  const countryCode = (params.country as string) || 'us';
   const { wishlist } = useAppStore();
 
   return (

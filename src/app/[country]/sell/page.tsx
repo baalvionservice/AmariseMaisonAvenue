@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -20,14 +19,14 @@ export default function SellPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { recordLog } = useAppStore();
-  
+
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate Institutional Authentication
     setTimeout(() => {
       toast({
@@ -43,8 +42,8 @@ export default function SellPage() {
     <div className="bg-white min-h-screen font-body text-gray-900">
       <header className="h-20 border-b border-gray-100 px-12 flex items-center justify-between bg-white sticky top-0 z-50">
         <div className="flex-1">
-          <Link 
-            href={`/${countryCode}`} 
+          <Link
+            href={`/${countryCode}`}
             className="text-[10px] font-bold tracking-[0.1em] text-gray-500 hover:text-black transition-colors flex items-center"
           >
             <ChevronLeft className="w-3 h-3 mr-1" /> Back to Shopping
@@ -77,17 +76,17 @@ export default function SellPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Input 
-                type="email" 
-                placeholder="Email Address" 
+              <Input
+                type="email"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-14 rounded-none border-gray-900 bg-white text-center text-sm font-light placeholder:text-gray-300 focus:ring-0 focus:border-black transition-all"
                 required
               />
             </div>
-            
-            <Button 
+
+            <Button
               type="submit"
               disabled={isSubmitting}
               className="w-full max-w-[160px] h-12 bg-[#E1D3DC] text-gray-900 hover:bg-[#D8C4D1] rounded-none text-[10px] font-bold tracking-[0.25em] uppercase transition-all mx-auto shadow-sm"
