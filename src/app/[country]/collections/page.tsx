@@ -1,19 +1,29 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { ChevronRight, Ban, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+type CollectionsPageProps = {
+  params: {
+    country: string;
+  };
+};
+
+export async function generateMetadata({ params }: CollectionsPageProps): Promise<Metadata> {
+  return {
+    title: 'Collections | AMARISÉ MAISON - Curated Luxury Collections',
+    description: 'Browse our exclusive collections featuring the finest curated selections from premier luxury brands and artisan craftspeople.',
+  };
+}
+
 /**
  * CollectionsPage: Refined for a more compact and elegant presentation.
  */
-export default function CollectionsPage() {
-  const { country } = useParams();
+export default function CollectionsPage({ params }: CollectionsPageProps) {
+  const countryCode = (params.country as string) || 'us';
   const { collections } = useAppStore();
-  const countryCode = (country as string) || 'us';
 
   return (
     <div className="bg-white min-h-screen relative">

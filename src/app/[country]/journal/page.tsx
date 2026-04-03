@@ -1,16 +1,26 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function JournalPage() {
-  const { country } = useParams();
+type JournalPageProps = {
+  params: {
+    country: string;
+  };
+};
+
+export async function generateMetadata({ params }: JournalPageProps): Promise<Metadata> {
+  return {
+    title: 'Maison Journal | Luxury Editorial, Insights & Heritage Stories',
+    description: 'Read curated editorial content about luxury artifacts, heritage craftsmanship, and the stories behind iconic collections.',
+  };
+}
+
+export default function JournalPage({ params }: JournalPageProps) {
+  const countryCode = (params.country as string) || 'us';
   const { editorials } = useAppStore();
-  const countryCode = (country as string) || 'us';
 
   const filteredEditorials = editorials.filter(ed => ed.country === countryCode || ed.country === 'us');
 
@@ -34,8 +44,8 @@ export default function JournalPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
         {filteredEditorials.map((ed, idx) => (
-          <Link 
-            key={ed.id} 
+          <Link
+            key={ed.id}
             href={`/${countryCode}/journal/${ed.id}`}
             className={`group space-y-8 block ${idx % 2 === 1 ? 'md:translate-y-20' : ''}`}
           >

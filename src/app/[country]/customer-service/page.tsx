@@ -1,29 +1,39 @@
 
-'use client';
-
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { Metadata } from 'next';
 import Link from 'next/link';
-import { 
-  ChevronRight, 
-  Truck, 
-  RefreshCcw, 
-  HelpCircle, 
-  ShieldCheck, 
-  Clock, 
-  Package 
+import {
+  ChevronRight,
+  Truck,
+  RefreshCcw,
+  HelpCircle,
+  ShieldCheck,
+  Clock,
+  Package
 } from 'lucide-react';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
 } from '@/components/ui/accordion';
 import { CUSTOMER_SERVICE, COUNTRIES } from '@/lib/mock-data';
 
-export default function CustomerServicePage() {
-  const { country } = useParams();
-  const countryCode = (country as string) || 'us';
+type CustomerServicePageProps = {
+  params: {
+    country: string;
+  };
+};
+
+export async function generateMetadata({ params }: CustomerServicePageProps): Promise<Metadata> {
+  return {
+    title: 'Customer Service & Support | AMARISÉ MAISON Help Center',
+    description: 'Get support for orders, shipping, returns, and more. Our customer service team is available to assist with all your inquiries.',
+  };
+}
+
+export default function CustomerServicePage({ params }: CustomerServicePageProps) {
+  const countryCode = (params.country as string) || 'us';
   const info = CUSTOMER_SERVICE[countryCode] || CUSTOMER_SERVICE.us;
   const currentCountry = COUNTRIES[countryCode] || COUNTRIES.us;
 
@@ -47,10 +57,10 @@ export default function CustomerServicePage() {
 
       {/* Main Content Grid */}
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-24 items-start">
-        
+
         {/* Policies Section */}
         <div className="lg:col-span-2 space-y-24">
-          
+
           {/* Shipping Info */}
           <div className="space-y-12">
             <div className="flex items-center space-x-4 text-plum">
@@ -65,15 +75,15 @@ export default function CustomerServicePage() {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-border">
-                <ServiceHighlight 
-                  icon={<ShieldCheck className="w-5 h-5 text-gold" />} 
-                  title="Full Insurance" 
-                  desc="Every artifact is insured for its replacement value during transit." 
+                <ServiceHighlight
+                  icon={<ShieldCheck className="w-5 h-5 text-gold" />}
+                  title="Full Insurance"
+                  desc="Every artifact is insured for its replacement value during transit."
                 />
-                <ServiceHighlight 
-                  icon={<Clock className="w-5 h-5 text-gold" />} 
-                  title="Priority Access" 
-                  desc="Bespoke and VIP clients receive prioritized dispatch from the ateliers." 
+                <ServiceHighlight
+                  icon={<Clock className="w-5 h-5 text-gold" />}
+                  title="Priority Access"
+                  desc="Bespoke and VIP clients receive prioritized dispatch from the ateliers."
                 />
               </div>
             </div>
@@ -93,15 +103,15 @@ export default function CustomerServicePage() {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-border">
-                <ServiceHighlight 
-                  icon={<Package className="w-5 h-5 text-gold" />} 
-                  title="Original Condition" 
-                  desc="Items must remain in their original architectural packaging with seals intact." 
+                <ServiceHighlight
+                  icon={<Package className="w-5 h-5 text-gold" />}
+                  title="Original Condition"
+                  desc="Items must remain in their original architectural packaging with seals intact."
                 />
-                <ServiceHighlight 
-                  icon={<ShieldCheck className="w-5 h-5 text-gold" />} 
-                  title="Authenticity Verification" 
-                  desc="All returned artifacts undergo a rigorous inspection by our master curators." 
+                <ServiceHighlight
+                  icon={<ShieldCheck className="w-5 h-5 text-gold" />}
+                  title="Authenticity Verification"
+                  desc="All returned artifacts undergo a rigorous inspection by our master curators."
                 />
               </div>
             </div>
@@ -132,25 +142,25 @@ export default function CustomerServicePage() {
         {/* Sidebar Navigation / Contact Shortcut */}
         <aside className="space-y-12 sticky top-32">
           <div className="bg-plum p-10 text-white shadow-luxury">
-             <h3 className="text-2xl font-headline font-bold italic mb-6">Direct Inquiries</h3>
-             <p className="text-xs text-white/70 font-light leading-relaxed italic mb-10">
-               "If your question remains unanswered, our private concierge team is available for a bespoke consultation."
-             </p>
-             <Link href={`/${countryCode}/contact`}>
-                <button className="w-full h-14 bg-white text-plum hover:bg-gold hover:text-gray-900 transition-all text-[10px] font-bold tracking-[0.3em] uppercase">
-                  Contact Concierge
-                </button>
-             </Link>
+            <h3 className="text-2xl font-headline font-bold italic mb-6">Direct Inquiries</h3>
+            <p className="text-xs text-white/70 font-light leading-relaxed italic mb-10">
+              "If your question remains unanswered, our private concierge team is available for a bespoke consultation."
+            </p>
+            <Link href={`/${countryCode}/contact`}>
+              <button className="w-full h-14 bg-white text-plum hover:bg-gold hover:text-gray-900 transition-all text-[10px] font-bold tracking-[0.3em] uppercase">
+                Contact Concierge
+              </button>
+            </Link>
           </div>
-          
+
           <div className="bg-white p-10 border border-border space-y-8">
-             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-plum">Client Resources</h4>
-             <ul className="space-y-6">
-                <ResourceLink label="Size Guide" href="#" />
-                <ResourceLink label="Product Care" href="#" />
-                <ResourceLink label="Authenticity Registry" href="#" />
-                <ResourceLink label="Gift Services" href="#" />
-             </ul>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-plum">Client Resources</h4>
+            <ul className="space-y-6">
+              <ResourceLink label="Size Guide" href="#" />
+              <ResourceLink label="Product Care" href="#" />
+              <ResourceLink label="Authenticity Registry" href="#" />
+              <ResourceLink label="Gift Services" href="#" />
+            </ul>
           </div>
         </aside>
 

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import {
   Heart,
   Star,
@@ -14,6 +13,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import placeholderData from "@/app/lib/placeholder-images.json";
 import { VipEmailSignup } from "@/components/home/VipEmailSingup";
 import { PRODUCTS } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
+import { useParams } from "next/navigation";
 import { Product } from "@/lib/types";
 
 /* ─────────────────────────────────────────────────────────────────

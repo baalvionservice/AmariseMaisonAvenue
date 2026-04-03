@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
 import Image from "next/image";
 import { COUNTRIES } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAppStore } from "@/lib/store";
+import { useParams } from "next/navigation";
 
 export default function AppointmentBookingPage() {
   const { country } = useParams();
