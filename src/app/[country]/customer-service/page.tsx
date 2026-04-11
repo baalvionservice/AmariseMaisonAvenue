@@ -74,7 +74,7 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
       <div className="container mx-auto px-6 lg:px-8 space-y-24 pb-32">
 
         {/* Shipping Section */}
-        <section className="space-y-12">
+        <section className="space-y-12 mt-12">
           <div className="text-center space-y-6">
             <div className="flex items-center justify-center space-x-4">
               <Truck className="w-12 h-12 text-plum" />
@@ -89,7 +89,7 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
             <div className="bg-gradient-to-r from-plum to-plum/80 p-8 text-white">
               <h3 className="text-3xl font-headline font-bold italic mb-4">Local Logistics: {currentCountry.name}</h3>
               <p className="text-lg font-light leading-relaxed opacity-90">
-                All orders within {currentCountry.name} are fulfilled through our trusted logistics partners, ensuring secure and refined white-glove delivery.
+                {info.shipping}
               </p>
             </div>
 
@@ -149,7 +149,7 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
             </div>
             <p className="text-xl text-plum font-semibold tracking-wide uppercase">The Return Charter ({currentCountry.name})</p>
             <p className="text-2xl text-gray-700 font-light max-w-3xl mx-auto italic leading-relaxed">
-              "Our relationship with you continues beyond delivery — defined by trust, authenticity, and care."
+              {info.returns}
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
               <div className="p-4 md:p-12 border-r border-gray-100">
                 <h3 className="text-3xl font-bold text-gray-900 mb-6">Return Window</h3>
                 <p className="text-xl text-gray-600 leading-relaxed italic mb-8">
-                  We accept returns for both <span className="text-plum font-semibold">defective and non-defective products within 30 days</span> of delivery.
+                  We accept returns for both <span className="text-plum font-semibold">defective and non-defective products within 7 to 15 days</span> of delivery.
                 </p>
 
                 <h4 className="text-2xl font-bold text-gray-900 mb-4">Eligibility Criteria</h4>
@@ -291,9 +291,9 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
               <div className="w-16 h-16 bg-plum/10 rounded-full flex items-center justify-center mx-auto">
                 <Package className="w-8 h-8 text-plum" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">Book a Viewing</h3>
+              <h3 className="text-3xl font-bold text-gray-900">{info.faqs[0]?.question || "Book a Viewing"}</h3>
               <p className="text-xl text-gray-600 leading-relaxed italic">
-                Private product viewings and consultations can be arranged upon request.
+                {info.faqs[0]?.answer || "Private product viewings and consultations can be arranged upon request."}
               </p>
             </div>
 
@@ -306,12 +306,7 @@ export default function CustomerServicePage({ params }: CustomerServicePageProps
               <p className="text-2xl text-gray-600 leading-relaxed italic mb-8">
                 "If your question remains unanswered, our private concierge team is available for a bespoke consultation."
               </p>
-              <Link href={`/${countryCode}/contact`}>
-                <button className="inline-flex items-center space-x-3 bg-plum text-white hover:bg-gold hover:text-gray-900 transition-all duration-300 text-lg font-bold tracking-wide uppercase px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                  <span>Contact Concierge</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
+             
             </div>
           </div>
         </section>

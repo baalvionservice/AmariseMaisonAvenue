@@ -113,6 +113,22 @@ export const COUNTRIES: Record<string, Country> = {
       image: "",
     },
   },
+  ca: {
+    code: "ca",
+    name: "Canada",
+    currency: "CAD",
+    symbol: "C$",
+    locale: "en-CA",
+    flag: "🇨🇦",
+    office: {
+      city: "Toronto",
+      address: "100 Bloor Street West, Toronto, ON M5S 3M2",
+      phone: "+1 (416) 555-0192",
+      email: "concierge.ca@amarise-luxe.com",
+      mapUrl: "https://maps.google.com/?q=100+Bloor+Street+West+Toronto",
+      image: "",
+    },
+  },
 };
 
 export const DEPARTMENTS: Department[] = [
@@ -319,7 +335,8 @@ const generateProducts = (): Product[] => {
     subcategoryId: "birkin-25cm",
     collectionId: "heritage",
     basePrice: 31741.89,
-    imageUrl: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
     isVip: true,
     rating: 5.0,
     reviewsCount: 1,
@@ -327,7 +344,7 @@ const generateProducts = (): Product[] => {
     brandId: "amarise-luxe",
     isGlobal: true,
     scope: "global",
-    regions: ["us", "uk", "ae", "in", "sg"],
+    regions: ["us", "uk", "ae", "in", "sg", "ca"],
     status: "published",
     versionHistory: [],
     currentVersion: 1,
@@ -363,7 +380,7 @@ const generateProducts = (): Product[] => {
       brandId: "amarise-luxe",
       isGlobal: true,
       scope: "global",
-      regions: ["us", "uk", "ae", "in", "sg"],
+      regions: ["us", "uk", "ae", "in", "sg", "ca"],
       status: "published",
       versionHistory: [],
       currentVersion: 1,
@@ -453,7 +470,7 @@ const generateSEOContent = () => {
     },
   ];
 
-  const countryCodes: CountryCode[] = ["us", "uk", "ae", "in", "sg"];
+  const countryCodes: CountryCode[] = ["us", "uk", "ae", "in", "sg", "ca"];
 
   for (let i = 1; i <= 100; i++) {
     const country = countryCodes[i % countryCodes.length];
@@ -542,9 +559,156 @@ export const MAISON_STORY: MaisonStory = {
 
 export const CUSTOMER_SERVICE: Record<string, CustomerServiceInfo> = {
   us: {
-    shipping: "White-glove delivery.",
-    returns: "30-day policy.",
-    faqs: [{ question: "Book a viewing?", answer: "Contact concierge." }],
+    shipping:
+      "White-glove delivery within the United States through our premium logistics network.",
+    returns:
+      "30-day return policy with free shipping and full authenticity verification.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Contact our concierge team to arrange a private viewing at our New York atelier.",
+      },
+      {
+        question: "Do you offer international shipping?",
+        answer:
+          "Yes, we provide white-glove shipping worldwide with full insurance coverage.",
+      },
+      {
+        question: "What is your authenticity guarantee?",
+        answer:
+          "Every piece undergoes rigorous verification by our master curators.",
+      },
+    ],
+  },
+  uk: {
+    shipping:
+      "White-glove delivery within the United Kingdom through our premium logistics network.",
+    returns:
+      "30-day return policy with free shipping and full authenticity verification.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Contact our concierge team to arrange a private viewing at our London atelier.",
+      },
+      {
+        question: "Do you offer international shipping?",
+        answer:
+          "Yes, we provide white-glove shipping worldwide with full insurance coverage.",
+      },
+      {
+        question: "What is your authenticity guarantee?",
+        answer:
+          "Every piece undergoes rigorous verification by our master curators.",
+      },
+    ],
+  },
+  ae: {
+    shipping:
+      "All UAE orders are fulfilled from our international ateliers and delivered via trusted global logistics partners. Order Processing: 1–2 business days. Transit Time: 3–7 business days. Estimated Delivery: 4–9 business days. Free standard shipping across the United Arab Emirates with full insurance coverage.",
+    returns:
+      "We accept returns for both defective and non-defective products within 30 days of delivery. Items must be unused and in original condition with original packaging, tags, and seals intact. Returns accepted by mail only with free return shipping provided. Refunds processed within 5–7 business days after inspection and approval.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Private consultations are available upon request. Contact our concierge team for a bespoke consultation.",
+      },
+      {
+        question: "Can I cancel my order?",
+        answer:
+          "Orders can be cancelled before dispatch. Once shipped, the return policy applies.",
+      },
+      {
+        question: "What if my item arrives damaged?",
+        answer: "Contact us within 48 hours with photos for immediate support.",
+      },
+      {
+        question: "What about customs and duties?",
+        answer:
+          "Duties and taxes (if applicable) are clearly communicated at checkout with no hidden charges after purchase.",
+      },
+    ],
+  },
+  in: {
+    shipping:
+      "White-glove delivery within India through our premium logistics network.",
+    returns:
+      "30-day return policy with free shipping and full authenticity verification.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Contact our concierge team to arrange a private viewing at our Mumbai atelier.",
+      },
+      {
+        question: "Do you offer international shipping?",
+        answer:
+          "Yes, we provide white-glove shipping worldwide with full insurance coverage.",
+      },
+      {
+        question: "What is your authenticity guarantee?",
+        answer:
+          "Every piece undergoes rigorous verification by our master curators.",
+      },
+    ],
+  },
+  sg: {
+    shipping:
+      "All Singapore orders are fulfilled from our international ateliers and delivered via trusted global logistics partners. Order Processing: 1–2 business days. International Transit: 4–8 business days. Estimated Delivery: 5–10 business days. Free standard shipping on all orders to Singapore with full insurance coverage.",
+    returns:
+      "We accept returns for both defective and non-defective products within 30 days of delivery. Items must be unused and in original condition with original packaging, tags, seals, and certificates intact. Returns accepted by mail only with free return shipping provided. Refunds processed within 5–7 business days after inspection and approval.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Private consultations are available upon request. Contact our concierge team for a bespoke consultation.",
+      },
+      {
+        question: "Can I cancel my order?",
+        answer:
+          "Orders can be cancelled before dispatch. Once shipped, the return policy applies.",
+      },
+      {
+        question: "What if my item arrives damaged?",
+        answer:
+          "Contact us within 48 hours with photos for immediate assistance.",
+      },
+      {
+        question: "What about customs and duties?",
+        answer:
+          "Any applicable duties or taxes are clearly communicated at checkout with no hidden charges after purchase.",
+      },
+    ],
+  },
+  ca: {
+    shipping:
+      "All Canadian orders are fulfilled from our international ateliers and shipped through trusted global logistics partners. Order Processing: 1–2 business days. International Transit: 5–10 business days. Estimated Delivery: 6–12 business days. Free standard shipping on all orders to Canada with full insurance coverage.",
+    returns:
+      "We accept returns for both defective and non-defective products within 30 days of delivery. Items must be unused and in original condition with original packaging, tags, seals, and certificates intact. Returns accepted by mail only with free return shipping provided. Refunds processed within 5–7 business days after inspection and approval.",
+    faqs: [
+      {
+        question: "How can I book a private viewing?",
+        answer:
+          "Private consultations are available upon request. Contact our concierge team for a bespoke consultation.",
+      },
+      {
+        question: "Can I cancel my order?",
+        answer:
+          "Orders can be cancelled before dispatch. Once shipped, the return policy applies.",
+      },
+      {
+        question: "What if my item arrives damaged?",
+        answer:
+          "Please contact us within 48 hours of delivery with photos, and we will assist immediately.",
+      },
+      {
+        question: "What about customs and duties?",
+        answer:
+          "Any applicable customs duties or taxes are clearly communicated at checkout with no hidden charges after purchase.",
+      },
+    ],
   },
 };
 
@@ -718,6 +882,14 @@ export const FX_RATES: FXRate[] = [
     lastUpdated: "2024-03-15T12:00:00Z",
     source: "Maison Core",
   },
+  {
+    currencyCode: "CAD",
+    baseCurrency: "USD",
+    rate: 1.36,
+    spread: 0.02,
+    lastUpdated: "2024-03-15T12:00:00Z",
+    source: "Maison Core",
+  },
 ];
 
 export const TAX_RULES: TaxRule[] = [
@@ -763,6 +935,15 @@ export const TAX_RULES: TaxRule[] = [
     taxType: "GST",
     category: "general",
     rate: 9,
+    isInclusive: true,
+    lastUpdated: "2024-03-15T12:00:00Z",
+  },
+  {
+    id: "tax-ca-gen",
+    country: "ca",
+    taxType: "GST",
+    category: "general",
+    rate: 13,
     isInclusive: true,
     lastUpdated: "2024-03-15T12:00:00Z",
   },

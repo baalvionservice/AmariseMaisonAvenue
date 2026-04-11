@@ -1,4 +1,4 @@
-export type CountryCode = "us" | "uk" | "ae" | "in" | "sg";
+export type CountryCode = "us" | "uk" | "ae" | "in" | "sg" | "ca";
 export type LanguageCode = "en" | "ar" | "hi" | "fr";
 
 export type PaymentGateway = "STRIPE" | "RAZORPAY" | "PAYU" | "BANK_TRANSFER";
