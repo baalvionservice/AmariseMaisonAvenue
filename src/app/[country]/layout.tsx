@@ -8,6 +8,7 @@ import { MaisonPopup } from "@/components/layout/MaisonPopup";
 import { MadAveLiveWidget } from "@/components/layout/MadAveLiveWidget";
 import { JudyTrigger } from "@/components/layout/JudyTrigger";
 import { CartSheet } from "@/components/layout/CartSheet";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Link from "next/link";
 import {
   Phone,
@@ -30,10 +31,19 @@ export default function CountryLayout({
   children: React.ReactNode;
 }) {
   const { country } = useParams();
+  const [isMobile, setIsMobile] = React.useState<boolean>(true);
   const countryCode = (country as string) || "us";
   const { currentLanguage } = useAppStore();
 
+
+  function checkMobile() {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 768);
+    }
+  }
+
   useEffect(() => {
+    checkMobile();
     // Update directionality on load
     document.documentElement.dir = i18n.getDirection();
     document.documentElement.lang = currentLanguage;
@@ -43,7 +53,7 @@ export default function CountryLayout({
     <div dir={i18n.getDirection()}>
       <MaisonPopup />
       <MadAveLiveWidget />
-      <JudyTrigger />
+      {!isMobile && <JudyTrigger />}
       <CartSheet />
       <Header />
       {/* Optimized Content Offset for Responsive Tiered Header */}
@@ -55,14 +65,213 @@ export default function CountryLayout({
       </main>
       <VipEmailSignup />
 
-      <footer className="bg-white text-black pt-20 pb-10 border-t border-gray-100 font-body">
+      <footer className="bg-white text-black pt-8 md:pt-20 pb-10 border-t border-gray-100 font-body">
         <div className="container mx-auto px-6 lg:px-12 max-w-[1600px]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-20 items-start">
+          <div className="md:hidden mb-12">
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="customer-care">
+                <AccordionTrigger className="uppercase">Customer Care</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4 text-[13px] font-light text-gray-600">
+                    <li>
+                      <Link
+                        href={`/${countryCode}/contact`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Contact Us
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/faq`}
+                        className="hover:text-black transition-colors"
+                      >
+                        FAQ
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/account`}
+                        className="hover:text-black transition-colors"
+                      >
+                        My Account
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/customer-service`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Shipping & Returns
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/customer-service`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Authenticity Guarantee
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/how-to-sell`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Sell To Us
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/appointments`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Showrooms
+                      </Link>
+                    </li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="about">
+                <AccordionTrigger  className="uppercase">About</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4 text-[13px] font-light text-gray-600">
+                    <li>
+                      <Link
+                        href={`/${countryCode}/about`}
+                        className="hover:text-black transition-colors"
+                      >
+                        About Us
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/contact`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Visit Us
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/about`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Message From Our Founder
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/journal`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Affiliates
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/journal`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Blog
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/journal`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Press
+                      </Link>
+                    </li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="shop">
+                <AccordionTrigger  className="uppercase">Shop</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4 text-[13px] font-light text-gray-600">
+                    <li>
+                      <Link
+                        href={`/${countryCode}/category/hermes`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Archive Registry
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/account/live`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Live Shops
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/category/new-arrivals`}
+                        className="hover:text-black transition-colors"
+                      >
+                        New Arrivals
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/category/hermes`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Hermès
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/category/chanel`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Chanel
+                      </Link>
+                    </li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="sell-with-us">
+                <AccordionTrigger  className="uppercase">Sell With Us</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4 text-[13px] font-light text-gray-600">
+                    <li>
+                      <Link
+                        href={`/${countryCode}/how-to-sell`}
+                        className="hover:text-black transition-colors"
+                      >
+                        How to Consign
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/${countryCode}/sell`}
+                        className="hover:text-black transition-colors"
+                      >
+                        Partner Portal
+                      </Link>
+                    </li>
+                  </ul>
+                  <div className="bg-[#f8f8f8] p-4 text-center space-y-3 border border-gray-100 text-[13px] text-gray-600">
+                    <ShieldCheck className="w-5 h-5 text-gray-400 mx-auto" />
+                    <p className="text-[10px] text-gray-400 font-light italic leading-relaxed">
+                      100% Authentic Guaranteed Heritage Sourcing
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-20 items-start">
             {/* Column 1: Customer Care */}
             <div className="space-y-8">
-              <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
                 Customer Care
-              </h4>
+              </p>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li>
                   <Link
@@ -70,6 +279,14 @@ export default function CountryLayout({
                     className="hover:text-black transition-colors"
                   >
                     Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={`/${countryCode}/faq`}
+                    className="hover:text-black transition-colors"
+                  >
+                    FAQ
                   </Link>
                 </li>
                 <li>
@@ -117,9 +334,9 @@ export default function CountryLayout({
 
             {/* Column 2: About */}
             <div className="space-y-8">
-              <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
                 About
-              </h4>
+              </p>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li>
                   <Link
@@ -174,9 +391,9 @@ export default function CountryLayout({
 
             {/* Column 3: Shop */}
             <div className="space-y-8">
-              <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
                 Shop
-              </h4>
+              </p>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li>
                   <Link
@@ -223,9 +440,9 @@ export default function CountryLayout({
 
             {/* Column 4: Sell & Trust */}
             <div className="space-y-8">
-              <h4 className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-black pb-4 w-full">
                 Sell With Us
-              </h4>
+              </p>
               <ul className="space-y-4 text-[13px] font-light text-gray-600">
                 <li>
                   <Link
@@ -269,7 +486,7 @@ export default function CountryLayout({
         </div>
       </footer>
 
-      <ShowcaseControls />
+      {!isMobile && <ShowcaseControls />}
     </div>
   );
 }

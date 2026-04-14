@@ -61,58 +61,10 @@ export default function ContactPage({ params }: ContactPageProps) {
           {/* Contact Form Section */}
           <ContactFormClient countryCode={countryCode} currentCountry={currentCountry} />
 
-          {/* Dynamic HQ Info Section */}
-          <aside className="lg:w-96 space-y-12 shrink-0">
-            <div className="space-y-8 bg-white p-10 border border-border shadow-luxury animate-fade-in" key={countryCode}>
-              <div className="flex items-center space-x-4 text-plum">
-                <Globe className="w-5 h-5" />
-                <h3 className="text-[10px] font-bold tracking-[0.4em] uppercase">Regional Headquarters</h3>
-              </div>
-
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h4 className="text-3xl font-headline font-bold italic text-gray-900">{currentCountry.office?.city} Ateliers</h4>
-                  <div className="h-px w-12 bg-gold" />
-                </div>
-
-                <div className="space-y-6">
-                  <ContactItem icon={<MapPin className="w-4 h-4 text-gold" />} label="Address" value={currentCountry.office?.address || ''} />
-                  <ContactItem icon={<Phone className="w-4 h-4 text-gold" />} label="Telephone" value={currentCountry.office?.phone || ''} />
-                  <ContactItem icon={<Mail className="w-4 h-4 text-gold" />} label="Email" value={currentCountry.office?.email || ''} />
-                  <ContactItem icon={<Clock className="w-4 h-4 text-gold" />} label="Hours" value="Mon - Sat | 10:00 AM - 07:00 PM" />
-                </div>
-              </div>
-
-              <div className="pt-8">
-                <Link href={currentCountry.office?.mapUrl || '#'} target="_blank">
-                  <Button variant="outline" className="w-full rounded-none border-border hover:bg-ivory text-[10px] font-bold tracking-[0.3em] uppercase h-12">
-                    REQUEST DIRECTIONS
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Map Simulation Card Box */}
-            <div className="relative aspect-[4/5] w-full border border-border shadow-luxury group overflow-hidden bg-muted flex items-center justify-center" key={`map-${countryCode}`}>
-              {/* HQ Card Box Placeholder */}
-              <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase transition-transform duration-[2s] group-hover:scale-105">
-                Atelier Location
-              </div>
-              <div className="absolute inset-0 bg-plum/10 group-hover:bg-transparent transition-colors" />
-              <div className="absolute bottom-0 inset-x-0 p-8 luxury-blur bg-opacity-90 border-t border-border">
-                <div className="flex items-center space-x-2 text-[10px] font-bold tracking-widest text-plum uppercase">
-                  <Sparkles className="w-3 h-3 text-gold" />
-                  <span>Maison Flagship</span>
-                </div>
-                <p className="text-xs text-gray-600 mt-2 font-light italic">
-                  Visit our flagship boutique in the heart of {currentCountry.office?.city} for a private viewing experience.
-                </p>
-              </div>
-            </div>
-          </aside>
 
         </div>
       </div>
+
 
       {/* Global Ateliers Section */}
       <section className="container mx-auto px-6 mt-40">

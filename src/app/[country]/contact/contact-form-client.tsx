@@ -135,7 +135,7 @@ export function ContactFormClient({ countryCode, currentCountry }: ContactFormCl
             </div>
 
             {/* Sidebar with HQ Info */}
-            <aside className="lg:w-96 space-y-12 shrink-0">
+            <aside className="lg:w-96 mx-auto space-y-12 shrink-0">
                 <div className="space-y-8 bg-white p-10 border border-border shadow-luxury animate-fade-in" key={countryCode}>
                     <div className="flex items-center space-x-4 text-plum">
                         <Globe className="w-5 h-5" />

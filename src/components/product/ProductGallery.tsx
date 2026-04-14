@@ -26,22 +26,26 @@ export function ProductGallery({
 
   return (
     <div className={className}>
-      <div className="flex flex-col md:flex-row gap-10 max-w-[600px]">
-        {/* Vertical Gallery Thumbnails */}
-        <VerticalGallery
-          images={images}
-          productName={productName}
-          selectedIndex={selectedImageIndex}
-          onImageSelect={handleImageSelect}
-        />
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-10 w-full">
+        {/* Vertical Gallery Thumbnails - Hidden on mobile if only one image */}
+        {images.length > 1 && (
+          <VerticalGallery
+            images={images}
+            productName={productName}
+            selectedIndex={selectedImageIndex}
+            onImageSelect={handleImageSelect}
+          />
+        )}
 
         {/* Main Artifact Viewport */}
+        <div className="flex-1 w-full">
           <ImageZoom
             src={currentImage}
             alt={productName}
-            className="flex-1 aspect-[4/5] luxury-reveal"
+            className="w-full aspect-[4/5] luxury-reveal"
             zoomScale={2.5}
           />
+        </div>
       </div>
     </div>
   );
