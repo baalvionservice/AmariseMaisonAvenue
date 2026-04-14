@@ -27,7 +27,7 @@ export default function WishlistPage() {
         <Button
           onClick={() => router.push(`/${countryCode}`)}
           size="lg"
-          className="rounded-none bg-primary hover:bg-secondary px-12 text-xs tracking-widest font-bold"
+          className="rounded-none bg-white hover:bg-secondary shadow-lg px-12 text-xs tracking-widest font-bold"
         >
           DISCOVER PIECES
         </Button>

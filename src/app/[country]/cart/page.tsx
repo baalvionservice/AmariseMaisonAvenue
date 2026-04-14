@@ -34,7 +34,7 @@ export default function CartPage() {
             "Discovery is the foundation of any significant collection. Explore our curated ateliers to find your next masterpiece."
           </p>
         </div>
-        <Button onClick={() => router.push(`/${countryCode}`)} size="lg" className="rounded-none bg-black hover:bg-plum px-16 h-16 text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl transition-all">
+        <Button onClick={() => router.push(`/${countryCode}`)} size="lg" className="rounded-none bg-white hover:bg-black/20 px-16 h-16 text-[10px] font-bold uppercase tracking-[0.4em] shadow-2xl transition-all">
           START DISCOVERY
         </Button>
       </div>

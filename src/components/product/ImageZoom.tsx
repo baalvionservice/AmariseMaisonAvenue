@@ -45,9 +45,8 @@ export function ImageZoom({
     <div
       ref={containerRef}
       className={cn(
-        "relative overflow-hidden cursor-zoom-in bg-white border border-gray-50 shadow-sm",
-        className,
-        isMobile && "hidden"
+        "relative overflow-hidden bg-white border border-gray-50 shadow-sm",
+        className
       )}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}

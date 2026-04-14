@@ -72,31 +72,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (!product)
     return (
-      <div className="py-40 text-center font-headline text-3xl">
+      <div className="py-20 sm:py-40 text-center font-headline text-2xl sm:text-3xl px-4">
         Artifact not found in registry.
       </div>
     );
 
   return (
-    <div className="bg-white max-w-[1200px] mx-auto min-h-screen px-3 pb-20 lg:pb-40 animate-fade-in font-body">
-      {/* 1. Breadcrumbs */}
-      <nav className="block w-full container mx-auto  lg:px-12 py-4 mb-4 md:max-w-[1600px]">
-        <div
-          className="flex items-center space-x-2 text-[10px] lg:text-[11px] font-normal text-black
-         tracking-widest"
-        >
-          <Link
-            href={`/${countryCode}`}
-            className="hover:text-black transition-colors"
-          >
-            Home
-          </Link>
-          <ChevronRight className="w-2.5 h-2.5" />
-          <span className="text-gray-900  md:flex md:truncate font-bold">
-            {product.name}
-          </span>
-        </div>
-      </nav>
+    <div className="bg-white min-h-screen animate-fade-in font-body">
+      {/* Container with responsive max-width */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumbs */}
+        <nav className="py-4 mb-4 sm:mb-6">
+          <div className="flex items-center space-x-2 text-xs sm:text-sm font-normal text-black tracking-wide">
+            <Link
+              href={`/${countryCode}`}
+              className="hover:text-gray-600 transition-colors truncate"
+            >
+              Home
+            </Link>
+            <ChevronRight className="w-3 h-3 flex-shrink-0" />
+            <span className="text-gray-900 text-xs font-bold truncate">
+              {product.name}
+            </span>
+          </div>
+        </nav>
 
       <main className=" lg:px-12 py-6 lg:py-2 ">
         <div className="flex flex-col lg:flex-row ">
@@ -108,13 +107,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
             />
           </div>
 
-          {/* Column 2: Actions & Technical Specs */}
-          <ProductInfoPanel />
-        </div>
-      </main>
+            {/* Product Info Section */}
+            <div className="order-2 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+              <ProductInfoPanel product={product} countryCode={countryCode} />
+            </div>
+          </div>
+        </main>
 
-      <YouMayAlsoLike />
-      <CustomerReviews />
+        {/* Additional Sections */}
+        <div className="space-y-16 sm:space-y-20">
+          <YouMayAlsoLike />
+          <CustomerReviews />
+        </div>
+      </div>
     </div>
   );
 }

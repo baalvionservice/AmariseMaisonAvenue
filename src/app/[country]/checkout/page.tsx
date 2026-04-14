@@ -285,8 +285,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-12 py-24 max-w-7xl animate-fade-in font-body">
-      <div className="flex justify-center items-center space-x-12 mb-24">
+    <div className="container mx-auto px-2 md:px-12 py-2 md:py-24 max-w-7xl animate-fade-in font-body">
+      <div className="hidden md:flex justify-center items-center space-x-12 mb-24">
         <ProtocolStep
           num={1}
           label="Logistics Registry"
@@ -322,14 +322,14 @@ export default function CheckoutPage() {
       <div className="flex flex-col lg:flex-row gap-24 items-start">
         {step < 3 ? (
           <>
-            <div className="flex-1 space-y-16">
+            <div className="flex-1 w-full justify-between space-y-16">
               {step === 1 && (
                 <div className="space-y-12 animate-fade-in">
                   <div className="space-y-2">
                     <h2 className="text-4xl font-headline font-bold italic tracking-tight">
                       Identity & Dispatch
                     </h2>
-                    <p className="text-sm text-gray-500 font-light italic">
+                    <p className="text-md text-gray-500 font-light italic">
                       Define your global delivery charter.
                     </p>
                   </div>
@@ -340,7 +340,7 @@ export default function CheckoutPage() {
                         Legal First Name
                       </Label>
                       <Input
-                        className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum"
+                        className="rounded-none border-border bg-ivory/30 h-14 text-md italic focus:border-plum"
                         placeholder="Julian"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
@@ -351,7 +351,7 @@ export default function CheckoutPage() {
                         Legal Last Name
                       </Label>
                       <Input
-                        className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum"
+                        className="rounded-none border-border bg-ivory/30 h-14 text-md italic focus:border-plum"
                         placeholder="Vandervilt"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
@@ -362,22 +362,20 @@ export default function CheckoutPage() {
                         Primary Residence / Dispatch Address
                       </Label>
                       <Input
-                        className="rounded-none border-border bg-ivory/30 h-14 text-sm italic focus:border-plum"
+                        className="rounded-none border-border bg-ivory/30 h-14 text-md italic focus:border-plum"
                         placeholder="730 Fifth Avenue"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-12 border-t border-border flex justify-end">
                     <Button
-                      className="h-20 px-16 bg-black text-white hover:bg-plum rounded-none text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl disabled:opacity-30"
+                      className="h-20 px-16 w-full mx-auto bg-black text-white hover:bg-plum rounded-none text-[11px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl disabled:opacity-30"
                       onClick={handleLockInventory}
                       disabled={!firstName || !lastName}
                     >
                       CONTINUE TO SETTLEMENT{" "}
                       <ArrowRight className="ml-4 w-4 h-4" />
                     </Button>
-                  </div>
                 </div>
               )}
 
@@ -387,7 +385,7 @@ export default function CheckoutPage() {
                     <h2 className="text-4xl font-headline font-bold italic tracking-tight">
                       Vault Authorization
                     </h2>
-                    <p className="text-sm text-gray-500 font-light italic">
+                    <p className="text-md text-gray-500 font-light italic">
                       Select your preferred global settlement gateway.
                     </p>
                   </div>
@@ -466,7 +464,7 @@ export default function CheckoutPage() {
             </div>
 
             <aside className="lg:w-96 shrink-0 lg:sticky lg:top-40">
-              <div className="bg-ivory p-10 border border-border space-y-10 rounded-none shadow-sm">
+              <div className="bg-ivory p-2 md:p-10 border border-border space-y-10 rounded-none shadow-sm">
                 <h3 className="text-xl font-headline font-bold uppercase tracking-widest border-b border-border pb-6">
                   Acquisition Context
                 </h3>
@@ -478,7 +476,7 @@ export default function CheckoutPage() {
                       className="flex justify-between items-start group"
                     >
                       <div className="space-y-1 flex-1">
-                        <span className="block font-bold text-sm uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">
+                        <span className="block font-bold text-md uppercase tracking-tight text-gray-900 group-hover:text-plum transition-colors">
                           {item.itemName}
                         </span>
                         <div className="flex items-center space-x-2">
@@ -490,7 +488,7 @@ export default function CheckoutPage() {
                           </span>
                         </div>
                       </div>
-                      <span className="font-bold text-sm tabular pl-4">
+                      <span className="font-bold text-md tabular pl-4">
                         {getLocalizedPrice(item.itemPrice + item.taxAmount)}
                       </span>
                     </div>
