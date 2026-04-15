@@ -25,7 +25,7 @@ export function ProductGallery({
   const currentImage = images[selectedImageIndex] || images[0];
   return (
     <div className={className}>
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-10 w-full">
+      <div className=" flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-10 w-full">
         {/* Vertical Gallery Thumbnails - Hidden on mobile if only one image */}
         {images.length > 1 && (
           <VerticalGallery
@@ -37,7 +37,7 @@ export function ProductGallery({
         )}
 
         {/* Main Artifact Viewport */}
-        <div className="flex-1 w-full">
+        <div className="hidden md:flex flex-1 w-full">
           <ImageZoom
             src={currentImage}
             alt={productName}

@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
 
             {/* Product Info Section */}
-            <div className="flex-1 pl-3 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+            <div className="flex-1 pl-3 pt-3 md:pt-0 lg:order-2 lg:sticky lg:top-8 lg:self-start">
               <ProductInfoPanel product={product} countryCode={countryCode} />
             </div>
           </div>
