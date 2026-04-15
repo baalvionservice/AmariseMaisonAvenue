@@ -25,39 +25,39 @@ export function CartSheet() {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
-      <SheetContent className="w-full sm:max-w-[480px] p-0 border-none rounded-none shadow-2xl flex flex-col bg-white font-body">
-        <SheetHeader className="p-8 border-b border-gray-50 bg-[#fcfcfc] shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <SheetTitle className="font-headline text-3xl italic tracking-tight text-gray-900">Shopping Bag</SheetTitle>
-              <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400">{cart.length} Artifacts Reserved</p>
-            </div>
+      <SheetContent className="w-[90%] md:w-[25%] p-6 border-none rounded-none duration-300 transition-all ease-in-out shadow-2xl flex flex-col bg-white font-body">
+        <SheetHeader className="space-y-2 border-b  border-gray-50 bg-[#fcfcfc] shrink-0">
+          <div className="flex justify-end">
+
             <SheetClose asChild>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors border-none bg-transparent outline-none cursor-pointer">
-                <X className="w-5 h-5 text-gray-400" />
+              <button className="flex text-neutral-500 gap-2 items-center rounded-full  border-none bg-transparent outline-none cursor-pointer">
+                <X className="w-5 h-5 mb-1 " /><span className='tracking-wide text-lg '>Close</span>
               </button>
             </SheetClose>
           </div>
+          <div className="space-y-1 pt-6">
+            <h3 className="text-2xl tracking-wide text-gray-900">Shopping Bag</h3>
+          </div>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+        <div className="flex-1 mt-4 overflow-y-auto space-y-2 custom-scrollbar">
           {cart.length > 0 ? (
             cart.map((item) => (
-              <div key={item.id} className="flex space-x-6 pb-8 border-b border-gray-50 group">
-                <div className="relative w-24 aspect-[3/4] bg-ivory border border-gray-100 overflow-hidden shrink-0">
-                  <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-2" />
+              <div key={item.id} className="flex space-x-6 pb-8 border-b border-gray-200 group">
+                <div className="relative w-24 aspect-[3/4] overflow-hidden shrink-0">
+                  <Image src={item.imageUrl[0]} alt={item.name} fill className="object-contain p-2" />
                 </div>
                 <div className="flex-1 flex flex-col justify-between py-1">
                   <div className="space-y-1">
-                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-gray-900 group-hover:text-plum transition-colors leading-relaxed">
+                    <h4 className="text-[11px] font-bold tracking-widest text-gray-900  transition-colors leading-relaxed">
                       <Link href={`/${countryCode}/product/${item.id}`} onClick={() => setCartOpen(false)}>{item.name}</Link>
                     </h4>
-                    <p className="text-[10px] text-gray-400 font-mono uppercase tracking-tighter">REF: {item.id.toUpperCase()}</p>
+                    <p className="text-xs font-bold tracking-widest text-gray-900   leading-relaxed">{item.colors}</p>
                   </div>
-                  <div className="flex items-end justify-between mt-4">
+                  <div className="flex flex-col items-start mt-4">
                     <span className="text-sm font-bold tabular-nums text-gray-900">{formatPrice(item.basePrice, countryCode)}</span>
-                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                      <Trash2 size={14} />
+                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500  bg-transparent border-none outline-none cursor-pointer">
+                      <span className="text-xs underline font-bold tracking-widest text-gray-900   leading-relaxed">Remove</span>
                     </button>
                   </div>
                 </div>
@@ -72,32 +72,22 @@ export function CartSheet() {
         </div>
 
         {cart.length > 0 && (
-          <div className="p-8 bg-[#fcfcfc] border-t border-gray-100 space-y-6 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
-            <div className="flex justify-between items-end">
-              <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Yield Total</span>
+          <div className=" bg-[#fcfcfc] border-t pt-4 border-gray-300 space-y-6 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+            <div className="flex justify-between items-center">
+              <span className="text-[12px] font-bold text-black">Total:</span>
               <span className="text-2xl font-bold tabular-nums text-gray-900">{formatPrice(subtotal, countryCode)}</span>
             </div>
-            
+
             <div className="space-y-3">
-              <Button 
-                onClick={() => { setCartOpen(false); router.push(`/${countryCode}/checkout`); }}
-                className="w-full h-16 bg-black text-white hover:bg-plum rounded-none text-[10px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl"
-              >
-                PROCEED TO SETTLEMENT <ArrowRight className="w-3 h-3 ml-3" />
-              </Button>
-              <Button 
-                variant="outline"
+              <Button
                 onClick={() => { setCartOpen(false); router.push(`/${countryCode}/cart`); }}
-                className="w-full h-14 border-gray-200 text-gray-500 hover:bg-white hover:text-black rounded-none text-[9px] font-bold tracking-[0.3em] uppercase"
+                className="w-full h-14 bg-black text-white text-[10px] font-bold tracking-[0.4em] uppercase transition-all shadow-2xl"
               >
-                VIEW FULL LEDGER
+                View Bag and Checkout <ArrowRight className="w-3 h-3 ml-3" />
               </Button>
             </div>
 
-            <div className="flex items-center justify-center space-x-2 text-emerald-500 opacity-60">
-              <ShieldCheck className="w-3 h-3" />
-              <span className="text-[8px] font-bold uppercase tracking-widest">End-to-End Secure Registry</span>
-            </div>
+          
           </div>
         )}
       </SheetContent>

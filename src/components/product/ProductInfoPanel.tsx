@@ -202,10 +202,11 @@ export default function ProductInfoPanel({
 }) {
   const { name, basePrice, condition, specialNotes } = product;
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const { addToCart, toggleWishlist } = useAppStore();
+  const { addToCart, toggleWishlist, setCartOpen } = useAppStore();
 
   const handleAddToCart = () => {
     addToCart(product);
+    setCartOpen(true);
   };
 
   const handleToggleWishlist = () => {

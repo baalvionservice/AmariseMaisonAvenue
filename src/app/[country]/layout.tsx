@@ -24,6 +24,7 @@ import { useAppStore } from "@/lib/store";
 import { i18n } from "@/lib/i18n/engine";
 import { VipEmailSignup } from "@/components/home/VipEmailSingup";
 import { MeowTrigger } from "@/components/layout/JudyTrigger";
+import { CookiePopup } from "@/components/layout/CookiePopup";
 
 export default function CountryLayout({
   children,
@@ -39,7 +40,7 @@ export default function CountryLayout({
   const isCollectionPage = pathname?.includes("/category/") || pathname?.includes("/account/live");
   const isProductPage = pathname?.includes("/product/");
 
-console.log(isCollectionPage, isProductPage)
+  console.log(isCollectionPage, isProductPage)
   function checkMobile() {
     if (typeof window !== "undefined") {
       setIsMobile(window.innerWidth < 768);
@@ -55,9 +56,15 @@ console.log(isCollectionPage, isProductPage)
 
   return (
     <div dir={i18n.getDirection()}>
-      <MaisonPopup />
-      <MadAveLiveWidget />
-      {(isCollectionPage || isProductPage) && <MeowTrigger />}
+      {/* <MaisonPopup /> */}
+      {/* <MadAveLiveWidget /> */}
+
+      {/*......... We will enable it when we integrate backend for AI Chat .........*/}
+
+
+
+      {/* {(isCollectionPage || isProductPage) && <MeowTrigger />} */}
+      <CookiePopup />
       <CartSheet />
       <Header />
       {/* Optimized Content Offset for Responsive Tiered Header */}
