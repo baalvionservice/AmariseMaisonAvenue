@@ -44,7 +44,7 @@ export async function generateMetadata({
       description: seoDescription,
       images: [
         {
-          url: product.imageUrl,
+          url: product.imageUrl[0],
           width: 800,
           height: 1000,
           alt: product.name,
@@ -55,7 +55,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: seoTitle,
       description: seoDescription,
-      images: [product.imageUrl],
+      images: [product.imageUrl[0]],
     },
   };
 }
@@ -97,18 +97,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </nav>
 
-      <main className=" lg:px-12 py-6 lg:py-2 ">
+      <main className=" lg:px-12 py-6 lg:py-2">
         <div className="flex flex-col lg:flex-row ">
           {/* Column 1: Gallery & Visual Authority */}
-          <div className="flex-1 space-y-16">
+          <div className="flex-1 space-y-16 min-w-0">
             <ProductGallery
-              images={[product.imageUrl]}
+              images={product.imageUrl}
               productName={product.name}
             />
           </div>
 
             {/* Product Info Section */}
-            <div className="order-2 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+            <div className="flex-1 pl-3 lg:order-2 lg:sticky lg:top-8 lg:self-start">
               <ProductInfoPanel product={product} countryCode={countryCode} />
             </div>
           </div>

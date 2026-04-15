@@ -23,7 +23,6 @@ export function ProductGallery({
 
   // Use the selected image or fallback to the first image
   const currentImage = images[selectedImageIndex] || images[0];
-
   return (
     <div className={className}>
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-10 w-full">
