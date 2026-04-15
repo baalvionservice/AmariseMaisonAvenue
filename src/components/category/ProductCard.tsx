@@ -21,7 +21,7 @@ export function ProductCard({ product, countryCode }: ProductCardProps) {
       {/* Image container */}
       <div className="relative aspect-square overflow-hidden mb-5">
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl[0]}
           alt={product.name}
           fill
           className="object-contain md:p-6 transition-transform duration-700 "

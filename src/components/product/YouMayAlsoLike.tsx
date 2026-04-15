@@ -38,7 +38,7 @@ function ProductCard({ product }: { product: Product }) {
         <Link href={`/us/product/${product.id}`}>
           <Image
             fill
-            src={product.imageUrl}
+            src={product.imageUrl[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
@@ -87,7 +87,7 @@ function MobileProductCard({ product }: { product: Product }) {
         <Link href={`/us/product/${product.id}`}>
           <Image
             fill
-            src={product.imageUrl}
+            src={product.imageUrl[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
