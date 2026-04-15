@@ -335,8 +335,10 @@ const generateProducts = (): Product[] => {
     subcategoryId: "birkin-25cm",
     collectionId: "heritage",
     basePrice: 31741.89,
-    imageUrl:
+    imageUrl: [
       "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
+      "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
+    ],
     isVip: true,
     rating: 5.0,
     reviewsCount: 1,
@@ -369,7 +371,10 @@ const generateProducts = (): Product[] => {
       subcategoryId: sub.toLowerCase().replace(/ /g, "-"),
       collectionId: COLLECTIONS[i % COLLECTIONS.length].id,
       basePrice: 1500 + ((i * 123) % 45000),
-      imageUrl: `https://picsum.photos/seed/amarise-prod-${i}/800/1000`,
+      imageUrl: [
+        `https://picsum.photos/seed/amarise-prod-${i}/800/1000`,
+        `https://picsum.photos/seed/amarise-prod-${i+1}/800/1000`,
+      ],
       isVip: i % 10 === 0,
       rating: 4.5 + (i % 5) / 10,
       reviewsCount: 12 + (i % 200),

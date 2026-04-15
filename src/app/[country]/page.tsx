@@ -15,7 +15,6 @@ import { VipEmailSignup } from "@/components/home/VipEmailSingup";
 import { PRODUCTS } from "@/lib/mock-data";
 import { Product } from "@/lib/types";
 import { useParams } from "next/navigation";
-import { Product } from "@/lib/types";
 
 /* ─────────────────────────────────────────────────────────────────
    DATA
@@ -42,56 +41,6 @@ const PRESS_LOGOS = [
   "The Wall Street Journal",
 ];
 
-const NEW_ARRIVALS = [
-  {
-    id: "1",
-    name: "Hermès Kelly Sellier 25 Craie Epsom Electrum Hardware",
-    price: 34500,
-    image: "https://picsum.photos/seed/mac-kelly-craie/600/750",
-  },
-  {
-    id: "2",
-    name: "Hermès Kelly Sellier 20 Jaune Mango Epsom Palladium Hardware",
-    price: 32500,
-    image: "https://picsum.photos/seed/mac-kelly-yellow/600/750",
-  },
-  {
-    id: "3",
-    name: "Hermès Special Order (HSS) Birkin 30 Etoupe and Rose Sakura",
-    price: 34500,
-    image: "https://picsum.photos/seed/mac-birkin-hss/600/750",
-  },
-  {
-    id: "4",
-    name: "Hermès Kelly Sellier 25 Vert Amande Epsom Gold Hardware",
-    price: 24500,
-    image: "https://picsum.photos/seed/mac-kelly-green/600/750",
-  },
-  {
-    id: "5",
-    name: "Hermès Birkin 30 Rouge H Togo Gold Hardware",
-    price: 28500,
-    image: "https://picsum.photos/seed/mac-birkin-rouge/600/750",
-  },
-  {
-    id: "6",
-    name: "Hermès Constance 18 Etoupe Epsom Palladium Hardware",
-    price: 22500,
-    image: "https://picsum.photos/seed/mac-constance/600/750",
-  },
-  {
-    id: "7",
-    name: "Hermès Picotin Lock 22 Vert Bosphore Clemence Gold",
-    price: 6800,
-    image: "https://picsum.photos/seed/mac-picotin/600/750",
-  },
-  {
-    id: "8",
-    name: "Hermès Lindy 26 Bleu Lin Swift Palladium Hardware",
-    price: 14500,
-    image: "https://picsum.photos/seed/mac-lindy/600/750",
-  },
-];
 
 const ARRIVAL_TABS = ["Hermès", "Chanel", "Other Brands", "View All"];
 
@@ -517,7 +466,7 @@ function ProductCard({
         style={{ aspectRatio: "4/5" }}
       >
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl[0]}
           alt={product.name}
           fill
           className="object-contain p-4 sm:p-6 transition-transform duration-[2.5s] ease-out group-hover:scale-105"

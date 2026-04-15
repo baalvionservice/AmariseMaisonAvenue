@@ -129,7 +129,7 @@ export interface Product {
   subcategoryId: string;
   collectionId: string;
   basePrice: number;
-  imageUrl: string;
+  imageUrl: string[];
   isVip: boolean;
   rating: number;
   reviewsCount: number;

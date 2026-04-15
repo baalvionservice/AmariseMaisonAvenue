@@ -32,7 +32,7 @@ export function VipEmailSignup() {
                 onClick={() => {
                   if (email) setSubscribed(true);
                 }}
-                className="h-[50px] px-7 text-black  font-bold text-[10px] uppercase tracking-[0.3em] hover:bg-gray-800 transition-colors shrink-0"
+                className="h-[50px] px-7 text-black  font-bold text-[10px] uppercase tracking-[0.3em] hover:bg-gray-200 transition-colors shrink-0"
               >
                 SUBMIT
               </button>

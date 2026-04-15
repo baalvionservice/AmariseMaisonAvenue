@@ -2,11 +2,10 @@
 
 import React, { useEffect } from "react";
 import { Header } from "@/components/layout/Header";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ShowcaseControls } from "@/components/demo/ShowcaseControls";
 import { MaisonPopup } from "@/components/layout/MaisonPopup";
 import { MadAveLiveWidget } from "@/components/layout/MadAveLiveWidget";
-import { JudyTrigger } from "@/components/layout/JudyTrigger";
 import { CartSheet } from "@/components/layout/CartSheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Link from "next/link";
@@ -24,6 +23,7 @@ import {
 import { useAppStore } from "@/lib/store";
 import { i18n } from "@/lib/i18n/engine";
 import { VipEmailSignup } from "@/components/home/VipEmailSingup";
+import { MeowTrigger } from "@/components/layout/JudyTrigger";
 
 export default function CountryLayout({
   children,
@@ -34,8 +34,12 @@ export default function CountryLayout({
   const [isMobile, setIsMobile] = React.useState<boolean>(true);
   const countryCode = (country as string) || "us";
   const { currentLanguage } = useAppStore();
+  const pathname = usePathname();
 
+  const isCollectionPage = pathname?.includes("/category/") || pathname?.includes("/account/live");
+  const isProductPage = pathname?.includes("/product/");
 
+console.log(isCollectionPage, isProductPage)
   function checkMobile() {
     if (typeof window !== "undefined") {
       setIsMobile(window.innerWidth < 768);
@@ -53,7 +57,7 @@ export default function CountryLayout({
     <div dir={i18n.getDirection()}>
       <MaisonPopup />
       <MadAveLiveWidget />
-      {!isMobile && <JudyTrigger />}
+      {(isCollectionPage || isProductPage) && <MeowTrigger />}
       <CartSheet />
       <Header />
       {/* Optimized Content Offset for Responsive Tiered Header */}
@@ -133,7 +137,7 @@ export default function CountryLayout({
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="about">
-                <AccordionTrigger  className="uppercase">About</AccordionTrigger>
+                <AccordionTrigger className="uppercase">About</AccordionTrigger>
                 <AccordionContent>
                   <ul className="space-y-4 text-[13px] font-light text-gray-600">
                     <li>
@@ -188,7 +192,7 @@ export default function CountryLayout({
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="shop">
-                <AccordionTrigger  className="uppercase">Shop</AccordionTrigger>
+                <AccordionTrigger className="uppercase">Shop</AccordionTrigger>
                 <AccordionContent>
                   <ul className="space-y-4 text-[13px] font-light text-gray-600">
                     <li>
@@ -235,7 +239,7 @@ export default function CountryLayout({
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="sell-with-us">
-                <AccordionTrigger  className="uppercase">Sell With Us</AccordionTrigger>
+                <AccordionTrigger className="uppercase">Sell With Us</AccordionTrigger>
                 <AccordionContent>
                   <ul className="space-y-4 text-[13px] font-light text-gray-600">
                     <li>
