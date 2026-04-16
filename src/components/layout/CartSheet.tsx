@@ -35,7 +35,7 @@ export function CartSheet() {
               </button>
             </SheetClose>
           </div>
-          <div className="space-y-1 pt-6">
+          <div className="space-y-1 pt-6  flex justify-start">
             <h3 className="text-2xl tracking-wide text-gray-900">Shopping Bag</h3>
           </div>
         </SheetHeader>
