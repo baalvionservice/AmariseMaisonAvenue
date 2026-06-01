@@ -1,4 +1,8 @@
 <div align="center">
+  <img src=".github/preview.png" alt="Amarise Maison" width="100%" />
+</div>
+
+<div align="center">
 
 # Amarise Maison Avenue
 
