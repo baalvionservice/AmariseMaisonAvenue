@@ -82,7 +82,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://madisonavenuecouture.com" />
       </head>
       <body className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-gold selection:text-white">
-        <AppProvider>{children}</AppProvider>
+        <div style={{
+            font: "700 1.5rem/2rem 'Inter', sans-serif",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+          <p>Pay to you Employee</p>
+          />
         <Toaster />
       </body>
     </html>
