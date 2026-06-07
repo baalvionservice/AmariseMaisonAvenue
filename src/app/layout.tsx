@@ -81,12 +81,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://picsum.photos" />
         <link rel="preconnect" href="https://madisonavenuecouture.com" />
       </head>
-      <body className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-gold selection:text-white">
-      
-          <p>Pay to you Employee</p>
-          
-        
-      </body>
+     <body
+  className="font-body antialiased bg-background text-foreground overflow-x-hidden selection:bg-gold selection:text-white"
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  }}
+>
+  <p>Pay to your Employee</p>
+</body>
     </html>
   );
 }
